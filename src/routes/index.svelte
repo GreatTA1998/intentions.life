@@ -39,7 +39,7 @@
   import RecursiveTask from '../RecursiveTask.svelte'
   import { onMount } from 'svelte'
   import db from '../db.js'
-  import { collection, doc, getDoc, setDoc, updateDoc, onSnapshot } from 'firebase/firestore'
+  import { doc, getDoc, updateDoc } from 'firebase/firestore'
 
   let allTasks = []
 
