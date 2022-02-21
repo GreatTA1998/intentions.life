@@ -2,23 +2,31 @@
   1. Drag and drop to calendar with height intervals
   2. Event loops, habits (with counters), repeats and follow-ups 
   3. Deadlines 
+  4. Spatial design (like Nototo)
 -->
 <h1>Project Y</h1>
 <div style="display: flex;">
   <div>
     {#each allTasks as task}
-      <div style="width: 500px; border: solid; margin-bottom: 25px; padding-left: 0; padding-top: 25px; padding-bottom: 25px; padding-right: 12px;">
-        <RecursiveTask 
-          on:task-create={(e) => modifyTaskTree(e, task)} 
-          taskObject={task}
-        >
+      {#if !task.isDeleted}
+        <div style="width: 500px; border: solid; margin-bottom: 25px; padding-left: 0; padding-top: 25px; padding-bottom: 25px; padding-right: 12px;">
+          <RecursiveTask 
+            on:task-create={(e) => modifyTaskTree(e, task)} 
+            on:task-done={updateFirestore}
+            on:task-delete={updateFirestore}
+            taskObject={task}
+          >
 
-        </RecursiveTask>
-      </div>
+          </RecursiveTask>
+        </div>
+      {/if}
     {/each}
-    <div on:click={createTask} style="display: flex; align-content: center; justify-items: center">
+    <div style="display: flex; align-content: center; justify-items: center">
       <div class="plus alt" style="margin-left: 12px"></div>
-      <div style="margin-top: 2px; font-size: 1.65rem;">Create task</div>
+      <input bind:value={newTopLevelTask} placeholder="Type task...">
+      <div on:click={createTask} style="margin-top: 2px; font-size: 1.65rem;">
+        Create task
+      </div>
     </div>
   </div>
 
@@ -42,6 +50,8 @@
   import { doc, getDoc, updateDoc } from 'firebase/firestore'
 
   let allTasks = []
+  let newTopLevelTask = ''
+  let timesOfTheDay = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
 
   async function fetchTasks () { 
     const user = await getDoc(
@@ -75,11 +85,19 @@
   })
 
   function createTask () {
-    allTasks = [...allTasks, {
-      name: 'New task',
-      id: 3,
-      children: []
-    }]
+    const newValue = [
+      ...allTasks, 
+      { name: newTopLevelTask, 
+        children: [] 
+      }
+    ]
+
+    updateDoc(
+      doc(db, 'users/GxBbopqXHW0qgjKEwU4z'),
+      { allTasks: newValue }
+    )
+    
+    allTasks = [...newValue]
   }
 
   function modifyTaskTree (e, task) {
@@ -96,12 +114,18 @@
     // allTasks' subtree is mutated, and it will correctly reference it,
     
     // but the reactivity system does not KNOW when exactly it has been mutated, 
-
-    // source of truth should be the database
     allTasks = [...allTasks]
   }
 
-  let timesOfTheDay = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+  function updateFirestore () {
+    console.log("updateFirestore()")
+    // NOTE: `allTasks` has been mutated (and is already correct), but the reactivity system doesn't know that
+    updateDoc(
+      doc(db, 'users/GxBbopqXHW0qgjKEwU4z'),
+      { allTasks }
+    )
+    allTasks = [...allTasks]
+  }
 </script>
 
 <style>

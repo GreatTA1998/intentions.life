@@ -1,34 +1,42 @@
 <!-- Recursively display a task and all its subtasks -->
-<div 
-  style="margin-left: 20px; margin-bottom: 10px"
-  on:pointerenter={showSubtasks}
-  on:pointerleave={hideSubtasks}
->
-  <div style="display: flex; align-items: center">
-    <div class="keep-on-same-line" style="font-size: 1.65rem">
-      {taskObject.name}
-    </div>
-    {#if isShowingSubtasks}
-      {#if !isTypingNewTask}
-        <div on:click={() => isTypingNewTask = true} style="margin-left: 14px; display: flex; align-content: center">
-          <div class="plus alt"></div>
-          <!-- <div style="margin-top: 1px">new sub-task</div> -->
-        </div>
-      {:else}
-        <input bind:value={newTask} on:keypress={detectEnterKey} style="width: 100%; margin-left: 5px"/>
-      {/if}
-    {/if}
-  </div>
+{#if !taskObject.isDeleted}
+  <div 
+    style="margin-left: 20px; margin-bottom: 10px"
+    on:pointerenter={showSubtasks}
+    on:pointerleave={hideSubtasks}
+  >
+    <div style="display: flex; align-items: center">
+    
+      <div class="keep-on-same-line" class:crossed-out={taskObject.isDone === true} style="font-size: 1.65rem">
+        {taskObject.name}
+      </div>
+      {#if isShowingSubtasks}
+        {#if !isTypingNewTask}
+          <div on:click={() => isTypingNewTask = true} style="margin-left: 14px; display: flex; align-content: center">
+            <div class="plus alt"></div>
+            <!-- <div style="margin-top: 1px">new sub-task</div> -->
+          </div>
+        {:else}
+          <input bind:value={newTask} on:keypress={detectEnterKey} style="width: 100%; margin-left: 5px"/>
+        {/if}
+        <div on:click={markAsDone}>Done</div>
 
-  <div style="margin-top: 10px;">
-    {#each taskObject.children as child, i}
-      <RecursiveTask 
-        taskObject={child}
-        on:task-create={(e) => handleGrandchildUpdate(e, i)}
-      />
-    {/each}
-  </div>
-</div>
+        <div on:click={deleteTask} style="margin-left: 10px">Delete</div>
+      {/if}
+    </div>
+
+    <div style="margin-top: 10px;">
+      {#each taskObject.children as child, i}
+        <RecursiveTask 
+          taskObject={child}
+          on:task-create={(e) => handleGrandchildUpdate(e, i)}
+          on:task-done
+          on:task-delete
+        />
+      {/each}
+    </div>
+  </div>    
+{/if}
 
 <script>
   import RecursiveTask from './RecursiveTask.svelte'
@@ -87,9 +95,30 @@
   function hideSubtasks () {
     isShowingSubtasks = false
   }
+
+  function markAsDone () {
+    taskObject.isDone = !taskObject.isDone
+    dispatch('task-done', {
+      // no need to create a payload, you just want to force the parent to manually run `allTasks = [...allTasks]`
+    })
+  }
+
+
+  function deleteTask () {
+    taskObject.isDeleted = !taskObject.isDeleted
+    console.log('taskObject.deleted =', taskObject.isDeleted)
+    dispatch('task-delete', {
+
+    })
+  }
 </script>
 
 <style>
+  .crossed-out {
+    text-decoration: line-through;
+    color: greenyellow;
+  }
+
   .keep-on-same-line {
     white-space: nowrap;
   }
