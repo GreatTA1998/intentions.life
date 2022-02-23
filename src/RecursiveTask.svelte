@@ -1,13 +1,13 @@
 <!-- Recursively display a task and all its subtasks -->
 {#if !taskObject.isDeleted}
   <div 
+    class="task-element"
     style="margin-left: 20px; margin-bottom: 10px"
     on:pointerenter={showSubtasks}
     on:pointerleave={hideSubtasks}
   >
     <div style="display: flex; align-items: center">
-    
-      <div class="keep-on-same-line" class:crossed-out={taskObject.isDone === true} style="font-size: 1.65rem">
+      <div class="keep-on-same-line name-of-task" class:crossed-out={taskObject.isDone === true} style="font-size: 1.65rem">
         {taskObject.name}
       </div>
       {#if isShowingSubtasks}
@@ -40,7 +40,7 @@
 
 <script>
   import RecursiveTask from './RecursiveTask.svelte'
-  import { createEventDispatcher } from 'svelte'
+  import { createEventDispatcher, onMount } from 'svelte'
 
   export let taskObject
 
@@ -48,6 +48,17 @@
   let isShowingSubtasks = false
   let isTypingNewTask = false 
   let newTask = ''
+
+  onMount(async () => {
+    const { Draggable } = await import('@shopify/draggable');
+    const draggable = new Draggable(document.querySelectorAll('.task-container'), {
+      draggable: '.name-of-task'
+    });
+    draggable.on('drag:start', () => console.log('drag:start'));
+    draggable.on('drag:move', () => console.log('drag:move'));
+    draggable.on('drag:stop', () => console.log('drag:stop'));
+  })
+
 
   /**
     * Creates a children payload that correctly reflects changes in grandchildren

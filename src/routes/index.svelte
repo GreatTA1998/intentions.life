@@ -2,56 +2,52 @@
   1. Drag and drop to calendar with height intervals
   2. Event loops, habits (with counters), repeats and follow-ups 
   3. Deadlines 
-  4. Spatial design (like Nototo)
+  4. Sortable todo
+  5. Spatial hierarchy design (like Nototo)
 -->
-<h1>Project Y</h1>
+<h1>Life Organizer</h1>
 <div style="display: flex;">
-  <div>
-    {#each allTasks as task}
-      {#if !task.isDeleted}
-        <div style="width: 500px; border: solid; margin-bottom: 25px; padding-left: 0; padding-top: 25px; padding-bottom: 25px; padding-right: 12px;">
-          <RecursiveTask 
-            on:task-create={(e) => modifyTaskTree(e, task)} 
-            on:task-done={updateFirestore}
-            on:task-delete={updateFirestore}
-            taskObject={task}
+  {#if allTasks.length > 0}
+    <div style="width: 500px;">
+      {#each allTasks as task}
+        {#if !task.isDeleted}
+          <div style="width: 500px; border: solid; margin-bottom: 25px; padding-left: 0; padding-top: 25px; padding-bottom: 25px; padding-right: 12px; overflow: auto;"
+            class="task-container"
           >
+            <RecursiveTask 
+              on:task-create={(e) => modifyTaskTree(e, task)} 
+              on:task-done={updateFirestore}
+              on:task-delete={updateFirestore}
+              taskObject={task}
+            >
 
-          </RecursiveTask>
+            </RecursiveTask>
+          </div>
+        {/if}
+      {/each}
+    
+      <div style="display: flex; align-content: center; justify-items: center">
+        <div class="plus alt" style="margin-left: 12px"></div>
+        <input bind:value={newTopLevelTask} placeholder="Type task...">
+        <div on:click={createTask} style="margin-top: 2px; font-size: 1.65rem;">
+          Create task
         </div>
-      {/if}
-    {/each}
-    <div style="display: flex; align-content: center; justify-items: center">
-      <div class="plus alt" style="margin-left: 12px"></div>
-      <input bind:value={newTopLevelTask} placeholder="Type task...">
-      <div on:click={createTask} style="margin-top: 2px; font-size: 1.65rem;">
-        Create task
       </div>
     </div>
-  </div>
+  {/if}
 
-  <!-- Calendar section of today -->
-  <div style="margin-left: 200px">
-    {#each timesOfTheDay as time}
-      <div style="display: flex; margin-bottom: 50px;">
-        {time}<hr style="width: 700px; margin-left: 20px;">
-        <div id={time}>
-
-        </div>
-      </div>
-    {/each}
-  </div>
+  <CalendarUI {scheduledTasks}/>
 </div>
 
 <script>
   import RecursiveTask from '../RecursiveTask.svelte'
+  import CalendarUI from '../CalendarUI.svelte'
   import { onMount } from 'svelte'
   import db from '../db.js'
   import { doc, getDoc, updateDoc } from 'firebase/firestore'
 
   let allTasks = []
   let newTopLevelTask = ''
-  let timesOfTheDay = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
 
   async function fetchTasks () { 
     const user = await getDoc(
