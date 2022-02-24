@@ -22,6 +22,9 @@
         <div on:click={markAsDone}>Done</div>
 
         <div on:click={deleteTask} style="margin-left: 10px">Delete</div>
+        
+        <p id="p1" draggable="true" on:dragstart={(e) => dragstart_handler(e, taskObject.name)} style="margin-left: 15px;">Drag</p>
+
       {/if}
     </div>
 
@@ -49,16 +52,9 @@
   let isTypingNewTask = false 
   let newTask = ''
 
-  onMount(async () => {
-    const { Draggable } = await import('@shopify/draggable');
-    const draggable = new Draggable(document.querySelectorAll('.task-container'), {
-      draggable: '.name-of-task'
-    });
-    draggable.on('drag:start', () => console.log('drag:start'));
-    draggable.on('drag:move', () => console.log('drag:move'));
-    draggable.on('drag:stop', () => console.log('drag:stop'));
-  })
-
+  function dragstart_handler(e, taskName) {
+    e.dataTransfer.setData("text/plain", taskName);
+  }
 
   /**
     * Creates a children payload that correctly reflects changes in grandchildren

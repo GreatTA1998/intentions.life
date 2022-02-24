@@ -1,48 +1,70 @@
 <div style="width: 100%; margin-left: 20px;">
-  {#each ['13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00', '24:00'] as timeOfDay}
+  {#each timesOfDay as timeOfDay}
     <div style="display: flex;">
       <div class="time-indicator">
         {timeOfDay}
       </div>
 
-      <div class="calendar-time-block">
-        <!-- we inject scheduled tasks here -->
-
-        <!-- example: 
-          <div class="scheduled-task" style="top: 7px; height: 20px">
-            Meditate
+      <div 
+        id={timeOfDay}
+        class="calendar-time-block"
+        on:drop={(e) => drop_handler(e, timeOfDay)}
+        on:dragover={dragover_handler}
+      > 
+        {#each tasksOfHour[timeOfDay] as task}
+          <div class="scheduled-task" style="top: 0; height: 30px;">
+            {task.name}
           </div>
-          <div class="scheduled-task" style="top: 55px; height: 40px">
-            Surprise the motherfucker
-          </div>
-        -->
+        {/each}
       </div>
     </div>
   {/each}
 </div>
 
 <script>
-  import { onMount } from 'svelte'
+  import { createEventDispatcher } from 'svelte'
 
   export let scheduledTasks 
+  const dispatch = createEventDispatcher()
+  const timesOfDay = ['13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00', '24:00']
+  let tasksOfHour = {} 
 
-  onMount(async () => {
-    // designate the calendar as dropzones
-    const { Droppable } = await import('@shopify/draggable')
-    const droppable = new Droppable(document.querySelectorAll('.calendar-time-block'), {
-      draggable: '.item',
-      dropzone: '.dropzone'
-    });
-    console.log('Droppable =', Droppable)
+  $: if (scheduledTasks) {
+    console.log('scheduledTasks changed')
+    recomputeTasksMap()
+  }
+  
 
-    droppable.on('droppable:dropped', () => console.log('droppable:dropped'));
-    droppable.on('droppable:returned', () => console.log('droppable:returned'));
+  function findTasksWithinHour (timeOfDay) {
+    console.log('findTasksWithinHour(), timeOfDay =', timeOfDay)
+    console.log("returning =", scheduledTasks.filter(task => task.startTime === timeOfDay))
+    return scheduledTasks.filter(task => task.startTime === timeOfDay)
+  }
 
-    for (const task of scheduledTasks) {
-      // create <div> with the `scheduled-task` class
-      // height = duration, `top` position property = its actual timing
+  function recomputeTasksMap () {
+    const dict = {} 
+    for (const timeOfDay of timesOfDay) {
+      dict[timeOfDay] = []
     }
-  })
+    // first initialize it with empty arrays, so there are no undefined look-ups
+    for (const task of scheduledTasks) {
+      dict[task.startTime] = [task] // TODO: don't assume there's only one task in each hour slot
+    }
+    tasksOfHour = dict
+  }
+
+  function dragover_handler (e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  }
+
+  function drop_handler (e, timeOfDay) {
+    e.preventDefault()
+    dispatch('task-scheduled', {
+      taskName: e.dataTransfer.getData('text/plain'),
+      timeOfDay
+    })
+  }
 </script>
 
 <style>
@@ -50,7 +72,7 @@
     height: 100px;
     width: 100%;
     position: relative;
-    border-top: solid;
+    border-top: 1px solid rgb(187, 180, 180);
   }
 
   .time-indicator {

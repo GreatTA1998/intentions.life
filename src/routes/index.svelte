@@ -5,38 +5,43 @@
   4. Sortable todo
   5. Spatial hierarchy design (like Nototo)
 -->
-<h1>Life Organizer</h1>
-<div style="display: flex;">
-  {#if allTasks.length > 0}
-    <div style="width: 500px;">
-      {#each allTasks as task}
-        {#if !task.isDeleted}
-          <div style="width: 500px; border: solid; margin-bottom: 25px; padding-left: 0; padding-top: 25px; padding-bottom: 25px; padding-right: 12px; overflow: auto;"
-            class="task-container"
-          >
-            <RecursiveTask 
-              on:task-create={(e) => modifyTaskTree(e, task)} 
-              on:task-done={updateFirestore}
-              on:task-delete={updateFirestore}
-              taskObject={task}
+<div style="padding-left: 10px;">
+  <h1>Life Organizer</h1>
+  <div style="display: flex;">
+    {#if allTasks.length > 0}
+      <div style="width: 500px;">
+        {#each allTasks as task}
+          {#if !task.isDeleted}
+            <div style="width: 500px; border: solid; margin-bottom: 25px; padding-left: 0; padding-top: 25px; padding-bottom: 25px; padding-right: 12px; overflow: auto;"
+              class="task-container"
             >
+              <RecursiveTask 
+                on:task-create={(e) => modifyTaskTree(e, task)} 
+                on:task-done={updateFirestore}
+                on:task-delete={updateFirestore}
+                taskObject={task}
+              >
 
-            </RecursiveTask>
+              </RecursiveTask>
+            </div>
+          {/if}
+        {/each}
+      
+        <div style="display: flex; align-content: center; justify-items: center">
+          <div class="plus alt" style="margin-left: 12px"></div>
+          <input bind:value={newTopLevelTask} placeholder="Type task...">
+          <div on:click={createTask} style="margin-top: 2px; font-size: 1.65rem;">
+            Create task
           </div>
-        {/if}
-      {/each}
-    
-      <div style="display: flex; align-content: center; justify-items: center">
-        <div class="plus alt" style="margin-left: 12px"></div>
-        <input bind:value={newTopLevelTask} placeholder="Type task...">
-        <div on:click={createTask} style="margin-top: 2px; font-size: 1.65rem;">
-          Create task
         </div>
       </div>
-    </div>
-  {/if}
+    {/if}
 
-  <CalendarUI {scheduledTasks}/>
+    <CalendarUI 
+      {scheduledTasks}
+      on:task-scheduled={(e) => mutateOneNode(e.detail)}
+    />
+  </div>
 </div>
 
 <script>
@@ -47,7 +52,42 @@
   import { doc, getDoc, updateDoc } from 'firebase/firestore'
 
   let allTasks = []
+  let scheduledTasks = []
   let newTopLevelTask = ''
+
+  async function mutateOneNode ({ taskName, timeOfDay }) {
+    // search for the particular node, mutate it, then update the database
+    function helper (node) {
+      if (node.name === taskName) {
+        node.startTime = timeOfDay
+        return true
+      }
+      else {
+        for (const child of node.children) {
+          if (helper(child)) {
+            return true
+          }
+        }
+        return false
+      }
+    }
+
+    for (const task of allTasks) {
+      if (helper(task)) { // the sub-task only exists in ONE of the root tasks, so only one of the `helper()` calls will return true
+        console.log('successfully mutated allTasks, =', allTasks)
+        break
+      }
+    }
+
+    await updateDoc(
+      doc(db, 'users/GxBbopqXHW0qgjKEwU4z'),
+      { allTasks }
+    )
+
+    // manually trigger reactivity because mutations can't be detected
+    allTasks = [...allTasks]
+  }
+
 
   async function fetchTasks () { 
     const user = await getDoc(
@@ -57,7 +97,25 @@
   }
   fetchTasks()
 
-  $: scheduledTasks = allTasks.filter(task => task.time !== undefined)
+
+  $: if (allTasks) {
+    const result = [] 
+
+    function recursivelyFindScheduledTasks (node) {
+      if (node.startTime !== undefined) {
+        result.push(node)
+      }
+      for (const child of node.children) {
+        recursivelyFindScheduledTasks(child)
+      }
+    }
+
+    for (const task of allTasks) {
+      recursivelyFindScheduledTasks(task)
+    }
+
+    scheduledTasks = result
+  }
 
   onMount(() => {
     console.log('mounted(), scheduledTasks =', scheduledTasks)
