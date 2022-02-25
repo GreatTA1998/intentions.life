@@ -1,29 +1,40 @@
 <!-- Recursively display a task and all its subtasks -->
 {#if !taskObject.isDeleted}
   <div 
-    class="task-element"
+    class="scheduled-task"
     style="margin-left: 20px; margin-bottom: 10px"
     on:pointerenter={showSubtasks}
     on:pointerleave={hideSubtasks}
   >
-    <div style="display: flex; align-items: center">
-      <div class="keep-on-same-line name-of-task" class:crossed-out={taskObject.isDone === true} style="font-size: 1.65rem">
+    <div class="current-task-flexbox">
+      <div class="keep-on-same-line name-of-task" class:crossed-out={taskObject.isDone}>
         {taskObject.name}
+        {#if taskObject.completionCount}
+          {taskObject.completionCount}
+        {/if}
       </div>
       {#if isShowingSubtasks}
         {#if !isTypingNewTask}
           <div on:click={() => isTypingNewTask = true} style="margin-left: 14px; display: flex; align-content: center">
             <div class="plus alt"></div>
-            <!-- <div style="margin-top: 1px">new sub-task</div> -->
           </div>
         {:else}
           <input bind:value={newTask} on:keypress={detectEnterKey} style="width: 100%; margin-left: 5px"/>
         {/if}
-        <div on:click={markAsDone}>Done</div>
 
-        <div on:click={deleteTask} style="margin-left: 10px">Delete</div>
+        <span on:click={markAsDone} style="margin-left: 10px;">
+          &#10003;
+        </span>
+
+        <div on:click={toggleRepeating} style="margin-left: 10px">
+          {taskObject.isRepeating ? 'unrepeat' : 'repeat'}
+        </div>
+
+        <div on:click={deleteTask} style="margin-left: 10px">
+          Delete
+        </div>
         
-        <p id="p1" draggable="true" on:dragstart={(e) => dragstart_handler(e, taskObject.name)} style="margin-left: 15px;">Drag</p>
+        <p id="p1" draggable="true" on:dragstart={(e) => dragstart_handler(e, taskObject.name)} style="margin-left: 10px;">Drag</p>
 
       {/if}
     </div>
@@ -35,6 +46,7 @@
           on:task-create={(e) => handleGrandchildUpdate(e, i)}
           on:task-done
           on:task-delete
+          on:task-repeating
         />
       {/each}
     </div>
@@ -44,6 +56,7 @@
 <script>
   import RecursiveTask from './RecursiveTask.svelte'
   import { createEventDispatcher, onMount } from 'svelte'
+import { getDateOfToday } from './helpers';
 
   export let taskObject
 
@@ -105,8 +118,25 @@
 
   function markAsDone () {
     taskObject.isDone = !taskObject.isDone
+    if (taskObject.isRepeating) {
+      if (!taskObject.isDone) {
+        taskObject.completionCount = taskObject.completionCount - 1 || 0 
+        taskObject.lastCompletionDate = ''
+      } 
+      else {
+        taskObject.completionCount = taskObject.completionCount + 1 || 1
+        taskObject.lastCompletionDate = getDateOfToday()
+      }
+    }
     dispatch('task-done', {
       // no need to create a payload, you just want to force the parent to manually run `allTasks = [...allTasks]`
+    })
+  }
+
+  function toggleRepeating () {
+    taskObject.isRepeating = !taskObject.isRepeating
+    dispatch('task-repeating', {
+
     })
   }
 
@@ -121,6 +151,13 @@
 </script>
 
 <style>
+  .current-task-flexbox {
+    display: flex; 
+    align-items: center;
+    position: relative; 
+    height: 12px;
+  }
+
   .crossed-out {
     text-decoration: line-through;
     color: greenyellow;
@@ -151,5 +188,14 @@
     background-position:center;
     background-size: 50% 2px,2px 50%; /*thickness = 2px, length = 50% (25px)*/
     background-repeat:no-repeat;
+  }
+
+  .scheduled-task {
+    /* display: inline; */
+    /* position: absolute; */
+    margin-left: 2px;
+    border-left: 2px solid green;
+    padding-left: 2px;
+    font-size: 0.8rem;
   }
 </style>

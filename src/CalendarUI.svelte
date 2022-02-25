@@ -1,12 +1,11 @@
-<div style="width: 100%; margin-left: 20px;">
+<div style="width: 100%; margin-left: 40px; margin-top: 5px;">
   {#each timesOfDay as timeOfDay}
     <div style="display: flex;">
       <div class="time-indicator">
         {timeOfDay}
       </div>
 
-      <div 
-        id={timeOfDay}
+      <div id={timeOfDay}
         class="calendar-time-block"
         on:drop={(e) => drop_handler(e, timeOfDay)}
         on:dragover={dragover_handler}
@@ -23,22 +22,16 @@
 
 <script>
   import { createEventDispatcher } from 'svelte'
+  import { getDateOfToday } from './helpers.js'
 
   export let scheduledTasks 
   const dispatch = createEventDispatcher()
-  const timesOfDay = ['13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00', '24:00']
+  const timesOfDay = ['12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00', '24:00']
   let tasksOfHour = {} 
 
   $: if (scheduledTasks) {
     console.log('scheduledTasks changed')
     recomputeTasksMap()
-  }
-  
-
-  function findTasksWithinHour (timeOfDay) {
-    console.log('findTasksWithinHour(), timeOfDay =', timeOfDay)
-    console.log("returning =", scheduledTasks.filter(task => task.startTime === timeOfDay))
-    return scheduledTasks.filter(task => task.startTime === timeOfDay)
   }
 
   function recomputeTasksMap () {
@@ -62,14 +55,15 @@
     e.preventDefault()
     dispatch('task-scheduled', {
       taskName: e.dataTransfer.getData('text/plain'),
-      timeOfDay
+      timeOfDay,
+      dateOfToday: getDateOfToday()
     })
   }
 </script>
 
 <style>
   .calendar-time-block {
-    height: 100px;
+    height: 90px;
     width: 100%;
     position: relative;
     border-top: 1px solid rgb(187, 180, 180);

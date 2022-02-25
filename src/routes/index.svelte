@@ -1,46 +1,55 @@
-<!-- TODO: 
-  1. Drag and drop to calendar with height intervals
-  2. Event loops, habits (with counters), repeats and follow-ups 
-  3. Deadlines 
+<!-- TODO:  
   4. Sortable todo
   5. Spatial hierarchy design (like Nototo)
 -->
-<div style="padding-left: 10px;">
-  <h1>Life Organizer</h1>
-  <div style="display: flex;">
-    {#if allTasks.length > 0}
-      <div style="width: 500px;">
-        {#each allTasks as task}
-          {#if !task.isDeleted}
-            <div style="width: 500px; border: solid; margin-bottom: 25px; padding-left: 0; padding-top: 25px; padding-bottom: 25px; padding-right: 12px; overflow: auto;"
-              class="task-container"
+  <div style="display: flex; padding-left: 10px;">
+    <div class="todo-list">
+      {#if allTasks.length > 0}
+      {#each allTasks as task}
+        {#if !task.isDeleted}
+          <div class="task-container">
+            <RecursiveTask 
+              on:task-create={(e) => modifyTaskTree(e, task)} 
+              on:task-done={updateFirestore}
+              on:task-delete={updateFirestore}
+              on:task-repeating={updateFirestore}
+              taskObject={task}
             >
-              <RecursiveTask 
-                on:task-create={(e) => modifyTaskTree(e, task)} 
-                on:task-done={updateFirestore}
-                on:task-delete={updateFirestore}
-                taskObject={task}
-              >
 
-              </RecursiveTask>
-            </div>
-          {/if}
-        {/each}
-      
-        <div style="display: flex; align-content: center; justify-items: center">
-          <div class="plus alt" style="margin-left: 12px"></div>
-          <input bind:value={newTopLevelTask} placeholder="Type task...">
-          <div on:click={createTask} style="margin-top: 2px; font-size: 1.65rem;">
-            Create task
+            </RecursiveTask>
           </div>
+        {/if}
+      {/each}
+    
+      <div style="display: flex; align-content: center; justify-items: center">
+        <div class="plus alt" style="margin-left: 12px"></div>
+        <input bind:value={newTopLevelTask} placeholder="Type task...">
+        <div on:click={createTask} style="margin-top: 2px; font-size: 1.65rem;">
+          Create task
         </div>
       </div>
     {/if}
+  </div>
 
-    <CalendarUI 
-      {scheduledTasks}
-      on:task-scheduled={(e) => mutateOneNode(e.detail)}
-    />
+
+  <CalendarUI 
+    {scheduledTasks}
+    on:task-scheduled={(e) => mutateOneNode(e.detail)}
+  />
+
+  <div style="width: 100%; padding: 6px;">
+    <!-- FUTURE: the tutorial itself is recursive -->
+    <h2>All you need is 3 concepts: sub-tasks, scheduled tasks, and repeated tasks.</h2>
+      <ul>
+        <li>A <b>follow-up</b> is just a scheduled sub-task
+        <li>A <b>deadline</b> is just a scheduled task that ends at a particular time (but start time must take the duration of the overall task into account)</li>
+        <li>A <b>habit</b> is just a repeated scheduled task</li>
+      </ul>
+
+    Differences with normal productivity apps: 
+    Because the todo and calendar are free flowing, there is no EVENT. Everything is a "task". So if you have an event, you must tick it off. 
+    Scheduled tasks are special in that, they have been designated a time and place. But they can always CHANGE. To change them is just to drag them around.
+    All that matters is, you never MISS a task unintentionally. 
   </div>
 </div>
 
@@ -50,16 +59,19 @@
   import { onMount } from 'svelte'
   import db from '../db.js'
   import { doc, getDoc, updateDoc } from 'firebase/firestore'
+  import { getDateOfToday } from '../helpers.js'
 
   let allTasks = []
+  let sortedAllTasks = [] 
   let scheduledTasks = []
   let newTopLevelTask = ''
 
-  async function mutateOneNode ({ taskName, timeOfDay }) {
+  async function mutateOneNode ({ taskName, timeOfDay, dateOfToday }) {
     // search for the particular node, mutate it, then update the database
     function helper (node) {
       if (node.name === taskName) {
         node.startTime = timeOfDay
+        node.startDate = dateOfToday
         return true
       }
       else {
@@ -114,7 +126,26 @@
       recursivelyFindScheduledTasks(task)
     }
 
-    scheduledTasks = result
+    // now filter for tasks that are scheduled for the DATE TODAY
+    const dateOfToday = getDateOfToday()
+    scheduledTasks = result.filter(task => task.startDate === dateOfToday)
+
+    // handle repeating tasks
+    for (const task of scheduledTasks) {
+      if (task.isRepeating) {
+        if (task.lastCompletionDate !== dateOfToday) {
+          task.startDate = dateOfToday
+          task.isDone = false 
+        }
+      }
+    }
+
+    // finished tasks go to the bottom
+    sortedAllTasks = allTasks.sort((t1, t2) => {
+      console.log('t2.isDone =', !!t2.isDone)
+      console.log('t1.isDone =', !!t1.isDone)
+      return !!t1.isDone - !!t2.isDone
+    })
   }
 
   onMount(() => {
@@ -183,6 +214,23 @@
 </script>
 
 <style>
+  .todo-list {
+    width: 100%; 
+    overflow-y: scroll;
+    height: 100vh;
+  }
+
+  .task-container {
+    width: 28vw; 
+    border: 0px solid; 
+    margin-bottom: 25px; 
+    padding-left: 0; 
+    padding-top: 16px; 
+    padding-bottom: 10px; 
+    padding-right: 12px; 
+    overflow: auto;
+  }
+
   .plus {
     display:inline-block;
     width:35px;
