@@ -1,8 +1,10 @@
 <!-- Recursively display a task and all its subtasks -->
 {#if !taskObject.isDeleted}
   <div 
+    draggable="true"
     class="scheduled-task"
     style="margin-left: 20px; margin-bottom: 10px"
+    on:dragstart|self={(e) => dragstart_handler(e, taskObject.name)}
     on:pointerenter={showSubtasks}
     on:pointerleave={hideSubtasks}
   >
@@ -33,9 +35,6 @@
         <div on:click={deleteTask} style="margin-left: 10px">
           Delete
         </div>
-        
-        <p id="p1" draggable="true" on:dragstart={(e) => dragstart_handler(e, taskObject.name)} style="margin-left: 10px;">Drag</p>
-
       {/if}
     </div>
 
@@ -56,7 +55,7 @@
 <script>
   import RecursiveTask from './RecursiveTask.svelte'
   import { createEventDispatcher, onMount } from 'svelte'
-import { getDateOfToday } from './helpers';
+  import { getDateOfToday } from './helpers';
 
   export let taskObject
 

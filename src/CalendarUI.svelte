@@ -11,8 +11,18 @@
         on:dragover={dragover_handler}
       > 
         {#each tasksOfHour[timeOfDay] as task}
-          <div class="scheduled-task" style="top: 0; height: 30px;">
-            {task.name}
+          <div class="scheduled-task" style="top: {task.verticalOffset}px; height: {task.duration * pixelsPerMinute || 30}px;">
+            <div draggable="true" on:dragstart={(e) => dragstart_handler(e, task.name)}>
+              {task.name}
+            </div>
+
+            <div draggable="true"
+              on:dragstart={(e) => mousedown_handler(e)}
+              on:dragend={(e) => mouseup_handler(e, task)}
+              style="border: 2px solid black; height: 2px; width: 100%; position: absolute; bottom: 0; cursor: ns-resize; "
+            >
+    
+            </div>
           </div>
         {/each}
       </div>
@@ -28,6 +38,8 @@
   const dispatch = createEventDispatcher()
   const timesOfDay = ['12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00', '24:00']
   let tasksOfHour = {} 
+  let startY = 0
+  let pixelsPerMinute = 90 / 60; 
 
   $: if (scheduledTasks) {
     console.log('scheduledTasks changed')
@@ -38,12 +50,18 @@
     const dict = {} 
     for (const timeOfDay of timesOfDay) {
       dict[timeOfDay] = []
-    }
-    // first initialize it with empty arrays, so there are no undefined look-ups
-    for (const task of scheduledTasks) {
-      dict[task.startTime] = [task] // TODO: don't assume there's only one task in each hour slot
+      for (const task of scheduledTasks) {
+        if (task.startTime.slice(0, 2) === timeOfDay.slice(0, 2)) {
+          // WARNING: this is a mutation that changes the prop at the child instead of the parent
+          dict[timeOfDay].push({ ...task, verticalOffset: computeOffset(task) })
+        }
+      }
     }
     tasksOfHour = dict
+  }
+
+  function dragstart_handler(e, taskName) {
+    e.dataTransfer.setData("text/plain", taskName);
   }
 
   function dragover_handler (e) {
@@ -53,11 +71,40 @@
 
   function drop_handler (e, timeOfDay) {
     e.preventDefault()
+
+    const heightOfHour = 90 // defined in CSS below
+    const hh = timeOfDay.slice(0, 2)
+    let minutesOffset = (e.offsetY / heightOfHour) * 60
+    if (minutesOffset < 10) {
+      minutesOffset = `0${minutesOffset}`
+    }
+    const scheduledTime = `${hh}:${minutesOffset}` 
+
     dispatch('task-scheduled', {
       taskName: e.dataTransfer.getData('text/plain'),
-      timeOfDay,
+      timeOfDay: scheduledTime,
       dateOfToday: getDateOfToday()
     })
+  }
+
+  function mousedown_handler (e) {
+    startY = e.offsetY
+  }
+
+  function mouseup_handler (e, task) {
+    const minutesPerPixel = 60 / 90
+    dispatch('task-duration-adjusted', {
+      taskName: task.name,
+      duration: (e.offsetY - startY) * minutesPerPixel
+    })
+    console.log("newDuration =", e.offsetY - startY * minutesPerPixel)
+  }
+
+  function computeOffset ({ startTime }) {
+    const pixelsPerHour = 90
+    const pixelsPerMinute = pixelsPerHour / 60
+    const minutesOffset = startTime.slice(3, 5) 
+    return minutesOffset * pixelsPerMinute
   }
 </script>
 

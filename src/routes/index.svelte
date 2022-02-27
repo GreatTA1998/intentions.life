@@ -35,6 +35,7 @@
   <CalendarUI 
     {scheduledTasks}
     on:task-scheduled={(e) => mutateOneNode(e.detail)}
+    on:task-duration-adjusted={(e) => mutateOneNode2(e.detail)}
   />
 
   <div style="width: 100%; padding: 6px;">
@@ -72,6 +73,39 @@
       if (node.name === taskName) {
         node.startTime = timeOfDay
         node.startDate = dateOfToday
+        return true
+      }
+      else {
+        for (const child of node.children) {
+          if (helper(child)) {
+            return true
+          }
+        }
+        return false
+      }
+    }
+
+    for (const task of allTasks) {
+      if (helper(task)) { // the sub-task only exists in ONE of the root tasks, so only one of the `helper()` calls will return true
+        console.log('successfully mutated allTasks, =', allTasks)
+        break
+      }
+    }
+
+    await updateDoc(
+      doc(db, 'users/GxBbopqXHW0qgjKEwU4z'),
+      { allTasks }
+    )
+
+    // manually trigger reactivity because mutations can't be detected
+    allTasks = [...allTasks]
+  }
+
+  async function mutateOneNode2 ({ taskName, duration }) {
+    // search for the particular node, mutate it, then update the database
+    function helper (node) {
+      if (node.name === taskName) {
+        node.duration = duration
         return true
       }
       else {
@@ -142,32 +176,9 @@
 
     // finished tasks go to the bottom
     sortedAllTasks = allTasks.sort((t1, t2) => {
-      console.log('t2.isDone =', !!t2.isDone)
-      console.log('t1.isDone =', !!t1.isDone)
-      return !!t1.isDone - !!t2.isDone
+      return !!t1.isDone - !!t2.isDone // `isDone` can be undefined, which screws up the subtraction
     })
   }
-
-  onMount(() => {
-    console.log('mounted(), scheduledTasks =', scheduledTasks)
-    // for each task, create a div representing it on the calendar, then attach it to the right place
-
-    // const scheduledTasks = allTasks.filter(task => task.time !== undefined)
-
-    for (const task of scheduledTasks) {
-      // const newDiv = document.createElement("div");
-      // const newContent = document.createTextNode(task.name);
-      // newDiv.appendChild(newContent)
-      console.log('task.time =', task.time)
-      
-      // document.getElementById(task.time).appendChild(newContent)
-
-      document.getElementById(task.time).textContent = task.name
-
-      // document.body.insertBefore(newDiv, document.getElementById(task.time))
-      console.log('successfully attached')
-    }
-  })
 
   function createTask () {
     const newValue = [
