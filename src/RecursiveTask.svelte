@@ -9,7 +9,11 @@
     on:pointerleave={hideSubtasks}
   >
     <div class="current-task-flexbox">
-      <div class="keep-on-same-line name-of-task" class:crossed-out={taskObject.isDone}>
+      <div 
+        class="keep-on-same-line name-of-task" 
+        class:crossed-out={taskObject.isDone} 
+        style="font-size: {1.35 - (0.14 * depth)}rem;"
+      >
         {taskObject.name}
         {#if taskObject.completionCount}
           {taskObject.completionCount}
@@ -46,6 +50,7 @@
           on:task-done
           on:task-delete
           on:task-repeating
+          depth={depth+1}
         />
       {/each}
     </div>
@@ -58,6 +63,7 @@
   import { getDateOfToday } from './helpers';
 
   export let taskObject
+  export let depth
 
   const dispatch = createEventDispatcher()
   let isShowingSubtasks = false
