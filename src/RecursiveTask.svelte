@@ -3,7 +3,7 @@
   <div 
     draggable="true"
     class="scheduled-task"
-    style="margin-left: 20px; margin-bottom: 10px"
+    style="margin-left: 20px; margin-bottom: 10px; width: 100%"
     on:dragstart|self={(e) => dragstart_handler(e, taskObject.name)}
     on:pointerenter={showSubtasks}
     on:pointerleave={hideSubtasks}
@@ -11,12 +11,16 @@
     <div class="current-task-flexbox">
       <div 
         class="keep-on-same-line name-of-task" 
+        class:scheduled-orange={!taskObject.isDone && taskObject.startTime && taskObject.startDate}
         class:crossed-out={taskObject.isDone} 
-        style="font-size: {2 - (0.3 * depth)}rem;"
+        style="font-size: {5 * (0.65 ** depth)}rem;"
       >
         {taskObject.name}
         {#if taskObject.completionCount}
           {taskObject.completionCount}
+        {/if}
+        {#if !taskObject.isDone && taskObject.startTime && taskObject.startDate}
+          {taskObject.startDate + ' ' + taskObject.startTime}
         {/if}
       </div>
       {#if isShowingSubtasks}
@@ -36,13 +40,21 @@
           {taskObject.isRepeating ? 'unrepeat' : 'repeat'}
         </div>
 
+        {#if !isSchedulingTask}
+          <div on:click={() => isSchedulingTask = true} style="margin-left: 14px;">Schedule</div>
+        {:else}
+          <input placeholder="03/14" bind:value={scheduledDate} style="width: 40px; margin-left: 14px;"/>
+          <input placeholder="13:00" bind:value={scheduledTime} style="width: 40px" on:keypress={detectEnterKey2}/>
+        {/if}
+
+
         <div on:click={deleteTask} style="margin-left: 10px">
           Delete
         </div>
       {/if}
     </div>
 
-    <div style="margin-top: {20 - 2 * depth}px;">
+    <div style="margin-top: {60 * (0.65 ** depth)}px;">
       {#each taskObject.children as child, i}
         <RecursiveTask 
           taskObject={child}
@@ -69,6 +81,10 @@
   let isShowingSubtasks = false
   let isTypingNewTask = false 
   let newTask = ''
+
+  let isSchedulingTask = false
+  let scheduledDate = ''
+  let scheduledTime = ''
 
   function dragstart_handler(e, taskName) {
     e.dataTransfer.setData("text/plain", taskName);
@@ -98,6 +114,23 @@
       createNewChild(newTask)
       newTask = ''
       isTypingNewTask = false
+    }
+  }
+
+  function detectEnterKey2 (e) {
+    if (e.charCode === 13) {
+      // do some basic checks, although this is not correct for all cases
+      if (scheduledDate.length !== 5 || scheduledTime.length !== 5) {
+        alert("Formats must be exact - date is mm:dd and time is hh:mm, resetting")
+        taskObject.startDate = ''
+        taskObject.scheduledTime = ''
+      } 
+      else {
+        taskObject.startDate = scheduledDate
+        taskObject.startTime = scheduledTime
+      }
+      // TODO: rename to `treeUpdated` or something 
+      dispatch('task-done', {})
     }
   }
 
@@ -166,6 +199,11 @@
   .crossed-out {
     text-decoration: line-through;
     color: greenyellow;
+    opacity: 60%;
+  }
+
+  .scheduled-orange {
+    color: orange;
   }
 
   .keep-on-same-line {

@@ -1,52 +1,54 @@
-<div style="width: 25vw; margin-left: 10px; margin-top: 10px; position: relative; height: 1600px" 
-  on:drop={(e) => drop_handler(e)}
-  on:dragover={dragover_handler}
->
-  {#each timesOfDay as timeOfDay, i}
-    <div style="display: flex; top: {90*i}px; position: absolute;">
-      <div class="time-indicator">
-        {timeOfDay}
-      </div>
-      <div id={timeOfDay} class="calendar-time-block"/> 
-    </div>
-  {/each}
-
-  <!-- we have a duplicate for loop because we really don't want the scheduled task elements to be the children of calendar blocks, we want them to be siblings,
-  else drag and drop won't work -->
-  {#each timesOfDay as timeOfDay, i}
-    {#each tasksOfHour[timeOfDay] as task}
-      <div 
-        class="scheduled-task" 
-        style="top: {task.verticalOffset}px; height: {task.duration * pixelsPerMinute || 30}px;"
-      >
-        <div draggable="true" on:dragstart={(e) => dragstart_handler(e, task.name)} style="width: 22vw">
-          {task.name}
+<div style="height: 100vh; overflow-y: scroll; overflow-x: hidden;">
+  <div style="width: 12vw; margin-left: 0px; margin-top: 10px; position: relative; height: 1600px" 
+    on:drop={(e) => drop_handler(e)}
+    on:dragover={dragover_handler}
+  >
+    {#each timesOfDay as timeOfDay, i}
+      <div style="display: flex; top: {90*i}px; position: absolute;">
+        <div class="time-indicator">
+          {timeOfDay}
         </div>
-        <!-- border: 2px solid red; -->
-        <div 
-          style="height: {task.duration * pixelsPerMinute - 20 - 10}px; width: 22vw" 
-          draggable="true" on:dragstart={(e) => dragstart_handler(e, task.name)}>
-
-        </div>
-        
-        <!-- border: 2px solid black; -->
-        <div draggable="true"
-          on:dragstart={(e) => mousedown_handler(e)}
-          on:dragend={(e) => mouseup_handler(e, task)}
-          style="height: 8px; width: 25vw; position: absolute; bottom: 0; left: -3px; cursor: ns-resize; "
-        >
-
-        </div>
+        <div id={timeOfDay} class="calendar-time-block"/> 
       </div>
     {/each}
-  {/each}
+
+    <!-- we have a duplicate for loop because we really don't want the scheduled task elements to be the children of calendar blocks, we want them to be siblings,
+    else drag and drop won't work -->
+    {#each timesOfDay as timeOfDay, i}
+      {#each tasksOfHour[timeOfDay] as task}
+        <div 
+          class="scheduled-task" 
+          style="top: {task.verticalOffset}px; height: {task.duration * pixelsPerMinute || 30}px;"
+        >
+          <div draggable="true" on:dragstart={(e) => dragstart_handler(e, task.name)} style="width: 11vw">
+            {task.name}
+          </div>
+          <!-- border: 2px solid red; -->
+          <div 
+            style="height: {task.duration * pixelsPerMinute - 20 - 10}px; width: 11vw" 
+            draggable="true" on:dragstart={(e) => dragstart_handler(e, task.name)}>
+
+          </div>
+          
+          <!-- border: 2px solid black; -->
+          <div draggable="true"
+            on:dragstart={(e) => mousedown_handler(e)}
+            on:dragend={(e) => mouseup_handler(e, task)}
+            style="height: 8px; width: 11vw; position: absolute; bottom: 0; left: -3px; cursor: ns-resize; "
+          >
+
+          </div>
+        </div>
+      {/each}
+    {/each}
+  </div>
 </div>
 
 <script>
   import { createEventDispatcher } from 'svelte'
-  import { getDateOfToday } from './helpers.js'
 
   export let scheduledTasks 
+  export let getDate
   const dispatch = createEventDispatcher()
   const timesOfDay = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00', '24:00']
   let tasksOfHour = {} 
@@ -108,7 +110,7 @@
     dispatch('task-scheduled', {
       taskName: e.dataTransfer.getData('text/plain'),
       timeOfDay: scheduledTime,
-      dateOfToday: getDateOfToday()
+      dateScheduled: getDate()
     })
   }
 
@@ -144,6 +146,11 @@
 </script>
 
 <style>
+  *::-webkit-scrollbar {
+    width: 0;
+    background-color: #aaa; /* or add it to the track */
+  }
+
   .calendar-time-block {
     height: 90px;
     width: 100%;
@@ -163,7 +170,7 @@
     display: inline;
     position: absolute;
     margin-left: 2px;
-    border-left: 2px solid green;
+    border-left: 2px solid orange;
     padding-left: 2px;
     font-size: 0.8rem;
     width: 100%;

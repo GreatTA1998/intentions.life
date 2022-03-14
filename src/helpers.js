@@ -11,3 +11,20 @@ export function getDateOfToday () {
   } 
   return `${mm}/${dd}`
 }
+
+// https://flaviocopes.com/how-to-get-tomorrow-date-javascript/
+export function getDateOfTomorrow () {
+  const today = new Date()
+  const tomorrow = new Date(today)
+  tomorrow.setDate(tomorrow.getDate() + 1)
+
+  let dd = tomorrow.getDate()
+  let mm = tomorrow.getMonth() + 1
+  if (dd < 10) {
+    dd = '0' + dd;
+  } 
+  if (mm < 10) {
+    mm = '0' + mm;
+  } 
+  return `${mm}/${dd}`
+}

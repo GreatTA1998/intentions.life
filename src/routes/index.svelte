@@ -2,7 +2,10 @@
   4. Sortable todo
   5. Spatial hierarchy design (like Nototo)
 -->
-<div style="display: flex; padding-left: 10px;">
+
+<svelte:body class="no-margin"></svelte:body>
+
+<div style="display: flex; padding-left: 10px; padding-top: 10px;">
   <div class="fixed-height-container-for-scrolling">
     <div class="todo-list">
       {#if allTasks.length > 0}
@@ -33,39 +36,43 @@
       {/if}
     </div>
   </div>
+  <div style="display: flex; justify-content: space-evenly; width: 30vw;">
+    <CalendarDayView
+      {scheduledTasks}
+      on:task-scheduled={(e) => mutateOneNode(e.detail)}
+      on:task-duration-adjusted={(e) => mutateOneNode2(e.detail)}
+      getDate={getDateOfToday}
+    />
 
-  <CalendarUI 
-    {scheduledTasks}
-    on:task-scheduled={(e) => mutateOneNode(e.detail)}
-    on:task-duration-adjusted={(e) => mutateOneNode2(e.detail)}
-  />
-
-  <CalendarUI 
-    {scheduledTasks}
-    on:task-scheduled={(e) => mutateOneNode(e.detail)}
-    on:task-duration-adjusted={(e) => mutateOneNode2(e.detail)}
-  />
+    <CalendarDayView
+      scheduledTasks={scheduledTasks2}
+      on:task-scheduled={(e) => mutateOneNode(e.detail)}
+      on:task-duration-adjusted={(e) => mutateOneNode2(e.detail)}
+      getDate={getDateOfTomorrow}
+    /> 
+  </div>
 </div>
 
 <script>
   import RecursiveTask from '../RecursiveTask.svelte'
-  import CalendarUI from '../CalendarUI.svelte'
+  import CalendarDayView from '../CalendarDayView.svelte'
   import { onMount } from 'svelte'
   import db from '../db.js'
   import { doc, getDoc, updateDoc } from 'firebase/firestore'
-  import { getDateOfToday } from '../helpers.js'
+  import { getDateOfToday, getDateOfTomorrow } from '../helpers.js'
 
   let allTasks = []
   let sortedAllTasks = [] 
   let scheduledTasks = []
+  let scheduledTasks2 = []
   let newTopLevelTask = ''
 
-  async function mutateOneNode ({ taskName, timeOfDay, dateOfToday }) {
+  async function mutateOneNode ({ taskName, timeOfDay, dateScheduled }) {
     // search for the particular node, mutate it, then update the database
     function helper (node) {
       if (node.name === taskName) {
         node.startTime = timeOfDay
-        node.startDate = dateOfToday
+        node.startDate = dateScheduled
         return true
       }
       else {
@@ -157,6 +164,10 @@
     const dateOfToday = getDateOfToday()
     scheduledTasks = result.filter(task => task.startDate === dateOfToday && !task.isDeleted)
 
+    const dateOfTomorrow = getDateOfTomorrow()
+    scheduledTasks2 = result.filter(task => task.startDate === dateOfTomorrow && !task.isDeleted)
+    console.log('scheduledTasks2 =', scheduledTasks2)
+
     // handle repeating tasks
     for (const task of scheduledTasks) {
       if (task.isRepeating) {
@@ -218,22 +229,28 @@
 </script>
 
 <style>
+  *::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    background-color: #aaa; /* or add it to the track */
+  }
+
   .fixed-height-container-for-scrolling {
     height: 100vh;
     overflow-y: scroll;
-    width: 50vw;
+    width: 70vw;
   }
 
   .todo-list {
     width: 100%; 
-    height: 200vh;
+    height: 300vh;
     display: flex; 
     flex-wrap: wrap; 
     flex-direction: column
   }
 
   .task-container {
-    width: 20vw; 
+    width: 30vw; 
     border: 0px solid; 
     margin-bottom: 25px; 
     padding-left: 0; 
