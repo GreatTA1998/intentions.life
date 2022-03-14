@@ -12,7 +12,7 @@
       <div 
         class="keep-on-same-line name-of-task" 
         class:crossed-out={taskObject.isDone} 
-        style="font-size: {1.35 - (0.14 * depth)}rem;"
+        style="font-size: {2 - (0.3 * depth)}rem;"
       >
         {taskObject.name}
         {#if taskObject.completionCount}
@@ -42,7 +42,7 @@
       {/if}
     </div>
 
-    <div style="margin-top: 10px;">
+    <div style="margin-top: {20 - 2 * depth}px;">
       {#each taskObject.children as child, i}
         <RecursiveTask 
           taskObject={child}

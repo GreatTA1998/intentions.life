@@ -1,32 +1,44 @@
-<div style="width: 100%; margin-left: 40px; margin-top: 5px;">
-  {#each timesOfDay as timeOfDay}
-    <div style="display: flex;">
+<div style="width: 25vw; margin-left: 10px; margin-top: 10px; position: relative; height: 1600px" 
+  on:drop={(e) => drop_handler(e)}
+  on:dragover={dragover_handler}
+>
+  {#each timesOfDay as timeOfDay, i}
+    <div style="display: flex; top: {90*i}px; position: absolute;">
       <div class="time-indicator">
         {timeOfDay}
       </div>
-
-      <div id={timeOfDay}
-        class="calendar-time-block"
-        on:drop={(e) => drop_handler(e, timeOfDay)}
-        on:dragover={dragover_handler}
-      > 
-        {#each tasksOfHour[timeOfDay] as task}
-          <div class="scheduled-task" style="top: {task.verticalOffset}px; height: {task.duration * pixelsPerMinute || 30}px;">
-            <div draggable="true" on:dragstart={(e) => dragstart_handler(e, task.name)}>
-              {task.name}
-            </div>
-
-            <div draggable="true"
-              on:dragstart={(e) => mousedown_handler(e)}
-              on:dragend={(e) => mouseup_handler(e, task)}
-              style="border: 2px solid black; height: 2px; width: 100%; position: absolute; bottom: 0; cursor: ns-resize; "
-            >
-    
-            </div>
-          </div>
-        {/each}
-      </div>
+      <div id={timeOfDay} class="calendar-time-block"/> 
     </div>
+  {/each}
+
+  <!-- we have a duplicate for loop because we really don't want the scheduled task elements to be the children of calendar blocks, we want them to be siblings,
+  else drag and drop won't work -->
+  {#each timesOfDay as timeOfDay, i}
+    {#each tasksOfHour[timeOfDay] as task}
+      <div 
+        class="scheduled-task" 
+        style="top: {task.verticalOffset}px; height: {task.duration * pixelsPerMinute || 30}px;"
+      >
+        <div draggable="true" on:dragstart={(e) => dragstart_handler(e, task.name)} style="width: 22vw">
+          {task.name}
+        </div>
+        <!-- border: 2px solid red; -->
+        <div 
+          style="height: {task.duration * pixelsPerMinute - 20 - 10}px; width: 22vw" 
+          draggable="true" on:dragstart={(e) => dragstart_handler(e, task.name)}>
+
+        </div>
+        
+        <!-- border: 2px solid black; -->
+        <div draggable="true"
+          on:dragstart={(e) => mousedown_handler(e)}
+          on:dragend={(e) => mouseup_handler(e, task)}
+          style="height: 8px; width: 25vw; position: absolute; bottom: 0; left: -3px; cursor: ns-resize; "
+        >
+
+        </div>
+      </div>
+    {/each}
   {/each}
 </div>
 
@@ -36,13 +48,12 @@
 
   export let scheduledTasks 
   const dispatch = createEventDispatcher()
-  const timesOfDay = ['12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00', '24:00']
+  const timesOfDay = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00', '24:00']
   let tasksOfHour = {} 
   let startY = 0
   let pixelsPerMinute = 90 / 60; 
 
   $: if (scheduledTasks) {
-    console.log('scheduledTasks changed')
     recomputeTasksMap()
   }
 
@@ -69,16 +80,30 @@
     e.dataTransfer.dropEffect = "move";
   }
 
-  function drop_handler (e, timeOfDay) {
+  function drop_handler (e) {
     e.preventDefault()
 
     const heightOfHour = 90 // defined in CSS below
-    const hh = timeOfDay.slice(0, 2)
-    let minutesOffset = (e.offsetY / heightOfHour) * 60
+    const calendarTopMargin = 20
+    let hoursOffset = (e.pageY - calendarTopMargin) / heightOfHour
+
+    let n = hoursOffset 
+    const decimal = n - Math.floor(n)
+    const integer = Math.trunc(n)
+    
+    let minutesOffset = decimal * 60
+    let hh = 8 + integer
+    if (hh < 10) {
+      hh = `0${hh}`
+    }
     if (minutesOffset < 10) {
+      minutesOffset = minutesOffset.toPrecision(1)
       minutesOffset = `0${minutesOffset}`
+    } else {
+      minutesOffset = minutesOffset.toPrecision(2)
     }
     const scheduledTime = `${hh}:${minutesOffset}` 
+    console.log('scheduledTime =', scheduledTime)
 
     dispatch('task-scheduled', {
       taskName: e.dataTransfer.getData('text/plain'),
@@ -92,19 +117,29 @@
   }
 
   function mouseup_handler (e, task) {
+    // alert(`From ${startY} to ${e.offsetY}`)
+
+    // quickfix
+    if (!task.duration) {
+      task.duration = 10
+    }
+
     const minutesPerPixel = 60 / 90
+    const durationChange = (e.offsetY - startY) * minutesPerPixel
+
     dispatch('task-duration-adjusted', {
       taskName: task.name,
-      duration: (e.offsetY - startY) * minutesPerPixel
+      duration: Math.max(1, task.duration + durationChange) // can't have a 0 duration event
     })
-    console.log("newDuration =", e.offsetY - startY * minutesPerPixel)
   }
 
   function computeOffset ({ startTime }) {
+    // compute how many hours ahead of 8 am `startTime` is
+    const hh = startTime.slice(0, 2)
+    const mm = startTime.slice(3, 5)
+    const hoursOffset = Number(hh) + (Number(mm) / 60) - 8 // 8 refers to "8 am"
     const pixelsPerHour = 90
-    const pixelsPerMinute = pixelsPerHour / 60
-    const minutesOffset = startTime.slice(3, 5) 
-    return minutesOffset * pixelsPerMinute
+    return hoursOffset * pixelsPerHour
   }
 </script>
 
@@ -112,8 +147,9 @@
   .calendar-time-block {
     height: 90px;
     width: 100%;
-    position: relative;
-    border-top: 1px solid rgb(187, 180, 180);
+    /* position: relative; */
+    position: absolute;
+    /* border-top: 1px solid rgb(187, 180, 180); */
   }
 
   .time-indicator {

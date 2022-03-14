@@ -39,6 +39,12 @@
     on:task-scheduled={(e) => mutateOneNode(e.detail)}
     on:task-duration-adjusted={(e) => mutateOneNode2(e.detail)}
   />
+
+  <CalendarUI 
+    {scheduledTasks}
+    on:task-scheduled={(e) => mutateOneNode(e.detail)}
+    on:task-duration-adjusted={(e) => mutateOneNode2(e.detail)}
+  />
 </div>
 
 <script>
@@ -149,7 +155,7 @@
 
     // now filter for tasks that are scheduled for the DATE TODAY
     const dateOfToday = getDateOfToday()
-    scheduledTasks = result.filter(task => task.startDate === dateOfToday)
+    scheduledTasks = result.filter(task => task.startDate === dateOfToday && !task.isDeleted)
 
     // handle repeating tasks
     for (const task of scheduledTasks) {
@@ -215,7 +221,7 @@
   .fixed-height-container-for-scrolling {
     height: 100vh;
     overflow-y: scroll;
-    width: 100%;
+    width: 50vw;
   }
 
   .todo-list {
