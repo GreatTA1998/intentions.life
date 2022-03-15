@@ -210,8 +210,8 @@
         taskObject.daysBeforeRepeating = 0
       } else {
         taskObject.daysBeforeRepeating = daysBeforeRepeating
-        dispatch('task-done', {})
       }
+      dispatch('task-done', {})
       daysBeforeRepeating = 0
       isRepeatingTask = false
     }

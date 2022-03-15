@@ -2,9 +2,6 @@
   4. Sortable todo
   5. Spatial hierarchy design (like Nototo)
 -->
-
-<svelte:body class="no-margin"></svelte:body>
-
 <div style="display: flex; padding-left: 10px; padding-top: 10px;">
   <div class="fixed-height-container-for-scrolling">
     <div class="todo-list">
