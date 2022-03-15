@@ -5587,8 +5587,8 @@ var entry, js, css;
 var init__ = __esm({
   ".svelte-kit/output/server/nodes/0.js"() {
     init_layout_svelte();
-    entry = "layout.svelte-54a9fcb0.js";
-    js = ["layout.svelte-54a9fcb0.js", "chunks/vendor-010b0951.js"];
+    entry = "layout.svelte-1c7f03fd.js";
+    js = ["layout.svelte-1c7f03fd.js", "chunks/vendor-24794758.js"];
     css = [];
   }
 });
@@ -5637,8 +5637,8 @@ var entry2, js2, css2;
 var init__2 = __esm({
   ".svelte-kit/output/server/nodes/1.js"() {
     init_error_svelte();
-    entry2 = "error.svelte-6843f295.js";
-    js2 = ["error.svelte-6843f295.js", "chunks/vendor-010b0951.js"];
+    entry2 = "error.svelte-a6c16fb4.js";
+    js2 = ["error.svelte-a6c16fb4.js", "chunks/vendor-24794758.js"];
     css2 = [];
   }
 });
@@ -31683,10 +31683,11 @@ var init_index_svelte = __esm({
     init_dist();
     init_dist2();
     css$2 = {
-      code: ".current-task-flexbox.svelte-fvgv77{display:flex;align-items:center;position:relative;height:12px}.crossed-out.svelte-fvgv77{text-decoration:line-through;color:greenyellow;opacity:60%}.scheduled-orange.svelte-fvgv77{color:orange}.keep-on-same-line.svelte-fvgv77{white-space:nowrap}.plus.svelte-fvgv77{display:inline-block;width:30px;height:30px;background:linear-gradient(#fff 0 0),\r\n      linear-gradient(#fff 0 0),\r\n      #000;background-position:center;background-size:50% 2px,2px 50%;background-repeat:no-repeat}.alt.svelte-fvgv77{background:linear-gradient(#000 0 0),\r\n      linear-gradient(#000 0 0);background-position:center;background-size:50% 2px,2px 50%;background-repeat:no-repeat}.scheduled-task.svelte-fvgv77{margin-left:2px;border-left:2px solid green;padding-left:2px;font-size:0.8rem}",
+      code: ".black-duration-line.svelte-1mgzq9h{border-left:2px solid black}.orange-duration-line.svelte-1mgzq9h{border-left:2px solid orange}.green-duration-line.svelte-1mgzq9h{border-left:2px solid rgb(212, 250, 156)}.current-task-flexbox.svelte-1mgzq9h{display:flex;align-items:center;position:relative;height:12px}.crossed-out.svelte-1mgzq9h{color:rgb(212, 250, 156);opacity:60%}.scheduled-orange.svelte-1mgzq9h{color:orange}.keep-on-same-line.svelte-1mgzq9h{white-space:nowrap}.scheduled-task.svelte-1mgzq9h{margin-left:2px;padding-left:2px;font-size:0.8rem}",
       map: null
     };
     RecursiveTask_1 = create_ssr_component(($$result, $$props, $$bindings, slots) => {
+      let doChildrenHaveDuration;
       let { taskObject } = $$props;
       let { depth } = $$props;
       createEventDispatcher();
@@ -31695,14 +31696,21 @@ var init_index_svelte = __esm({
       if ($$props.depth === void 0 && $$bindings.depth && depth !== void 0)
         $$bindings.depth(depth);
       $$result.css.add(css$2);
+      doChildrenHaveDuration = taskObject.children.filter((child) => child.duration).length > 0;
       return `
-${!taskObject.isDeleted ? `<div draggable="${"true"}" class="${"scheduled-task svelte-fvgv77"}" style="${"margin-left: 20px; margin-bottom: 10px; width: 100%"}"><div class="${"current-task-flexbox svelte-fvgv77"}"><div class="${[
-        "keep-on-same-line name-of-task svelte-fvgv77",
+
+${!taskObject.isDeleted ? `<div draggable="${"true"}" class="${[
+        "scheduled-task svelte-1mgzq9h",
+        (!taskObject.isDone && !(taskObject.startTime && taskObject.startDate) ? "black-duration-line" : "") + " " + (!taskObject.isDone && taskObject.startTime && taskObject.startDate ? "orange-duration-line" : "") + " " + (taskObject.isDone ? "green-duration-line" : "")
+      ].join(" ").trim()}" style="${"margin-left: 20px; margin-bottom: 10px; width: 100%; height: " + escape(taskObject.duration && !doChildrenHaveDuration && taskObject.duration * 90 / 60 > taskObject.children.length * 60 * 0.7 ** depth && taskObject.duration * 90 / 60 > 60 * 0.65 ** depth ? `${taskObject.duration * 90 / 60}px` : "100%") + ";"}"><div class="${"current-task-flexbox svelte-1mgzq9h"}"><div class="${[
+        "keep-on-same-line name-of-task svelte-1mgzq9h",
         (!taskObject.isDone && taskObject.startTime && taskObject.startDate ? "scheduled-orange" : "") + " " + (taskObject.isDone ? "crossed-out" : "")
-      ].join(" ").trim()}" style="${"font-size: " + escape(5 * 0.65 ** depth) + "rem;"}">${escape(taskObject.name)}
-        ${taskObject.completionCount ? `${escape(taskObject.completionCount)}` : ``}
-        ${!taskObject.isDone && taskObject.startTime && taskObject.startDate ? `${escape(taskObject.startDate + " " + taskObject.startTime)}` : ``}</div>
-      ${``}</div>
+      ].join(" ").trim()}" style="${"font-size: " + escape(5 * 0.65 ** depth) + "rem;"}">${`<div>${escape(taskObject.name)}
+          ${taskObject.completionCount ? `${escape(taskObject.completionCount)}` : ``}
+          ${!taskObject.isDone && taskObject.startTime && taskObject.startDate ? `${escape(taskObject.startDate + " " + taskObject.startTime)}` : ``}
+          ${taskObject.daysBeforeRepeating ? `Every ${escape(taskObject.daysBeforeRepeating)} days` : ``}</div>`}</div>
+    
+      <div style="${"width: " + escape(200 * 0.9 ** depth) + "px; height: 100%"}">${``}</div></div>
 
     <div style="${"margin-top: " + escape(60 * 0.65 ** depth) + "px;"}">${each(taskObject.children, (child, i2) => {
         return `${validate_component(RecursiveTask_1, "RecursiveTask").$$render($$result, { taskObject: child, depth: depth + 1 }, {}, {})}`;
@@ -31761,7 +31769,7 @@ ${!taskObject.isDeleted ? `<div draggable="${"true"}" class="${"scheduled-task s
           recomputeTasksMap();
         }
       }
-      return `<div style="${"height: 100vh; overflow-y: scroll; overflow-x: hidden;"}" class="${"svelte-1otkjb3"}"><div style="${"width: 12vw; margin-left: 0px; margin-top: 10px; position: relative; height: 1600px"}" class="${"svelte-1otkjb3"}">${each(timesOfDay, (timeOfDay, i2) => {
+      return `<div style="${"height: 100vh; overflow-y: scroll; overflow-x: hidden;"}" class="${"svelte-1otkjb3"}"><div id="${"calendar-day-container"}" style="${"width: 12vw; margin-left: 0px; margin-top: 10px; position: relative; height: 1600px"}" class="${"svelte-1otkjb3"}">${each(timesOfDay, (timeOfDay, i2) => {
         return `<div style="${"display: flex; top: " + escape(90 * i2) + "px; position: absolute;"}" class="${"svelte-1otkjb3"}"><div class="${"time-indicator svelte-1otkjb3"}">${escape(timeOfDay)}</div>
         <div${add_attribute("id", timeOfDay, 0)} class="${"calendar-time-block svelte-1otkjb3"}"></div> 
       </div>`;
@@ -31793,7 +31801,7 @@ ${!taskObject.isDeleted ? `<div draggable="${"true"}" class="${"scheduled-task s
     initializeApp(firebaseConfig);
     db = getFirestore();
     css3 = {
-      code: ".svelte-72e1ex::-webkit-scrollbar{width:0;height:0;background-color:#aaa}.fixed-height-container-for-scrolling.svelte-72e1ex{height:100vh;overflow-y:scroll;width:70vw}.todo-list.svelte-72e1ex{width:100%;height:300vh;display:flex;flex-wrap:wrap;flex-direction:column\n  }.task-container.svelte-72e1ex{width:30vw;border:0px solid;margin-bottom:25px;padding-left:0;padding-top:16px;padding-bottom:10px;padding-right:12px;overflow:auto}.plus.svelte-72e1ex{display:inline-block;width:35px;height:35px;background:linear-gradient(#fff 0 0),\n      linear-gradient(#fff 0 0),\n      #000;background-position:center;background-size:50% 2px,2px 50%;background-repeat:no-repeat}.alt.svelte-72e1ex{background:linear-gradient(#000 0 0),\n      linear-gradient(#000 0 0);background-position:center;background-size:50% 2px,2px 50%;background-repeat:no-repeat}",
+      code: ".svelte-qn541z::-webkit-scrollbar{width:0;height:0;background-color:#aaa}.fixed-height-container-for-scrolling.svelte-qn541z{height:100vh;overflow-y:scroll;width:70vw}.todo-list.svelte-qn541z{width:100%;height:300vh;display:flex;flex-wrap:wrap;flex-direction:column\n  }.task-container.svelte-qn541z{border:0px solid;margin-bottom:25px;padding-left:0;padding-top:16px;padding-bottom:10px;padding-right:12px;overflow:none}.plus.svelte-qn541z{display:inline-block;width:35px;height:35px;background:linear-gradient(#fff 0 0),\n      linear-gradient(#fff 0 0),\n      #000;background-position:center;background-size:50% 2px,2px 50%;background-repeat:no-repeat}.alt.svelte-qn541z{background:linear-gradient(#000 0 0),\n      linear-gradient(#000 0 0);background-position:center;background-size:50% 2px,2px 50%;background-repeat:no-repeat}",
       map: null
     };
     Routes = create_ssr_component(($$result, $$props, $$bindings, slots) => {
@@ -31843,16 +31851,16 @@ ${!taskObject.isDeleted ? `<div draggable="${"true"}" class="${"scheduled-task s
 
 
 
-<div style="${"display: flex; padding-left: 10px; padding-top: 10px;"}" class="${"svelte-72e1ex"}"><div class="${"fixed-height-container-for-scrolling svelte-72e1ex"}"><div class="${"todo-list svelte-72e1ex"}">${allTasks.length > 0 ? `${each(allTasks, (task) => {
-        return `${!task.isDeleted ? `<div class="${"task-container svelte-72e1ex"}">${validate_component(RecursiveTask_1, "RecursiveTask").$$render($$result, { taskObject: task, depth: 1 }, {}, {})}
+<div style="${"display: flex; padding-left: 10px; padding-top: 10px;"}" class="${"svelte-qn541z"}"><div class="${"fixed-height-container-for-scrolling svelte-qn541z"}"><div class="${"todo-list svelte-qn541z"}">${allTasks.length > 0 ? `${each(allTasks, (task) => {
+        return `${!task.isDeleted ? `<div class="${"task-container svelte-qn541z"}">${validate_component(RecursiveTask_1, "RecursiveTask").$$render($$result, { taskObject: task, depth: 1 }, {}, {})}
             </div>` : ``}`;
       })}
         
-        <div style="${"display: flex; align-content: center; justify-items: center"}" class="${"svelte-72e1ex"}"><div class="${"plus alt svelte-72e1ex"}" style="${"margin-left: 12px"}"></div>
-          <input placeholder="${"Type task..."}" class="${"svelte-72e1ex"}"${add_attribute("value", newTopLevelTask, 0)}>
-          <div style="${"margin-top: 2px; font-size: 1.65rem;"}" class="${"svelte-72e1ex"}">Create task
+        <div style="${"display: flex; align-content: center; justify-items: center"}" class="${"svelte-qn541z"}"><div class="${"plus alt svelte-qn541z"}" style="${"margin-left: 12px"}"></div>
+          <input placeholder="${"Type task..."}" class="${"svelte-qn541z"}"${add_attribute("value", newTopLevelTask, 0)}>
+          <div style="${"margin-top: 2px; font-size: 1.65rem;"}" class="${"svelte-qn541z"}">Create task
           </div></div>` : ``}</div></div>
-  <div style="${"display: flex; justify-content: space-evenly; width: 30vw;"}" class="${"svelte-72e1ex"}">${validate_component(CalendarDayView, "CalendarDayView").$$render($$result, { scheduledTasks, getDate: getDateOfToday }, {}, {})}
+  <div style="${"display: flex; justify-content: space-evenly; width: 30vw; border-left: 2px dashed grey"}" class="${"svelte-qn541z"}">${validate_component(CalendarDayView, "CalendarDayView").$$render($$result, { scheduledTasks, getDate: getDateOfToday }, {}, {})}
 
     ${validate_component(CalendarDayView, "CalendarDayView").$$render($$result, {
         scheduledTasks: scheduledTasks2,
@@ -31875,9 +31883,9 @@ var entry3, js3, css4;
 var init__3 = __esm({
   ".svelte-kit/output/server/nodes/2.js"() {
     init_index_svelte();
-    entry3 = "pages/index.svelte-4a7751e6.js";
-    js3 = ["pages/index.svelte-4a7751e6.js", "chunks/vendor-010b0951.js"];
-    css4 = ["assets/pages/index.svelte-c50e62f8.css"];
+    entry3 = "pages/index.svelte-80c48af6.js";
+    js3 = ["pages/index.svelte-80c48af6.js", "chunks/vendor-24794758.js"];
+    css4 = ["assets/pages/index.svelte-23f2c411.css"];
   }
 });
 
@@ -33284,7 +33292,7 @@ var user_hooks = /* @__PURE__ */ Object.freeze({
   __proto__: null,
   [Symbol.toStringTag]: "Module"
 });
-var template = ({ head, body, assets: assets2 }) => '<!DOCTYPE html>\n<html lang="en">\n	<head>\n		<meta charset="utf-8" />\n		<meta name="description" content="" />\n		<link rel="icon" href="' + assets2 + '/favicon.png" />\n		<meta name="viewport" content="width=device-width, initial-scale=1" />\n		' + head + '\n	</head>\n	<body style="margin-top: 0; margin-bottom: 0">\n		<div id="svelte">' + body + "</div>\n	</body>\n</html>";
+var template = ({ head, body, assets: assets2 }) => '<!DOCTYPE html>\n<html lang="en">\n	<head>\n		<meta charset="utf-8" />\n		<meta name="description" content="" />\n		<link rel="icon" href="' + assets2 + '/favicon.png" />\n		<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">\n		<meta name="viewport" content="width=device-width, initial-scale=1" />\n		' + head + '\n	</head>\n	<body style="margin-top: 0; margin-bottom: 0">\n		<div id="svelte">' + body + "</div>\n	</body>\n</html>\n\n";
 var read = null;
 set_paths({ "base": "", "assets": "" });
 var get_hooks = (hooks) => ({
@@ -33343,7 +33351,7 @@ var manifest = {
   assets: new Set(["favicon.png"]),
   _: {
     mime: { ".png": "image/png" },
-    entry: { "file": "start-e8b10d51.js", "js": ["start-e8b10d51.js", "chunks/vendor-010b0951.js"], "css": [] },
+    entry: { "file": "start-b74481bf.js", "js": ["start-b74481bf.js", "chunks/vendor-24794758.js"], "css": [] },
     nodes: [
       () => Promise.resolve().then(() => (init__(), __exports)),
       () => Promise.resolve().then(() => (init__2(), __exports2)),
