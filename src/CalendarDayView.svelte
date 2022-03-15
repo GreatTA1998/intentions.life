@@ -1,5 +1,7 @@
 <div style="height: 100vh; overflow-y: scroll; overflow-x: hidden;">
-  <div style="width: 12vw; margin-left: 0px; margin-top: 10px; position: relative; height: 1600px" 
+  <div 
+    id="calendar-day-container"
+    style="width: 12vw; margin-left: 0px; margin-top: 10px; position: relative; height: 1600px" 
     on:drop={(e) => drop_handler(e)}
     on:dragover={dragover_handler}
   >
@@ -84,10 +86,17 @@
 
   function drop_handler (e) {
     e.preventDefault()
+    const element = document.getElementById("calendar-day-container")
+    var position = element.getBoundingClientRect();
+    var x = position.left;
+    var y = position.top;
 
     const heightOfHour = 90 // defined in CSS below
     const calendarTopMargin = 20
-    let hoursOffset = (e.pageY - calendarTopMargin) / heightOfHour
+
+    // `e.layerY` gives the Y-coordinate with respect to the current container
+    // otherwise the multiple scrolling contexts messes it up
+    let hoursOffset = (e.layerY) / heightOfHour
 
     let n = hoursOffset 
     const decimal = n - Math.floor(n)

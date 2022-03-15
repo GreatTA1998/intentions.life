@@ -36,7 +36,7 @@
       {/if}
     </div>
   </div>
-  <div style="display: flex; justify-content: space-evenly; width: 30vw;">
+  <div style="display: flex; justify-content: space-evenly; width: 30vw; border-left: 2px dashed grey">
     <CalendarDayView
       {scheduledTasks}
       on:task-scheduled={(e) => mutateOneNode(e.detail)}
@@ -185,6 +185,9 @@
   }
 
   function createTask () {
+    if (!newTopLevelTask) {
+      alert("You have to type something first")
+    }
     const newValue = [
       ...allTasks, 
       { name: newTopLevelTask, 
@@ -249,15 +252,14 @@
     flex-direction: column
   }
 
-  .task-container {
-    width: 30vw; 
+  .task-container { 
     border: 0px solid; 
     margin-bottom: 25px; 
     padding-left: 0; 
     padding-top: 16px; 
     padding-bottom: 10px; 
     padding-right: 12px; 
-    overflow: auto;
+    overflow: none;
   }
 
   .plus {

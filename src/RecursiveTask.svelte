@@ -1,12 +1,22 @@
 <!-- Recursively display a task and all its subtasks -->
+<!-- Check if parent's fixed duration is enough to practically include its children's font sizes `taskObject.duration * 90/60 > children.length * 10  -->
 {#if !taskObject.isDeleted}
   <div 
     draggable="true"
     class="scheduled-task"
-    style="margin-left: 20px; margin-bottom: 10px; width: 100%"
+    class:black-duration-line={!taskObject.isDone && !(taskObject.startTime && taskObject.startDate)}
+    class:orange-duration-line={!taskObject.isDone && taskObject.startTime && taskObject.startDate}
+    class:green-duration-line={taskObject.isDone}
+    style="
+      margin-left: 20px; margin-bottom: 10px; width: 100%; 
+      height: {taskObject.duration && !doChildrenHaveDuration 
+        && (taskObject.duration * 90/60 > taskObject.children.length * 60 * 0.7 ** depth)
+        && (taskObject.duration * 90/60 > 60 * (0.65 ** depth))
+        ? `${taskObject.duration * 90/60}px` : '100%'};
+    "
     on:dragstart|self={(e) => dragstart_handler(e, taskObject.name)}
-    on:pointerenter={showSubtasks}
-    on:pointerleave={hideSubtasks}
+    on:pointerenter={showOptions}
+    on:pointerleave={hideOptions}
   >
     <div class="current-task-flexbox">
       <div 
@@ -15,43 +25,67 @@
         class:crossed-out={taskObject.isDone} 
         style="font-size: {5 * (0.65 ** depth)}rem;"
       >
-        {taskObject.name}
-        {#if taskObject.completionCount}
-          {taskObject.completionCount}
-        {/if}
-        {#if !taskObject.isDone && taskObject.startTime && taskObject.startDate}
-          {taskObject.startDate + ' ' + taskObject.startTime}
+        {#if !isEditingTaskName}
+          <div on:click={startEditTaskName}>
+            {taskObject.name}
+          {#if taskObject.completionCount}
+            {taskObject.completionCount}
+          {/if}
+          {#if !taskObject.isDone && taskObject.startTime && taskObject.startDate}
+            {taskObject.startDate + ' ' + taskObject.startTime}
+          {/if}
+          {#if taskObject.daysBeforeRepeating}
+            Every {taskObject.daysBeforeRepeating} days
+          {/if}
+          </div>
+        {:else} 
+          <input bind:value={newTaskName} on:keypress={detectEnterKey3}>
         {/if}
       </div>
-      {#if isShowingSubtasks}
-        {#if !isTypingNewTask}
-          <div on:click={() => isTypingNewTask = true} style="margin-left: 14px; display: flex; align-content: center">
-            <div class="plus alt"></div>
-          </div>
-        {:else}
-          <input bind:value={newTask} on:keypress={detectEnterKey} style="width: 100%; margin-left: 5px"/>
+    
+      <div style="width: {200 * (0.9 ** depth)}px; height: 100%">
+        {#if isShowingOptions}
+          {#if !(isTypingNewTask || isSchedulingTask || isRepeatingTask || isDeletingTask )}  
+            <span class="material-icons" on:click={() => isTypingNewTask = true} style="margin-left: 5px; font-size: {2.5 * (0.7 ** depth)}rem;">
+              playlist_add
+            </span>
+
+            <span on:click={markAsDone} class="material-icons" style="margin-left: 5px; font-size: {2.5 * (0.7 ** depth)}rem;">
+              check
+            </span>
+
+            <span class="material-icons" on:click={() => isSchedulingTask = true} style="margin-left: 5px; font-size: {2.5 * (0.7 ** depth)}rem;">
+              schedule
+            </span>
+
+            <span class="material-icons" on:click={() => isRepeatingTask = true} style="margin-left: 5px; font-size: {2.5 * (0.7 ** depth)}rem;">
+              event_repeat
+            </span>
+
+            <span class="material-icons" on:click={() => isDeletingTask = true} style="margin-left: 5px; font-size: {2.5 * (0.7 ** depth)}rem;">
+              delete
+            </span>
+          {:else}
+            {#if isTypingNewTask}
+              <div style="display: flex; align-items: center">
+                <input placeholder="Sub-task A" bind:value={newTask} on:keypress={detectEnterKey} style="width: 100%; margin-left: 5px"/>
+              </div>
+            {:else if isSchedulingTask}
+              <input placeholder="03/14" bind:value={scheduledDate} style="width: 40px; margin-left: 14px;"/>
+              <input placeholder="13:00" bind:value={scheduledTime} style="width: 40px" on:keypress={detectEnterKey2}/>
+            {:else if isRepeatingTask} 
+              <div style="display: flex">
+                Repeats every <input bind:value={daysBeforeRepeating} style="width: 20px;" placeholder="0" on:keypress={detectEnterKey4}> days 
+              </div>
+            {:else if isDeletingTask}
+              <div style="display: flex; align-items: center; justify-content: space-evenly">
+                <div on:click={deleteTask}>Delete</div>
+                <div on:click={() => isDeletingTask = false}>Cancel</div>
+              </div>
+            {/if}
+          {/if}
         {/if}
-
-        <span on:click={markAsDone} style="margin-left: 10px;">
-          &#10003;
-        </span>
-
-        <div on:click={toggleRepeating} style="margin-left: 10px">
-          {taskObject.isRepeating ? 'unrepeat' : 'repeat'}
-        </div>
-
-        {#if !isSchedulingTask}
-          <div on:click={() => isSchedulingTask = true} style="margin-left: 14px;">Schedule</div>
-        {:else}
-          <input placeholder="03/14" bind:value={scheduledDate} style="width: 40px; margin-left: 14px;"/>
-          <input placeholder="13:00" bind:value={scheduledTime} style="width: 40px" on:keypress={detectEnterKey2}/>
-        {/if}
-
-
-        <div on:click={deleteTask} style="margin-left: 10px">
-          Delete
-        </div>
-      {/if}
+      </div>
     </div>
 
     <div style="margin-top: {60 * (0.65 ** depth)}px;">
@@ -78,13 +112,24 @@
   export let depth
 
   const dispatch = createEventDispatcher()
-  let isShowingSubtasks = false
+  let isEditingTaskName = false
+  let newTaskName = ''
+
+  let isShowingOptions = false
   let isTypingNewTask = false 
   let newTask = ''
 
   let isSchedulingTask = false
   let scheduledDate = ''
   let scheduledTime = ''
+
+  let isRepeatingTask = false
+  let daysBeforeRepeating = 0
+
+  let isDeletingTask = false
+
+  // if children have duration then it'll contradict the parent's height duration, so childrens take precedence
+  $: doChildrenHaveDuration = taskObject.children.filter(child => child.duration).length > 0
 
   function dragstart_handler(e, taskName) {
     e.dataTransfer.setData("text/plain", taskName);
@@ -109,9 +154,19 @@
     sendUpNewChildrenPayload(childrenCopy)
   }
 
+  function startEditTaskName () {
+    isEditingTaskName = true
+    newTaskName = taskObject.name
+  }
+
   function detectEnterKey (e) {
     if (e.charCode === 13) {
-      createNewChild(newTask)
+      if (!newTask) {
+        // 
+      } 
+      else {
+        createNewChild(newTask)
+      }
       newTask = ''
       isTypingNewTask = false
     }
@@ -131,6 +186,34 @@
       }
       // TODO: rename to `treeUpdated` or something 
       dispatch('task-done', {})
+      isSchedulingTask = false
+    }
+  }
+
+  function detectEnterKey3 (e) {
+    if (e.charCode === 13) {
+      if (!newTaskName) {
+        alert("Task name can't be empty.")
+        return
+      }
+      taskObject.name = newTaskName
+      dispatch('task-done', {})
+      newTaskName = ''
+      isEditingTaskName = false
+    }
+  }
+
+  function detectEnterKey4 (e) {
+    if (e.charCode === 13) {
+      if (!daysBeforeRepeating) {
+        alert('Task is reset and will no longer repeat')
+        taskObject.daysBeforeRepeating = 0
+      } else {
+        taskObject.daysBeforeRepeating = daysBeforeRepeating
+        dispatch('task-done', {})
+      }
+      daysBeforeRepeating = 0
+      isRepeatingTask = false
     }
   }
 
@@ -146,12 +229,12 @@
     })
   }
 
-  function showSubtasks () {
-    isShowingSubtasks = true
+  function showOptions () {
+    isShowingOptions = true
   }
 
-  function hideSubtasks () {
-    isShowingSubtasks = false
+  function hideOptions () {
+    isShowingOptions = false
   }
 
   function markAsDone () {
@@ -189,6 +272,18 @@
 </script>
 
 <style>
+  .black-duration-line {
+    border-left: 2px solid black;
+  }
+
+  .orange-duration-line {
+    border-left: 2px solid orange;
+  }
+
+  .green-duration-line {
+    border-left: 2px solid rgb(212, 250, 156);
+  }
+
   .current-task-flexbox {
     display: flex; 
     align-items: center;
@@ -197,8 +292,8 @@
   }
 
   .crossed-out {
-    text-decoration: line-through;
-    color: greenyellow;
+    /* text-decoration: line-through; */
+    color: rgb(212, 250, 156);
     opacity: 60%;
   }
 
@@ -237,7 +332,7 @@
     /* display: inline; */
     /* position: absolute; */
     margin-left: 2px;
-    border-left: 2px solid green;
+    /* border-left: 2px solid green; */
     padding-left: 2px;
     font-size: 0.8rem;
   }
