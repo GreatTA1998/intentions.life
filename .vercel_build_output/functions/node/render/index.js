@@ -31848,9 +31848,6 @@ ${!taskObject.isDeleted ? `<div draggable="${"true"}" class="${[
         }
       }
       return `
-
-
-
 <div style="${"display: flex; padding-left: 10px; padding-top: 10px;"}" class="${"svelte-qn541z"}"><div class="${"fixed-height-container-for-scrolling svelte-qn541z"}"><div class="${"todo-list svelte-qn541z"}">${allTasks.length > 0 ? `${each(allTasks, (task) => {
         return `${!task.isDeleted ? `<div class="${"task-container svelte-qn541z"}">${validate_component(RecursiveTask_1, "RecursiveTask").$$render($$result, { taskObject: task, depth: 1 }, {}, {})}
             </div>` : ``}`;
@@ -31883,8 +31880,8 @@ var entry3, js3, css4;
 var init__3 = __esm({
   ".svelte-kit/output/server/nodes/2.js"() {
     init_index_svelte();
-    entry3 = "pages/index.svelte-80c48af6.js";
-    js3 = ["pages/index.svelte-80c48af6.js", "chunks/vendor-24794758.js"];
+    entry3 = "pages/index.svelte-8113cb1e.js";
+    js3 = ["pages/index.svelte-8113cb1e.js", "chunks/vendor-24794758.js"];
     css4 = ["assets/pages/index.svelte-23f2c411.css"];
   }
 });
@@ -33351,7 +33348,7 @@ var manifest = {
   assets: new Set(["favicon.png"]),
   _: {
     mime: { ".png": "image/png" },
-    entry: { "file": "start-b74481bf.js", "js": ["start-b74481bf.js", "chunks/vendor-24794758.js"], "css": [] },
+    entry: { "file": "start-93e77846.js", "js": ["start-93e77846.js", "chunks/vendor-24794758.js"], "css": [] },
     nodes: [
       () => Promise.resolve().then(() => (init__(), __exports)),
       () => Promise.resolve().then(() => (init__2(), __exports2)),
