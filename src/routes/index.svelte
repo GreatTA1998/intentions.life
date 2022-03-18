@@ -2,7 +2,7 @@
   4. Sortable todo
   5. Spatial hierarchy design (like Nototo)
 -->
-<div style="display: flex; padding-left: 10px; padding-top: 10px;">
+<div style="display: flex; padding-left: 0; padding-top: 10px;">
   <div class="fixed-height-container-for-scrolling">
     <div class="todo-list">
       {#if allTasks.length > 0}
@@ -255,7 +255,7 @@
     padding-left: 0; 
     padding-top: 16px; 
     padding-bottom: 10px; 
-    padding-right: 12px; 
+    padding-right: 0; 
     overflow: none;
   }
 

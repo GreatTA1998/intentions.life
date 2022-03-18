@@ -8,7 +8,7 @@
     class:orange-duration-line={!taskObject.isDone && taskObject.startTime && taskObject.startDate}
     class:green-duration-line={taskObject.isDone}
     style="
-      margin-left: 20px; margin-bottom: 10px; width: 100%; 
+      margin-left: {depth === 1 ? '0' : '20'}px; margin-bottom: 10px; width: {560 * 0.8 ** depth}px; 
       height: {taskObject.duration && !doChildrenHaveDuration 
         && (taskObject.duration * 90/60 > taskObject.children.length * 60 * 0.7 ** depth)
         && (taskObject.duration * 90/60 > 60 * (0.65 ** depth))
@@ -20,13 +20,13 @@
   >
     <div class="current-task-flexbox">
       <div 
-        class="keep-on-same-line name-of-task" 
+        class="keep-on-same-line name-of-task truncate" 
         class:scheduled-orange={!taskObject.isDone && taskObject.startTime && taskObject.startDate}
         class:crossed-out={taskObject.isDone} 
-        style="font-size: {5 * (0.65 ** depth)}rem;"
+        style="font-size: {4 * (0.68 ** depth)}rem;"
       >
         {#if !isEditingTaskName}
-          <div on:click={startEditTaskName}>
+          <div on:click={startEditTaskName} style="width: 1000px" class="truncate">
             {taskObject.name}
           {#if taskObject.completionCount}
             {taskObject.completionCount}
@@ -272,6 +272,12 @@
 </script>
 
 <style>
+  .truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
   .black-duration-line {
     border-left: 2px solid black;
   }
@@ -293,7 +299,7 @@
 
   .crossed-out {
     /* text-decoration: line-through; */
-    color: rgb(212, 250, 156);
+    color: rgb(183, 228, 115);
     opacity: 60%;
   }
 
