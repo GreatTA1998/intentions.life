@@ -1,6 +1,6 @@
 <!-- Recursively display a task and all its subtasks -->
 <!-- Check if parent's fixed duration is enough to practically include its children's font sizes `taskObject.duration * 90/60 > children.length * 10  -->
-{#if !taskObject.isDeleted}
+{#if !taskObject.isDeleted && !taskObject.isDone}
   <div 
     draggable="true"
     class="scheduled-task"
@@ -26,22 +26,19 @@
         style="font-size: {4 * (0.68 ** depth)}rem;"
       >
         {#if !isEditingTaskName}
-          <div on:click={startEditTaskName} style="width: 1000px" class="truncate">
+          <div on:click={() => isDetailedCardOpen = true} style="width: 1000px" class="truncate">
             {taskObject.name}
-          {#if taskObject.completionCount}
-            {taskObject.completionCount}
-          {/if}
-          {#if !taskObject.isDone && taskObject.startTime && taskObject.startDate}
-            {taskObject.startDate + ' ' + taskObject.startTime}
-          {/if}
-          {#if taskObject.daysBeforeRepeating}
-            Every {taskObject.daysBeforeRepeating} days
-          {/if}
           </div>
         {:else} 
           <input bind:value={newTaskName} on:keypress={detectEnterKey3}>
         {/if}
       </div>
+
+      <CardPopup 
+        isOpen={isDetailedCardOpen}
+        {taskObject}
+        on:card-close={() => isDetailedCardOpen = false}
+      />
     
       <div style="width: {200 * (0.9 ** depth)}px; height: 100%">
         {#if isShowingOptions}
@@ -49,22 +46,11 @@
             <span class="material-icons" on:click={() => isTypingNewTask = true} style="margin-left: 5px; font-size: {2.5 * (0.7 ** depth)}rem;">
               playlist_add
             </span>
-
-            <span on:click={markAsDone} class="material-icons" style="margin-left: 5px; font-size: {2.5 * (0.7 ** depth)}rem;">
-              check
-            </span>
-
-            <span class="material-icons" on:click={() => isSchedulingTask = true} style="margin-left: 5px; font-size: {2.5 * (0.7 ** depth)}rem;">
-              schedule
-            </span>
-
-            <span class="material-icons" on:click={() => isRepeatingTask = true} style="margin-left: 5px; font-size: {2.5 * (0.7 ** depth)}rem;">
-              event_repeat
-            </span>
-
-            <span class="material-icons" on:click={() => isDeletingTask = true} style="margin-left: 5px; font-size: {2.5 * (0.7 ** depth)}rem;">
-              delete
-            </span>
+            <!-- 
+              <span on:click={markAsDone} class="material-icons" style="margin-left: 5px; font-size: {2.5 * (0.7 ** depth)}rem;">
+                check
+              </span>
+            -->
           {:else}
             {#if isTypingNewTask}
               <div style="display: flex; align-items: center">
@@ -106,10 +92,13 @@
 <script>
   import RecursiveTask from './RecursiveTask.svelte'
   import { createEventDispatcher, onMount } from 'svelte'
-  import { getDateOfToday } from './helpers';
+  import { getDateOfToday } from './helpers'
+  import CardPopup from './CardPopup.svelte'
 
   export let taskObject
   export let depth
+
+  let isDetailedCardOpen = false
 
   const dispatch = createEventDispatcher()
   let isEditingTaskName = false
