@@ -23,16 +23,30 @@
           {/if}
         {/each}
         
-        <div style="display: flex; align-content: center; justify-items: center">
-          <div class="plus alt" style="margin-left: 12px"></div>
-          <input bind:value={newTopLevelTask} placeholder="Type task...">
-          <div on:click={createTask} style="margin-top: 2px; font-size: 1.65rem;">
-            Create task
-          </div>
+        <!-- Invisible, but hoverable region -->
+        <div style="height: 100px;"
+          on:mouseenter={() => isShowingCreateButton = true}
+          on:mouseleave={() => isShowingCreateButton = false}
+        >
+          {#if isShowingCreateButton}
+            {#if !isTypingNewRootTask}
+              <div style="font-size: 1.5rem; color: grey;" on:click={() => isTypingNewRootTask = true}>
+                New task 
+              </div>
+            {:else}
+              <div style="display: flex; align-content: center; justify-items: center">
+                <input 
+                  bind:value={newTopLevelTask} placeholder="Type task..." 
+                  on:keypress={detectEnterKey2}
+                >
+              </div>
+            {/if}
+          {/if}
         </div>
       {/if}
     </div>
   </div>
+
   <div style="display: flex; justify-content: space-evenly; width: 30vw; border-left: 2px dashed grey">
     <CalendarDayView
       {scheduledTasks}
@@ -63,6 +77,8 @@
   let scheduledTasks = []
   let scheduledTasks2 = []
   let newTopLevelTask = ''
+  let isTypingNewRootTask = false
+  let isShowingCreateButton = false
 
   async function mutateOneNode ({ taskName, timeOfDay, dateScheduled }) {
     // search for the particular node, mutate it, then update the database
@@ -181,6 +197,12 @@
     })
   }
 
+  function detectEnterKey2 () { 
+    if (e.charCode === 13) {
+      createTask()
+    }
+  }
+
   function createTask () {
     if (!newTopLevelTask) {
       alert("You have to type something first")
@@ -198,6 +220,9 @@
     )
     
     allTasks = [...newValue]
+
+    newToplevelTask = ''
+    isTypingNewTask = false
   }
 
   function modifyTaskTree (e, task) {
@@ -243,7 +268,7 @@
 
   .todo-list {
     width: 100%; 
-    height: 300vh;
+    height: 100vh;
     display: flex; 
     flex-wrap: wrap; 
     flex-direction: column

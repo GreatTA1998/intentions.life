@@ -1,6 +1,6 @@
 <!-- Recursively display a task and all its subtasks -->
 <!-- Check if parent's fixed duration is enough to practically include its children's font sizes `taskObject.duration * 90/60 > children.length * 10  -->
-{#if !taskObject.isDeleted && !taskObject.isDone}
+{#if !taskObject.isDeleted && !taskObject.isDone && !(taskObject.startTime && taskObject.startDate)}
   <div 
     draggable="true"
     class="scheduled-task"
@@ -8,25 +8,32 @@
     class:orange-duration-line={!taskObject.isDone && taskObject.startTime && taskObject.startDate}
     class:green-duration-line={taskObject.isDone}
     style="
-      margin-left: {depth === 1 ? '0' : '20'}px; margin-bottom: 10px; width: {560 * 0.8 ** depth}px; 
+      margin-left: {depth === 1 ? '0' : '20'}px; 
+      margin-bottom: 10px; 
+      width: {350 * 0.8 ** depth}px; 
       height: {taskObject.duration && !doChildrenHaveDuration 
         && (taskObject.duration * 90/60 > taskObject.children.length * 60 * 0.7 ** depth)
         && (taskObject.duration * 90/60 > 60 * (0.65 ** depth))
         ? `${taskObject.duration * 90/60}px` : '100%'};
+      padding-left: {10 * 0.8 ** depth}px;
     "
     on:dragstart|self={(e) => dragstart_handler(e, taskObject.name)}
-    on:pointerenter={showOptions}
     on:pointerleave={hideOptions}
   >
     <div class="current-task-flexbox">
       <div 
-        class="keep-on-same-line name-of-task truncate" 
+        style="font-size: {1.5 * (0.85 ** depth)}rem;"
+        class="keep-on-same-line name-of-task" 
         class:scheduled-orange={!taskObject.isDone && taskObject.startTime && taskObject.startDate}
         class:crossed-out={taskObject.isDone} 
-        style="font-size: {4 * (0.68 ** depth)}rem;"
       >
         {#if !isEditingTaskName}
-          <div on:click={() => isDetailedCardOpen = true} style="width: 1000px" class="truncate">
+          <div 
+            on:click={() => isDetailedCardOpen = true} 
+            on:pointerenter={showOptions}
+            class="truncate"
+            style="width: {350 * (0.85 ** depth)}px"
+          >
             {taskObject.name}
           </div>
         {:else} 
@@ -43,20 +50,13 @@
       <div style="width: {200 * (0.9 ** depth)}px; height: 100%">
         {#if isShowingOptions}
           {#if !(isTypingNewTask || isSchedulingTask || isRepeatingTask || isDeletingTask )}  
-            <span class="material-icons" on:click={() => isTypingNewTask = true} style="margin-left: 5px; font-size: {2.5 * (0.7 ** depth)}rem;">
-              playlist_add
-            </span>
             <!-- 
               <span on:click={markAsDone} class="material-icons" style="margin-left: 5px; font-size: {2.5 * (0.7 ** depth)}rem;">
                 check
               </span>
             -->
           {:else}
-            {#if isTypingNewTask}
-              <div style="display: flex; align-items: center">
-                <input placeholder="Sub-task A" bind:value={newTask} on:keypress={detectEnterKey} style="width: 100%; margin-left: 5px"/>
-              </div>
-            {:else if isSchedulingTask}
+            {#if isSchedulingTask}
               <input placeholder="03/14" bind:value={scheduledDate} style="width: 40px; margin-left: 14px;"/>
               <input placeholder="13:00" bind:value={scheduledTime} style="width: 40px" on:keypress={detectEnterKey2}/>
             {:else if isRepeatingTask} 
@@ -74,7 +74,7 @@
       </div>
     </div>
 
-    <div style="margin-top: {60 * (0.65 ** depth)}px;">
+    <div style="margin-top: {20 * (0.7 ** depth)}px;">
       {#each taskObject.children as child, i}
         <RecursiveTask 
           taskObject={child}
@@ -85,6 +85,24 @@
           depth={depth+1}
         />
       {/each}
+
+      {#if isShowingOptions}
+        {#if !isTypingNewTask}
+          <div style="display: flex; align-items: center; margin-left: 20px;">
+            <!-- `padding-bottom` accounts for the text fonts are just not vertically centered, see https://stackoverflow.com/questions/21580059/text-is-not-vertically-centered -->
+            <div 
+              on:click={() => isTypingNewTask = true} 
+              style="border-left: 2px solid grey; color: grey; padding-left: 5px; padding-bottom: {8 * 0.68 ** (depth + 1)}px; font-size: {1.5 * (0.85 ** (depth + 1))}rem;"
+            >
+              new sub-task
+            </div>
+          </div>
+        {:else}
+          <div style="display: flex; align-items: center; margin-left: 20px;">
+            <input placeholder="Type sub-task" bind:value={newTask} on:keypress={detectEnterKey} style="width: 100%; margin-left: 5px"/>
+          </div>
+        {/if}
+      {/if}
     </div>
   </div>    
 {/if}
@@ -265,10 +283,11 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    max-width: 800px
   }
 
   .black-duration-line {
-    border-left: 2px solid black;
+    border-left: 2px solid rgb(146, 146, 146);
   }
 
   .orange-duration-line {
@@ -284,6 +303,7 @@
     align-items: center;
     position: relative; 
     height: 12px;
+    /* max-width: 600px; */
   }
 
   .crossed-out {
