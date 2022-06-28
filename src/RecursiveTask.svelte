@@ -45,6 +45,7 @@
         isOpen={isDetailedCardOpen}
         {taskObject}
         on:card-close={() => isDetailedCardOpen = false}
+        on:task-done={markAsDone}
       />
     
       <div style="width: {200 * (0.9 ** depth)}px; height: 100%">

@@ -33,6 +33,11 @@
         Repeats every {taskObject.daysBeforeRepeating} days, completed {taskObject.completionCount || 0} times
       {/if}
     </div>
+
+    <!-- I don't care this looks bad -->
+    <div on:click={() => dispatch('task-done')}>
+      Done
+    </div>
   </div>
 {/if}
 

@@ -197,7 +197,7 @@
     })
   }
 
-  function detectEnterKey2 () { 
+  function detectEnterKey2 (e) { 
     if (e.charCode === 13) {
       createTask()
     }

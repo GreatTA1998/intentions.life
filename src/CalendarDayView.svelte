@@ -7,15 +7,21 @@
   >
     {#each timesOfDay as timeOfDay, i}
       <div style="display: flex; top: {90*i}px; position: absolute;">
-        <div class="time-indicator">
+        <div 
+          class="time-indicator" 
+          style="color: {timeOfDay.slice(0, 2) === getHH() ? 'red' : ''}" 
+          id="{timeOfDay.slice(0, 2) === getHH() ? 'current-hour-block' : ''}"
+        >
           {timeOfDay}
         </div>
         <div id={timeOfDay} class="calendar-time-block"/> 
       </div>
     {/each}
 
-    <!-- we have a duplicate for loop because we really don't want the scheduled task elements to be the children of calendar blocks, we want them to be siblings,
-    else drag and drop won't work -->
+    <!-- 
+      we have a duplicate for-loop because we really don't want the scheduled task elements to be the children of calendar blocks, we want them to be siblings,
+      else drag and drop won't work 
+    -->
     {#each timesOfDay as timeOfDay, i}
       {#each tasksOfHour[timeOfDay] as task}
         <div 
@@ -47,15 +53,24 @@
 </div>
 
 <script>
-  import { createEventDispatcher } from 'svelte'
+  import { createEventDispatcher, onMount } from 'svelte'
+  import { getDateOfToday, getHH } from './helpers.js'
 
   export let scheduledTasks 
   export let getDate
+
   const dispatch = createEventDispatcher()
-  const timesOfDay = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00', '24:00']
+  const timesOfDay = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00', '00:00']
   let tasksOfHour = {} 
   let startY = 0
   let pixelsPerMinute = 90 / 60; 
+
+  onMount(() => {
+    // note getDate() is a prop specific to this component!
+    if (getDateOfToday() === getDate()) {
+      document.getElementById('current-hour-block').scrollIntoView()
+    }
+  })
 
   $: if (scheduledTasks) {
     recomputeTasksMap()
