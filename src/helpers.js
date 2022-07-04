@@ -20,7 +20,7 @@ export function getHH () {
   if (hh < 10) {
     hh = '0' + hh
   }
-  return hh
+  return `${hh}`
 }
 
 // https://flaviocopes.com/how-to-get-tomorrow-date-javascript/

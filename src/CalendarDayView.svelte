@@ -9,7 +9,7 @@
       <div style="display: flex; top: {90*i}px; position: absolute;">
         <div 
           class="time-indicator" 
-          style="color: {timeOfDay.slice(0, 2) === getHH() ? 'red' : ''}" 
+          style="color: {timeOfDay.slice(0, 2) === getHH() && getDateOfToday() === getDate()? 'red' : ''}" 
           id="{timeOfDay.slice(0, 2) === getHH() ? 'current-hour-block' : ''}"
         >
           {timeOfDay}
@@ -60,7 +60,7 @@
   export let getDate
 
   const dispatch = createEventDispatcher()
-  const timesOfDay = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00', '00:00']
+  const timesOfDay = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00', '00:00', '01:00', '02:00']
   let tasksOfHour = {} 
   let startY = 0
   let pixelsPerMinute = 90 / 60; 

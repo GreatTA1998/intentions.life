@@ -5,10 +5,6 @@
         schedule
       </span>
       
-      <span class="material-icons" on:click={() => isRepeatingTask = true} style="margin-left: 5px; font-size: {2.5 * (0.7 ** depth)}rem;">
-        event_repeat
-      </span>
-
       <span class="material-icons" on:click={() => isDeletingTask = true} style="margin-left: 5px; font-size: {2.5 * (0.7 ** depth)}rem;">
         delete
       </span>   -->
@@ -38,9 +34,19 @@
     <div on:click={() => dispatch('task-done')}>
       Done
     </div>
+
+    <!-- Repeating tasks -->
+    {#if !isTypingRepeatFrequency}
+      <span on:click={() => isTypingRepeatFrequency = true} style="margin-left: 5px;">
+        Repeat task
+      </span>
+    {:else}
+      <div style="display: flex">
+        Repeats every <input bind:value={daysBeforeRepeating} style="width: 20px;" placeholder="0" on:keypress={detectEnterKey4}> days 
+      </div> 
+    {/if}
   </div>
 {/if}
-
 
 <script>
 import { createEventDispatcher, onMount } from 'svelte'
@@ -50,7 +56,24 @@ export let isOpen = false
 
 let depth = 1
 
+let isTypingRepeatFrequency = false
+let daysBeforeRepeating = 7
+
 const dispatch = createEventDispatcher()
+
+function detectEnterKey4 (e) {
+  if (e.charCode === 13) {
+    if (!daysBeforeRepeating) {
+      alert('Task is reset and will no longer repeat')
+      taskObject.daysBeforeRepeating = 0
+    } else {
+      taskObject.daysBeforeRepeating = daysBeforeRepeating
+    }
+    dispatch('task-repeat')
+    daysBeforeRepeating = 0
+    isTypingRepeatFrequency = false
+  }
+}
 </script>
 
 <style>

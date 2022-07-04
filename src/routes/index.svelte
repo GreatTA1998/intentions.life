@@ -181,12 +181,42 @@
     scheduledTasks2 = result.filter(task => task.startDate === dateOfTomorrow && !task.isDeleted)
     console.log('scheduledTasks2 =', scheduledTasks2)
 
+    // RE-THINK THE REPEATING TASKS
+
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     // handle repeating tasks
     for (const task of scheduledTasks) {
       if (task.isRepeating) {
+        console.log('task.name =', task.name)
+        console.log("last completion date =", task.lastCompletionDate)
         if (task.lastCompletionDate !== dateOfToday) {
           task.startDate = dateOfToday
           task.isDone = false 
+
+
+
         }
       }
     }

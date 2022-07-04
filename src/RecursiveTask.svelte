@@ -41,11 +41,13 @@
         {/if}
       </div>
 
+      <!-- `task-done` is just an excuse for the tree to re-render, because everyting is done through mutation -->
       <CardPopup 
         isOpen={isDetailedCardOpen}
         {taskObject}
         on:card-close={() => isDetailedCardOpen = false}
         on:task-done={markAsDone}
+        on:task-repeat={() => dispatch('task-done')}
       />
     
       <div style="width: {200 * (0.9 ** depth)}px; height: 100%">
@@ -208,20 +210,6 @@
       dispatch('task-done', {})
       newTaskName = ''
       isEditingTaskName = false
-    }
-  }
-
-  function detectEnterKey4 (e) {
-    if (e.charCode === 13) {
-      if (!daysBeforeRepeating) {
-        alert('Task is reset and will no longer repeat')
-        taskObject.daysBeforeRepeating = 0
-      } else {
-        taskObject.daysBeforeRepeating = daysBeforeRepeating
-      }
-      dispatch('task-done', {})
-      daysBeforeRepeating = 0
-      isRepeatingTask = false
     }
   }
 
