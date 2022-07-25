@@ -22,7 +22,7 @@
   >
     <div class="current-task-flexbox">
       <div 
-        style="font-size: {1.5 * (0.85 ** depth)}rem;"
+        style="font-size: {1.5 * (0.85 ** depth)}rem; font-family: aktiv-grotesk, sans-serif;"
         class="keep-on-same-line name-of-task" 
         class:scheduled-orange={!taskObject.isDone && taskObject.startTime && taskObject.startDate}
         class:crossed-out={taskObject.isDone} 
@@ -47,6 +47,7 @@
         {taskObject}
         on:card-close={() => isDetailedCardOpen = false}
         on:task-done={markAsDone}
+        on:task-notes-update={() => dispatch('task-done')}
         on:task-repeat={() => dispatch('task-done')}
       />
     

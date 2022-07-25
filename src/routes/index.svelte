@@ -2,67 +2,82 @@
   4. Sortable todo
   5. Spatial hierarchy design (like Nototo)
 -->
-<div style="display: flex; padding-left: 0; padding-top: 10px;">
-  <div class="fixed-height-container-for-scrolling">
-    <div class="todo-list">
-      {#if allTasks.length > 0}
-        {#each allTasks as task}
-          {#if !task.isDeleted}
-            <div class="task-container">
-              <RecursiveTask 
-                on:task-create={(e) => modifyTaskTree(e, task)} 
-                on:task-done={updateFirestore}
-                on:task-delete={updateFirestore}
-                on:task-repeating={updateFirestore}
-                taskObject={task}
-                depth={1}
-              >
+<div id="background-image-holder" style="height: 100vh; padding-left: 80px; padding-right: 80px;">
+  <!-- 300 px  -->
+  <div style="height: 80px;"></div>
 
-              </RecursiveTask>
-            </div>
-          {/if}
-        {/each}
-        
-        <!-- Invisible, but hoverable region -->
-        <div style="height: 100px;"
-          on:mouseenter={() => isShowingCreateButton = true}
-          on:mouseleave={() => isShowingCreateButton = false}
-        >
-          {#if isShowingCreateButton}
-            {#if !isTypingNewRootTask}
-              <div style="font-size: 1.5rem; color: grey;" on:click={() => isTypingNewRootTask = true}>
-                New task 
-              </div>
-            {:else}
-              <div style="display: flex; align-content: center; justify-items: center">
-                <input 
-                  bind:value={newTopLevelTask} placeholder="Type task..." 
-                  on:keypress={detectEnterKey2}
+  <div style="display: flex; padding-left: 0; padding-top: 10px;">
+    <div class="fixed-height-container-for-scrolling" style="background-color: white; border: 2px solid green; border-top-left-radius: 20px; border-bottom-left-radius: 20px;">
+      <div class="todo-list">
+        {#if allTasks.length > 0}
+          {#each allTasks as task}
+            {#if !task.isDeleted}
+              <div class="task-container">
+                <RecursiveTask 
+                  on:task-create={(e) => modifyTaskTree(e, task)} 
+                  on:task-done={updateFirestore}
+                  on:task-delete={updateFirestore}
+                  on:task-repeating={updateFirestore}
+                  taskObject={task}
+                  depth={1}
                 >
+
+                </RecursiveTask>
               </div>
             {/if}
-          {/if}
-        </div>
-      {/if}
+          {/each}
+          
+          <!-- Invisible, but hoverable region -->
+          <div style="height: 100px;"
+            on:mouseenter={() => isShowingCreateButton = true}
+            on:mouseleave={() => isShowingCreateButton = false}
+          >
+            {#if isShowingCreateButton}
+              {#if !isTypingNewRootTask}
+                <div style="font-size: 1.5rem; color: grey;" on:click={() => isTypingNewRootTask = true}>
+                  New task 
+                </div>
+              {:else}
+                <div style="display: flex; align-content: center; justify-items: center">
+                  <input 
+                    bind:value={newTopLevelTask} placeholder="Type task..." 
+                    on:keypress={detectEnterKey2}
+                  >
+                </div>
+              {/if}
+            {/if}
+          </div>
+        {/if}
+      </div>
+    </div>
+
+    <div 
+      style="display: flex; justify-content: space-evenly; width: 30vw; border-left: 2px dashed grey;
+         background-color: white; border: 2px solid green; border-top-right-radius: 20px; border-bottom-right-radius: 20px;"
+    >
+      <CalendarDayView
+        {scheduledTasks}
+        on:task-scheduled={(e) => mutateOneNode(e.detail)}
+        on:task-duration-adjusted={(e) => mutateOneNode2(e.detail)}
+        getDate={getDateOfToday}
+      />
+
+      <CalendarDayView
+        scheduledTasks={scheduledTasks2}
+        on:task-scheduled={(e) => mutateOneNode(e.detail)}
+        on:task-duration-adjusted={(e) => mutateOneNode2(e.detail)}
+        getDate={getDateOfTomorrow}
+      /> 
     </div>
   </div>
-
-  <div style="display: flex; justify-content: space-evenly; width: 30vw; border-left: 2px dashed grey">
-    <CalendarDayView
-      {scheduledTasks}
-      on:task-scheduled={(e) => mutateOneNode(e.detail)}
-      on:task-duration-adjusted={(e) => mutateOneNode2(e.detail)}
-      getDate={getDateOfToday}
-    />
-
-    <CalendarDayView
-      scheduledTasks={scheduledTasks2}
-      on:task-scheduled={(e) => mutateOneNode(e.detail)}
-      on:task-duration-adjusted={(e) => mutateOneNode2(e.detail)}
-      getDate={getDateOfTomorrow}
-    /> 
-  </div>
 </div>
+
+<iframe src="../illiyard-moor-lofi.mp3" allow="autoplay" style="display:none" id="iframeAudio">
+</iframe> 
+
+<!-- <div id="radio-player-with-art" style="width: 100vw; height: 15vh">
+  <audio src="../yorushika-elma.mp3" controls="true"></audio>
+</div> -->
 
 <script>
   import RecursiveTask from '../RecursiveTask.svelte'
@@ -284,6 +299,14 @@
 </script>
 
 <style>
+  #background-image-holder {
+    background-image: url('../maplestory-orange.jpg');
+  }
+
+  /* #radio-player-with-art {
+    background-image: url('../maplestory-watercolor.jpg')
+  } */
+
   *::-webkit-scrollbar {
     width: 0;
     height: 0;
@@ -291,14 +314,16 @@
   }
 
   .fixed-height-container-for-scrolling {
-    height: 100vh;
-    overflow-y: scroll;
+    /* background-image: linear-gradient(rgba(255,255,255,0.7), rgba(255,255,255,0.5)), url('../illiyard-moor.jpg'); */
+    /* opacity: 0.5; */
+    height: 80vh;
+    /* overflow-y: scroll; */
     width: 70vw;
   }
 
   .todo-list {
     width: 100%; 
-    height: 100vh;
+    height: 80vh;
     display: flex; 
     flex-wrap: wrap; 
     flex-direction: column

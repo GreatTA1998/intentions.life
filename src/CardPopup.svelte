@@ -30,6 +30,14 @@
       {/if}
     </div>
 
+    <h2>Notes</h2>
+
+    <textarea bind:value={notesAboutTask} cols="44"/>
+
+    <div on:click={saveNotes}>
+      Save notes
+    </div>
+
     <!-- I don't care this looks bad -->
     <div on:click={() => dispatch('task-done')}>
       Done
@@ -60,6 +68,13 @@ let isTypingRepeatFrequency = false
 let daysBeforeRepeating = 7
 
 const dispatch = createEventDispatcher()
+
+let notesAboutTask = taskObject.notes || ''
+
+function saveNotes () {
+  taskObject.notes = notesAboutTask
+  dispatch('task-notes-update')
+}
 
 function detectEnterKey4 (e) {
   if (e.charCode === 13) {
