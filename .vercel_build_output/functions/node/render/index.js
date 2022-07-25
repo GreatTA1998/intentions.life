@@ -5587,8 +5587,8 @@ var entry, js, css;
 var init__ = __esm({
   ".svelte-kit/output/server/nodes/0.js"() {
     init_layout_svelte();
-    entry = "layout.svelte-ab3a5759.js";
-    js = ["layout.svelte-ab3a5759.js", "chunks/vendor-acd53e54.js"];
+    entry = "layout.svelte-5124c21f.js";
+    js = ["layout.svelte-5124c21f.js", "chunks/vendor-8f14ca92.js"];
     css = [];
   }
 });
@@ -5637,8 +5637,8 @@ var entry2, js2, css2;
 var init__2 = __esm({
   ".svelte-kit/output/server/nodes/1.js"() {
     init_error_svelte();
-    entry2 = "error.svelte-9f7d0541.js";
-    js2 = ["error.svelte-9f7d0541.js", "chunks/vendor-acd53e54.js"];
+    entry2 = "error.svelte-8362c866.js";
+    js2 = ["error.svelte-8362c866.js", "chunks/vendor-8f14ca92.js"];
     css2 = [];
   }
 });
@@ -31822,7 +31822,7 @@ ${!taskObject.isDeleted && !taskObject.isDone && !(taskObject.startTime && taskO
           recomputeTasksMap();
         }
       }
-      return `<div style="${"height: 80vh; overflow-y: scroll; overflow-x: hidden;"}" class="${"svelte-1otkjb3"}"><div id="${"calendar-day-container"}" style="${"width: 12vw; margin-left: 0px; margin-top: 10px; position: relative; height: 1600px"}" class="${"svelte-1otkjb3"}">${each(timesOfDay, (timeOfDay, i2) => {
+      return `<div style="${"height: 77vh; overflow-y: scroll; overflow-x: hidden;"}" class="${"svelte-1otkjb3"}"><div id="${"calendar-day-container"}" style="${"width: 12vw; margin-left: 0px; margin-top: 10px; position: relative; height: 1600px"}" class="${"svelte-1otkjb3"}">${each(timesOfDay, (timeOfDay, i2) => {
         return `<div style="${"display: flex; top: " + escape(90 * i2) + "px; position: absolute;"}" class="${"svelte-1otkjb3"}"><div class="${"time-indicator svelte-1otkjb3"}" style="${"color: " + escape(timeOfDay.slice(0, 2) === getHH() && getDateOfToday() === getDate() ? "red" : "")}"${add_attribute("id", timeOfDay.slice(0, 2) === getHH() ? "current-hour-block" : "", 0)}>${escape(timeOfDay)}</div>
         <div${add_attribute("id", timeOfDay, 0)} class="${"calendar-time-block svelte-1otkjb3"}"></div> 
       </div>`;
@@ -31854,7 +31854,7 @@ ${!taskObject.isDeleted && !taskObject.isDone && !(taskObject.startTime && taskO
     initializeApp(firebaseConfig);
     db = getFirestore();
     css3 = {
-      code: "#background-image-holder.svelte-15hkf6q{background-image:url('maplestory-orange.jpg')}.svelte-15hkf6q::-webkit-scrollbar{width:0;height:0;background-color:#aaa}.fixed-height-container-for-scrolling.svelte-15hkf6q{height:80vh;width:70vw}.todo-list.svelte-15hkf6q{width:100%;height:80vh;display:flex;flex-wrap:wrap;flex-direction:column\n  }.task-container.svelte-15hkf6q{border:0px solid;margin-bottom:25px;padding-left:0;padding-top:16px;padding-bottom:10px;padding-right:0;overflow:none}",
+      code: "#background-image-holder.svelte-1agrjel{background-repeat:no-repeat;background-size:100% 100%}.svelte-1agrjel::-webkit-scrollbar{width:0;height:0;background-color:#aaa}.fixed-height-container-for-scrolling.svelte-1agrjel{height:77vh;width:70vw}.todo-list.svelte-1agrjel{width:100%;height:77vh;display:flex;flex-wrap:wrap;flex-direction:column\n  }.task-container.svelte-1agrjel{border:0px solid;margin-bottom:25px;padding-left:0;padding-top:16px;padding-bottom:10px;padding-right:0;overflow:none}",
       map: null
     };
     Routes = create_ssr_component(($$result, $$props, $$bindings, slots) => {
@@ -31903,31 +31903,29 @@ ${!taskObject.isDeleted && !taskObject.isDone && !(taskObject.startTime && taskO
         }
       }
       return `
-<div id="${"background-image-holder"}" style="${"height: 100vh; padding-left: 80px; padding-right: 80px;"}" class="${"svelte-15hkf6q"}">
-  <div style="${"height: 80px;"}" class="${"svelte-15hkf6q"}"></div>
+<div id="${"background-image-holder"}" style="${"height: 100vh; padding-left: 120px; padding-right: 120px;"}" class="${"svelte-1agrjel"}">
+  <div style="${"height: 100px;"}" class="${"svelte-1agrjel"}"></div>
 
   
-  <div style="${"position: absolute; top: 30px; left: 30px;"}" class="${"svelte-15hkf6q"}"><span class="${"material-icons svelte-15hkf6q"}" style="${"margin-left: auto; margin-right: 0; color: white"}">${escape("music_note")}</span>
+  <div style="${"position: absolute; top: 30px; left: 30px;"}" class="${"svelte-1agrjel"}"><span class="${"material-icons svelte-1agrjel"}" style="${"margin-left: auto; margin-right: 0; color: white"}">${escape("music_off")}</span>
     </div>
 
-  <div style="${"display: flex; padding-left: 0; padding-top: 10px;"}" class="${"svelte-15hkf6q"}"><div class="${"fixed-height-container-for-scrolling svelte-15hkf6q"}" style="${"background-color: white; border: 2px solid green; border-top-left-radius: 20px; border-bottom-left-radius: 20px;"}"><div class="${"todo-list svelte-15hkf6q"}">${allTasks.length > 0 ? `${each(allTasks, (task) => {
-        return `${!task.isDeleted ? `<div class="${"task-container svelte-15hkf6q"}">${validate_component(RecursiveTask_1, "RecursiveTask").$$render($$result, { taskObject: task, depth: 1 }, {}, {})}
+  <div style="${"display: flex; padding-left: 0; padding-top: 10px;"}" class="${"svelte-1agrjel"}"><div class="${"fixed-height-container-for-scrolling svelte-1agrjel"}" style="${"background-color: white; border: 2px solid green; border-top-left-radius: 20px; border-bottom-left-radius: 20px;"}"><div class="${"todo-list svelte-1agrjel"}">${allTasks.length > 0 ? `${each(allTasks, (task) => {
+        return `${!task.isDeleted ? `<div class="${"task-container svelte-1agrjel"}">${validate_component(RecursiveTask_1, "RecursiveTask").$$render($$result, { taskObject: task, depth: 1 }, {}, {})}
               </div>` : ``}`;
       })}
           
           
-          <div style="${"height: 100px;"}" class="${"svelte-15hkf6q"}">${``}</div>` : ``}</div></div>
+          <div style="${"height: 100px;"}" class="${"svelte-1agrjel"}">${``}</div>` : ``}</div></div>
 
-    <div style="${"display: flex; justify-content: space-evenly; width: 30vw; border-left: 2px dashed grey; background-color: white; border: 2px solid green; border-top-right-radius: 20px; border-bottom-right-radius: 20px;"}" class="${"svelte-15hkf6q"}">${validate_component(CalendarDayView, "CalendarDayView").$$render($$result, { scheduledTasks, getDate: getDateOfToday }, {}, {})}
+    <div style="${"display: flex; justify-content: space-evenly; width: 30vw; border-left: 2px dashed grey; background-color: white; border: 2px solid green; border-top-right-radius: 20px; border-bottom-right-radius: 20px;"}" class="${"svelte-1agrjel"}">${validate_component(CalendarDayView, "CalendarDayView").$$render($$result, { scheduledTasks, getDate: getDateOfToday }, {}, {})}
 
       ${validate_component(CalendarDayView, "CalendarDayView").$$render($$result, {
         scheduledTasks: scheduledTasks2,
         getDate: getDateOfTomorrow
       }, {}, {})}</div></div></div>
 
-<audio src="${"illiyard-moor-lofi.mp3"}" class="${"svelte-15hkf6q"}"${add_attribute("this", AudioElem, 0)}></audio>
-
-`;
+<audio class="${"svelte-1agrjel"}"${add_attribute("this", AudioElem, 0)}></audio>`;
     });
   }
 });
@@ -31944,9 +31942,9 @@ var entry3, js3, css4;
 var init__3 = __esm({
   ".svelte-kit/output/server/nodes/2.js"() {
     init_index_svelte();
-    entry3 = "pages/index.svelte-11c87f23.js";
-    js3 = ["pages/index.svelte-11c87f23.js", "chunks/vendor-acd53e54.js"];
-    css4 = ["assets/pages/index.svelte-c078d1b6.css"];
+    entry3 = "pages/index.svelte-9068daa3.js";
+    js3 = ["pages/index.svelte-9068daa3.js", "chunks/vendor-8f14ca92.js"];
+    css4 = ["assets/pages/index.svelte-5c028859.css"];
   }
 });
 
@@ -33409,10 +33407,10 @@ var App = class {
 // .svelte-kit/vercel-tmp/manifest.js
 var manifest = {
   appDir: "_app",
-  assets: new Set(["background-picture.png", "favicon.png", "illiyard-moor-lofi.mp3", "illiyard-moor.jpg", "maplestory-orange-blurred.jpg", "maplestory-orange.jpg", "maplestory-watercolor.jpg", "yorushika-elma.mp3", "yorushika-elma.mp4"]),
+  assets: new Set(["background-picture.png", "favicon.png", "illiyard-moor-lofi.mp3", "illiyard-moor.jpg", "illiyard-moor.mp3", "maplestory-orange-blurred.jpg", "maplestory-orange.jpg", "maplestory-watercolor.jpg", "ms-leafre-lofi.mp3", "yorushika-elma.mp3", "yorushika-elma.mp4"]),
   _: {
     mime: { ".png": "image/png", ".mp3": "audio/mpeg", ".jpg": "image/jpeg", ".mp4": "video/mp4" },
-    entry: { "file": "start-4e33d5fc.js", "js": ["start-4e33d5fc.js", "chunks/vendor-acd53e54.js"], "css": [] },
+    entry: { "file": "start-d7c3f0b6.js", "js": ["start-d7c3f0b6.js", "chunks/vendor-8f14ca92.js"], "css": [] },
     nodes: [
       () => Promise.resolve().then(() => (init__(), __exports)),
       () => Promise.resolve().then(() => (init__2(), __exports2)),
