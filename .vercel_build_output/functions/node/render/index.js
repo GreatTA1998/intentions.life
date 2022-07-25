@@ -5587,8 +5587,8 @@ var entry, js, css;
 var init__ = __esm({
   ".svelte-kit/output/server/nodes/0.js"() {
     init_layout_svelte();
-    entry = "layout.svelte-26a446ce.js";
-    js = ["layout.svelte-26a446ce.js", "chunks/vendor-fd55e573.js"];
+    entry = "layout.svelte-a898dbd5.js";
+    js = ["layout.svelte-a898dbd5.js", "chunks/vendor-a8c23782.js"];
     css = [];
   }
 });
@@ -5637,8 +5637,8 @@ var entry2, js2, css2;
 var init__2 = __esm({
   ".svelte-kit/output/server/nodes/1.js"() {
     init_error_svelte();
-    entry2 = "error.svelte-0d000683.js";
-    js2 = ["error.svelte-0d000683.js", "chunks/vendor-fd55e573.js"];
+    entry2 = "error.svelte-009f77ee.js";
+    js2 = ["error.svelte-009f77ee.js", "chunks/vendor-a8c23782.js"];
     css2 = [];
   }
 });
@@ -31698,6 +31698,7 @@ var init_index_svelte = __esm({
       let { taskObject } = $$props;
       let { isOpen = false } = $$props;
       createEventDispatcher();
+      let notesAboutTask = taskObject.notes || "";
       if ($$props.taskObject === void 0 && $$bindings.taskObject && taskObject !== void 0)
         $$bindings.taskObject(taskObject);
       if ($$props.isOpen === void 0 && $$bindings.isOpen && isOpen !== void 0)
@@ -31713,6 +31714,13 @@ var init_index_svelte = __esm({
     <div class="${"google-calendar-event-time svelte-1q27ax5"}" style="${"margin-top: 4px; margin-left: 10px;"}">${!taskObject.isDone && taskObject.startTime && taskObject.startDate ? `Scheduled for ${escape(taskObject.startDate + " " + taskObject.startTime)}` : ``}</div>
 
     <div class="${"google-calendar-event-detail svelte-1q27ax5"}" style="${"margin-top: 12px; margin-left: 16px;"}">${taskObject.daysBeforeRepeating ? `Repeats every ${escape(taskObject.daysBeforeRepeating)} days, completed ${escape(taskObject.completionCount || 0)} times` : ``}</div>
+
+    <h2>Notes</h2>
+
+    <textarea cols="${"44"}">${notesAboutTask || ""}</textarea>
+
+    <div>Save notes
+    </div>
 
     
     <div>Done
@@ -31743,7 +31751,7 @@ var init_index_svelte = __esm({
 ${!taskObject.isDeleted && !taskObject.isDone && !(taskObject.startTime && taskObject.startDate) ? `<div draggable="${"true"}" class="${[
         "scheduled-task svelte-t4v7r0",
         (!taskObject.isDone && !(taskObject.startTime && taskObject.startDate) ? "black-duration-line" : "") + " " + (!taskObject.isDone && taskObject.startTime && taskObject.startDate ? "orange-duration-line" : "") + " " + (taskObject.isDone ? "green-duration-line" : "")
-      ].join(" ").trim()}" style="${"margin-left: " + escape(depth === 1 ? "0" : "20") + "px; margin-bottom: 10px; width: " + escape(350 * 0.8 ** depth) + "px; height: " + escape(taskObject.duration && !doChildrenHaveDuration && taskObject.duration * 90 / 60 > taskObject.children.length * 60 * 0.7 ** depth && taskObject.duration * 90 / 60 > 60 * 0.65 ** depth ? `${taskObject.duration * 90 / 60}px` : "100%") + "; padding-left: " + escape(10 * 0.8 ** depth) + "px;"}"><div class="${"current-task-flexbox svelte-t4v7r0"}"><div style="${"font-size: " + escape(1.5 * 0.85 ** depth) + "rem;"}" class="${[
+      ].join(" ").trim()}" style="${"margin-left: " + escape(depth === 1 ? "0" : "20") + "px; margin-bottom: 10px; width: " + escape(350 * 0.8 ** depth) + "px; height: " + escape(taskObject.duration && !doChildrenHaveDuration && taskObject.duration * 90 / 60 > taskObject.children.length * 60 * 0.7 ** depth && taskObject.duration * 90 / 60 > 60 * 0.65 ** depth ? `${taskObject.duration * 90 / 60}px` : "100%") + "; padding-left: " + escape(10 * 0.8 ** depth) + "px;"}"><div class="${"current-task-flexbox svelte-t4v7r0"}"><div style="${"font-size: " + escape(1.5 * 0.85 ** depth) + "rem; font-family: aktiv-grotesk, sans-serif;"}" class="${[
         "keep-on-same-line name-of-task svelte-t4v7r0",
         (!taskObject.isDone && taskObject.startTime && taskObject.startDate ? "scheduled-orange" : "") + " " + (taskObject.isDone ? "crossed-out" : "")
       ].join(" ").trim()}">${`<div class="${"truncate svelte-t4v7r0"}" style="${"width: " + escape(350 * 0.85 ** depth) + "px"}">${escape(taskObject.name)}</div>`}</div>
@@ -31814,7 +31822,7 @@ ${!taskObject.isDeleted && !taskObject.isDone && !(taskObject.startTime && taskO
           recomputeTasksMap();
         }
       }
-      return `<div style="${"height: 100vh; overflow-y: scroll; overflow-x: hidden;"}" class="${"svelte-1otkjb3"}"><div id="${"calendar-day-container"}" style="${"width: 12vw; margin-left: 0px; margin-top: 10px; position: relative; height: 1600px"}" class="${"svelte-1otkjb3"}">${each(timesOfDay, (timeOfDay, i2) => {
+      return `<div style="${"height: 80vh; overflow-y: scroll; overflow-x: hidden;"}" class="${"svelte-1otkjb3"}"><div id="${"calendar-day-container"}" style="${"width: 12vw; margin-left: 0px; margin-top: 10px; position: relative; height: 1600px"}" class="${"svelte-1otkjb3"}">${each(timesOfDay, (timeOfDay, i2) => {
         return `<div style="${"display: flex; top: " + escape(90 * i2) + "px; position: absolute;"}" class="${"svelte-1otkjb3"}"><div class="${"time-indicator svelte-1otkjb3"}" style="${"color: " + escape(timeOfDay.slice(0, 2) === getHH() && getDateOfToday() === getDate() ? "red" : "")}"${add_attribute("id", timeOfDay.slice(0, 2) === getHH() ? "current-hour-block" : "", 0)}>${escape(timeOfDay)}</div>
         <div${add_attribute("id", timeOfDay, 0)} class="${"calendar-time-block svelte-1otkjb3"}"></div> 
       </div>`;
@@ -31846,7 +31854,7 @@ ${!taskObject.isDeleted && !taskObject.isDone && !(taskObject.startTime && taskO
     initializeApp(firebaseConfig);
     db = getFirestore();
     css3 = {
-      code: ".svelte-tilh6m::-webkit-scrollbar{width:0;height:0;background-color:#aaa}.fixed-height-container-for-scrolling.svelte-tilh6m{height:100vh;overflow-y:scroll;width:70vw}.todo-list.svelte-tilh6m{width:100%;height:100vh;display:flex;flex-wrap:wrap;flex-direction:column\n  }.task-container.svelte-tilh6m{border:0px solid;margin-bottom:25px;padding-left:0;padding-top:16px;padding-bottom:10px;padding-right:0;overflow:none}",
+      code: "#background-image-holder.svelte-lld6s9{background-image:url('../maplestory-orange.jpg')}.svelte-lld6s9::-webkit-scrollbar{width:0;height:0;background-color:#aaa}.fixed-height-container-for-scrolling.svelte-lld6s9{height:80vh;width:70vw}.todo-list.svelte-lld6s9{width:100%;height:80vh;display:flex;flex-wrap:wrap;flex-direction:column\n  }.task-container.svelte-lld6s9{border:0px solid;margin-bottom:25px;padding-left:0;padding-top:16px;padding-bottom:10px;padding-right:0;overflow:none}",
       map: null
     };
     Routes = create_ssr_component(($$result, $$props, $$bindings, slots) => {
@@ -31894,21 +31902,27 @@ ${!taskObject.isDeleted && !taskObject.isDone && !(taskObject.startTime && taskO
         }
       }
       return `
-<div style="${"display: flex; padding-left: 0; padding-top: 10px;"}" class="${"svelte-tilh6m"}"><div class="${"fixed-height-container-for-scrolling svelte-tilh6m"}"><div class="${"todo-list svelte-tilh6m"}">${allTasks.length > 0 ? `${each(allTasks, (task) => {
-        return `${!task.isDeleted ? `<div class="${"task-container svelte-tilh6m"}">${validate_component(RecursiveTask_1, "RecursiveTask").$$render($$result, { taskObject: task, depth: 1 }, {}, {})}
-            </div>` : ``}`;
+<div id="${"background-image-holder"}" style="${"height: 100vh; padding-left: 80px; padding-right: 80px;"}" class="${"svelte-lld6s9"}">
+  <div style="${"height: 80px;"}" class="${"svelte-lld6s9"}"></div>
+
+  <div style="${"display: flex; padding-left: 0; padding-top: 10px;"}" class="${"svelte-lld6s9"}"><div class="${"fixed-height-container-for-scrolling svelte-lld6s9"}" style="${"background-color: white; border: 2px solid green; border-top-left-radius: 20px; border-bottom-left-radius: 20px;"}"><div class="${"todo-list svelte-lld6s9"}">${allTasks.length > 0 ? `${each(allTasks, (task) => {
+        return `${!task.isDeleted ? `<div class="${"task-container svelte-lld6s9"}">${validate_component(RecursiveTask_1, "RecursiveTask").$$render($$result, { taskObject: task, depth: 1 }, {}, {})}
+              </div>` : ``}`;
       })}
-        
-        
-        <div style="${"height: 100px;"}" class="${"svelte-tilh6m"}">${``}</div>` : ``}</div></div>
+          
+          
+          <div style="${"height: 100px;"}" class="${"svelte-lld6s9"}">${``}</div>` : ``}</div></div>
 
-  <div style="${"display: flex; justify-content: space-evenly; width: 30vw; border-left: 2px dashed grey"}" class="${"svelte-tilh6m"}">${validate_component(CalendarDayView, "CalendarDayView").$$render($$result, { scheduledTasks, getDate: getDateOfToday }, {}, {})}
+    <div style="${"display: flex; justify-content: space-evenly; width: 30vw; border-left: 2px dashed grey; background-color: white; border: 2px solid green; border-top-right-radius: 20px; border-bottom-right-radius: 20px;"}" class="${"svelte-lld6s9"}">${validate_component(CalendarDayView, "CalendarDayView").$$render($$result, { scheduledTasks, getDate: getDateOfToday }, {}, {})}
 
-    ${validate_component(CalendarDayView, "CalendarDayView").$$render($$result, {
+      ${validate_component(CalendarDayView, "CalendarDayView").$$render($$result, {
         scheduledTasks: scheduledTasks2,
         getDate: getDateOfTomorrow
-      }, {}, {})}</div>
-</div>`;
+      }, {}, {})}</div></div></div>
+
+<iframe src="${"../illiyard-moor-lofi.mp3"}" allow="${"autoplay"}" style="${"display:none"}" id="${"iframeAudio"}" class="${"svelte-lld6s9"}"></iframe> 
+
+`;
     });
   }
 });
@@ -31925,9 +31939,9 @@ var entry3, js3, css4;
 var init__3 = __esm({
   ".svelte-kit/output/server/nodes/2.js"() {
     init_index_svelte();
-    entry3 = "pages/index.svelte-1ddd2588.js";
-    js3 = ["pages/index.svelte-1ddd2588.js", "chunks/vendor-fd55e573.js"];
-    css4 = ["assets/pages/index.svelte-c4d5cea5.css"];
+    entry3 = "pages/index.svelte-f6a8a310.js";
+    js3 = ["pages/index.svelte-f6a8a310.js", "chunks/vendor-a8c23782.js"];
+    css4 = ["assets/pages/index.svelte-f173eb27.css"];
   }
 });
 
@@ -33334,7 +33348,7 @@ var user_hooks = /* @__PURE__ */ Object.freeze({
   __proto__: null,
   [Symbol.toStringTag]: "Module"
 });
-var template = ({ head, body, assets: assets2 }) => '<!DOCTYPE html>\n<html lang="en">\n	<head>\n		<meta charset="utf-8" />\n		<meta name="description" content="" />\n		<link rel="icon" href="' + assets2 + '/favicon.png" />\n		<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">\n		<meta name="viewport" content="width=device-width, initial-scale=1" />\n		' + head + '\n	</head>\n	<body style="margin-top: 0; margin-bottom: 0">\n		<div id="svelte">' + body + "</div>\n	</body>\n</html>\n\n";
+var template = ({ head, body, assets: assets2 }) => '<!DOCTYPE html>\n<html lang="en">\n	<head>\n		<meta charset="utf-8" />\n		<meta name="description" content="" />\n		<link rel="icon" href="' + assets2 + '/favicon.png" />\n		<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">\n		<meta name="viewport" content="width=device-width, initial-scale=1" />\n		' + head + '\n	</head>\n	<body style="margin-top: 0; margin-bottom: 0; margin-right: 0; margin-left: 0">\n		<div id="svelte">' + body + "</div>\n	</body>\n</html>\n\n";
 var read = null;
 set_paths({ "base": "", "assets": "" });
 var get_hooks = (hooks) => ({
@@ -33390,10 +33404,10 @@ var App = class {
 // .svelte-kit/vercel-tmp/manifest.js
 var manifest = {
   appDir: "_app",
-  assets: new Set(["favicon.png"]),
+  assets: new Set(["background-picture.png", "favicon.png", "illiyard-moor-lofi.mp3", "illiyard-moor.jpg", "maplestory-orange-blurred.jpg", "maplestory-orange.jpg", "maplestory-watercolor.jpg", "yorushika-elma.mp3", "yorushika-elma.mp4"]),
   _: {
-    mime: { ".png": "image/png" },
-    entry: { "file": "start-75ba9e22.js", "js": ["start-75ba9e22.js", "chunks/vendor-fd55e573.js"], "css": [] },
+    mime: { ".png": "image/png", ".mp3": "audio/mpeg", ".jpg": "image/jpeg", ".mp4": "video/mp4" },
+    entry: { "file": "start-23da026c.js", "js": ["start-23da026c.js", "chunks/vendor-a8c23782.js"], "css": [] },
     nodes: [
       () => Promise.resolve().then(() => (init__(), __exports)),
       () => Promise.resolve().then(() => (init__2(), __exports2)),
