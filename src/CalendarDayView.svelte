@@ -1,4 +1,4 @@
-<div style="height: 80vh; overflow-y: scroll; overflow-x: hidden;">
+<div style="height: 77vh; overflow-y: scroll; overflow-x: hidden;">
   <div 
     id="calendar-day-container"
     style="width: 12vw; margin-left: 0px; margin-top: 10px; position: relative; height: 1600px" 

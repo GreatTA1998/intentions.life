@@ -2,14 +2,14 @@
   4. Sortable todo
   5. Spatial hierarchy design (like Nototo)
 -->
-<div id="background-image-holder" style="height: 100vh; padding-left: 80px; padding-right: 80px;">
+<div id="background-image-holder" style="height: 100vh; padding-left: 120px; padding-right: 120px;">
   <!-- 300 px  -->
-  <div style="height: 80px;"></div>
+  <div style="height: 100px;"></div>
 
   <!-- Cannot autoplay music unfortunately, but ability to play/pause might not be so bad -->
   <div on:click={toggleMusic} style="position: absolute; top: 30px; left: 30px;">
     <span  class="material-icons" style="margin-left: auto; margin-right: 0; color: white">
-      {isMusicPlaying ? 'music_off' : 'music_note'}
+      {isMusicPlaying ? 'music_note' : 'music_off'}
     </span>
     <!-- <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" /> -->
   </div>
@@ -80,10 +80,7 @@
   </div>
 </div>
 
-<audio bind:this={AudioElem} src="illiyard-moor-lofi.mp3"></audio>
-
-<!-- <iframe src="illiyard-moor-lofi.mp3" allow="autoplay" style="display:none" id="iframeAudio">
-</iframe>  -->
+<audio bind:this={AudioElem}></audio>
 
 <script>
   import RecursiveTask from '../RecursiveTask.svelte'
@@ -93,9 +90,36 @@
   import { doc, getDoc, updateDoc } from 'firebase/firestore'
   import { getDateOfToday, getDateOfTomorrow } from '../helpers.js'
 
+  function getRandomInt(max) {
+    return Math.floor(Math.random() * max);
+  }
+
+  let chosenMusicFile
+  let musicFiles = [
+    'illiyard-moor.mp3',
+    'ms-leafre-lofi.mp3'
+  ]
 
   let AudioElem
   let isMusicPlaying = false
+
+  // let background images 
+  let bgImageURLs = [
+    'https://i.imgur.com/rzkUMW8.jpeg', // cute monsters
+    'https://i.imgur.com/ShnqIpJ.jpeg', // airships 
+    // 'https://i.imgur.com/ifP3xPg.jpeg' // forest (too dark I think)
+  ]
+  let chosenBgImageURL
+
+  onMount(() => {
+    chosenBgImageURL = bgImageURLs[getRandomInt(2)]
+    const div = document.getElementById("background-image-holder")
+    div.style['background-image'] = `url(${chosenBgImageURL})`
+
+    chosenMusicFile = musicFiles[getRandomInt(2)]
+    console.log('chosenAudio =', chosenMusicFile)
+    AudioElem.src = chosenMusicFile
+  })
 
   let allTasks = []
   let sortedAllTasks = [] 
@@ -322,7 +346,10 @@
 
 <style>
   #background-image-holder {
-    background-image: url('maplestory-orange.jpg');
+    /* background-image: url('maplestory-orange.jpg'); */
+    /* background-image: url('https://i.imgur.com/ShnqIpJ.jpeg'); */
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
   }
 
   /* #radio-player-with-art {
@@ -338,14 +365,14 @@
   .fixed-height-container-for-scrolling {
     /* background-image: linear-gradient(rgba(255,255,255,0.7), rgba(255,255,255,0.5)), url('../illiyard-moor.jpg'); */
     /* opacity: 0.5; */
-    height: 80vh;
+    height: 77vh;
     /* overflow-y: scroll; */
     width: 70vw;
   }
 
   .todo-list {
     width: 100%; 
-    height: 80vh;
+    height: 77vh;
     display: flex; 
     flex-wrap: wrap; 
     flex-direction: column
