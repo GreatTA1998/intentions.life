@@ -6,6 +6,14 @@
   <!-- 300 px  -->
   <div style="height: 80px;"></div>
 
+  <!-- Cannot autoplay music unfortunately, but ability to play/pause might not be so bad -->
+  <div on:click={toggleMusic} style="position: absolute; top: 30px; left: 30px;">
+    <span  class="material-icons" style="margin-left: auto; margin-right: 0; color: white">
+      {isMusicPlaying ? 'music_off' : 'music_note'}
+    </span>
+    <!-- <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" /> -->
+  </div>
+
   <div style="display: flex; padding-left: 0; padding-top: 10px;">
     <div class="fixed-height-container-for-scrolling" style="background-color: white; border: 2px solid green; border-top-left-radius: 20px; border-bottom-left-radius: 20px;">
       <div class="todo-list">
@@ -72,12 +80,10 @@
   </div>
 </div>
 
-<iframe src="../illiyard-moor-lofi.mp3" allow="autoplay" style="display:none" id="iframeAudio">
-</iframe> 
+<audio bind:this={AudioElem} src="illiyard-moor-lofi.mp3"></audio>
 
-<!-- <div id="radio-player-with-art" style="width: 100vw; height: 15vh">
-  <audio src="../yorushika-elma.mp3" controls="true"></audio>
-</div> -->
+<!-- <iframe src="illiyard-moor-lofi.mp3" allow="autoplay" style="display:none" id="iframeAudio">
+</iframe>  -->
 
 <script>
   import RecursiveTask from '../RecursiveTask.svelte'
@@ -87,6 +93,10 @@
   import { doc, getDoc, updateDoc } from 'firebase/firestore'
   import { getDateOfToday, getDateOfTomorrow } from '../helpers.js'
 
+
+  let AudioElem
+  let isMusicPlaying = false
+
   let allTasks = []
   let sortedAllTasks = [] 
   let scheduledTasks = []
@@ -94,6 +104,18 @@
   let newTopLevelTask = ''
   let isTypingNewRootTask = false
   let isShowingCreateButton = false
+
+  function toggleMusic () {
+    AudioElem.volume = 0.1
+    if (AudioElem.paused) {
+      AudioElem.play()
+      isMusicPlaying = true
+    }
+    else {
+      AudioElem.pause()
+      isMusicPlaying = false
+    }
+  }
 
   async function mutateOneNode ({ taskName, timeOfDay, dateScheduled }) {
     // search for the particular node, mutate it, then update the database
@@ -300,7 +322,7 @@
 
 <style>
   #background-image-holder {
-    background-image: url('../maplestory-orange.jpg');
+    background-image: url('maplestory-orange.jpg');
   }
 
   /* #radio-player-with-art {
