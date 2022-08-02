@@ -1,6 +1,9 @@
 {#if isOpen}
   <div class="detailed-card">
     <div style="display: flex">
+      <div class="google-calendar-event-title" style="margin-top: 10px; margin-left: 10px;">
+        {taskObject.name}
+      </div>
       <!-- <span class="material-icons" on:click={() => isSchedulingTask = true} style="margin-left: 5px; font-size: {2.5 * (0.7 ** depth)}rem;">
         schedule
       </span>
@@ -14,10 +17,6 @@
       </span>
     </div>
 
-    <div class="google-calendar-event-title" style="margin-top: 10px; margin-left: 10px;">
-      {taskObject.name}
-    </div>
-
     <div class="google-calendar-event-time" style="margin-top: 4px; margin-left: 10px;">
       {#if !taskObject.isDone && taskObject.startTime && taskObject.startDate}
         Scheduled for {taskObject.startDate + ' ' + taskObject.startTime}
@@ -27,37 +26,88 @@
     <div class="google-calendar-event-detail" style="margin-top: 12px; margin-left: 16px;">
       {#if taskObject.daysBeforeRepeating}
         Repeats every {taskObject.daysBeforeRepeating} days, completed {taskObject.completionCount || 0} times
+      {:else if taskObject.repeatsOnDaysOfWeek}
+        Repeats {taskObject.repeatsOnDaysOfWeek}
       {/if}
     </div>
 
-    <h2>Notes</h2>
+    <textarea 
+      bind:value={notesAboutTask}
+      on:input={handleInput}
+      cols="48" 
+      placeholder="notes"
+      style="margin-left: 10px;"
+    />
 
-    <textarea bind:value={notesAboutTask} cols="44"/>
+    <div style="display: flex; margin-left: 6px">
+      <div>
+        <!-- Repeating tasks -->
+        {#if !isTypingRepeatFrequency}
+        <button on:click={() => isTypingRepeatFrequency = true} style="margin-left: 5px;">
+          Repeat task
+        </button>
+        {:else}
+          <!-- TODO: design repeat menu -->
+          <!-- Can't choose both -->
+          <div style="display: flex">
+            Repeats every <input bind:value={daysBeforeRepeating} style="width: 20px;" placeholder="0" on:keypress={detectEnterKey4}> days 
+          </div>
 
-    <div on:click={saveNotes}>
-      Save notes
+          <div style="display: flex">
+            <div>
+              <button on:click={() => repeatOnDayOfWeek({ dayNumber: 1 })}
+                class:selected="{taskObject.repeatsOnDaysOfWeek && taskObject.repeatsOnDaysOfWeek[0]}"
+              >
+                M
+              </button>
+              <button on:click={() => repeatOnDayOfWeek({ dayNumber: 2 })}
+                class:selected="{taskObject.repeatsOnDaysOfWeek && taskObject.repeatsOnDaysOfWeek[1]}"  
+              >
+                T
+              </button>
+              <button on:click={() => repeatOnDayOfWeek({ dayNumber: 3 })}
+                class:selected="{taskObject.repeatsOnDaysOfWeek && taskObject.repeatsOnDaysOfWeek[2]}"  
+              >
+                W
+              </button>
+              <button on:click={() => repeatOnDayOfWeek({ dayNumber: 4 })}
+                class:selected="{taskObject.repeatsOnDaysOfWeek && taskObject.repeatsOnDaysOfWeek[3]}"
+              >
+                R
+              </button>
+              <button on:click={() => repeatOnDayOfWeek({ dayNumber: 5 })}
+                class:selected="{taskObject.repeatsOnDaysOfWeek && taskObject.repeatsOnDaysOfWeek[4]}"  
+              >
+                F
+              </button>
+              <button on:click={() => repeatOnDayOfWeek({ dayNumber: 6 })} 
+                class:selected="{taskObject.repeatsOnDaysOfWeek && taskObject.repeatsOnDaysOfWeek[5]}"
+              >
+                S
+              </button>
+              <button on:click={() => repeatOnDayOfWeek({ dayNumber: 7 })} 
+                class:selected="{taskObject.repeatsOnDaysOfWeek && taskObject.repeatsOnDaysOfWeek[6]}"
+              >
+                S
+              </button>
+            </div>
+          </div>
+        {/if}
+      </div>
+
+      <div style="margin-left: auto; margin-right: 16px">
+        <!-- I don't care this looks bad -->
+        <button on:click={() => dispatch('task-done')}>
+          Done
+        </button>
+      </div>
     </div>
-
-    <!-- I don't care this looks bad -->
-    <div on:click={() => dispatch('task-done')}>
-      Done
-    </div>
-
-    <!-- Repeating tasks -->
-    {#if !isTypingRepeatFrequency}
-      <span on:click={() => isTypingRepeatFrequency = true} style="margin-left: 5px;">
-        Repeat task
-      </span>
-    {:else}
-      <div style="display: flex">
-        Repeats every <input bind:value={daysBeforeRepeating} style="width: 20px;" placeholder="0" on:keypress={detectEnterKey4}> days 
-      </div> 
-    {/if}
   </div>
 {/if}
 
 <script>
 import { createEventDispatcher, onMount } from 'svelte'
+import { debounce, throttle } from 'lodash'
 
 export let taskObject 
 export let isOpen = false
@@ -70,6 +120,21 @@ let daysBeforeRepeating = 7
 const dispatch = createEventDispatcher()
 
 let notesAboutTask = taskObject.notes || ''
+
+const handleInput = throttle(e => {
+  notesAboutTask = e.target.value;
+  saveNotes()
+}, 500) // milliseconds
+
+function repeatOnDayOfWeek ({ dayNumber }) {
+  if (!taskObject.repeatsOnDaysOfWeek) {
+    taskObject.repeatsOnDaysOfWeek = [false,false,false,false,false,false,false]
+  } 
+  taskObject.repeatsOnDaysOfWeek[dayNumber - 1] = !taskObject.repeatsOnDaysOfWeek[dayNumber - 1]
+  
+  // dispatch the event so it updates the database
+  dispatch('task-repeat')
+}
 
 function saveNotes () {
   taskObject.notes = notesAboutTask
@@ -119,18 +184,22 @@ function detectEnterKey4 (e) {
     color: #3c4043;
   }
 
-
-
   .detailed-card {
     z-index: 5;
     position: absolute;
-    width: 350px; 
-    height: 200px; 
+    width: 400px; 
+    height: 250px; 
     border-radius: 10px;
     background-color: white;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     padding: 6px;
   }
+
+  .selected {
+    background-color: indianred;
+  }
+
+
   .material-symbols-outlined {
   font-variation-settings:
   'FILL' 0,

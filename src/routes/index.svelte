@@ -63,19 +63,20 @@
       style="display: flex; justify-content: space-evenly; width: 30vw; border-left: 2px dashed grey;
          background-color: white; border: 2px solid green; border-top-right-radius: 20px; border-bottom-right-radius: 20px;"
     >
+      <CardPopup 
+        isOpen={isDetailedCardOpen}
+        taskObject={clickedTask}
+        on:card-close={() => isDetailedCardOpen = false}
+        on:task-done={() => markNodeAsDone(clickedTask.name)}
+      />
       <CalendarDayView
         {scheduledTasks}
         on:task-scheduled={(e) => mutateOneNode(e.detail)}
         on:task-duration-adjusted={(e) => mutateOneNode2(e.detail)}
+        on:task-click={(e) => openDetailedCard(e.detail)}
         getDate={getDateOfToday}
       />
-
-      <CalendarDayView
-        scheduledTasks={scheduledTasks2}
-        on:task-scheduled={(e) => mutateOneNode(e.detail)}
-        on:task-duration-adjusted={(e) => mutateOneNode2(e.detail)}
-        getDate={getDateOfTomorrow}
-      /> 
+      <FuturePreview/>
     </div>
   </div>
 </div>
@@ -85,6 +86,8 @@
 <script>
   import RecursiveTask from '../RecursiveTask.svelte'
   import CalendarDayView from '../CalendarDayView.svelte'
+  import FuturePreview from '../FuturePreview.svelte'
+  import CardPopup from '../CardPopup.svelte'
   import { onMount } from 'svelte'
   import db from '../db.js'
   import { doc, getDoc, updateDoc } from 'firebase/firestore'
@@ -129,6 +132,14 @@
   let isTypingNewRootTask = false
   let isShowingCreateButton = false
 
+  let isDetailedCardOpen = false
+  let clickedTask = {}
+
+  function openDetailedCard ({ task }) {
+    clickedTask = task
+    isDetailedCardOpen = true
+  }
+
   function toggleMusic () {
     AudioElem.volume = 0.1
     if (AudioElem.paused) {
@@ -139,6 +150,35 @@
       AudioElem.pause()
       isMusicPlaying = false
     }
+  }
+
+  // useful helper function for task update operations
+  function traverseAndUpdateTree ({ node, fulfilsCriteria, applyFunc }) {
+    // console.log('fulfilsCriteria =', fulfilsCriteria)
+    if (fulfilsCriteria(node)) {
+      console.log('found node')
+      applyFunc(node)
+      console.log("after apply, node =", node)
+    }
+    for (const child of node.children) {
+      traverseAndUpdateTree({ node: child, fulfilsCriteria, applyFunc })
+    }
+  }
+
+  async function markNodeAsDone (name) {
+    for (const task of allTasks) {
+      traverseAndUpdateTree({ 
+        node: task, 
+        fulfilsCriteria: (task) => { return task.name === name },
+        applyFunc: (task) => task.isDone = true
+      })
+    }
+    // update database
+    await updateDoc(
+      doc(db, 'users/GxBbopqXHW0qgjKEwU4z'),
+      { allTasks }
+    )
+    console.log('updated')
   }
 
   async function mutateOneNode ({ taskName, timeOfDay, dateScheduled }) {
@@ -242,45 +282,92 @@
     scheduledTasks2 = result.filter(task => task.startDate === dateOfTomorrow && !task.isDeleted)
     console.log('scheduledTasks2 =', scheduledTasks2)
 
-    // RE-THINK THE REPEATING TASKS
+    // RE-THINK THE REPEATING TASK
+    console.log('running repeating task algorithm')
 
+    // TODO:
+    //  1. Handle repeating Twitch streams e.g. Mon, Wed, Fri 7 pm
+    //  Figure out if it's Wednesday or Saturday etc. with `Date.getDate()` method 
+    //  If it is, place it at 7 pm. Easiest game of my life.
+    const today = new Date() // use `getDay()` to get 0 to 6 number
+    const habitPoolToResolveConflict = []
 
-
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    // handle repeating tasks
-    for (const task of scheduledTasks) {
-      if (task.isRepeating) {
-        console.log('task.name =', task.name)
-        console.log("last completion date =", task.lastCompletionDate)
-        if (task.lastCompletionDate !== dateOfToday) {
-          task.startDate = dateOfToday
-          task.isDone = false 
-
-
-
+    // mutate repeating tasks
+    function recursivelyRepeatTasks (node) {
+      if (node.repeatsOnDaysOfWeek) {
+        if (node.repeatsOnDaysOfWeek[today.getDay()]) { 
+          if (node.lastCompletionDate !== dateOfToday) {
+            node.isDone = false
+            node.startDate = dateOfToday
+            if (!node.startTime) {
+              habitPoolToResolveConflict.push(node)
+            }
+          }
         }
       }
+      for (const child of node.children) {
+        recursivelyRepeatTasks(child)
+      }
     }
+    
+    // actually call the function on the root nodes
+    for (const task of allTasks) {
+      recursivelyRepeatTasks(task)
+    }
+
+    //  #2 Handle repeating habits e.g. meditate every 3 day, run every 7 days
+    //  Schedule it at the end of the day
+    //  Visualize "debt" with by not allowing overlap 
+    function recursivelyRepeatTasks2 (node) {
+      if (node.daysBeforeRepeating) {
+        // if `daysBeforeRepeating` is 4, we need to see if 4 days have gone past already
+        const d1 = new Date(`node.lastCompletionDate/${2022}`)
+        const d2 = new Date()
+        const millisec_diff = d2.getTime() - d1.getTime()
+        const day_diff = Math.ceil(millisec_diff / (1000 * 3600 * 24))
+        if (day_diff >= node.daysBeforeRepeating) {
+          node.isDone = false 
+          node.startDate = dateOfToday 
+          habitPoolToResolveConflict.push(node)
+        }
+      }
+      for (const child of node.children) {
+        recursivelyRepeatTasks2(child)
+      }
+    }
+
+    // actually call the function on root nodes of tree
+    for (const task of allTasks) {
+      recursivelyRepeatTasks2(task)
+    }
+
+    console.log('pool for resolve conflict =', habitPoolToResolveConflict)
+    // initially deadline is end of day, 00:00
+    // but there's already a task there, so the actual deadline becomes 00:00 - task.duration
+    // now you just repeat it until no tasks are left
+    let trueEndOfDay = 1440 
+    for (const habit of habitPoolToResolveConflict) {
+      // convert everything into minutes, so military time 
+      // 00:00: start of new day := 0 minutes
+      // 24:00: end of new day := 1440 minutes
+      trueEndOfDay -= (habit.duration || 5) // note `.duration` is already in minutes
+
+      // convert to 'hh:mm' format
+      const militaryHours = trueEndOfDay / 60
+      const integerPart = parseInt(militaryHours)
+      const decimalPart = militaryHours - integerPart
+      const hh = integerPart
+      let mm = Math.round(decimalPart * 60) // might need to round to 2 decimal places because of Javascript floats?
+      if (mm < 10) {
+        mm = `0${mm}`
+      }
+      habit.startTime = `${hh}:${mm}`
+      console.log(`habit ${habit.name} starts =`, habit.startTime)
+    }
+
+    // AFTER YOU CONFIRM IT'S CORRECT, UPDATE FIRESTORE
+
+
 
     // finished tasks go to the bottom
     sortedAllTasks = allTasks.sort((t1, t2) => {

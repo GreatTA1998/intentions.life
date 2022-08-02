@@ -1,4 +1,5 @@
 <div style="height: 77vh; overflow-y: scroll; overflow-x: hidden;">
+  Today
   <div 
     id="calendar-day-container"
     style="width: 12vw; margin-left: 0px; margin-top: 10px; position: relative; height: 1600px" 
@@ -24,7 +25,7 @@
     -->
     {#each timesOfDay as timeOfDay, i}
       {#each tasksOfHour[timeOfDay] as task}
-        <div 
+        <div on:click={() => openDetailedCard(task)}
           class="scheduled-task" 
           style="top: {task.verticalOffset}px; height: {task.duration * pixelsPerMinute || 30}px;"
         >
@@ -32,7 +33,7 @@
             {task.name}
           </div>
           <!-- border: 2px solid red; -->
-          <div 
+          <div  
             style="height: {task.duration * pixelsPerMinute - 20 - 10}px; width: 11vw" 
             draggable="true" on:dragstart={(e) => dragstart_handler(e, task.name)}>
 
@@ -63,13 +64,10 @@
   const timesOfDay = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00', '00:00', '01:00', '02:00']
   let tasksOfHour = {} 
   let startY = 0
-  let pixelsPerMinute = 90 / 60; 
-
+  let pixelsPerMinute = 90 / 60
+  
   onMount(() => {
-    // note getDate() is a prop specific to this component!
-    if (getDateOfToday() === getDate()) {
-      document.getElementById('current-hour-block').scrollIntoView()
-    }
+    document.getElementById('current-hour-block').scrollIntoView()
   })
 
   $: if (scheduledTasks) {
@@ -90,8 +88,14 @@
     tasksOfHour = dict
   }
 
+  function openDetailedCard (task) {
+    dispatch('task-click', {
+      task
+    })
+  }
+
   function dragstart_handler(e, taskName) {
-    e.dataTransfer.setData("text/plain", taskName);
+    e.dataTransfer.setData("text/plain", taskName)
   }
 
   function dragover_handler (e) {
@@ -194,7 +198,7 @@
     display: inline;
     position: absolute;
     margin-left: 2px;
-    border-left: 2px solid orange;
+    border-left: 2px solid grey;
     padding-left: 2px;
     font-size: 0.8rem;
     width: 100%;
