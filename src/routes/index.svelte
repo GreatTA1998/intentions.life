@@ -76,6 +76,7 @@
         taskObject={clickedTask}
         on:card-close={() => isDetailedCardOpen = false}
         on:task-done={() => markNodeAsDone(clickedTask.name)}
+        on:task-delete={() => deleteSubtree(clickedTask.name)}
       />
       <CalendarDayView2
         {scheduledTasks}
@@ -168,7 +169,9 @@
 
   // useful helper function for task update operations
   function traverseAndUpdateTree ({ node, fulfilsCriteria, applyFunc }) {
-    if (fulfilsCriteria(node)) applyFunc(node)
+    if (fulfilsCriteria(node)) {
+      applyFunc(node)
+    } 
     for (const child of node.children) {
       traverseAndUpdateTree({ node: child, fulfilsCriteria, applyFunc })
     }
@@ -199,6 +202,34 @@
       { allTasks }
     )
     console.log('updated')
+  }
+
+  async function deleteSubtree (name) {
+    let root = { 
+      name: 'root',
+      children: allTasks
+    }
+    traverseAndUpdateTree({
+      node: root,
+      fulfilsCriteria: (task) => task.children.filter(c => c.name === name).length >= 1, // inequality is important because sometimes 2 or more tasks have the same name
+      applyFunc: (task) => { 
+        let idx 
+        // do not use `forEach` it mutates the array while it iterates even if you use return statements etc. it's unintuitive code
+        for (let i = 0; i < task.children.length; i++) {
+          if (task.children[i] === name) {
+            idx = i
+            break
+          }
+        }
+        task.children.splice(idx, 1)
+      }
+    })
+
+    await updateDoc(
+      doc(db, 'users/GxBbopqXHW0qgjKEwU4z'),
+      { allTasks }
+    )
+    allTasks = [...allTasks]
   }
 
   async function mutateOneNode ({ taskName, timeOfDay, dateScheduled }) {
@@ -283,9 +314,6 @@
     // FIND SCHEDULED TASK
     console.log('collecting scheduled tasks to be displayed...')
     collectScheduledTasksIntoArray()
-
-
-
 
     // finished tasks go to the bottom
     sortedAllTasks = allTasks.sort((t1, t2) => {

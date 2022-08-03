@@ -4,13 +4,11 @@
       <div class="google-calendar-event-title" style="margin-top: 10px; margin-left: 10px;">
         {taskObject.name}
       </div>
-      <!-- <span class="material-icons" on:click={() => isSchedulingTask = true} style="margin-left: 5px; font-size: {2.5 * (0.7 ** depth)}rem;">
+      <!--
+      <span class="material-icons" on:click={() => isSchedulingTask = true} style="margin-left: 5px; font-size: {2.5 * (0.7 ** depth)}rem;">
         schedule
       </span>
-      
-      <span class="material-icons" on:click={() => isDeletingTask = true} style="margin-left: 5px; font-size: {2.5 * (0.7 ** depth)}rem;">
-        delete
-      </span>   -->
+      -->
         
       <span on:click={() => dispatch('card-close')} class="material-icons" style="margin-left: auto; margin-right: 0">
         close
@@ -96,6 +94,11 @@
       </div>
 
       <div style="margin-left: auto; margin-right: 16px">
+        <!-- class="material-icons" style="margin-left: 5px; font-size: {2.5 * (0.7 ** depth)}rem;" -->
+        <button on:click={() => dispatch('task-delete')}>
+          Delete
+        </button>
+
         <!-- I don't care this looks bad -->
         <button on:click={() => dispatch('task-done')}>
           Done
