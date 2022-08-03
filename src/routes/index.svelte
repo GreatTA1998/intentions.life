@@ -37,7 +37,6 @@
           
           <!-- CREATE NEW TASK -->
           <!-- Invisible, but hoverable region -->
-          <!-- TODO: reset itself properly after typing a task -->
           <div style="height: 100px;"
             on:mouseenter={() => isShowingCreateButton = true}
             on:mouseleave={() => isShowingCreateButton = false}
@@ -148,8 +147,6 @@
 
   let isDetailedCardOpen = false
   let clickedTask = {}
-
-
 
 
   function openDetailedCard ({ task }) {
@@ -286,50 +283,6 @@
     // FIND SCHEDULED TASK
     console.log('collecting scheduled tasks to be displayed...')
     collectScheduledTasksIntoArray()
-    console.log('scheduledTasks =', scheduledTasks)
-
-    // const result = [] 
-
-    // function recursivelyFindScheduledTasks (node) {
-    //   if (node.startTime !== undefined) {
-    //     result.push(node)
-    //   }
-    //   for (const child of node.children) {
-    //     recursivelyFindScheduledTasks(child)
-    //   }
-    // }
-
-    // for (const task of allTasks) {
-    //   recursivelyFindScheduledTasks(task)
-    // }
-
-    // // now filter for tasks that are scheduled for the DATE TODAY
-    // const dateOfToday = getDateOfToday()
-    // scheduledTasks = result.filter(task => task.startDate === dateOfToday && !task.isDeleted)
-
-    // const dateOfTomorrow = getDateOfTomorrow()
-    // scheduledTasks2 = result.filter(task => task.startDate === dateOfTomorrow && !task.isDeleted)
-    // console.log('scheduledTasks2 =', scheduledTasks2)
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

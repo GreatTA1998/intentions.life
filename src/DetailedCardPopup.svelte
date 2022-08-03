@@ -107,7 +107,7 @@
 
 <script>
 import { createEventDispatcher, onMount } from 'svelte'
-import { debounce, throttle } from 'lodash'
+import _ from 'lodash'
 
 export let taskObject 
 export let isOpen = false
@@ -121,7 +121,7 @@ const dispatch = createEventDispatcher()
 
 let notesAboutTask = taskObject.notes || ''
 
-const handleInput = throttle(e => {
+const handleInput = _.throttle(e => {
   notesAboutTask = e.target.value;
   saveNotes()
 }, 500) // milliseconds
