@@ -42,7 +42,7 @@
       </div>
 
       <!-- `task-done` is just an excuse for the tree to re-render, because everyting is done through mutation -->
-      <CardPopup 
+      <DetailedCardPopup 
         isOpen={isDetailedCardOpen}
         {taskObject}
         on:card-close={() => isDetailedCardOpen = false}
@@ -115,7 +115,7 @@
   import RecursiveTask from './RecursiveTask.svelte'
   import { createEventDispatcher, onMount } from 'svelte'
   import { getDateOfToday } from './helpers'
-  import CardPopup from './CardPopup.svelte'
+  import DetailedCardPopup from './DetailedCardPopup.svelte'
 
   export let taskObject
   export let depth

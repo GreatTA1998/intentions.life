@@ -10,7 +10,7 @@
       <div style="display: flex; top: {90*i}px; position: absolute;">
         <div 
           class="time-indicator" 
-          style="color: {timeOfDay.slice(0, 2) === getHH() && getDateOfToday() === getDate()? 'red' : ''}" 
+          style="color: {timeOfDay.slice(0, 2) === getHH() && getDateOfToday() === getDate() ? 'red' : ''}" 
           id="{timeOfDay.slice(0, 2) === getHH() ? 'current-hour-block' : ''}"
         >
           {timeOfDay}
@@ -35,7 +35,8 @@
           <!-- border: 2px solid red; -->
           <div  
             style="height: {task.duration * pixelsPerMinute - 20 - 10}px; width: 11vw" 
-            draggable="true" on:dragstart={(e) => dragstart_handler(e, task.name)}>
+            draggable="true" on:dragstart={(e) => dragstart_handler(e, task.name)}
+          >
 
           </div>
           
@@ -43,7 +44,7 @@
           <div draggable="true"
             on:dragstart={(e) => mousedown_handler(e)}
             on:dragend={(e) => mouseup_handler(e, task)}
-            style="height: 8px; width: 11vw; position: absolute; bottom: 0; left: -3px; cursor: ns-resize; "
+            style="cursor: ns-resize; height: 8px; width: 11vw; position: absolute; bottom: 0; left: -3px;"
           >
 
           </div>
