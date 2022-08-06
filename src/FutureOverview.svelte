@@ -1,34 +1,31 @@
 <div style="height: 77vh; overflow-y: scroll; overflow-x: hidden">
-  <!-- Future overview -->
+  <div style="width: 12vw; margin-left: 0px; margin-top: 6px; position: relative; height: 1600px" >
+    {#each futureScheduledTasks as task, i}
+      <div style="position: absolute; top: {100*i}px">
+        {task.startDate}
+      </div>
 
-  <div style="width: 12vw; margin-left: 0px; margin-top: 10px; position: relative; height: 1600px" >
-    <!-- Task: can just import CSS from <CalendarDayView>  -->
-    <div>Fri. Sep. 27</div>
-    <div 
-      class="scheduled-task" 
-      style="top: {20}px; height: {30}px; border-left: 2px solid red;"
-    >
-      Essay for Ashay
-    </div>
-
-    <div 
-      class="scheduled-task" 
-      style="top: {70}px; height: {15}px; border-left: 2px dashed black;"
-    >
-    </div>
-
-    <div style="top: 100px; position: absolute">Sat. Feb. 1</div>
-    <div 
-      class="scheduled-task" 
-      style="top: {120}px; height: {93}px;"
-    >
-      Fly to Singapore
-    </div>
+      <div 
+        class="scheduled-task" 
+        style="top: {20 + (100*i)}px; height: {30}px; border-left: 2px solid red;"
+      >
+        {task.name}
+      </div>
+    
+      <!-- broken axis -->
+      <div 
+        class="scheduled-task" 
+        style="top: {70 + (100*i)}px; height: {15}px; border-left: 2px dashed black;"
+      >
+      </div>
+    {/each}
   </div>
 </div>
   <!-- Broken axis design <Just do a different border-line variant> -->
   <!-- That's it, everything is just a combination of `Task` and `Broken Axis` -->
 <script>
+export let futureScheduledTasks 
+
 // Broken-axes will be used relentlessly
 
 // Shows anything that is SCHEDULED:

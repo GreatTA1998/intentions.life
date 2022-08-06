@@ -4,11 +4,6 @@
       <div class="google-calendar-event-title" style="margin-top: 10px; margin-left: 10px;">
         {taskObject.name}
       </div>
-      <!--
-      <span class="material-icons" on:click={() => isSchedulingTask = true} style="margin-left: 5px; font-size: {2.5 * (0.7 ** depth)}rem;">
-        schedule
-      </span>
-      -->
         
       <span on:click={() => dispatch('card-close')} class="material-icons" style="margin-left: auto; margin-right: 0">
         close
@@ -18,6 +13,15 @@
     <div class="google-calendar-event-time" style="margin-top: 4px; margin-left: 10px;">
       {#if !taskObject.isDone && taskObject.startTime && taskObject.startDate}
         Scheduled for {taskObject.startDate + ' ' + taskObject.startTime}
+      {:else}
+        {#if !isSchedulingTask}
+        <button on:click={() => isSchedulingTask = true}>
+          Schedule
+        </button>
+        {:else}
+          <input bind:value={newStartDate} placeholder="12/31" style="width: 40px"/>
+          <input bind:value={newStartTime} placeholder="19:45" style="width: 40px" on:keypress={detectEnterKey5}/>
+        {/if}
       {/if}
     </div>
 
@@ -117,6 +121,9 @@ export let isOpen = false
 
 let depth = 1
 
+let newStartDate 
+let newStartTime
+let isSchedulingTask = false
 let isTypingRepeatFrequency = false
 let daysBeforeRepeating = 7
 
@@ -155,6 +162,20 @@ function detectEnterKey4 (e) {
     dispatch('task-repeat')
     daysBeforeRepeating = 0
     isTypingRepeatFrequency = false
+  }
+}
+
+function detectEnterKey5 (e) {
+  if (e.charCode === 13) {
+    if (!newStartDate || !newStartTime) {
+      alert('Need BOTH date and time')
+    } else {
+      taskObject.startDate = newStartDate
+      taskObject.startTime = newStartTime
+    }
+    dispatch('task-schedule')
+    newStartDate = ''
+    newStartTime = ''
   }
 }
 </script>
@@ -203,7 +224,7 @@ function detectEnterKey4 (e) {
   }
 
 
-  .material-symbols-outlined {
+.material-symbols-outlined {
   font-variation-settings:
   'FILL' 0,
   'wght' 400,

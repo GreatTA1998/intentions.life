@@ -49,6 +49,7 @@
         on:task-done={markAsDone}
         on:task-notes-update={() => dispatch('task-done')}
         on:task-repeat={() => dispatch('task-done')}
+        on:task-schedule={() => dispatch('task-done')}
       />
     
       <div style="width: {200 * (0.9 ** depth)}px; height: 100%">

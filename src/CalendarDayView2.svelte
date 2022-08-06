@@ -4,7 +4,7 @@
   on:drop={(e) => drop_handler(e)}
   on:dragover={dragover_handler}
 >
-  <div>Today</div>
+  <div style="margin-top: 6px">{getDate()}</div>
   
   {#each timesOfDay as timeOfDay, i}
     <div 

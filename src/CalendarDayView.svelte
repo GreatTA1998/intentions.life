@@ -1,5 +1,7 @@
 <div style="height: 77vh; overflow-y: scroll; overflow-x: hidden;">
-  Today
+  <div style="margin-top: 6px">
+    Today
+  </div>
   <div 
     id="calendar-day-container"
     style="width: 12vw; margin-left: 0px; margin-top: 10px; position: relative; height: 1600px" 

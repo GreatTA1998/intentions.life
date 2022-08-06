@@ -79,12 +79,24 @@
         on:task-delete={() => deleteSubtree(clickedTask.name)}
       />
       <CalendarDayView2
-        {scheduledTasks}
+        scheduledTasks={todayScheduledTasks}
         on:task-scheduled={(e) => mutateOneNode(e.detail)}
         on:task-duration-adjusted={(e) => mutateOneNode2(e.detail)}
         on:task-click={(e) => openDetailedCard(e.detail)}
       />
-      <FuturePreview/>
+      
+      <!-- 
+        PROBLEM: the habits have been set an artificial startTime
+        Need everything that has explicit scheduled times
+
+        I don't care for now
+
+        Actually it works out because those habits will always be scheduled ON THE DAY,
+        whereas future preview only cares about the FUTURE
+      -->
+      <FutureOverview
+        {futureScheduledTasks}
+      />
     </div>
   </div>
 </div>
@@ -95,7 +107,7 @@
   import RecursiveTask from '../RecursiveTask.svelte'
   import CalendarDayView from '../CalendarDayView.svelte'
   import CalendarDayView2 from '../CalendarDayView2.svelte'
-  import FuturePreview from '../FuturePreview.svelte'
+  import FutureOverview from '../FutureOverview.svelte'
   import DetailedCardPopup from '../DetailedCardPopup.svelte'
   import { onMount } from 'svelte'
   import db from '../db.js'
@@ -140,7 +152,9 @@
   let sortedAllTasks = [] 
   let lastRanRepeatAtDate = ''
   let dateOfToday = getDateOfToday()
-  let scheduledTasks = []
+  let todayScheduledTasks = []
+  let futureScheduledTasks = [] // AF([])
+
   let scheduledTasks2 = []
   let newTopLevelTask = ''
   let isTypingNewRootTask = false
@@ -177,16 +191,27 @@
     }
   }
 
-  function collectScheduledTasksIntoArray () {
-    scheduledTasks = []
+  function collectTodayScheduledTasksToArray () {
+    todayScheduledTasks = []
     for (const task of allTasks) {
       traverseAndUpdateTree({
         node: task,
         fulfilsCriteria: (task) => task.startDate === getDateOfToday() && task.startTime, 
-        applyFunc: (task) => scheduledTasks.push(task)
+        applyFunc: (task) => todayScheduledTasks.push(task)
       })
     }
   } 
+
+  function collectFutureScheduledTasksToArray () {
+    futureScheduledTasks = [] 
+    for (const task of allTasks) {
+      traverseAndUpdateTree({
+        node: task,
+        fulfilsCriteria: (task) => task.startDate && task.startTime && task.startDate > getDateOfToday(),
+        applyFunc: (task) => futureScheduledTasks.push(task)
+      })
+    }
+  }
 
   async function markNodeAsDone (name) {
     for (const task of allTasks) {
@@ -313,14 +338,23 @@
   $: if (allTasks) {
     // FIND SCHEDULED TASK
     console.log('collecting scheduled tasks to be displayed...')
-    collectScheduledTasksIntoArray()
+    collectTodayScheduledTasksToArray()
+
+    collectFutureScheduledTasksToArray()
+    // sort it from earliest to latest
+    futureScheduledTasks.sort((task1, task2) => {
+      const d1 = new Date(task1.startDate)
+      const d2 = new Date(task2.startDate)
+
+      return d1.getTime() - d2.getTime()
+    })
 
     // finished tasks go to the bottom
     sortedAllTasks = allTasks.sort((t1, t2) => {
       return !!t1.isDone - !!t2.isDone // `isDone` can be undefined, which screws up the subtraction
     })
 
-    // RE-THINK THE REPEATING TASK
+    // HANDLE TASKS THAT REPEAT
     // can't use `return` in reactive expression https://github.com/sveltejs/svelte/issues/2828
     if (lastRanRepeatAtDate !== dateOfToday) {
       console.log('running repeating task algorithm')
