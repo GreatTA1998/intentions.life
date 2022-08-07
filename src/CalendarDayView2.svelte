@@ -1,50 +1,58 @@
-<div 
-  id="calendar-day-container" 
-  style="position: relative; width: 12vw; overflow-y: scroll; overflow-x: hidden;"
-  on:drop={(e) => drop_handler(e)}
-  on:dragover={dragover_handler}
->
-  <div style="margin-top: 6px">{getDate()}</div>
-  
-  {#each timesOfDay as timeOfDay, i}
-    <div 
-      class="time-indicator" 
-      style="top: {30 + (60 * i)}px;"
-    >
-      {timeOfDay}
-      
-    </div>
-  {/each}
+<!-- 
+  You need the relative scrolling container to be different from `calendar-day-container`,
+  so the absolute positionings will count from the right place (no need to fully understand yet) 
 
-  {#each scheduledTasks as task, i}
-    <div 
-      on:click={() => openDetailedCard(task)}
-      class="scheduled-task" 
-      style="top: {computeOffset(task)}px; 
-             height: {task.duration * pixelsPerMinute || 30}px; 
-             left: 30px"
-    >
-      <div draggable="true" on:dragstart={(e) => dragstart_handler(e, task.name)} style="width: 11vw">
-        {task.name} 
-      </div>
-      <!-- border: 2px solid red; -->
-      <div  
-        style="height: {task.duration * pixelsPerMinute - 20 - 10}px; width: 11vw" 
-        draggable="true" on:dragstart={(e) => dragstart_handler(e, task.name)}
+  height: 200% is just so it's high enough to contain all the absolute elements
+-->
+<div style="overflow-y: scroll; overflow-x: hidden; height: 77vh">
+  <div 
+    id="calendar-day-container" 
+    style="position: relative; width: 12vw; height: 1500px"
+    on:drop={(e) => drop_handler(e)}
+    on:dragover={dragover_handler}
+  >
+    <div style="margin-top: 6px">{getDate()}</div>
+    
+    {#each timesOfDay as timeOfDay, i}
+      <div 
+        class="time-indicator" 
+        style="top: {30 + (60 * i)}px;"
       >
-
+        {timeOfDay}
+        
       </div>
-      
-      <!-- border: 2px solid black; -->
-      <div draggable="true"
-        on:dragstart={(e) => mousedown_handler(e)}
-        on:dragend={(e) => mouseup_handler(e, task)}
-        style="height: 8px; width: 11vw; position: absolute; bottom: 0; left: -3px; cursor: ns-resize;"
+    {/each}
+
+    {#each scheduledTasks as task, i}
+      <div 
+        on:click={() => openDetailedCard(task)}
+        class="scheduled-task" 
+        style="top: {computeOffset(task)}px; 
+              height: {task.duration * pixelsPerMinute || 30}px; 
+              left: 30px"
       >
+        <div draggable="true" on:dragstart={(e) => dragstart_handler(e, task.name)} style="width: 11vw">
+          {task.name} 
+        </div>
+        <!-- border: 2px solid red; -->
+        <div  
+          style="height: {task.duration * pixelsPerMinute - 20 - 10}px; width: 11vw" 
+          draggable="true" on:dragstart={(e) => dragstart_handler(e, task.name)}
+        >
 
+        </div>
+        
+        <!-- border: 2px solid black; -->
+        <div draggable="true"
+          on:dragstart={(e) => mousedown_handler(e)}
+          on:dragend={(e) => mouseup_handler(e, task)}
+          style="height: 8px; width: 11vw; position: absolute; bottom: 0; left: -3px; cursor: ns-resize;"
+        >
+
+        </div>
       </div>
-    </div>
-  {/each}
+    {/each}
+  </div>
 </div>
 
 <!-- 
@@ -60,7 +68,7 @@
 
   const dispatch = createEventDispatcher()
   const getDate = getDateOfToday
-  const timesOfDay = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00', '00:00', '01:00', '02:00']
+  const timesOfDay = ['01:00', '02:00', '03:00', '04:00', '05:00', '06:00', '07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00', '00:00']
   let pixelsPerMinute = 90 / 60
   let startY = 0
 
