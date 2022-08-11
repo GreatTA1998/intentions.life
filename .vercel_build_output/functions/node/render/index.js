@@ -37964,13 +37964,6 @@ function getDateOfToday() {
   }
   return `${mm}/${dd}`;
 }
-function computeOffset({ startTime }) {
-  const hh = startTime.slice(0, 2);
-  const mm = startTime.slice(3, 5);
-  const hoursOffset = Number(hh) + Number(mm) / 60 - 8;
-  const pixelsPerHour = 90;
-  return hoursOffset * pixelsPerHour;
-}
 function traverseAndUpdateTree({ node, fulfilsCriteria, applyFunc }) {
   if (fulfilsCriteria(node)) {
     applyFunc(node);
@@ -38077,48 +38070,65 @@ ${!taskObject.isDeleted && !taskObject.isDone && !(taskObject.startTime && taskO
       let { scheduledTasks } = $$props;
       createEventDispatcher();
       const getDate = getDateOfToday;
-      const timesOfDay = [
-        "08:00",
-        "09:00",
-        "10:00",
-        "11:00",
-        "12:00",
-        "13:00",
-        "14:00",
-        "15:00",
-        "16:00",
-        "17:00",
-        "18:00",
-        "19:00",
-        "20:00",
-        "21:00",
-        "22:00",
-        "23:00",
-        "00:00",
-        "01:00",
-        "02:00"
-      ];
+      let timesOfDay = [];
       let pixelsPerMinute = 90 / 60;
+      let calendarStartTime = "";
+      function decideCalendarStartTime() {
+        const today = new Date();
+        const currentMinutesFromMidnight = today.getHours() * 60;
+        for (const task of scheduledTasks) {
+          const hhOfStart = task.startTime.substring(0, 2);
+          const taskStartMinutesFromMidnight = parseInt(hhOfStart) * 60;
+          const taskEndMinutesFromMidnight = taskStartMinutesFromMidnight + task.duration;
+          if (taskStartMinutesFromMidnight < currentMinutesFromMidnight && currentMinutesFromMidnight < taskEndMinutesFromMidnight) {
+            calendarStartTime = `${hhOfStart}:00`;
+          }
+        }
+        if (!calendarStartTime) {
+          calendarStartTime = `${today.toLocaleTimeString().substring(0, 2)}:00`;
+        }
+        let currentHour = today.getHours();
+        for (let i2 = 0; i2 < 16; i2++) {
+          if (currentHour === 24) {
+            currentHour = 0;
+          }
+          if (currentHour < 10) {
+            timesOfDay.push("0" + currentHour + ":00");
+          } else {
+            timesOfDay.push(currentHour + ":00");
+          }
+          currentHour += 1;
+        }
+      }
+      decideCalendarStartTime();
+      function computeOffset({ startTime }) {
+        const hh = startTime.slice(0, 2);
+        const mm = startTime.slice(3, 5);
+        const hoursOffset = Number(hh) + Number(mm) / 60 - parseInt(calendarStartTime.substring(0, 2));
+        const pixelsPerHour = 90;
+        return hoursOffset * pixelsPerHour;
+      }
       if ($$props.scheduledTasks === void 0 && $$bindings.scheduledTasks && scheduledTasks !== void 0)
         $$bindings.scheduledTasks(scheduledTasks);
       $$result.css.add(css$2);
-      return `<div id="${"calendar-day-container"}" style="${"position: relative; width: 12vw; overflow-y: scroll; overflow-x: hidden;"}" class="${"svelte-x8u2ov"}"><div style="${"margin-top: 6px"}" class="${"svelte-x8u2ov"}">${escape(getDate())}</div>
-  
-  ${each(timesOfDay, (timeOfDay, i2) => {
-        return `<div class="${"time-indicator svelte-x8u2ov"}" style="${"top: " + escape(30 + 60 * i2) + "px;"}">${escape(timeOfDay)}
-      
-    </div>`;
+      return `
+<div style="${"overflow-y: scroll; overflow-x: hidden; height: 77vh"}" class="${"svelte-x8u2ov"}"><div id="${"calendar-day-container"}" style="${"position: relative; width: 12vw; height: 1000px"}" class="${"svelte-x8u2ov"}"><div style="${"margin-top: 6px"}" class="${"svelte-x8u2ov"}">${escape(getDate())}</div>
+    
+    ${each(timesOfDay, (timeOfDay, i2) => {
+        return `<div class="${"time-indicator svelte-x8u2ov"}" style="${"top: " + escape(30 + 60 * i2) + "px;"}">${escape(timeOfDay.substring(0, 5))}
+        
+      </div>`;
       })}
 
-  ${each(scheduledTasks, (task, i2) => {
+    ${each(scheduledTasks, (task, i2) => {
         return `<div class="${"scheduled-task svelte-x8u2ov"}" style="${"top: " + escape(computeOffset(task)) + "px; height: " + escape(task.duration * pixelsPerMinute || 30) + "px; left: 30px"}"><div draggable="${"true"}" style="${"width: 11vw"}" class="${"svelte-x8u2ov"}">${escape(task.name)}</div>
-      
-      <div style="${"height: " + escape(task.duration * pixelsPerMinute - 20 - 10) + "px; width: 11vw"}" draggable="${"true"}" class="${"svelte-x8u2ov"}"></div>
-      
-      
-      <div draggable="${"true"}" style="${"height: 8px; width: 11vw; position: absolute; bottom: 0; left: -3px; cursor: ns-resize;"}" class="${"svelte-x8u2ov"}"></div>
-    </div>`;
-      })}</div>
+        
+        <div style="${"height: " + escape(task.duration * pixelsPerMinute - 20 - 10) + "px; width: 11vw"}" draggable="${"true"}" class="${"svelte-x8u2ov"}"></div>
+        
+        
+        <div draggable="${"true"}" style="${"height: 8px; width: 11vw; position: absolute; bottom: 0; left: -3px; cursor: ns-resize;"}" class="${"svelte-x8u2ov"}"></div>
+      </div>`;
+      })}</div></div>
 
 `;
     });
@@ -38312,8 +38322,8 @@ var entry3, js3, css4;
 var init__3 = __esm({
   ".svelte-kit/output/server/nodes/2.js"() {
     init_index_svelte();
-    entry3 = "pages/index.svelte-5dbf7de3.js";
-    js3 = ["pages/index.svelte-5dbf7de3.js", "chunks/vendor-ecd12436.js"];
+    entry3 = "pages/index.svelte-4015ddc8.js";
+    js3 = ["pages/index.svelte-4015ddc8.js", "chunks/vendor-ecd12436.js"];
     css4 = ["assets/pages/index.svelte-d5a6faa9.css"];
   }
 });
@@ -39822,7 +39832,7 @@ var manifest = {
   assets: new Set(["background-picture.png", "favicon.png", "illiyard-moor-lofi.mp3", "illiyard-moor.jpg", "illiyard-moor.mp3", "maplestory-orange-blurred.jpg", "maplestory-orange.jpg", "maplestory-watercolor.jpg", "ms-leafre-lofi.mp3", "yorushika-elma.mp3", "yorushika-elma.mp4"]),
   _: {
     mime: { ".png": "image/png", ".mp3": "audio/mpeg", ".jpg": "image/jpeg", ".mp4": "video/mp4" },
-    entry: { "file": "start-92fde377.js", "js": ["start-92fde377.js", "chunks/vendor-ecd12436.js"], "css": [] },
+    entry: { "file": "start-8fe4af8f.js", "js": ["start-8fe4af8f.js", "chunks/vendor-ecd12436.js"], "css": [] },
     nodes: [
       () => Promise.resolve().then(() => (init__(), __exports)),
       () => Promise.resolve().then(() => (init__2(), __exports2)),
