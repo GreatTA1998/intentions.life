@@ -13,15 +13,6 @@
     <div class="google-calendar-event-time" style="margin-top: 4px; margin-left: 10px;">
       {#if !taskObject.isDone && taskObject.startTime && taskObject.startDate}
         Scheduled for {taskObject.startDate + ' ' + taskObject.startTime}
-      {:else}
-        {#if !isSchedulingTask}
-        <button on:click={() => isSchedulingTask = true}>
-          Schedule
-        </button>
-        {:else}
-          <input bind:value={newStartDate} placeholder="12/31" style="width: 40px"/>
-          <input bind:value={newStartTime} placeholder="19:45" style="width: 40px" on:keypress={detectEnterKey5}/>
-        {/if}
       {/if}
     </div>
 
@@ -41,13 +32,21 @@
       style="margin-left: 10px;"
     />
 
-    <div style="display: flex; margin-left: 6px">
+    <div style="display: flex; margin-left: 10px">
       <div>
+        {#if !isSchedulingTask}
+          <button on:click={() => isSchedulingTask = true}>
+            Schedule
+          </button>
+        {:else}
+          <input bind:value={newStartDate} placeholder="12/31" style="width: 40px"/>
+          <input bind:value={newStartTime} placeholder="19:45" style="width: 40px" on:keypress={detectEnterKey5}/>
+        {/if}
         <!-- Repeating tasks -->
         {#if !isTypingRepeatFrequency}
-        <button on:click={() => isTypingRepeatFrequency = true} style="margin-left: 5px;">
-          Repeat task
-        </button>
+          <button on:click={() => isTypingRepeatFrequency = true} style="margin-left: 0px;">
+            Repeat task
+          </button>
         {:else}
           <!-- TODO: design repeat menu -->
           <!-- Can't choose both -->
@@ -96,7 +95,6 @@
           </div>
         {/if}
       </div>
-
       <div style="margin-left: auto; margin-right: 16px">
         <!-- class="material-icons" style="margin-left: 5px; font-size: {2.5 * (0.7 ** depth)}rem;" -->
         <button on:click={() => dispatch('task-delete')}>
@@ -109,12 +107,26 @@
         </button>
       </div>
     </div>
+
+    <!-- This is the section where you show everything regardless of whether it is scheduled or not -->
+    <div style="font-size: 1rem; margin-top: 12px; margin-left: 12px">
+      Full task history
+    </div>
+
+    {#each taskObject.children as child}
+      <div style="margin-left: 12px;">
+      <RecursiveBulletPoint taskObject={child}>
+      
+      </RecursiveBulletPoint>
+      </div>
+    {/each}
   </div>
 {/if}
 
 <script>
 import { createEventDispatcher, onMount } from 'svelte'
 import _ from 'lodash'
+import RecursiveBulletPoint from './RecursiveBulletPoint.svelte';
 
 export let taskObject 
 export let isOpen = false
@@ -209,6 +221,7 @@ function detectEnterKey5 (e) {
   }
 
   .detailed-card {
+    overflow-y: scroll;
     z-index: 5;
     position: absolute;
     width: 400px; 
