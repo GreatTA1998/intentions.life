@@ -51,47 +51,17 @@
         on:task-repeat={() => dispatch('task-done')}
         on:task-schedule={() => dispatch('task-done')}
       />
-    
-      <div style="width: {200 * (0.9 ** depth)}px; height: 100%">
-        {#if isShowingOptions}
-          {#if !(isTypingNewTask || isSchedulingTask || isRepeatingTask || isDeletingTask )}  
-            <!-- 
-              <span on:click={markAsDone} class="material-icons" style="margin-left: 5px; font-size: {2.5 * (0.7 ** depth)}rem;">
-                check
-              </span>
-            -->
-          {:else}
-            {#if isSchedulingTask}
-              <input placeholder="03/14" bind:value={scheduledDate} style="width: 40px; margin-left: 14px;"/>
-              <input placeholder="13:00" bind:value={scheduledTime} style="width: 40px" on:keypress={detectEnterKey2}/>
-            {:else if isRepeatingTask} 
-              <div style="display: flex">
-                Repeats every <input bind:value={daysBeforeRepeating} style="width: 20px;" placeholder="0" on:keypress={detectEnterKey4}> days 
-              </div>
-            {:else if isDeletingTask}
-              <div style="display: flex; align-items: center; justify-content: space-evenly">
-                <div on:click={deleteTask}>
-                  Delete
-                </div>
-                <div on:click={() => isDeletingTask = false}>
-                  Cancel
-                </div>
-              </div>
-            {/if}
-          {/if}
-        {/if}
-      </div>
     </div>
 
     <div style="margin-top: {20 * (0.7 ** depth)}px;">
       {#each taskObject.children as child, i}
         <RecursiveTask 
           taskObject={child}
+          depth={depth+1}
           on:task-create={(e) => handleGrandchildUpdate(e, i)}
           on:task-done
           on:task-delete
           on:task-repeating
-          depth={depth+1}
         />
       {/each}
 
