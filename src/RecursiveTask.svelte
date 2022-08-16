@@ -70,8 +70,12 @@
               </div>
             {:else if isDeletingTask}
               <div style="display: flex; align-items: center; justify-content: space-evenly">
-                <div on:click={deleteTask}>Delete</div>
-                <div on:click={() => isDeletingTask = false}>Cancel</div>
+                <div on:click={deleteTask}>
+                  Delete
+                </div>
+                <div on:click={() => isDeletingTask = false}>
+                  Cancel
+                </div>
               </div>
             {/if}
           {/if}

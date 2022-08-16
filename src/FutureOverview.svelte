@@ -7,7 +7,7 @@
 
       <div 
         class="scheduled-task" 
-        style="top: {20 + (100*i)}px; height: {30}px; border-left: 2px solid red;"
+        style="top: {20 + (100*i)}px; height: {30}px; border-left: 2px solid orange;"
       >
         {task.name}
       </div>
