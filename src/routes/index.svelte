@@ -141,7 +141,6 @@
     div.style['background-image'] = `url(${chosenBgImageURL})`
 
     chosenMusicFile = musicFiles[getRandomInt(2)]
-    console.log('chosenAudio =', chosenMusicFile)
     AudioElem.src = chosenMusicFile
   })
 
@@ -239,14 +238,16 @@
       fulfilsCriteria: (task) => task.children.filter(c => c.name === name).length >= 1, // inequality is important because sometimes 2 or more tasks have the same name
       applyFunc: (task) => { 
         let idx 
-        // do not use `forEach` it mutates the array while it iterates even if you use return statements etc. it's unintuitive code
+        // do not use `forEach` it might mutate the array while it iterates even if you use return statements etc. it's unintuitive code
         for (let i = 0; i < task.children.length; i++) {
-          if (task.children[i] === name) {
+          if (task.children[i].name === name) {
             idx = i
             break
           }
         }
-        task.children.splice(idx, 1)
+        if (idx) { // sometimes `idx` is undefined for some reason, meaning the last item of the array will be deleted
+          task.children.splice(idx, 1)
+        }
       }
     })
 
