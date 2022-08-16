@@ -2,17 +2,18 @@
   <div style="width: 12vw; margin-left: 0px; margin-top: 27px; position: relative; height: 1600px" >
     {#each futureScheduledTasks as task, i}
       <div style="position: absolute; top: {100*i}px">
-        {task.startDate}
+        <b>{task.startDate}</b>
       </div>
 
-      <div 
-        class="scheduled-task" 
-        style="top: {20 + (100*i)}px; height: {30}px; border-left: 2px solid orange;"
-      >
-        {task.name}
-      </div>
-    
-      <!-- broken axis -->
+      <TaskElement  
+        {task}
+        fontSize={0.8}
+        offsetFromTop={20 + (100*i)}
+        height={task.duration * pixelsPerMinute || 15}
+        on:task-click
+        on:task-duration-adjusted
+      />
+      <!-- Broken axis -->
       <div 
         class="scheduled-task" 
         style="top: {70 + (100*i)}px; height: {15}px; border-left: 2px dashed black;"
@@ -24,7 +25,11 @@
   <!-- Broken axis design <Just do a different border-line variant> -->
   <!-- That's it, everything is just a combination of `Task` and `Broken Axis` -->
 <script>
+import TaskElement from './TaskElement.svelte'
+
 export let futureScheduledTasks 
+
+const pixelsPerMinute = 90/60
 
 // Broken-axes will be used relentlessly
 

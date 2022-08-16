@@ -11,50 +11,29 @@
     on:drop={(e) => drop_handler(e)}
     on:dragover={dragover_handler}
   >
-    <div style="margin-top: 27px">{getDate()}</div>
+    <div style="margin-top: 27px; font-weight: 600">
+      {getDate()}
+    </div>
     
-    {#each timesOfDay as timeOfDay, i}
-      <div 
-        class="time-indicator" 
-        style="top: {30 + (60 * i)}px;"
-      >
-        {timeOfDay.substring(0, 5)}
-        
-      </div>
-    {/each}
-
-    {#each scheduledTasks as task, i}
-      <div 
-        on:click={() => openDetailedCard(task)}
-        class="scheduled-task" 
-        style="top: {computeOffset(task)}px; 
-               height: {task.duration * pixelsPerMinute || 30}px; 
-               left: 30px"
-      >
-
-        <div draggable="true" on:dragstart={(e) => dragstart_handler(e, task.name)} style="width: 11vw">
-          {task.name} 
+    {#if calendarStartTime}
+      {#each timesOfDay as timeOfDay, i}
+        <div class="time-indicator" style="top: {30 + (60 * i)}px;">
+          {timeOfDay.substring(0, 5)}
         </div>
-        <!-- Continuation of re-scheduling zone -->
-        <!-- border: 2px solid red; -->
-        <div  
-          style="height: {task.duration * pixelsPerMinute - 20 - 10}px; width: 11vw" 
-          draggable="true" on:dragstart={(e) => dragstart_handler(e, task.name)}
-        >
+      {/each}
 
-        </div>
-        
-        <!-- Bottom region for adjusting duration -->
-        <!-- border: 2px solid black; -->
-        <div draggable="true"
-          on:dragstart={(e) => mousedown_handler(e)}
-          on:dragend={(e) => mouseup_handler(e, task)}
-          style="height: 8px; width: 11vw; position: absolute; bottom: 0; left: -3px; cursor: ns-resize;"
-        >
-
-        </div>
-      </div>
-    {/each}
+      {#each scheduledTasks as task, i}
+        <TaskElement  
+          {task}
+          offsetFromTop={computeOffset(task)}
+          height={task.duration * pixelsPerMinute || 30}
+          fontSize={0.8}
+          offsetFromLeft={30}
+          on:task-click
+          on:task-duration-adjusted
+        />
+      {/each}
+    {/if}
   </div>
 </div>
 
@@ -66,6 +45,7 @@
 <script>
   import { createEventDispatcher } from 'svelte'
   import { getDateOfToday } from './helpers.js'
+  import TaskElement from './TaskElement.svelte'
 
   export let scheduledTasks
 
@@ -126,16 +106,6 @@
     return hoursOffset * pixelsPerHour
   }
 
-  function openDetailedCard (task) {
-    dispatch('task-click', {
-      task
-    })
-  }
-
-  function dragstart_handler(e, taskName) {
-    e.dataTransfer.setData("text/plain", taskName)
-  }
-
   function dragover_handler (e) {
     e.preventDefault();
     e.dataTransfer.dropEffect = "move";
@@ -194,43 +164,12 @@
       dateScheduled: getDate()
     })
   }
-
-  function mousedown_handler (e) {
-    startY = e.offsetY
-  }
-
-  function mouseup_handler (e, task) {
-    // alert(`From ${startY} to ${e.offsetY}`)
-
-    // quickfix
-    if (!task.duration) {
-      task.duration = 10
-    }
-
-    const minutesPerPixel = 60 / 90
-    const durationChange = (e.offsetY - startY) * minutesPerPixel
-
-    dispatch('task-duration-adjusted', {
-      taskName: task.name,
-      duration: Math.max(1, task.duration + durationChange) // can't have a 0 duration event
-    })
-  }
 </script>
 
 <style>
   *::-webkit-scrollbar {
     width: 0;
     background-color: #aaa; /* or add it to the track */
-  }
-
-  .scheduled-task {
-    display: inline;
-    position: absolute;
-    margin-left: 2px;
-    border-left: 2px solid grey;
-    padding-left: 2px;
-    font-size: 0.8rem;
-    width: 100%;
   }
 
   .time-indicator {

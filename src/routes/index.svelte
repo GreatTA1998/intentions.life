@@ -3,15 +3,12 @@
   5. Spatial hierarchy design (like Nototo)
 -->
 <div id="background-image-holder" style="height: 100vh; padding-left: 120px; padding-right: 120px;">
-  <!-- 300 px  -->
   <div style="height: 100px;"></div>
 
-  <!-- Cannot autoplay music unfortunately, but ability to play/pause might not be so bad -->
   <div on:click={toggleMusic} style="position: absolute; top: 30px; left: 30px;">
     <span  class="material-icons" style="margin-left: auto; margin-right: 0; color: white">
       {isMusicPlaying ? 'music_note' : 'music_off'}
     </span>
-    <!-- <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" /> -->
   </div>
 
   <div style="display: flex; padding-left: 0; padding-top: 0px">
@@ -60,17 +57,7 @@
       </div>
     </div>
 
-    <div 
-      style="
-        display: flex; 
-        justify-content: space-evenly; 
-        width: 36vw; 
-        background-color: white; 
-        border: 1px solid green; 
-        border-top-right-radius: 20px; 
-        border-bottom-right-radius: 20px;
-        padding-left: 8px"
-    >
+    <div class="calendar-section-container">
       <DetailedCardPopup 
         isOpen={isDetailedCardOpen}
         taskObject={clickedTask}
@@ -84,18 +71,10 @@
         on:task-duration-adjusted={(e) => mutateOneNode2(e.detail)}
         on:task-click={(e) => openDetailedCard(e.detail)}
       />
-      
-      <!-- 
-        PROBLEM: the habits have been set an artificial startTime
-        Need everything that has explicit scheduled times
-
-        I don't care for now
-
-        Actually it works out because those habits will always be scheduled ON THE DAY,
-        whereas future preview only cares about the FUTURE
-      -->
       <FutureOverview
         {futureScheduledTasks}
+        on:task-duration-adjusted={(e) => mutateOneNode2(e.detail)}
+        on:task-click={(e) => openDetailedCard(e.detail)}
       />
     </div>
   </div>
@@ -503,6 +482,17 @@
 </script>
 
 <style>
+  .calendar-section-container {
+    display: flex; 
+    justify-content: space-evenly; 
+    width: 36vw; 
+    background-color: white; 
+    border: 1px solid green; 
+    border-top-right-radius: 20px; 
+    border-bottom-right-radius: 20px;
+    padding-left: 8px;
+  }
+
   #background-image-holder {
     /* background-image: url('maplestory-orange.jpg'); */
     /* background-image: url('https://i.imgur.com/ShnqIpJ.jpeg'); */
