@@ -11,7 +11,7 @@
     on:drop={(e) => drop_handler(e)}
     on:dragover={dragover_handler}
   >
-    <div style="margin-top: 6px">{getDate()}</div>
+    <div style="margin-top: 27px">{getDate()}</div>
     
     {#each timesOfDay as timeOfDay, i}
       <div 
@@ -28,12 +28,14 @@
         on:click={() => openDetailedCard(task)}
         class="scheduled-task" 
         style="top: {computeOffset(task)}px; 
-              height: {task.duration * pixelsPerMinute || 30}px; 
-              left: 30px"
+               height: {task.duration * pixelsPerMinute || 30}px; 
+               left: 30px"
       >
+
         <div draggable="true" on:dragstart={(e) => dragstart_handler(e, task.name)} style="width: 11vw">
           {task.name} 
         </div>
+        <!-- Continuation of re-scheduling zone -->
         <!-- border: 2px solid red; -->
         <div  
           style="height: {task.duration * pixelsPerMinute - 20 - 10}px; width: 11vw" 
@@ -42,6 +44,7 @@
 
         </div>
         
+        <!-- Bottom region for adjusting duration -->
         <!-- border: 2px solid black; -->
         <div draggable="true"
           on:dragstart={(e) => mousedown_handler(e)}
@@ -144,6 +147,8 @@
    * 
    * We don't just read the hh e.g. "24" from the hour block, 
    * because the drop_handler is defined outside of those hour <divs>
+   * 
+   * TODO: ensure the drop package is a valid task
    */
   function drop_handler (e) {
     console.log('drop detected')

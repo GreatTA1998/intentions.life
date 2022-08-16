@@ -14,8 +14,8 @@
     <!-- <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" /> -->
   </div>
 
-  <div style="display: flex; padding-left: 0; padding-top: 10px;">
-    <div class="fixed-height-container-for-scrolling" style="background-color: white; border: 2px solid green; border-top-left-radius: 20px; border-bottom-left-radius: 20px;">
+  <div style="display: flex; padding-left: 0; padding-top: 0px">
+    <div class="fixed-height-container-for-scrolling" style="background-color: white; border: 1px solid green; border-top-left-radius: 20px; border-bottom-left-radius: 20px; padding-top: 14px; padding-left: 30px">
       <div class="todo-list">
         {#if allTasks}
           {#each allTasks as task}
@@ -64,12 +64,12 @@
       style="
         display: flex; 
         justify-content: space-evenly; 
-        width: 30vw; 
-        border-left: 2px dashed grey;
+        width: 36vw; 
         background-color: white; 
-        border: 2px solid green; 
+        border: 1px solid green; 
         border-top-right-radius: 20px; 
-        border-bottom-right-radius: 20px;"
+        border-bottom-right-radius: 20px;
+        padding-left: 8px"
     >
       <DetailedCardPopup 
         isOpen={isDetailedCardOpen}
@@ -78,7 +78,7 @@
         on:task-done={() => markNodeAsDone(clickedTask.name)}
         on:task-delete={() => deleteSubtree(clickedTask.name)}
       />
-      <CalendarDayView2
+      <CalendarDayView
         scheduledTasks={todayScheduledTasks}
         on:task-scheduled={(e) => mutateOneNode(e.detail)}
         on:task-duration-adjusted={(e) => mutateOneNode2(e.detail)}
@@ -106,7 +106,6 @@
 <script>
   import RecursiveTask from '../RecursiveTask.svelte'
   import CalendarDayView from '../CalendarDayView.svelte'
-  import CalendarDayView2 from '../CalendarDayView2.svelte'
   import FutureOverview from '../FutureOverview.svelte'
   import DetailedCardPopup from '../DetailedCardPopup.svelte'
   import { onMount } from 'svelte'
