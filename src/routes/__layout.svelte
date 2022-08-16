@@ -1,6 +1,10 @@
-<slot>
+{#if hasFetchedUser}
+  <slot>
 
-</slot>
+  </slot>
+{:else}
+  <div>Fetching your info...</div>
+{/if}
 
 <script>
   import db from '../db.js'
@@ -29,6 +33,23 @@
         await setDoc(userRef, {
           uid: resultUser.uid,
           phoneNumber: resultUser.phoneNumber || '',
+          allTasks: [{
+            name: 'Try life-organizer',
+            children: [
+              {
+                name: 'Create a sub-task by hovering to the approximate region',
+                children: []
+              },
+              {
+                name: 'Schedule a task by dragging it to the calendar',
+                children: []
+              },
+              {
+                name: 'Schedule future task by inputting the date',
+                children: []
+              }
+            ]
+          }]
         })
         dbUserSnapshot = await getDoc(userRef) // seems like a redundant fetch, but keep for now
       } 

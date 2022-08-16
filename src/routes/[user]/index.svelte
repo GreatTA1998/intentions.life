@@ -8,6 +8,20 @@
   }  
 </script>
 
+{#key clickedTask}
+  <DetailedCardPopup 
+    isOpen={isDetailedCardOpen}
+    taskObject={clickedTask}
+    on:card-close={() => isDetailedCardOpen = false}
+    on:task-done={() => markNodeAsDone(clickedTask.name)}
+    on:task-delete={() => deleteSubtree(clickedTask.name)}
+    on:task-repeat={updateFirestore}
+    on:task-schedule={updateFirestore}
+    on:task-title-update={updateFirestore}
+    on:task-notes-update={updateFirestore}
+  />
+{/key}
+
 <div id="background-image-holder" style="height: 100vh; padding-left: 120px; padding-right: 120px;">
   <div style="height: 100px;"></div>
 
@@ -18,29 +32,27 @@
   </div>
 
   <div style="display: flex; padding-left: 0; padding-top: 0px">
-    <div class="fixed-height-container-for-scrolling" style="background-color: white; border: 1px solid green; border-top-left-radius: 20px; border-bottom-left-radius: 20px; padding-top: 14px; padding-left: 30px">
+    <div class="fixed-height-container-for-scrolling">
       <div class="todo-list">
         {#if allTasks}
           {#each allTasks as task}
             {#if !task.isDeleted}
               <div class="task-container">
                 <RecursiveTask 
+                  on:task-click={(e) => openDetailedCard(e.detail)}
                   on:task-create={(e) => modifyTaskTree(e, task)} 
                   on:task-done={updateFirestore}
                   on:task-delete={updateFirestore}
                   on:task-repeating={updateFirestore}
                   taskObject={task}
                   depth={1}
-                >
-
-                </RecursiveTask>
+                />
               </div>
             {/if}
           {/each}
           
-          <!-- CREATE NEW TASK -->
-          <!-- Invisible, but hoverable region -->
-          <div style="height: 100px;"
+          <!-- CREATE NEW TASK (invisible but hoverable region) -->
+          <div style="height: 200px;"
             on:mouseenter={() => isShowingCreateButton = true}
             on:mouseleave={() => isShowingCreateButton = false}
           >
@@ -64,13 +76,6 @@
     </div>
 
     <div class="calendar-section-container">
-      <DetailedCardPopup 
-        isOpen={isDetailedCardOpen}
-        taskObject={clickedTask}
-        on:card-close={() => isDetailedCardOpen = false}
-        on:task-done={() => markNodeAsDone(clickedTask.name)}
-        on:task-delete={() => deleteSubtree(clickedTask.name)}
-      />
       <CalendarDayView
         scheduledTasks={todayScheduledTasks}
         on:task-scheduled={(e) => mutateOneNode(e.detail)}
@@ -100,7 +105,7 @@
   import { doc, getDoc, updateDoc } from 'firebase/firestore'
   import { getDateOfToday, getDateOfTomorrow } from '../../helpers.js'
 
-  const userDocPath = 'users/GxBbopqXHW0qgjKEwU4z'
+  const userDocPath = `users/${userID}`
 
   function getRandomInt(max) {
     return Math.floor(Math.random() * max);
@@ -213,7 +218,6 @@
       doc(db, userDocPath),
       { allTasks }
     )
-    console.log('updated')
   }
 
   async function deleteSubtree (name) {
@@ -521,11 +525,17 @@
   }
 
   .fixed-height-container-for-scrolling {
+    height: 77vh;
+    width: 70vw;
+    background-color: white; 
+    border: 1px solid green; 
+    border-top-left-radius: 20px; 
+    border-bottom-left-radius: 20px; 
+    padding-top: 14px; 
+    padding-left: 30px;
     /* background-image: linear-gradient(rgba(255,255,255,0.7), rgba(255,255,255,0.5)), url('../illiyard-moor.jpg'); */
     /* opacity: 0.5; */
-    height: 77vh;
     /* overflow-y: scroll; */
-    width: 70vw;
   }
 
   .todo-list {

@@ -29,7 +29,7 @@
       >
         {#if !isEditingTaskName}
           <div 
-            on:click={() => isDetailedCardOpen = true} 
+            on:click={() => dispatch('task-click', { task: taskObject })} 
             on:pointerenter={showOptions}
             class="truncate"
             style="width: {350 * (0.85 ** depth)}px"
@@ -40,17 +40,6 @@
           <input bind:value={newTaskName} on:keypress={detectEnterKey3}>
         {/if}
       </div>
-
-      <!-- `task-done` is just an excuse for the tree to re-render, because everyting is done through mutation -->
-      <DetailedCardPopup 
-        isOpen={isDetailedCardOpen}
-        {taskObject}
-        on:card-close={() => isDetailedCardOpen = false}
-        on:task-done={markAsDone}
-        on:task-notes-update={() => dispatch('task-done')}
-        on:task-repeat={() => dispatch('task-done')}
-        on:task-schedule={() => dispatch('task-done')}
-      />
     </div>
 
     <div style="margin-top: {20 * (0.7 ** depth)}px;">
@@ -59,6 +48,7 @@
           taskObject={child}
           depth={depth+1}
           on:task-create={(e) => handleGrandchildUpdate(e, i)}
+          on:task-click
           on:task-done
           on:task-delete
           on:task-repeating

@@ -1,9 +1,13 @@
 {#if isOpen}
   <div class="detailed-card">
     <div style="display: flex">
-      <div class="google-calendar-event-title" style="margin-top: 10px; margin-left: 10px;">
-        {taskObject.name}
-      </div>
+      <input 
+        type="text" 
+        class="google-calendar-event-title" 
+        bind:value={titleOfTask} 
+        on:input={handleInput2}
+        style="width: 90%; margin-left: 10px"
+      >
         
       <span on:click={() => dispatch('card-close')} class="material-icons" style="margin-left: auto; margin-right: 0">
         close
@@ -24,13 +28,16 @@
       {/if}
     </div>
 
-    <textarea 
-      bind:value={notesAboutTask}
-      on:input={handleInput}
-      cols="48" 
-      placeholder="notes"
-      style="margin-left: 10px;"
-    />
+    <div stle="float: left; width: 80%">
+      <!-- cols="48" determines width -->
+      <textarea 
+        bind:value={notesAboutTask}
+        on:input={handleInput}
+
+        placeholder="notes"
+        style="margin-left: 10px; width: 100%; max-width: 90%;"
+      />
+    </div>
 
     <div style="display: flex; margin-left: 10px">
       <div>
@@ -142,10 +149,18 @@ let daysBeforeRepeating = 7
 const dispatch = createEventDispatcher()
 
 let notesAboutTask = taskObject.notes || ''
+let titleOfTask = taskObject.name || ''
+
+console.log('detailed card popup taskObject =', taskObject)
 
 const handleInput = _.throttle(e => {
   notesAboutTask = e.target.value;
   saveNotes()
+}, 500) // milliseconds
+
+const handleInput2 = _.throttle(e => {
+  titleOfTask = e.target.value;
+  saveTitle()
 }, 500) // milliseconds
 
 function repeatOnDayOfWeek ({ dayNumber }) {
@@ -161,6 +176,11 @@ function repeatOnDayOfWeek ({ dayNumber }) {
 function saveNotes () {
   taskObject.notes = notesAboutTask
   dispatch('task-notes-update')
+}
+
+function saveTitle () {
+  taskObject.name = titleOfTask 
+  dispatch('task-title-update')
 }
 
 function detectEnterKey4 (e) {
@@ -193,6 +213,33 @@ function detectEnterKey5 (e) {
 </script>
 
 <style>
+  .detailed-card {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 50%;
+
+    overflow-y: scroll;
+    z-index: 5;
+    width: 80%;
+    height: 50%;
+    border-radius: 10px;
+    background-color: white;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    padding: 6px;
+  }
+
+  /* Refer to: https://stackoverflow.com/questions/3131072/how-to-change-input-text-box-style-to-line */
+  input[type=text] {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid #000000;
+    outline: none;
+
+    padding: 2px 0px;
+  }
+
   .google-calendar-event-detail {
     font-family: Roboto,Arial,sans-serif;
     font-size: 14px;
@@ -218,18 +265,6 @@ function detectEnterKey5 (e) {
     letter-spacing: .2px;
     line-height: 20px;
     color: #3c4043;
-  }
-
-  .detailed-card {
-    overflow-y: scroll;
-    z-index: 5;
-    position: absolute;
-    width: 400px; 
-    height: 250px; 
-    border-radius: 10px;
-    background-color: white;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-    padding: 6px;
   }
 
   .selected {
