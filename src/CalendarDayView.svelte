@@ -17,7 +17,7 @@
     
     {#if calendarStartTime}
       {#each timesOfDay as timeOfDay, i}
-        <div class="time-indicator" style="top: {30 + (60 * i)}px;">
+        <div class="time-indicator" style="top: {30 + (pixelsPerHour * i)}px;">
           {timeOfDay.substring(0, 5)}
         </div>
       {/each}
@@ -37,11 +37,6 @@
   </div>
 </div>
 
-<!-- 
-  VERDICT: absolute works
-  "Independence" is the best word you can ever hear in programming
- -->
-
 <script>
   import { createEventDispatcher } from 'svelte'
   import { getDateOfToday } from './helpers.js'
@@ -51,8 +46,10 @@
 
   const dispatch = createEventDispatcher()
   const getDate = getDateOfToday
+
+  const pixelsPerHour = 80
+  const pixelsPerMinute = 80 / 60
   let timesOfDay = []
-  let pixelsPerMinute = 90 / 60
   let startY = 0
 
   let calendarStartTime = ''
@@ -76,7 +73,8 @@
     }
 
     if (!calendarStartTime) {
-      calendarStartTime = `${today.toLocaleTimeString().substring(0, 2)}:00`
+      const currentH = today.getHours()
+      calendarStartTime = `${currentH < 10 ? '0' : ''}` + `${currentH}:00`
     }
 
     let currentHour = today.getHours() // get the integer i.e. 0 to 23
@@ -99,10 +97,10 @@
 
   function computeOffset ({ startTime }) {
     // compute how many hours ahead of calendar's starting hour
+    // TODO: this breaks when the scheduled time is "lower" than the calendar's startTime i.e. need to pad 24 on top of it
     const hh = startTime.slice(0, 2)
     const mm = startTime.slice(3, 5)
     const hoursOffset = Number(hh) + (Number(mm) / 60) - parseInt(calendarStartTime.substring(0, 2)) // 8 refers to "8 am"
-    const pixelsPerHour = 90
     return hoursOffset * pixelsPerHour
   }
 
@@ -112,7 +110,6 @@
   }
 
   /**
-   * 
    * Calculate what the new time is by measuring offset from top of container
    * 
    * We don't just read the hh e.g. "24" from the hour block, 
@@ -148,12 +145,17 @@
       mm = minutesOffset.toPrecision(2)
     }
 
+
+    console.log('calendarStartTime =', calendarStartTime)
+
     // calculate hours i.e. `hh`
     const origin = parseInt(calendarStartTime.substring(0, 2))
     let hh = origin + integer
     if (hh < 10) {
       hh = `0${hh}`
     }
+
+    console.log('origin =', origin)
 
     const scheduledTime = `${hh}:${mm}` 
     console.log('scheduledTime =', scheduledTime)
@@ -172,6 +174,8 @@
     background-color: #aaa; /* or add it to the track */
   }
 
+  /* VERDICT: absolute works
+  "Independence" is the best word you can ever hear in programming */
   .time-indicator {
     /* position: relative;  */
     top: -5px; 

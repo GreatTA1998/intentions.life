@@ -1,6 +1,6 @@
 <div 
   class:task-completed={taskObject.isDone}
-  class:task-scheduled={taskObject.startDate && taskObject.startTime}
+  class:task-scheduled={!taskObject.isDone && taskObject.startDate && taskObject.startTime}
 >
   {taskObject.name}
 

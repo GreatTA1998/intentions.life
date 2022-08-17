@@ -6,7 +6,7 @@
         class="google-calendar-event-title" 
         bind:value={titleOfTask} 
         on:input={handleInput2}
-        style="width: 90%; margin-left: 10px"
+        style="width: 96%; margin-left: 10px"
       >
         
       <span on:click={() => dispatch('card-close')} class="material-icons" style="margin-left: auto; margin-right: 0">
@@ -33,9 +33,9 @@
       <textarea 
         bind:value={notesAboutTask}
         on:input={handleInput}
-
+        rows="5"
         placeholder="notes"
-        style="margin-left: 10px; width: 100%; max-width: 90%;"
+        style="margin-left: 10px; width: 100%; max-width: 97%;"
       />
     </div>
 
@@ -61,7 +61,7 @@
             Repeats every <input bind:value={daysBeforeRepeating} style="width: 20px;" placeholder="0" on:keypress={detectEnterKey4}> days 
           </div>
 
-          <div style="display: flex">
+          <!-- <div style="display: flex">
             <div>
               <button on:click={() => repeatOnDayOfWeek({ dayNumber: 1 })}
                 class:selected="{taskObject.repeatsOnDaysOfWeek && taskObject.repeatsOnDaysOfWeek[0]}"
@@ -99,7 +99,7 @@
                 S
               </button>
             </div>
-          </div>
+          </div> -->
         {/if}
       </div>
       <div style="margin-left: auto; margin-right: 16px">
@@ -116,8 +116,8 @@
     </div>
 
     <!-- This is the section where you show everything regardless of whether it is scheduled or not -->
-    <div style="font-size: 1rem; margin-top: 12px; margin-left: 12px">
-      Full task history
+    <div style="font-size: 1rem; margin-top: 12px; margin-left: 12px; font-weight: 600">
+      Full task history:
     </div>
 
     {#each taskObject.children as child}
@@ -134,6 +134,7 @@
 import { createEventDispatcher, onMount } from 'svelte'
 import _ from 'lodash'
 import RecursiveBulletPoint from './RecursiveBulletPoint.svelte';
+import { getDateOfToday } from './helpers';
 
 export let taskObject 
 export let isOpen = false
@@ -151,8 +152,6 @@ const dispatch = createEventDispatcher()
 let notesAboutTask = taskObject.notes || ''
 let titleOfTask = taskObject.name || ''
 
-console.log('detailed card popup taskObject =', taskObject)
-
 const handleInput = _.throttle(e => {
   notesAboutTask = e.target.value;
   saveNotes()
@@ -162,16 +161,6 @@ const handleInput2 = _.throttle(e => {
   titleOfTask = e.target.value;
   saveTitle()
 }, 500) // milliseconds
-
-function repeatOnDayOfWeek ({ dayNumber }) {
-  if (!taskObject.repeatsOnDaysOfWeek) {
-    taskObject.repeatsOnDaysOfWeek = [false,false,false,false,false,false,false]
-  } 
-  taskObject.repeatsOnDaysOfWeek[dayNumber - 1] = !taskObject.repeatsOnDaysOfWeek[dayNumber - 1]
-  
-  // dispatch the event so it updates the database
-  dispatch('task-repeat')
-}
 
 function saveNotes () {
   taskObject.notes = notesAboutTask
@@ -188,8 +177,14 @@ function detectEnterKey4 (e) {
     if (!daysBeforeRepeating) {
       alert('Task is reset and will no longer repeat')
       taskObject.daysBeforeRepeating = 0
-    } else {
+    } 
+    else {
       taskObject.daysBeforeRepeating = daysBeforeRepeating
+      // schedule it right away by starting today
+
+      taskObject.startDate = getDateOfToday()
+      // TODO: some form of conflict resolution algorithm for all deadlined tasks
+      taskObject.startTime = '23:30' // quick-fix for now, this is of course not correct for all cases
     }
     dispatch('task-repeat')
     daysBeforeRepeating = 0
@@ -210,6 +205,16 @@ function detectEnterKey5 (e) {
     newStartTime = ''
   }
 }
+
+function repeatOnDayOfWeek ({ dayNumber }) {
+  if (!taskObject.repeatsOnDaysOfWeek) {
+    taskObject.repeatsOnDaysOfWeek = [false,false,false,false,false,false,false]
+  } 
+  taskObject.repeatsOnDaysOfWeek[dayNumber - 1] = !taskObject.repeatsOnDaysOfWeek[dayNumber - 1]
+  
+  // dispatch the event so it updates the database
+  dispatch('task-repeat')
+}
 </script>
 
 <style>
@@ -222,7 +227,7 @@ function detectEnterKey5 (e) {
 
     overflow-y: scroll;
     z-index: 5;
-    width: 80%;
+    width: 70%;
     height: 50%;
     border-radius: 10px;
     background-color: white;
@@ -247,6 +252,11 @@ function detectEnterKey5 (e) {
     letter-spacing: .2px;
     line-height: 20px;
     color: #3c4043;
+  }
+
+  *::-webkit-scrollbar {
+    width: 0;
+    background-color: #aaa; /* or add it to the track */
   }
 
   .google-calendar-event-time {

@@ -1,6 +1,7 @@
 <div 
   on:click={() => dispatch('task-click', { task })}
   class="scheduled-task" 
+  class:green={task.isDone}
   style="top: {offsetFromTop}px; 
          height: {height}px; 
          left: {offsetFromLeft}px;
@@ -83,5 +84,9 @@
   border-left: 2px solid grey;
   padding-left: 2px;
   width: 100%;
+}
+
+.green {
+  border-left: 2px solid green;
 }
 </style>

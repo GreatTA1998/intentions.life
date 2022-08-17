@@ -106,6 +106,7 @@
   import { getDateOfToday, getDateOfTomorrow } from '../../helpers.js'
 
   const userDocPath = `users/${userID}`
+  let isTypingNewTask = false
 
   function getRandomInt(max) {
     return Math.floor(Math.random() * max);
@@ -221,6 +222,7 @@
   }
 
   async function deleteSubtree (name) {
+    console.log('deleteSubtree =', name)
     let root = { 
       name: 'root',
       children: allTasks
@@ -229,7 +231,7 @@
       node: root,
       fulfilsCriteria: (task) => task.children.filter(c => c.name === name).length >= 1, // inequality is important because sometimes 2 or more tasks have the same name
       applyFunc: (task) => { 
-        let idx 
+        let idx = null
         // do not use `forEach` it might mutate the array while it iterates even if you use return statements etc. it's unintuitive code
         for (let i = 0; i < task.children.length; i++) {
           if (task.children[i].name === name) {
@@ -237,7 +239,7 @@
             break
           }
         }
-        if (idx) { // sometimes `idx` is undefined for some reason, meaning the last item of the array will be deleted
+        if (idx >= 0) { // sometimes `idx` is undefined for some reason, meaning the last item of the array will be deleted
           task.children.splice(idx, 1)
         }
       }
@@ -260,9 +262,7 @@
       }
       else {
         for (const child of node.children) {
-          if (helper(child)) {
-            return true
-          }
+          if (helper(child)) return true
         }
         return false
       }
@@ -293,9 +293,7 @@
       }
       else {
         for (const child of node.children) {
-          if (helper(child)) {
-            return true
-          }
+          if (helper(child)) return true
         }
         return false
       }
@@ -317,7 +315,6 @@
     allTasks = [...allTasks]
   }
 
-
   async function fetchTasks () { 
     const user = await getDoc(
       doc(db, userDocPath)
@@ -326,7 +323,6 @@
     lastRanRepeatAtDate = user.data().lastRanRepeatAtDate
   }
   fetchTasks()
-
 
   $: if (allTasks) {
     // FIND SCHEDULED TASK
@@ -351,7 +347,6 @@
     // can't use `return` in reactive expression https://github.com/sveltejs/svelte/issues/2828
     if (lastRanRepeatAtDate !== dateOfToday) {
       console.log('running repeating task algorithm')
-      // TODO:
       //  1. Handle repeating Twitch streams e.g. Mon, Wed, Fri 7 pm
       //  Figure out if it's Wednesday or Saturday etc. with `Date.getDate()` method 
       //  If it is, place it at 7 pm. Easiest game of my life.
@@ -383,7 +378,7 @@
 
       //  #2 Handle repeating habits e.g. meditate every 3 day, run every 7 days
       //  Schedule it at the end of the day
-      //  Visualize "debt" with by not allowing overlap 
+      //  Visualize "debt" by not allowing overlap 
       function recursivelyRepeatTasks2 (node) {
         if (node.daysBeforeRepeating) {
           // if `daysBeforeRepeating` is 4, we need to see if 4 days have gone past already

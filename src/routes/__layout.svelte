@@ -8,8 +8,8 @@
 
 <script>
   import db from '../db.js'
-  import { hasFetchedUser, user } from '../store.js'
   import { page } from '$app/stores'
+  import { hasFetchedUser, user } from '../store.js'
   import { goto } from '$app/navigation'
   import { getAuth, onAuthStateChanged } from 'firebase/auth'
   import { getFirestore, doc, deleteDoc, getDoc, setDoc, updateDoc, increment } from 'firebase/firestore'
@@ -33,23 +33,57 @@
         await setDoc(userRef, {
           uid: resultUser.uid,
           phoneNumber: resultUser.phoneNumber || '',
-          allTasks: [{
-            name: 'Try life-organizer',
-            children: [
-              {
-                name: 'Create a sub-task by hovering to the approximate region',
-                children: []
-              },
-              {
-                name: 'Schedule a task by dragging it to the calendar',
-                children: []
-              },
-              {
-                name: 'Schedule future task by inputting the date',
-                children: []
-              }
-            ]
-          }]
+          allTasks: [
+            {
+              name: 'Try life-organizer',
+              children: [
+                {
+                  name: 'Create a sub-task by hovering to the approximate region',
+                  children: []
+                },
+                {
+                  name: 'Schedule a task by dragging it to the calendar',
+                  children: []
+                },
+                {
+                  name: 'Schedule future task by inputting the date',
+                  children: []
+                }
+              ]
+            },
+            {
+              name: 'Work',
+              children: [
+                {
+                  name: 'Pitch idea to santa',
+                  startDate: '12/25',
+                  startTime: '12:00',
+                  children: [
+                    {
+                      name: 'Email draft 1 to Rudolf',
+                      children: []
+                    },
+                    {
+                      name: 'Follow-up with Rudolf',
+                      startDate: '12/01',
+                      startTime: '12:00',
+                      children: []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              name: 'Life-keeping',
+              notes: 'Press ENTER to save changes e.g. repeat, schedule, etc.',
+              children: [
+                {
+                  name: 'meditate',
+                  children: []
+                }
+              ]
+            }
+          ]
         })
         dbUserSnapshot = await getDoc(userRef) // seems like a redundant fetch, but keep for now
       } 
@@ -62,6 +96,6 @@
       goto('/' + $user.uid)
     }
     
-    // hasFetchedUser.set(true) 
+    hasFetchedUser.set(true) 
   })
 </script>

@@ -33,33 +33,26 @@
 
   <h2>life-organizer = hierarchical todo + calendar</h2>
   <p>
-
   Everything is a task / sub-task. A task is starts unscheduled - you drag it onto the calendar to schedule it. Lastly, tasks can repeat. That's all you need! Consider common life situations:
-
   <br>
   <br>
   Email follow-ups:
     - Send the email 
     - Create a task called "follow-up with that email" scheduled for 1 - 7 days. 
     - Follow-ups = sub-task + deadline
-
-
   <br>
   <br>
   Important deadlines:
     - Just schedule the task!
     - Deadlines = scheduled task (with start time dependent on its duration)
-
   <br>
   <br>
   Habits:
     - Specify how the task repeats e.g. "Push-ups" every 2 days
     - If the time is flexible, it's equivalent to a deadline, and scheduled on the calendar 
     - Habits = repeat + deadline
-
   <br>
   <br>
-
   Message notifications (work in progress):
     - If someone messages you on zen-messenger, it appears as a task
 
@@ -70,5 +63,4 @@
 <script>
   import { goto } from '$app/navigation'
   import PhoneLogin from '../PhoneLogin.svelte'
-
 </script>
