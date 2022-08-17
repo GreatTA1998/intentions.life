@@ -38169,7 +38169,7 @@ function writable2(value, start = noop2) {
   }
   return { set, update, subscribe: subscribe2 };
 }
-var subscriber_queue2, user, _layout;
+var subscriber_queue2, user, hasFetchedUser, _layout;
 var init_layout_svelte = __esm({
   ".svelte-kit/output/server/entries/pages/__layout.svelte.js"() {
     init_index_f085b291();
@@ -38180,6 +38180,7 @@ var init_layout_svelte = __esm({
     init_dist();
     subscriber_queue2 = [];
     user = writable2({});
+    hasFetchedUser = writable2(false);
     _layout = create_ssr_component(($$result, $$props, $$bindings, slots) => {
       let $user, $$unsubscribe_user;
       $$unsubscribe_user = subscribe(user, (value) => $user = value);
@@ -38196,7 +38197,53 @@ var init_layout_svelte = __esm({
           if (!dbUserSnapshot.exists()) {
             await setDoc(userRef, {
               uid: resultUser.uid,
-              phoneNumber: resultUser.phoneNumber || ""
+              phoneNumber: resultUser.phoneNumber || "",
+              allTasks: [
+                {
+                  name: "Try life-organizer",
+                  children: [
+                    {
+                      name: "Create a sub-task by hovering to the approximate region",
+                      children: []
+                    },
+                    {
+                      name: "Schedule a task by dragging it to the calendar",
+                      children: []
+                    },
+                    {
+                      name: "Schedule future task by inputting the date",
+                      children: []
+                    }
+                  ]
+                },
+                {
+                  name: "Work",
+                  children: [
+                    {
+                      name: "Pitch idea to santa",
+                      startDate: "12/25",
+                      startTime: "12:00",
+                      children: [
+                        {
+                          name: "Email draft 1 to Rudolf",
+                          children: []
+                        },
+                        {
+                          name: "Follow-up with Rudolf",
+                          startDate: "12/01",
+                          startTime: "12:00",
+                          children: []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  name: "Life-keeping",
+                  notes: "Press ENTER to save changes e.g. repeat, schedule, etc.",
+                  children: [{ name: "meditate", children: [] }]
+                }
+              ]
             });
             dbUserSnapshot = await getDoc(userRef);
           }
@@ -38205,11 +38252,12 @@ var init_layout_svelte = __esm({
           }, dbUserSnapshot.data()));
           goto("/" + $user.uid);
         }
+        hasFetchedUser.set(true);
       });
       $$unsubscribe_user();
-      return `${slots.default ? slots.default({}) : `
+      return `${hasFetchedUser ? `${slots.default ? slots.default({}) : `
 
-`}`;
+  `}` : `<div>Fetching your info...</div>`}`;
     });
   }
 });
@@ -38226,8 +38274,8 @@ var entry, js, css;
 var init__ = __esm({
   ".svelte-kit/output/server/nodes/0.js"() {
     init_layout_svelte();
-    entry = "pages/__layout.svelte-4f89a1cb.js";
-    js = ["pages/__layout.svelte-4f89a1cb.js", "chunks/vendor-28ca87d0.js", "chunks/db-00a3d57f.js", "chunks/navigation-bd39ff07.js", "chunks/singletons-a6a7384f.js"];
+    entry = "pages/__layout.svelte-e668b374.js";
+    js = ["pages/__layout.svelte-e668b374.js", "chunks/vendor-94da56df.js", "chunks/db-66132ac0.js", "chunks/navigation-bd39ff07.js", "chunks/singletons-a6a7384f.js"];
     css = [];
   }
 });
@@ -38276,8 +38324,8 @@ var entry2, js2, css2;
 var init__2 = __esm({
   ".svelte-kit/output/server/nodes/1.js"() {
     init_error_svelte();
-    entry2 = "error.svelte-08b1a255.js";
-    js2 = ["error.svelte-08b1a255.js", "chunks/vendor-28ca87d0.js"];
+    entry2 = "error.svelte-63a149f4.js";
+    js2 = ["error.svelte-63a149f4.js", "chunks/vendor-94da56df.js"];
     css2 = [];
   }
 });
@@ -38440,7 +38488,7 @@ var init_index_svelte = __esm({
 
   ${validate_component(PhoneLogin, "PhoneLogin").$$render($$result, { canTakeInternationalNumbers: true }, {}, {})}</div>
 
-<div style="${"margin-left: 80px; margin-right: 80px"}"><h2>Writing on paper &amp; Google Calendar just aren&#39;t good enough</h2>
+<div style="${"margin-left: 80px; margin-right: 80px"}"><h2>Writing on paper &amp; Google Calendar just isn&#39;t good enough</h2>
   <p>Life is complicated because almost everything matters. That job interview matters, but so does not forgetting to drink water, or meditating a little. How about that package you ordered 3 days ago? Or the 7 emails you&#39;re awaiting on a follow-up? Have you visited your grandparents? Should you start a new hobby? Oh you forgot to pay taxes.
 
   Calendars and lists has made things better, but the most widely-used apps have truly non-sensical designs that further complicates things. For example, Google Tasks&#39; to-do lists have no concept of &quot;levels&quot;, like a desktop with no folders - every time you read it you get lost in the details instead of a balanced overview on your fundamental priorities. 
@@ -38457,32 +38505,26 @@ var init_index_svelte = __esm({
   </p>
 
   <h2>life-organizer = hierarchical todo + calendar</h2>
-  <p>Everything is a task / sub-task. A task is starts unscheduled - you drag it onto the calendar to schedule it. Lastly, tasks can repeat. That&#39;s all you need! Consider common life situations:
-
+  <p>Everything is a task / sub-task. A task is starts unscheduled - you drag it onto the calendar to schedule it (computer recommended). Lastly, tasks can repeat. That&#39;s all you need! Consider common life situations:
   <br>
   <br>
   Email follow-ups:
     - Send the email 
     - Create a task called &quot;follow-up with that email&quot; scheduled for 1 - 7 days. 
     - Follow-ups = sub-task + deadline
-
-
   <br>
   <br>
   Important deadlines:
     - Just schedule the task!
     - Deadlines = scheduled task (with start time dependent on its duration)
-
   <br>
   <br>
   Habits:
     - Specify how the task repeats e.g. &quot;Push-ups&quot; every 2 days
     - If the time is flexible, it&#39;s equivalent to a deadline, and scheduled on the calendar 
     - Habits = repeat + deadline
-
   <br>
   <br>
-
   Message notifications (work in progress):
     - If someone messages you on zen-messenger, it appears as a task
 
@@ -38505,8 +38547,8 @@ var entry3, js3, css4;
 var init__3 = __esm({
   ".svelte-kit/output/server/nodes/2.js"() {
     init_index_svelte();
-    entry3 = "pages/index.svelte-58d41281.js";
-    js3 = ["pages/index.svelte-58d41281.js", "chunks/vendor-28ca87d0.js", "chunks/navigation-bd39ff07.js", "chunks/singletons-a6a7384f.js"];
+    entry3 = "pages/index.svelte-fe2cba8f.js";
+    js3 = ["pages/index.svelte-fe2cba8f.js", "chunks/vendor-94da56df.js", "chunks/navigation-bd39ff07.js", "chunks/singletons-a6a7384f.js"];
     css4 = ["assets/pages/index.svelte-fac5162c.css"];
   }
 });
@@ -43955,7 +43997,7 @@ function traverseAndUpdateTree({ node, fulfilsCriteria, applyFunc }) {
     traverseAndUpdateTree({ node: child, fulfilsCriteria, applyFunc });
   }
 }
-var import_lodash, css$6, RecursiveBulletPoint_1, css$5, DetailedCardPopup, css$4, RecursiveTask_1, css$3, TaskElement, css$2, CalendarDayView, css$1, FutureOverview, css5, userDocPath, U5Buseru5D;
+var import_lodash, css$6, RecursiveBulletPoint_1, css$5, DetailedCardPopup, css$4, RecursiveTask_1, css$3, TaskElement, css$2, pixelsPerHour, CalendarDayView, css$1, minimumContainerHeight, FutureOverview, css5, U5Buseru5D;
 var init_index_svelte2 = __esm({
   ".svelte-kit/output/server/entries/pages/_user_/index.svelte.js"() {
     init_index_f085b291();
@@ -43974,7 +44016,7 @@ var init_index_svelte2 = __esm({
       $$result.css.add(css$6);
       return `<div class="${[
         "svelte-10bdwqk",
-        (taskObject.isDone ? "task-completed" : "") + " " + (taskObject.startDate && taskObject.startTime ? "task-scheduled" : "")
+        (taskObject.isDone ? "task-completed" : "") + " " + (!taskObject.isDone && taskObject.startDate && taskObject.startTime ? "task-scheduled" : "")
       ].join(" ").trim()}">${escape(taskObject.name)}
 
   ${taskObject.isRepeating ? `(Repeats)` : ``}
@@ -43990,7 +44032,7 @@ var init_index_svelte2 = __esm({
 </div>`;
     });
     css$5 = {
-      code: ".google-calendar-event-detail.svelte-1382weo{font-family:Roboto,Arial,sans-serif;font-size:14px;font-weight:400;letter-spacing:.2px;line-height:20px;color:#3c4043}.google-calendar-event-time.svelte-1382weo{font-family:Roboto,Arial,sans-serif;font-size:14px;font-weight:400;letter-spacing:.2px;line-height:20px;color:#3c4043}.google-calendar-event-title.svelte-1382weo{font-family:Roboto,Arial,sans-serif;font-size:18px;font-weight:400;letter-spacing:.2px;line-height:20px;color:#3c4043}.detailed-card.svelte-1382weo{overflow-y:scroll;z-index:5;position:absolute;width:400px;height:250px;border-radius:10px;background-color:white;box-shadow:0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);padding:6px}.selected.svelte-1382weo{background-color:indianred}",
+      code: ".detailed-card.svelte-bv1cfr{position:fixed;top:50%;left:50%;transform:translate(-50%, -50%);width:50%;overflow-y:scroll;z-index:5;width:70%;height:50%;border-radius:10px;background-color:white;box-shadow:0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);padding:6px}input[type=text].svelte-bv1cfr{background:transparent;border:none;border-bottom:1px solid #000000;outline:none;padding:2px 0px}.google-calendar-event-detail.svelte-bv1cfr{font-family:Roboto,Arial,sans-serif;font-size:14px;font-weight:400;letter-spacing:.2px;line-height:20px;color:#3c4043}.svelte-bv1cfr::-webkit-scrollbar{width:0;background-color:#aaa}.google-calendar-event-time.svelte-bv1cfr{font-family:Roboto,Arial,sans-serif;font-size:14px;font-weight:400;letter-spacing:.2px;line-height:20px;color:#3c4043}.google-calendar-event-title.svelte-bv1cfr{font-family:Roboto,Arial,sans-serif;font-size:18px;font-weight:400;letter-spacing:.2px;line-height:20px;color:#3c4043}",
       map: null
     };
     DetailedCardPopup = create_ssr_component(($$result, $$props, $$bindings, slots) => {
@@ -43998,49 +44040,59 @@ var init_index_svelte2 = __esm({
       let { isOpen = false } = $$props;
       const dispatch = createEventDispatcher();
       let notesAboutTask = taskObject.notes || "";
+      let titleOfTask = taskObject.name || "";
       import_lodash.default.throttle((e2) => {
         notesAboutTask = e2.target.value;
         saveNotes();
       }, 500);
+      import_lodash.default.throttle((e2) => {
+        titleOfTask = e2.target.value;
+        saveTitle();
+      }, 500);
       function saveNotes() {
         taskObject.notes = notesAboutTask;
         dispatch("task-notes-update");
+      }
+      function saveTitle() {
+        taskObject.name = titleOfTask;
+        dispatch("task-title-update");
       }
       if ($$props.taskObject === void 0 && $$bindings.taskObject && taskObject !== void 0)
         $$bindings.taskObject(taskObject);
       if ($$props.isOpen === void 0 && $$bindings.isOpen && isOpen !== void 0)
         $$bindings.isOpen(isOpen);
       $$result.css.add(css$5);
-      return `${isOpen ? `<div class="${"detailed-card svelte-1382weo"}"><div style="${"display: flex"}"><div class="${"google-calendar-event-title svelte-1382weo"}" style="${"margin-top: 10px; margin-left: 10px;"}">${escape(taskObject.name)}</div>
+      return `${isOpen ? `<div class="${"detailed-card svelte-bv1cfr"}"><div style="${"display: flex"}" class="${"svelte-bv1cfr"}"><input type="${"text"}" class="${"google-calendar-event-title svelte-bv1cfr"}" style="${"width: 96%; margin-left: 10px"}"${add_attribute("value", titleOfTask, 0)}>
         
-      <span class="${"material-icons"}" style="${"margin-left: auto; margin-right: 0"}">close
+      <span class="${"material-icons svelte-bv1cfr"}" style="${"margin-left: auto; margin-right: 0"}">close
       </span></div>
 
-    <div class="${"google-calendar-event-time svelte-1382weo"}" style="${"margin-top: 4px; margin-left: 10px;"}">${!taskObject.isDone && taskObject.startTime && taskObject.startDate ? `Scheduled for ${escape(taskObject.startDate + " " + taskObject.startTime)}` : ``}</div>
+    <div class="${"google-calendar-event-time svelte-bv1cfr"}" style="${"margin-top: 4px; margin-left: 10px;"}">${!taskObject.isDone && taskObject.startTime && taskObject.startDate ? `Scheduled for ${escape(taskObject.startDate + " " + taskObject.startTime)}` : ``}</div>
 
-    <div class="${"google-calendar-event-detail svelte-1382weo"}" style="${"margin-top: 12px; margin-left: 16px;"}">${taskObject.daysBeforeRepeating ? `Repeats every ${escape(taskObject.daysBeforeRepeating)} days, completed ${escape(taskObject.completionCount || 0)} times` : `${taskObject.repeatsOnDaysOfWeek ? `Repeats ${escape(taskObject.repeatsOnDaysOfWeek)}` : ``}`}</div>
+    <div class="${"google-calendar-event-detail svelte-bv1cfr"}" style="${"margin-top: 12px; margin-left: 16px;"}">${taskObject.daysBeforeRepeating ? `Repeats every ${escape(taskObject.daysBeforeRepeating)} days, completed ${escape(taskObject.completionCount || 0)} times` : `${taskObject.repeatsOnDaysOfWeek ? `Repeats ${escape(taskObject.repeatsOnDaysOfWeek)}` : ``}`}</div>
 
-    <textarea cols="${"48"}" placeholder="${"notes"}" style="${"margin-left: 10px;"}">${notesAboutTask || ""}</textarea>
+    <div stle="${"float: left; width: 80%"}" class="${"svelte-bv1cfr"}">
+      <textarea rows="${"5"}" placeholder="${"notes"}" style="${"margin-left: 10px; width: 100%; max-width: 97%;"}" class="${"svelte-bv1cfr"}">${notesAboutTask || ""}</textarea></div>
 
-    <div style="${"display: flex; margin-left: 10px"}"><div>${`<button>Schedule
+    <div style="${"display: flex; margin-left: 10px"}" class="${"svelte-bv1cfr"}"><div class="${"svelte-bv1cfr"}">${`<button class="${"svelte-bv1cfr"}">Schedule
           </button>`}
         
-        ${`<button style="${"margin-left: 0px;"}">Repeat task
+        ${`<button style="${"margin-left: 0px;"}" class="${"svelte-bv1cfr"}">Repeat task
           </button>`}</div>
-      <div style="${"margin-left: auto; margin-right: 16px"}">
-        <button>Delete
+      <div style="${"margin-left: auto; margin-right: 16px"}" class="${"svelte-bv1cfr"}">
+        <button class="${"svelte-bv1cfr"}">Delete
         </button>
 
         
-        <button>Done
+        <button class="${"svelte-bv1cfr"}">Done
         </button></div></div>
 
     
-    <div style="${"font-size: 1rem; margin-top: 12px; margin-left: 12px"}">Full task history
+    <div style="${"font-size: 1rem; margin-top: 12px; margin-left: 12px; font-weight: 600"}" class="${"svelte-bv1cfr"}">Full task history:
     </div>
 
     ${each(taskObject.children, (child) => {
-        return `<div style="${"margin-left: 12px;"}">${validate_component(RecursiveBulletPoint_1, "RecursiveBulletPoint").$$render($$result, { taskObject: child }, {}, {})}
+        return `<div style="${"margin-left: 12px;"}" class="${"svelte-bv1cfr"}">${validate_component(RecursiveBulletPoint_1, "RecursiveBulletPoint").$$render($$result, { taskObject: child }, {}, {})}
       </div>`;
       })}</div>` : ``}`;
     });
@@ -44052,7 +44104,6 @@ var init_index_svelte2 = __esm({
       let doChildrenHaveDuration;
       let { taskObject } = $$props;
       let { depth } = $$props;
-      let isDetailedCardOpen = false;
       createEventDispatcher();
       if ($$props.taskObject === void 0 && $$bindings.taskObject && taskObject !== void 0)
         $$bindings.taskObject(taskObject);
@@ -44068,10 +44119,7 @@ ${!taskObject.isDeleted && !taskObject.isDone && !(taskObject.startTime && taskO
       ].join(" ").trim()}" style="${"margin-left: " + escape(depth === 1 ? "0" : "20") + "px; margin-bottom: 10px; width: " + escape(350 * 0.8 ** depth) + "px; height: " + escape(taskObject.duration && !doChildrenHaveDuration && taskObject.duration * 90 / 60 > taskObject.children.length * 60 * 0.7 ** depth && taskObject.duration * 90 / 60 > 60 * 0.65 ** depth ? `${taskObject.duration * 90 / 60}px` : "100%") + "; padding-left: " + escape(10 * 0.8 ** depth) + "px;"}"><div class="${"current-task-flexbox svelte-t4v7r0"}"><div style="${"font-size: " + escape(1.5 * 0.85 ** depth) + "rem; font-family: aktiv-grotesk, sans-serif;"}" class="${[
         "keep-on-same-line name-of-task svelte-t4v7r0",
         (!taskObject.isDone && taskObject.startTime && taskObject.startDate ? "scheduled-orange" : "") + " " + (taskObject.isDone ? "crossed-out" : "")
-      ].join(" ").trim()}">${`<div class="${"truncate svelte-t4v7r0"}" style="${"width: " + escape(350 * 0.85 ** depth) + "px"}">${escape(taskObject.name)}</div>`}</div>
-
-      
-      ${validate_component(DetailedCardPopup, "DetailedCardPopup").$$render($$result, { isOpen: isDetailedCardOpen, taskObject }, {}, {})}</div>
+      ].join(" ").trim()}">${`<div class="${"truncate svelte-t4v7r0"}" style="${"width: " + escape(350 * 0.85 ** depth) + "px"}">${escape(taskObject.name)}</div>`}</div></div>
 
     <div style="${"margin-top: " + escape(20 * 0.7 ** depth) + "px;"}">${each(taskObject.children, (child, i2) => {
         return `${validate_component(RecursiveTask_1, "RecursiveTask").$$render($$result, { taskObject: child, depth: depth + 1 }, {}, {})}`;
@@ -44080,7 +44128,7 @@ ${!taskObject.isDeleted && !taskObject.isDone && !(taskObject.startTime && taskO
       ${``}</div></div>` : ``}`;
     });
     css$3 = {
-      code: ".scheduled-task.svelte-1ups3a0{display:inline;position:absolute;margin-left:2px;border-left:2px solid grey;padding-left:2px;width:100%}",
+      code: ".scheduled-task.svelte-1at2tfe{display:inline;position:absolute;margin-left:2px;border-left:2px solid grey;padding-left:2px;width:100%}.green.svelte-1at2tfe{border-left:2px solid green}",
       map: null
     };
     TaskElement = create_ssr_component(($$result, $$props, $$bindings, slots) => {
@@ -44110,7 +44158,7 @@ ${!taskObject.isDeleted && !taskObject.isDone && !(taskObject.startTime && taskO
       if ($$props.calendarStartTime === void 0 && $$bindings.calendarStartTime && calendarStartTime !== void 0)
         $$bindings.calendarStartTime(calendarStartTime);
       $$result.css.add(css$3);
-      return `<div class="${"scheduled-task svelte-1ups3a0"}" style="${"top: " + escape(offsetFromTop) + "px; height: " + escape(height) + "px; left: " + escape(offsetFromLeft) + "px; font-size: " + escape(fontSize) + "rem;"}"><div draggable="${"true"}" style="${"width: 11vw"}">${escape(task.name)}</div>
+      return `<div class="${["scheduled-task svelte-1at2tfe", task.isDone ? "green" : ""].join(" ").trim()}" style="${"top: " + escape(offsetFromTop) + "px; height: " + escape(height) + "px; left: " + escape(offsetFromLeft) + "px; font-size: " + escape(fontSize) + "rem;"}"><div draggable="${"true"}" style="${"width: 11vw"}">${escape(task.name)}</div>
 
   
   
@@ -44124,15 +44172,16 @@ ${!taskObject.isDeleted && !taskObject.isDone && !(taskObject.startTime && taskO
 </div>`;
     });
     css$2 = {
-      code: ".svelte-ti334g::-webkit-scrollbar{width:0;background-color:#aaa}.time-indicator.svelte-ti334g{top:-5px;margin-right:4px;font-size:0.7rem;position:absolute}",
+      code: ".svelte-xbksim::-webkit-scrollbar{width:0;background-color:#aaa}.time-indicator.svelte-xbksim{top:-5px;margin-right:4px;font-size:0.7rem;position:absolute}",
       map: null
     };
+    pixelsPerHour = 80;
     CalendarDayView = create_ssr_component(($$result, $$props, $$bindings, slots) => {
       let { scheduledTasks } = $$props;
       createEventDispatcher();
       const getDate = getDateOfToday;
+      const pixelsPerMinute = 80 / 60;
       let timesOfDay = [];
-      let pixelsPerMinute = 90 / 60;
       let calendarStartTime = "";
       function decideCalendarStartTime() {
         const today = new Date();
@@ -44146,7 +44195,8 @@ ${!taskObject.isDeleted && !taskObject.isDone && !(taskObject.startTime && taskO
           }
         }
         if (!calendarStartTime) {
-          calendarStartTime = `${today.toLocaleTimeString().substring(0, 2)}:00`;
+          const currentH = today.getHours();
+          calendarStartTime = `${currentH < 10 ? "0" : ""}${currentH}:00`;
         }
         let currentHour = today.getHours();
         for (let i2 = 0; i2 < 16; i2++) {
@@ -44166,17 +44216,16 @@ ${!taskObject.isDeleted && !taskObject.isDone && !(taskObject.startTime && taskO
         const hh = startTime.slice(0, 2);
         const mm = startTime.slice(3, 5);
         const hoursOffset = Number(hh) + Number(mm) / 60 - parseInt(calendarStartTime.substring(0, 2));
-        const pixelsPerHour = 90;
         return hoursOffset * pixelsPerHour;
       }
       if ($$props.scheduledTasks === void 0 && $$bindings.scheduledTasks && scheduledTasks !== void 0)
         $$bindings.scheduledTasks(scheduledTasks);
       $$result.css.add(css$2);
       return `
-<div style="${"overflow-y: scroll; overflow-x: hidden; height: 77vh"}" class="${"svelte-ti334g"}"><div id="${"calendar-day-container"}" style="${"position: relative; width: 12vw; height: 1000px"}" class="${"svelte-ti334g"}"><div style="${"margin-top: 27px; font-weight: 600"}" class="${"svelte-ti334g"}">${escape(getDate())}</div>
+<div style="${"overflow-y: scroll; overflow-x: hidden; height: 77vh"}" class="${"svelte-xbksim"}"><div id="${"calendar-day-container"}" style="${"position: relative; width: 12vw; height: 1000px"}" class="${"svelte-xbksim"}"><div style="${"margin-top: 27px; font-weight: 600"}" class="${"svelte-xbksim"}">${escape(getDate())}</div>
     
     ${calendarStartTime ? `${each(timesOfDay, (timeOfDay, i2) => {
-        return `<div class="${"time-indicator svelte-ti334g"}" style="${"top: " + escape(30 + 60 * i2) + "px;"}">${escape(timeOfDay.substring(0, 5))}
+        return `<div class="${"time-indicator svelte-xbksim"}" style="${"top: " + escape(30 + pixelsPerHour * i2) + "px;"}">${escape(timeOfDay.substring(0, 5))}
         </div>`;
       })}
 
@@ -44188,42 +44237,41 @@ ${!taskObject.isDeleted && !taskObject.isDone && !(taskObject.startTime && taskO
           fontSize: 0.8,
           offsetFromLeft: 30
         }, {}, {})}`;
-      })}` : ``}</div></div>
-
-`;
+      })}` : ``}</div>
+</div>`;
     });
     css$1 = {
-      code: ".svelte-ko0je8::-webkit-scrollbar{width:0;background-color:#aaa}.scheduled-task.svelte-ko0je8{display:inline;position:absolute;margin-left:2px;border-left:2px solid grey;padding-left:2px;font-size:0.8rem;width:100%}",
+      code: ".svelte-d8tb0p::-webkit-scrollbar{width:0;background-color:#aaa}.broken-axis.svelte-d8tb0p{display:inline;height:20px;margin-left:2px;border-left:2px dashed black;padding-left:2px;font-size:0.8rem;width:100%}",
       map: null
     };
+    minimumContainerHeight = 20;
     FutureOverview = create_ssr_component(($$result, $$props, $$bindings, slots) => {
       let { futureScheduledTasks } = $$props;
       const pixelsPerMinute = 90 / 60;
       if ($$props.futureScheduledTasks === void 0 && $$bindings.futureScheduledTasks && futureScheduledTasks !== void 0)
         $$bindings.futureScheduledTasks(futureScheduledTasks);
       $$result.css.add(css$1);
-      return `<div style="${"height: 77vh; overflow-y: scroll; overflow-x: hidden"}" class="${"svelte-ko0je8"}"><div style="${"width: 12vw; margin-left: 0px; margin-top: 27px; position: relative; height: 1600px"}" class="${"svelte-ko0je8"}">${each(futureScheduledTasks, (task, i2) => {
-        return `<div style="${"position: absolute; top: " + escape(100 * i2) + "px"}" class="${"svelte-ko0je8"}"><b class="${"svelte-ko0je8"}">${escape(task.startDate)}</b></div>
+      return `<div style="${"height: 77vh; overflow-y: scroll; overflow-x: hidden"}" class="${"svelte-d8tb0p"}"><div style="${"width: 12vw; margin-left: 0px; margin-top: 27px; position: relative; height: 1600px"}" class="${"svelte-d8tb0p"}">${each(futureScheduledTasks, (task, i2) => {
+        return `<div style="${"position: relative; height: " + escape(minimumContainerHeight + (task.duration * pixelsPerMinute || 15)) + "px; margin-top: 25px;"}" class="${"svelte-d8tb0p"}"><div class="${"svelte-d8tb0p"}"><b class="${"svelte-d8tb0p"}">${escape(task.startDate)}</b></div>
 
-      ${validate_component(TaskElement, "TaskElement").$$render($$result, {
+        ${validate_component(TaskElement, "TaskElement").$$render($$result, {
           task,
           fontSize: 0.8,
-          offsetFromTop: 20 + 100 * i2,
+          offsetFromTop: 20,
           height: task.duration * pixelsPerMinute || 15
-        }, {}, {})}
-      
-      <div class="${"scheduled-task svelte-ko0je8"}" style="${"top: " + escape(70 + 100 * i2) + "px; height: " + escape(15) + "px; border-left: 2px dashed black;"}"></div>`;
+        }, {}, {})}</div>
+      <div class="${"broken-axis svelte-d8tb0p"}"></div>`;
       })}</div></div>
   
   `;
     });
     css5 = {
-      code: ".calendar-section-container.svelte-1q1xb5z{display:flex;justify-content:space-evenly;width:36vw;background-color:white;border:1px solid green;border-top-right-radius:20px;border-bottom-right-radius:20px;padding-left:8px}#background-image-holder.svelte-1q1xb5z{background-repeat:no-repeat;background-size:100% 100%}.svelte-1q1xb5z::-webkit-scrollbar{width:0;height:0;background-color:#aaa}.fixed-height-container-for-scrolling.svelte-1q1xb5z{height:77vh;width:70vw}.todo-list.svelte-1q1xb5z{width:100%;height:77vh;display:flex;flex-wrap:wrap;flex-direction:column\r\n  }.task-container.svelte-1q1xb5z{border:0px solid;margin-bottom:25px;padding-left:0;padding-top:16px;padding-bottom:10px;padding-right:0;overflow:none}",
+      code: ".calendar-section-container.svelte-17oi90h{display:flex;justify-content:space-evenly;width:36vw;background-color:white;border:1px solid green;border-top-right-radius:20px;border-bottom-right-radius:20px;padding-left:8px}#background-image-holder.svelte-17oi90h{background-repeat:no-repeat;background-size:100% 100%}.svelte-17oi90h::-webkit-scrollbar{width:0;height:0;background-color:#aaa}.fixed-height-container-for-scrolling.svelte-17oi90h{height:77vh;width:70vw;background-color:white;border:1px solid green;border-top-left-radius:20px;border-bottom-left-radius:20px;padding-top:14px;padding-left:30px}.todo-list.svelte-17oi90h{width:100%;height:77vh;display:flex;flex-wrap:wrap;flex-direction:column\r\n  }.task-container.svelte-17oi90h{border:0px solid;margin-bottom:25px;padding-left:0;padding-top:16px;padding-bottom:10px;padding-right:0;overflow:none}",
       map: null
     };
-    userDocPath = "users/GxBbopqXHW0qgjKEwU4z";
     U5Buseru5D = create_ssr_component(($$result, $$props, $$bindings, slots) => {
       let { userID } = $$props;
+      const userDocPath = `users/${userID}`;
       let AudioElem;
       let allTasks = null;
       let lastRanRepeatAtDate = "";
@@ -44337,27 +44385,27 @@ ${!taskObject.isDeleted && !taskObject.isDone && !(taskObject.startTime && taskO
           }
         }
       }
-      return `<div id="${"background-image-holder"}" style="${"height: 100vh; padding-left: 120px; padding-right: 120px;"}" class="${"svelte-1q1xb5z"}"><div style="${"height: 100px;"}" class="${"svelte-1q1xb5z"}"></div>
+      return `${validate_component(DetailedCardPopup, "DetailedCardPopup").$$render($$result, {
+        isOpen: isDetailedCardOpen,
+        taskObject: clickedTask
+      }, {}, {})}
 
-  <div style="${"position: absolute; top: 30px; left: 30px;"}" class="${"svelte-1q1xb5z"}"><span class="${"material-icons svelte-1q1xb5z"}" style="${"margin-left: auto; margin-right: 0; color: white"}">${escape("music_off")}</span></div>
+<div id="${"background-image-holder"}" style="${"height: 100vh; padding-left: 120px; padding-right: 120px;"}" class="${"svelte-17oi90h"}"><div style="${"height: 100px;"}" class="${"svelte-17oi90h"}"></div>
 
-  <div style="${"display: flex; padding-left: 0; padding-top: 0px"}" class="${"svelte-1q1xb5z"}"><div class="${"fixed-height-container-for-scrolling svelte-1q1xb5z"}" style="${"background-color: white; border: 1px solid green; border-top-left-radius: 20px; border-bottom-left-radius: 20px; padding-top: 14px; padding-left: 30px"}"><div class="${"todo-list svelte-1q1xb5z"}">${allTasks ? `${each(allTasks, (task) => {
-        return `${!task.isDeleted ? `<div class="${"task-container svelte-1q1xb5z"}">${validate_component(RecursiveTask_1, "RecursiveTask").$$render($$result, { taskObject: task, depth: 1 }, {}, {})}
+  <div style="${"position: absolute; top: 30px; left: 30px;"}" class="${"svelte-17oi90h"}"><span class="${"material-icons svelte-17oi90h"}" style="${"margin-left: auto; margin-right: 0; color: white"}">${escape("music_off")}</span></div>
+
+  <div style="${"display: flex; padding-left: 0; padding-top: 0px"}" class="${"svelte-17oi90h"}"><div class="${"fixed-height-container-for-scrolling svelte-17oi90h"}"><div class="${"todo-list svelte-17oi90h"}">${allTasks ? `${each(allTasks, (task) => {
+        return `${!task.isDeleted ? `<div class="${"task-container svelte-17oi90h"}">${validate_component(RecursiveTask_1, "RecursiveTask").$$render($$result, { taskObject: task, depth: 1 }, {}, {})}
               </div>` : ``}`;
       })}
           
           
-          
-          <div style="${"height: 100px;"}" class="${"svelte-1q1xb5z"}">${``}</div>` : ``}</div></div>
+          <div style="${"height: 200px;"}" class="${"svelte-17oi90h"}">${``}</div>` : ``}</div></div>
 
-    <div class="${"calendar-section-container svelte-1q1xb5z"}">${validate_component(DetailedCardPopup, "DetailedCardPopup").$$render($$result, {
-        isOpen: isDetailedCardOpen,
-        taskObject: clickedTask
-      }, {}, {})}
-      ${validate_component(CalendarDayView, "CalendarDayView").$$render($$result, { scheduledTasks: todayScheduledTasks }, {}, {})}
+    <div class="${"calendar-section-container svelte-17oi90h"}">${validate_component(CalendarDayView, "CalendarDayView").$$render($$result, { scheduledTasks: todayScheduledTasks }, {}, {})}
       ${validate_component(FutureOverview, "FutureOverview").$$render($$result, { futureScheduledTasks }, {}, {})}</div></div></div>
 
-<audio class="${"svelte-1q1xb5z"}"${add_attribute("this", AudioElem, 0)}></audio>`;
+<audio class="${"svelte-17oi90h"}"${add_attribute("this", AudioElem, 0)}></audio>`;
     });
   }
 });
@@ -44374,9 +44422,9 @@ var entry4, js4, css6;
 var init__4 = __esm({
   ".svelte-kit/output/server/nodes/3.js"() {
     init_index_svelte2();
-    entry4 = "pages/_user_/index.svelte-459b8a9f.js";
-    js4 = ["pages/_user_/index.svelte-459b8a9f.js", "chunks/vendor-28ca87d0.js", "chunks/db-00a3d57f.js"];
-    css6 = ["assets/pages/_user_/index.svelte-e2391092.css"];
+    entry4 = "pages/_user_/index.svelte-5e8d3acd.js";
+    js4 = ["pages/_user_/index.svelte-5e8d3acd.js", "chunks/vendor-94da56df.js", "chunks/db-66132ac0.js"];
+    css6 = ["assets/pages/_user_/index.svelte-969124d3.css"];
   }
 });
 
@@ -45842,7 +45890,7 @@ var manifest = {
   assets: new Set(["background-picture.png", "favicon.png", "illiyard-moor-lofi.mp3", "illiyard-moor.jpg", "illiyard-moor.mp3", "maplestory-orange-blurred.jpg", "maplestory-orange.jpg", "maplestory-watercolor.jpg", "ms-leafre-lofi.mp3"]),
   _: {
     mime: { ".png": "image/png", ".mp3": "audio/mpeg", ".jpg": "image/jpeg" },
-    entry: { "file": "start-6df8513a.js", "js": ["start-6df8513a.js", "chunks/vendor-28ca87d0.js", "chunks/singletons-a6a7384f.js"], "css": [] },
+    entry: { "file": "start-566b6f09.js", "js": ["start-566b6f09.js", "chunks/vendor-94da56df.js", "chunks/singletons-a6a7384f.js"], "css": [] },
     nodes: [
       () => Promise.resolve().then(() => (init__(), __exports)),
       () => Promise.resolve().then(() => (init__2(), __exports2)),

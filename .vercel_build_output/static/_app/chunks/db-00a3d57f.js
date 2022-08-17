@@ -1,1 +1,0 @@
-import{P as a,U as e}from"./vendor-28ca87d0.js";const p={apiKey:"AIzaSyCOVm0X6UUQQcftXf066z_0hFk497j4dNY",authDomain:"project-y-2a061.firebaseapp.com",projectId:"project-y-2a061",storageBucket:"project-y-2a061.appspot.com",messagingSenderId:"132745397287",appId:"1:132745397287:web:b34052fb4683bc85e73a02",measurementId:"G-EZSLE84PYQ"};a(p);var r=e();export{r as d};

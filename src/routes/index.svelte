@@ -14,7 +14,7 @@
 </div>
 
 <div style="margin-left: 80px; margin-right: 80px">
-  <h2>Writing on paper & Google Calendar just aren't good enough</h2>
+  <h2>Writing on paper & Google Calendar just isn't good enough</h2>
   <p>
   Life is complicated because almost everything matters. That job interview matters, but so does not forgetting to drink water, or meditating a little. How about that package you ordered 3 days ago? Or the 7 emails you're awaiting on a follow-up? Have you visited your grandparents? Should you start a new hobby? Oh you forgot to pay taxes.
 
@@ -33,7 +33,7 @@
 
   <h2>life-organizer = hierarchical todo + calendar</h2>
   <p>
-  Everything is a task / sub-task. A task is starts unscheduled - you drag it onto the calendar to schedule it. Lastly, tasks can repeat. That's all you need! Consider common life situations:
+  Everything is a task / sub-task. A task is starts unscheduled - you drag it onto the calendar to schedule it (computer recommended). Lastly, tasks can repeat. That's all you need! Consider common life situations:
   <br>
   <br>
   Email follow-ups:
