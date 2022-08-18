@@ -276,7 +276,7 @@
     }
 
     await updateDoc(
-      doc(db, 'users/GxBbopqXHW0qgjKEwU4z'),
+      doc(db, userDocPath),
       { allTasks }
     )
 
@@ -389,7 +389,9 @@
           if (day_diff >= node.daysBeforeRepeating) {
             node.isDone = false 
             node.startDate = dateOfToday 
-            habitPoolToResolveConflict.push(node)
+            if (!node.startTime) {
+              habitPoolToResolveConflict.push(node)
+            }
           }
         }
         for (const child of node.children) {
@@ -537,8 +539,7 @@
     width: 100%; 
     height: 77vh;
     display: flex; 
-    flex-wrap: wrap; 
-    flex-direction: column
+    overflow-x: auto;
   }
 
   .task-container { 

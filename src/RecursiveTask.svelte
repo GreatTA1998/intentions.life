@@ -14,7 +14,7 @@
       height: {taskObject.duration && !doChildrenHaveDuration 
         && (taskObject.duration * 90/60 > taskObject.children.length * 60 * 0.7 ** depth)
         && (taskObject.duration * 90/60 > 60 * (0.65 ** depth))
-        ? `${taskObject.duration * 90/60}px` : '100%'};
+        ? `${taskObject.duration * 90/60}px` : ''};
       padding-left: {10 * 0.8 ** depth}px;
     "
     on:dragstart|self={(e) => dragstart_handler(e, taskObject.name)}
@@ -57,14 +57,12 @@
 
       {#if isShowingOptions}
         {#if !isTypingNewTask}
-          <div style="display: flex; align-items: center; margin-left: 20px;">
-            <!-- `padding-bottom` accounts for the text fonts are just not vertically centered, see https://stackoverflow.com/questions/21580059/text-is-not-vertically-centered -->
-            <div 
-              on:click={() => isTypingNewTask = true} 
-              style="border-left: 2px solid grey; color: grey; padding-left: 5px; padding-bottom: {8 * 0.68 ** (depth + 1)}px; font-size: {1.5 * (0.85 ** (depth + 1))}rem;"
-            >
-              new sub-task
-            </div>
+          <!-- `padding-bottom` accounts for the text fonts are just not vertically centered, see https://stackoverflow.com/questions/21580059/text-is-not-vertically-centered -->
+          <div 
+            on:click={() => isTypingNewTask = true} 
+            style="margin-left: 20px; margin-right: 20px; margin-bottom: 10px; border-left: 2px solid grey; color: grey; padding-left: 5px; padding-bottom: {8 * 0.68 ** (depth + 1)}px; font-size: {1.5 * (0.85 ** (depth + 1))}rem;"
+          >
+            new sub-task
           </div>
         {:else}
           <div style="display: flex; align-items: center; margin-left: 20px;">

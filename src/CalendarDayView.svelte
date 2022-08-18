@@ -7,7 +7,7 @@
 <div style="overflow-y: scroll; overflow-x: hidden; height: 77vh">
   <div 
     id="calendar-day-container" 
-    style="position: relative; width: 12vw; height: 1000px"
+    style="position: relative; width: 12vw; height: {pixelsPerHour * numOfHourBlocksDisplayed}px"
     on:drop={(e) => drop_handler(e)}
     on:dragover={dragover_handler}
   >
@@ -49,6 +49,7 @@
 
   const pixelsPerHour = 80
   const pixelsPerMinute = 80 / 60
+  const numOfHourBlocksDisplayed = 16
   let timesOfDay = []
   let startY = 0
 
@@ -79,7 +80,7 @@
 
     let currentHour = today.getHours() // get the integer i.e. 0 to 23
     // now generate 16 hours of time (so it covers, for example, 8 am - midnight)
-    for (let i = 0; i < 16; i++) {
+    for (let i = 0; i < numOfHourBlocksDisplayed; i++) {
       if (currentHour === 24) {
         currentHour = 0
       }
@@ -126,13 +127,10 @@
     var x = position.left;
     var y = position.top;
 
-    const heightOfHour = 90 // defined in CSS below
-    const calendarTopMargin = 20
-
     // `n` represents time in PURE hours e.g. 8.24, 13.90
     // `e.layerY` gives the Y-coordinate with respect to the current container
     // otherwise the multiple scrolling contexts messes it up
-    let n = (e.layerY) / heightOfHour
+    let n = (e.layerY) / pixelsPerHour
     const decimal = n - Math.floor(n)
     const integer = Math.trunc(n)
     
