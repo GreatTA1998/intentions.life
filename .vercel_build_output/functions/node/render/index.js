@@ -43997,7 +43997,7 @@ function traverseAndUpdateTree({ node, fulfilsCriteria, applyFunc }) {
     traverseAndUpdateTree({ node: child, fulfilsCriteria, applyFunc });
   }
 }
-var import_lodash, css$6, RecursiveBulletPoint_1, css$5, DetailedCardPopup, css$4, RecursiveTask_1, css$3, TaskElement, css$2, pixelsPerHour, CalendarDayView, css$1, minimumContainerHeight, FutureOverview, css5, U5Buseru5D;
+var import_lodash, css$6, RecursiveBulletPoint_1, css$5, DetailedCardPopup, css$4, RecursiveTask_1, css$3, TaskElement, css$2, pixelsPerHour, numOfHourBlocksDisplayed, CalendarDayView, css$1, minimumContainerHeight, FutureOverview, css5, U5Buseru5D;
 var init_index_svelte2 = __esm({
   ".svelte-kit/output/server/entries/pages/_user_/index.svelte.js"() {
     init_index_f085b291();
@@ -44116,7 +44116,7 @@ var init_index_svelte2 = __esm({
 ${!taskObject.isDeleted && !taskObject.isDone && !(taskObject.startTime && taskObject.startDate) ? `<div draggable="${"true"}" class="${[
         "scheduled-task svelte-t4v7r0",
         (!taskObject.isDone && !(taskObject.startTime && taskObject.startDate) ? "black-duration-line" : "") + " " + (!taskObject.isDone && taskObject.startTime && taskObject.startDate ? "orange-duration-line" : "") + " " + (taskObject.isDone ? "green-duration-line" : "")
-      ].join(" ").trim()}" style="${"margin-left: " + escape(depth === 1 ? "0" : "20") + "px; margin-bottom: 10px; width: " + escape(350 * 0.8 ** depth) + "px; height: " + escape(taskObject.duration && !doChildrenHaveDuration && taskObject.duration * 90 / 60 > taskObject.children.length * 60 * 0.7 ** depth && taskObject.duration * 90 / 60 > 60 * 0.65 ** depth ? `${taskObject.duration * 90 / 60}px` : "100%") + "; padding-left: " + escape(10 * 0.8 ** depth) + "px;"}"><div class="${"current-task-flexbox svelte-t4v7r0"}"><div style="${"font-size: " + escape(1.5 * 0.85 ** depth) + "rem; font-family: aktiv-grotesk, sans-serif;"}" class="${[
+      ].join(" ").trim()}" style="${"margin-left: " + escape(depth === 1 ? "0" : "20") + "px; margin-bottom: 10px; width: " + escape(350 * 0.8 ** depth) + "px; height: " + escape(taskObject.duration && !doChildrenHaveDuration && taskObject.duration * 90 / 60 > taskObject.children.length * 60 * 0.7 ** depth && taskObject.duration * 90 / 60 > 60 * 0.65 ** depth ? `${taskObject.duration * 90 / 60}px` : "") + "; padding-left: " + escape(10 * 0.8 ** depth) + "px;"}"><div class="${"current-task-flexbox svelte-t4v7r0"}"><div style="${"font-size: " + escape(1.5 * 0.85 ** depth) + "rem; font-family: aktiv-grotesk, sans-serif;"}" class="${[
         "keep-on-same-line name-of-task svelte-t4v7r0",
         (!taskObject.isDone && taskObject.startTime && taskObject.startDate ? "scheduled-orange" : "") + " " + (taskObject.isDone ? "crossed-out" : "")
       ].join(" ").trim()}">${`<div class="${"truncate svelte-t4v7r0"}" style="${"width: " + escape(350 * 0.85 ** depth) + "px"}">${escape(taskObject.name)}</div>`}</div></div>
@@ -44176,6 +44176,7 @@ ${!taskObject.isDeleted && !taskObject.isDone && !(taskObject.startTime && taskO
       map: null
     };
     pixelsPerHour = 80;
+    numOfHourBlocksDisplayed = 16;
     CalendarDayView = create_ssr_component(($$result, $$props, $$bindings, slots) => {
       let { scheduledTasks } = $$props;
       createEventDispatcher();
@@ -44199,7 +44200,7 @@ ${!taskObject.isDeleted && !taskObject.isDone && !(taskObject.startTime && taskO
           calendarStartTime = `${currentH < 10 ? "0" : ""}${currentH}:00`;
         }
         let currentHour = today.getHours();
-        for (let i2 = 0; i2 < 16; i2++) {
+        for (let i2 = 0; i2 < numOfHourBlocksDisplayed; i2++) {
           if (currentHour === 24) {
             currentHour = 0;
           }
@@ -44222,7 +44223,7 @@ ${!taskObject.isDeleted && !taskObject.isDone && !(taskObject.startTime && taskO
         $$bindings.scheduledTasks(scheduledTasks);
       $$result.css.add(css$2);
       return `
-<div style="${"overflow-y: scroll; overflow-x: hidden; height: 77vh"}" class="${"svelte-xbksim"}"><div id="${"calendar-day-container"}" style="${"position: relative; width: 12vw; height: 1000px"}" class="${"svelte-xbksim"}"><div style="${"margin-top: 27px; font-weight: 600"}" class="${"svelte-xbksim"}">${escape(getDate())}</div>
+<div style="${"overflow-y: scroll; overflow-x: hidden; height: 77vh"}" class="${"svelte-xbksim"}"><div id="${"calendar-day-container"}" style="${"position: relative; width: 12vw; height: " + escape(pixelsPerHour * numOfHourBlocksDisplayed) + "px"}" class="${"svelte-xbksim"}"><div style="${"margin-top: 27px; font-weight: 600"}" class="${"svelte-xbksim"}">${escape(getDate())}</div>
     
     ${calendarStartTime ? `${each(timesOfDay, (timeOfDay, i2) => {
         return `<div class="${"time-indicator svelte-xbksim"}" style="${"top: " + escape(30 + pixelsPerHour * i2) + "px;"}">${escape(timeOfDay.substring(0, 5))}
@@ -44266,7 +44267,7 @@ ${!taskObject.isDeleted && !taskObject.isDone && !(taskObject.startTime && taskO
   `;
     });
     css5 = {
-      code: ".calendar-section-container.svelte-17oi90h{display:flex;justify-content:space-evenly;width:36vw;background-color:white;border:1px solid green;border-top-right-radius:20px;border-bottom-right-radius:20px;padding-left:8px}#background-image-holder.svelte-17oi90h{background-repeat:no-repeat;background-size:100% 100%}.svelte-17oi90h::-webkit-scrollbar{width:0;height:0;background-color:#aaa}.fixed-height-container-for-scrolling.svelte-17oi90h{height:77vh;width:70vw;background-color:white;border:1px solid green;border-top-left-radius:20px;border-bottom-left-radius:20px;padding-top:14px;padding-left:30px}.todo-list.svelte-17oi90h{width:100%;height:77vh;display:flex;flex-wrap:wrap;flex-direction:column\r\n  }.task-container.svelte-17oi90h{border:0px solid;margin-bottom:25px;padding-left:0;padding-top:16px;padding-bottom:10px;padding-right:0;overflow:none}",
+      code: ".calendar-section-container.svelte-1ih468c{display:flex;justify-content:space-evenly;width:36vw;background-color:white;border:1px solid green;border-top-right-radius:20px;border-bottom-right-radius:20px;padding-left:8px}#background-image-holder.svelte-1ih468c{background-repeat:no-repeat;background-size:100% 100%}.svelte-1ih468c::-webkit-scrollbar{width:0;height:0;background-color:#aaa}.fixed-height-container-for-scrolling.svelte-1ih468c{height:77vh;width:70vw;background-color:white;border:1px solid green;border-top-left-radius:20px;border-bottom-left-radius:20px;padding-top:14px;padding-left:30px}.todo-list.svelte-1ih468c{width:100%;height:77vh;display:flex;overflow-x:auto}.task-container.svelte-1ih468c{border:0px solid;margin-bottom:25px;padding-left:0;padding-top:16px;padding-bottom:10px;padding-right:0;overflow:none}",
       map: null
     };
     U5Buseru5D = create_ssr_component(($$result, $$props, $$bindings, slots) => {
@@ -44347,7 +44348,9 @@ ${!taskObject.isDeleted && !taskObject.isDone && !(taskObject.startTime && taskO
                 if (day_diff >= node.daysBeforeRepeating) {
                   node.isDone = false;
                   node.startDate = dateOfToday;
-                  habitPoolToResolveConflict.push(node);
+                  if (!node.startTime) {
+                    habitPoolToResolveConflict.push(node);
+                  }
                 }
               }
               for (const child of node.children) {
@@ -44390,22 +44393,22 @@ ${!taskObject.isDeleted && !taskObject.isDone && !(taskObject.startTime && taskO
         taskObject: clickedTask
       }, {}, {})}
 
-<div id="${"background-image-holder"}" style="${"height: 100vh; padding-left: 120px; padding-right: 120px;"}" class="${"svelte-17oi90h"}"><div style="${"height: 100px;"}" class="${"svelte-17oi90h"}"></div>
+<div id="${"background-image-holder"}" style="${"height: 100vh; padding-left: 120px; padding-right: 120px;"}" class="${"svelte-1ih468c"}"><div style="${"height: 100px;"}" class="${"svelte-1ih468c"}"></div>
 
-  <div style="${"position: absolute; top: 30px; left: 30px;"}" class="${"svelte-17oi90h"}"><span class="${"material-icons svelte-17oi90h"}" style="${"margin-left: auto; margin-right: 0; color: white"}">${escape("music_off")}</span></div>
+  <div style="${"position: absolute; top: 30px; left: 30px;"}" class="${"svelte-1ih468c"}"><span class="${"material-icons svelte-1ih468c"}" style="${"margin-left: auto; margin-right: 0; color: white"}">${escape("music_off")}</span></div>
 
-  <div style="${"display: flex; padding-left: 0; padding-top: 0px"}" class="${"svelte-17oi90h"}"><div class="${"fixed-height-container-for-scrolling svelte-17oi90h"}"><div class="${"todo-list svelte-17oi90h"}">${allTasks ? `${each(allTasks, (task) => {
-        return `${!task.isDeleted ? `<div class="${"task-container svelte-17oi90h"}">${validate_component(RecursiveTask_1, "RecursiveTask").$$render($$result, { taskObject: task, depth: 1 }, {}, {})}
+  <div style="${"display: flex; padding-left: 0; padding-top: 0px"}" class="${"svelte-1ih468c"}"><div class="${"fixed-height-container-for-scrolling svelte-1ih468c"}"><div class="${"todo-list svelte-1ih468c"}">${allTasks ? `${each(allTasks, (task) => {
+        return `${!task.isDeleted ? `<div class="${"task-container svelte-1ih468c"}">${validate_component(RecursiveTask_1, "RecursiveTask").$$render($$result, { taskObject: task, depth: 1 }, {}, {})}
               </div>` : ``}`;
       })}
           
           
-          <div style="${"height: 200px;"}" class="${"svelte-17oi90h"}">${``}</div>` : ``}</div></div>
+          <div style="${"height: 200px;"}" class="${"svelte-1ih468c"}">${``}</div>` : ``}</div></div>
 
-    <div class="${"calendar-section-container svelte-17oi90h"}">${validate_component(CalendarDayView, "CalendarDayView").$$render($$result, { scheduledTasks: todayScheduledTasks }, {}, {})}
+    <div class="${"calendar-section-container svelte-1ih468c"}">${validate_component(CalendarDayView, "CalendarDayView").$$render($$result, { scheduledTasks: todayScheduledTasks }, {}, {})}
       ${validate_component(FutureOverview, "FutureOverview").$$render($$result, { futureScheduledTasks }, {}, {})}</div></div></div>
 
-<audio class="${"svelte-17oi90h"}"${add_attribute("this", AudioElem, 0)}></audio>`;
+<audio class="${"svelte-1ih468c"}"${add_attribute("this", AudioElem, 0)}></audio>`;
     });
   }
 });
@@ -44422,9 +44425,9 @@ var entry4, js4, css6;
 var init__4 = __esm({
   ".svelte-kit/output/server/nodes/3.js"() {
     init_index_svelte2();
-    entry4 = "pages/_user_/index.svelte-5e8d3acd.js";
-    js4 = ["pages/_user_/index.svelte-5e8d3acd.js", "chunks/vendor-94da56df.js", "chunks/db-66132ac0.js"];
-    css6 = ["assets/pages/_user_/index.svelte-969124d3.css"];
+    entry4 = "pages/_user_/index.svelte-4b335b16.js";
+    js4 = ["pages/_user_/index.svelte-4b335b16.js", "chunks/vendor-94da56df.js", "chunks/db-66132ac0.js"];
+    css6 = ["assets/pages/_user_/index.svelte-a586d4b2.css"];
   }
 });
 
@@ -45890,7 +45893,7 @@ var manifest = {
   assets: new Set(["background-picture.png", "favicon.png", "illiyard-moor-lofi.mp3", "illiyard-moor.jpg", "illiyard-moor.mp3", "maplestory-orange-blurred.jpg", "maplestory-orange.jpg", "maplestory-watercolor.jpg", "ms-leafre-lofi.mp3"]),
   _: {
     mime: { ".png": "image/png", ".mp3": "audio/mpeg", ".jpg": "image/jpeg" },
-    entry: { "file": "start-566b6f09.js", "js": ["start-566b6f09.js", "chunks/vendor-94da56df.js", "chunks/singletons-a6a7384f.js"], "css": [] },
+    entry: { "file": "start-7b6c88d4.js", "js": ["start-7b6c88d4.js", "chunks/vendor-94da56df.js", "chunks/singletons-a6a7384f.js"], "css": [] },
     nodes: [
       () => Promise.resolve().then(() => (init__(), __exports)),
       () => Promise.resolve().then(() => (init__2(), __exports2)),
