@@ -37,13 +37,13 @@
   import { createEventDispatcher } from 'svelte'
 
   export let fontSize = 1
-  export let name = ''
   export let offsetFromTop
   export let offsetFromLeft = 0
   export let height = 15 //
   export let duration = 15
-  export let task = null
   export let calendarStartTime = ''
+  export let name = ''
+  export let task = null
 
   const dispatch = createEventDispatcher()
   let startY = 0

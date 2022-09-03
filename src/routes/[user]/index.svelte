@@ -77,7 +77,8 @@
 
     <div class="calendar-section-container">
       <CalendarDayView
-        scheduledTasks={todayScheduledTasks}
+        scheduledTasksToday={todayScheduledTasks}
+        on:task-done={(e) => markNodeAsDone(e.detail.taskName)}
         on:task-scheduled={(e) => mutateOneNode(e.detail)}
         on:task-duration-adjusted={(e) => mutateOneNode2(e.detail)}
         on:task-click={(e) => openDetailedCard(e.detail)}
@@ -210,8 +211,8 @@
     for (const task of allTasks) {
       traverseAndUpdateTree({ 
         node: task, 
-        fulfilsCriteria: (task) => { return task.name === name },
-        applyFunc: (task) => task.isDone = true
+        fulfilsCriteria: (task) => task.name === name,
+        applyFunc: (task) => task.isDone = !task.isDone
       })
     }
     // update database
@@ -219,6 +220,7 @@
       doc(db, userDocPath),
       { allTasks }
     )
+    allTasks = [...allTasks]
   }
 
   async function deleteSubtree (name) {
@@ -250,6 +252,23 @@
       { allTasks }
     )
     allTasks = [...allTasks]
+  }
+
+
+  async function recollectScheduledButIncompletedTasks () {
+    let root = { 
+      name: 'root',
+      children: allTasks
+    }
+    traverseAndUpdateTree({
+      node: root,
+      fulfilsCriteria: (task) => task.startDate < dateOfToday && !task.isDone,
+      applyFunc: (task) => {
+        task.startDate = ''
+        task.startTime = ''
+        // this means the task will re-appear on the unscheduled todo-list
+      }
+    })
   }
 
   async function mutateOneNode ({ taskName, timeOfDay, dateScheduled }) {
@@ -346,7 +365,10 @@
     // HANDLE TASKS THAT REPEAT
     // can't use `return` in reactive expression https://github.com/sveltejs/svelte/issues/2828
     if (lastRanRepeatAtDate !== dateOfToday) {
-      console.log('running repeating task algorithm')
+      console.log('new day, running repeat algorithm and process un-finished tasks')
+      
+      recollectScheduledButIncompletedTasks()
+
       //  1. Handle repeating Twitch streams e.g. Mon, Wed, Fri 7 pm
       //  Figure out if it's Wednesday or Saturday etc. with `Date.getDate()` method 
       //  If it is, place it at 7 pm. Easiest game of my life.
@@ -522,7 +544,7 @@
   }
 
   .fixed-height-container-for-scrolling {
-    height: 77vh;
+    height: 60vh;
     width: 70vw;
     background-color: white; 
     border: 1px solid green; 

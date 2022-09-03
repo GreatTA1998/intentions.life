@@ -4,36 +4,54 @@
 
   height: 200% is just so it's high enough to contain all the absolute elements
 -->
-<div style="overflow-y: scroll; overflow-x: hidden; height: 77vh">
-  <div 
-    id="calendar-day-container" 
-    style="position: relative; width: 12vw; height: {pixelsPerHour * numOfHourBlocksDisplayed}px"
-    on:drop={(e) => drop_handler(e)}
-    on:dragover={dragover_handler}
-  >
-    <div style="margin-top: 27px; font-weight: 600">
+<div style="height: 77vh">
+  <div style="margin-top: 8px; font-weight: 600;">
+    Passed tasks:
+  </div>
+
+  {#each tasksThatAlreadyHappened as task}
+    <div style="display: flex; align-items: center;" class:green-text={task.isDone} class:red-text={!task.isDone}>
+      <input 
+        type="checkbox" 
+        bind:checked={task.isDone}
+        on:click={() => toggleIsDone(task)}
+      >
+      <div style="font-size: 0.82rem;">{task.name}</div>
+    </div>
+  {/each}
+
+  <div style="overflow-y: scroll; overflow-x: hidden; height: 60vh; margin-top: 12px;">
+    <div style="margin-top: {0}px; font-weight: 600">
       {getDate()}
     </div>
-    
-    {#if calendarStartTime}
-      {#each timesOfDay as timeOfDay, i}
-        <div class="time-indicator" style="top: {30 + (pixelsPerHour * i)}px;">
-          {timeOfDay.substring(0, 5)}
-        </div>
-      {/each}
 
-      {#each scheduledTasks as task, i}
-        <TaskElement  
-          {task}
-          offsetFromTop={computeOffset(task)}
-          height={task.duration * pixelsPerMinute || 30}
-          fontSize={0.8}
-          offsetFromLeft={30}
-          on:task-click
-          on:task-duration-adjusted
-        />
-      {/each}
-    {/if}
+    <div 
+      id="calendar-day-container" 
+      style="position: relative; height: {pixelsPerHour * numOfHourBlocksDisplayed}px; width: 12vw; "
+      on:drop={(e) => drop_handler(e)}
+      on:dragover={dragover_handler}
+    >
+
+      {#if calendarStartTime}
+        {#each timesOfDay as timeOfDay, i}
+          <div class="time-indicator" style="top: {pixelsPerHour * i}px;">
+            {timeOfDay.substring(0, 5)}
+          </div>
+        {/each}
+
+        {#each scheduledTasksToday as task, i}
+          <TaskElement  
+            {task}
+            offsetFromTop={computeOffset(task)}
+            height={task.duration * pixelsPerMinute || 30}
+            fontSize={0.8}
+            offsetFromLeft={30}
+            on:task-click
+            on:task-duration-adjusted
+          />
+        {/each}
+      {/if}
+    </div>
   </div>
 </div>
 
@@ -42,7 +60,7 @@
   import { getDateOfToday } from './helpers.js'
   import TaskElement from './TaskElement.svelte'
 
-  export let scheduledTasks
+  export let scheduledTasksToday
 
   const dispatch = createEventDispatcher()
   const getDate = getDateOfToday
@@ -50,10 +68,21 @@
   const pixelsPerHour = 80
   const pixelsPerMinute = 80 / 60
   const numOfHourBlocksDisplayed = 16
+
   let timesOfDay = []
   let startY = 0
 
   let calendarStartTime = ''
+  let tasksThatAlreadyHappened
+
+  $: if (calendarStartTime) {
+    tasksThatAlreadyHappened = scheduledTasksToday.filter(task => task.startTime < calendarStartTime)
+  }
+
+  function toggleIsDone (task) { 
+    console.log('task =', task)
+    dispatch('task-done', { taskName: task.name })
+  }
 
   // Start either from the current hour, or the current ongoing task's start time
   //   - if it's 8 pm, but there's an ongoing task that started at 7 pm and hasn't ended
@@ -64,7 +93,7 @@
     // note we don't care about the minutes, we always start from the exact hour
     const currentMinutesFromMidnight = today.getHours() * 60 // `getHour()` between 0-23
     // for all tasks, check if it "includes" current time
-    for (const task of scheduledTasks) { // (only includes today's)
+    for (const task of scheduledTasksToday) {
     const hhOfStart = task.startTime.substring(0, 2)
       const taskStartMinutesFromMidnight = parseInt(hhOfStart) * 60
       const taskEndMinutesFromMidnight = taskStartMinutesFromMidnight + task.duration 
@@ -130,7 +159,7 @@
     // `n` represents time in PURE hours e.g. 8.24, 13.90
     // `e.layerY` gives the Y-coordinate with respect to the current container
     // otherwise the multiple scrolling contexts messes it up
-    let n = (e.layerY) / pixelsPerHour
+    let n = e.layerY / pixelsPerHour
     const decimal = n - Math.floor(n)
     const integer = Math.trunc(n)
     
@@ -142,9 +171,6 @@
     } else {
       mm = minutesOffset.toPrecision(2)
     }
-
-
-    console.log('calendarStartTime =', calendarStartTime)
 
     // calculate hours i.e. `hh`
     const origin = parseInt(calendarStartTime.substring(0, 2))
@@ -170,6 +196,14 @@
   *::-webkit-scrollbar {
     width: 0;
     background-color: #aaa; /* or add it to the track */
+  }
+
+  .green-text {
+    color: green;
+  }
+
+  .red-text {
+    color: red;
   }
 
   /* VERDICT: absolute works

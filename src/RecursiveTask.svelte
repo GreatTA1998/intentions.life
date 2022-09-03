@@ -22,7 +22,7 @@
   >
     <div class="current-task-flexbox">
       <div 
-        style="font-size: {1.5 * (0.85 ** depth)}rem; font-family: aktiv-grotesk, sans-serif;"
+        style="font-size: {1.7 * (0.76 ** depth)}rem; font-family: aktiv-grotesk, sans-serif;"
         class="keep-on-same-line name-of-task" 
         class:scheduled-orange={!taskObject.isDone && taskObject.startTime && taskObject.startDate}
         class:crossed-out={taskObject.isDone} 
