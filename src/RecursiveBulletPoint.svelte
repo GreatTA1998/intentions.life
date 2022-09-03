@@ -4,16 +4,15 @@
 >
   {taskObject.name}
 
-  {#if taskObject.isRepeating}
-    (Repeats)
-  {/if}
-
-  {#if taskObject.isDone}
-    (Completed)
+  {#if taskObject.daysBeforeRepeating}
+    (repeats every {taskObject.daysBeforeRepeating} days)
+    (completed {taskObject.completionCount || 0} times)
+  {:else if taskObject.isDone}
+    (completed)
   {/if}
 
   {#if taskObject.startDate && taskObject.startTime}
-    ({taskObject.startDate} {taskObject.startTime})
+    (scheduled {taskObject.startDate} {taskObject.startTime})
   {/if}
   
   {#each taskObject.children as child}

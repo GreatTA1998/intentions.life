@@ -4,8 +4,8 @@
 
   height: 200% is just so it's high enough to contain all the absolute elements
 -->
-<div style="height: 77vh">
-  <div style="margin-top: 8px; font-weight: 600;">
+<div style="height: 50vh">
+  <div style="margin-top: 26px; font-weight: 600;">
     Passed tasks:
   </div>
 
@@ -20,8 +20,8 @@
     </div>
   {/each}
 
-  <div style="overflow-y: scroll; overflow-x: hidden; height: 60vh; margin-top: 12px;">
-    <div style="margin-top: {0}px; font-weight: 600">
+  <div style="overflow-y: scroll; overflow-x: hidden; height: 46vh; margin-top: 12px;">
+    <div style="font-weight: 600">
       {getDate()}
     </div>
 

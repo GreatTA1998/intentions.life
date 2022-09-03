@@ -46,8 +46,8 @@
             Schedule
           </button>
         {:else}
-          <input bind:value={newStartDate} placeholder="12/31" style="width: 40px"/>
-          <input bind:value={newStartTime} placeholder="19:45" style="width: 40px" on:keypress={detectEnterKey5}/>
+          <input bind:value={newStartDate} placeholder={getDateOfToday()} style="width: 40px"/>
+          <input bind:value={newStartTime} placeholder="13:00" style="width: 40px" on:keypress={detectEnterKey5}/>
         {/if}
         <!-- Repeating tasks -->
         {#if !isTypingRepeatFrequency}
@@ -194,9 +194,14 @@ function detectEnterKey4 (e) {
 
 function detectEnterKey5 (e) {
   if (e.charCode === 13) {
-    if (!newStartDate || !newStartTime) {
+    if (!newStartDate && !newStartTime) {
+      taskObject.startDate = '' 
+      taskObject.startTime = ''
+    }
+    else if (!newStartDate || !newStartTime) {
       alert('Need BOTH date and time')
-    } else {
+    } 
+    else {
       taskObject.startDate = newStartDate
       taskObject.startTime = newStartTime
     }

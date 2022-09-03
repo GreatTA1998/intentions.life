@@ -1,4 +1,4 @@
-<div style="height: 77vh; overflow-y: scroll; overflow-x: hidden">
+<div style="height: 60vh; overflow-y: scroll; overflow-x: hidden">
   <div style="width: 12vw; margin-left: 0px; margin-top: 27px; position: relative; height: 1600px" >
     {#each futureScheduledTasks as task, i}
       <div style="position: relative; height: {minimumContainerHeight + (task.duration * pixelsPerMinute || 15)}px; margin-top: 25px;">

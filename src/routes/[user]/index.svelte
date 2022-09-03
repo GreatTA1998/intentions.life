@@ -15,10 +15,10 @@
     on:card-close={() => isDetailedCardOpen = false}
     on:task-done={() => markNodeAsDone(clickedTask.name)}
     on:task-delete={() => deleteSubtree(clickedTask.name)}
-    on:task-repeat={updateFirestore}
-    on:task-schedule={updateFirestore}
-    on:task-title-update={updateFirestore}
-    on:task-notes-update={updateFirestore}
+    on:task-repeat={updateFirestoreAndTriggerReactivity}
+    on:task-schedule={updateFirestoreAndTriggerReactivity}
+    on:task-title-update={updateFirestoreAndTriggerReactivity}
+    on:task-notes-update={updateFirestoreAndTriggerReactivity}
   />
 {/key}
 
@@ -41,9 +41,9 @@
                 <RecursiveTask 
                   on:task-click={(e) => openDetailedCard(e.detail)}
                   on:task-create={(e) => modifyTaskTree(e, task)} 
-                  on:task-done={updateFirestore}
-                  on:task-delete={updateFirestore}
-                  on:task-repeating={updateFirestore}
+                  on:task-done={updateFirestoreAndTriggerReactivity}
+                  on:task-delete={updateFirestoreAndTriggerReactivity}
+                  on:task-repeating={updateFirestoreAndTriggerReactivity}
                   taskObject={task}
                   depth={1}
                 />
@@ -212,7 +212,11 @@
       traverseAndUpdateTree({ 
         node: task, 
         fulfilsCriteria: (task) => task.name === name,
-        applyFunc: (task) => task.isDone = !task.isDone
+        applyFunc: (task) => { 
+          task.isDone = !task.isDone
+          if (task.isDone) task.completionCount = task.completionCount + 1 || 1
+          else task.completionCount = task.completionCount - 1 || 0 
+        }
       })
     }
     // update database
@@ -491,20 +495,14 @@
     const { updatedChildren } = e.detail
     task.children = [...updatedChildren]
 
-    updateDoc(
-      doc(db, userDocPath),
-      { allTasks }
-    )
-
-    // change the pointer to the updatedChildren
-    // allTasks' subtree is mutated, and it will correctly reference it,
-    
-    // but the reactivity system does not KNOW when exactly it has been mutated, 
-    allTasks = [...allTasks]
+    updateFirestoreAndTriggerReactivity()
   }
 
-  function updateFirestore () {
-    console.log("updateFirestore()")
+  // change the pointer to the updatedChildren
+  // allTasks' subtree is mutated, and it will correctly reference it,
+    
+  // but the reactivity system does not KNOW when exactly it has been mutated, 
+  function updateFirestoreAndTriggerReactivity () {
     // NOTE: `allTasks` has been mutated (and is already correct), but the reactivity system doesn't know that
     updateDoc(
       doc(db, userDocPath),
