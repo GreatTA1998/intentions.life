@@ -44019,11 +44019,10 @@ var init_index_svelte2 = __esm({
         (taskObject.isDone ? "task-completed" : "") + " " + (!taskObject.isDone && taskObject.startDate && taskObject.startTime ? "task-scheduled" : "")
       ].join(" ").trim()}">${escape(taskObject.name)}
 
-  ${taskObject.isRepeating ? `(Repeats)` : ``}
+  ${taskObject.daysBeforeRepeating ? `(repeats every ${escape(taskObject.daysBeforeRepeating)} days)
+    (completed ${escape(taskObject.completionCount || 0)} times)` : `${taskObject.isDone ? `(completed)` : ``}`}
 
-  ${taskObject.isDone ? `(Completed)` : ``}
-
-  ${taskObject.startDate && taskObject.startTime ? `(${escape(taskObject.startDate)} ${escape(taskObject.startTime)})` : ``}
+  ${taskObject.startDate && taskObject.startTime ? `(scheduled ${escape(taskObject.startDate)} ${escape(taskObject.startTime)})` : ``}
   
   ${each(taskObject.children, (child) => {
         return `<div style="${"margin-left: 12px;"}">${validate_component(RecursiveBulletPoint_1, "RecursiveBulletPoint").$$render($$result, { taskObject: child }, {}, {})}
@@ -44229,7 +44228,7 @@ ${!taskObject.isDeleted && !taskObject.isDone && !(taskObject.startTime && taskO
         }
       }
       return `
-<div style="${"height: 77vh"}" class="${"svelte-1ksya56"}"><div style="${"margin-top: 8px; font-weight: 600;"}" class="${"svelte-1ksya56"}">Passed tasks:
+<div style="${"height: 50vh"}" class="${"svelte-1ksya56"}"><div style="${"margin-top: 26px; font-weight: 600;"}" class="${"svelte-1ksya56"}">Passed tasks:
   </div>
 
   ${each(tasksThatAlreadyHappened, (task) => {
@@ -44241,7 +44240,7 @@ ${!taskObject.isDeleted && !taskObject.isDone && !(taskObject.startTime && taskO
     </div>`;
       })}
 
-  <div style="${"overflow-y: scroll; overflow-x: hidden; height: 60vh; margin-top: 12px;"}" class="${"svelte-1ksya56"}"><div style="${"margin-top: " + escape(0) + "px; font-weight: 600"}" class="${"svelte-1ksya56"}">${escape(getDate())}</div>
+  <div style="${"overflow-y: scroll; overflow-x: hidden; height: 46vh; margin-top: 12px;"}" class="${"svelte-1ksya56"}"><div style="${"font-weight: 600"}" class="${"svelte-1ksya56"}">${escape(getDate())}</div>
 
     <div id="${"calendar-day-container"}" style="${"position: relative; height: " + escape(pixelsPerHour * numOfHourBlocksDisplayed) + "px; width: 12vw;"}" class="${"svelte-1ksya56"}">${calendarStartTime ? `${each(timesOfDay, (timeOfDay, i2) => {
         return `<div class="${"time-indicator svelte-1ksya56"}" style="${"top: " + escape(pixelsPerHour * i2) + "px;"}">${escape(timeOfDay.substring(0, 5))}
@@ -44270,7 +44269,7 @@ ${!taskObject.isDeleted && !taskObject.isDone && !(taskObject.startTime && taskO
       if ($$props.futureScheduledTasks === void 0 && $$bindings.futureScheduledTasks && futureScheduledTasks !== void 0)
         $$bindings.futureScheduledTasks(futureScheduledTasks);
       $$result.css.add(css$1);
-      return `<div style="${"height: 77vh; overflow-y: scroll; overflow-x: hidden"}" class="${"svelte-d8tb0p"}"><div style="${"width: 12vw; margin-left: 0px; margin-top: 27px; position: relative; height: 1600px"}" class="${"svelte-d8tb0p"}">${each(futureScheduledTasks, (task, i2) => {
+      return `<div style="${"height: 60vh; overflow-y: scroll; overflow-x: hidden"}" class="${"svelte-d8tb0p"}"><div style="${"width: 12vw; margin-left: 0px; margin-top: 27px; position: relative; height: 1600px"}" class="${"svelte-d8tb0p"}">${each(futureScheduledTasks, (task, i2) => {
         return `<div style="${"position: relative; height: " + escape(minimumContainerHeight + (task.duration * pixelsPerMinute || 15)) + "px; margin-top: 25px;"}" class="${"svelte-d8tb0p"}"><div class="${"svelte-d8tb0p"}"><b class="${"svelte-d8tb0p"}">${escape(task.startDate)}</b></div>
 
         ${validate_component(TaskElement, "TaskElement").$$render($$result, {
@@ -44455,8 +44454,8 @@ var entry4, js4, css6;
 var init__4 = __esm({
   ".svelte-kit/output/server/nodes/3.js"() {
     init_index_svelte2();
-    entry4 = "pages/_user_/index.svelte-87ad2479.js";
-    js4 = ["pages/_user_/index.svelte-87ad2479.js", "chunks/vendor-94da56df.js", "chunks/db-66132ac0.js"];
+    entry4 = "pages/_user_/index.svelte-3304e8c0.js";
+    js4 = ["pages/_user_/index.svelte-3304e8c0.js", "chunks/vendor-94da56df.js", "chunks/db-66132ac0.js"];
     css6 = ["assets/pages/_user_/index.svelte-90d0a5c1.css"];
   }
 });
@@ -45923,7 +45922,7 @@ var manifest = {
   assets: new Set(["background-picture.png", "favicon.png", "illiyard-moor-lofi.mp3", "illiyard-moor.jpg", "illiyard-moor.mp3", "maplestory-orange-blurred.jpg", "maplestory-orange.jpg", "maplestory-watercolor.jpg", "ms-leafre-lofi.mp3"]),
   _: {
     mime: { ".png": "image/png", ".mp3": "audio/mpeg", ".jpg": "image/jpeg" },
-    entry: { "file": "start-a5584742.js", "js": ["start-a5584742.js", "chunks/vendor-94da56df.js", "chunks/singletons-a6a7384f.js"], "css": [] },
+    entry: { "file": "start-4d17a6d9.js", "js": ["start-4d17a6d9.js", "chunks/vendor-94da56df.js", "chunks/singletons-a6a7384f.js"], "css": [] },
     nodes: [
       () => Promise.resolve().then(() => (init__(), __exports)),
       () => Promise.resolve().then(() => (init__2(), __exports2)),
