@@ -38274,8 +38274,8 @@ var entry, js, css;
 var init__ = __esm({
   ".svelte-kit/output/server/nodes/0.js"() {
     init_layout_svelte();
-    entry = "pages/__layout.svelte-e668b374.js";
-    js = ["pages/__layout.svelte-e668b374.js", "chunks/vendor-94da56df.js", "chunks/db-66132ac0.js", "chunks/navigation-bd39ff07.js", "chunks/singletons-a6a7384f.js"];
+    entry = "pages/__layout.svelte-8cbb9734.js";
+    js = ["pages/__layout.svelte-8cbb9734.js", "chunks/vendor-94da56df.js", "chunks/db-66132ac0.js", "chunks/navigation-bd39ff07.js", "chunks/singletons-a6a7384f.js"];
     css = [];
   }
 });
@@ -38324,8 +38324,8 @@ var entry2, js2, css2;
 var init__2 = __esm({
   ".svelte-kit/output/server/nodes/1.js"() {
     init_error_svelte();
-    entry2 = "error.svelte-63a149f4.js";
-    js2 = ["error.svelte-63a149f4.js", "chunks/vendor-94da56df.js"];
+    entry2 = "error.svelte-8a7091ee.js";
+    js2 = ["error.svelte-8a7091ee.js", "chunks/vendor-94da56df.js"];
     css2 = [];
   }
 });
@@ -38547,8 +38547,8 @@ var entry3, js3, css4;
 var init__3 = __esm({
   ".svelte-kit/output/server/nodes/2.js"() {
     init_index_svelte();
-    entry3 = "pages/index.svelte-fe2cba8f.js";
-    js3 = ["pages/index.svelte-fe2cba8f.js", "chunks/vendor-94da56df.js", "chunks/navigation-bd39ff07.js", "chunks/singletons-a6a7384f.js"];
+    entry3 = "pages/index.svelte-49cd0638.js";
+    js3 = ["pages/index.svelte-49cd0638.js", "chunks/vendor-94da56df.js", "chunks/navigation-bd39ff07.js", "chunks/singletons-a6a7384f.js"];
     css4 = ["assets/pages/index.svelte-fac5162c.css"];
   }
 });
@@ -44116,7 +44116,7 @@ var init_index_svelte2 = __esm({
 ${!taskObject.isDeleted && !taskObject.isDone && !(taskObject.startTime && taskObject.startDate) ? `<div draggable="${"true"}" class="${[
         "scheduled-task svelte-t4v7r0",
         (!taskObject.isDone && !(taskObject.startTime && taskObject.startDate) ? "black-duration-line" : "") + " " + (!taskObject.isDone && taskObject.startTime && taskObject.startDate ? "orange-duration-line" : "") + " " + (taskObject.isDone ? "green-duration-line" : "")
-      ].join(" ").trim()}" style="${"margin-left: " + escape(depth === 1 ? "0" : "20") + "px; margin-bottom: 10px; width: " + escape(350 * 0.8 ** depth) + "px; height: " + escape(taskObject.duration && !doChildrenHaveDuration && taskObject.duration * 90 / 60 > taskObject.children.length * 60 * 0.7 ** depth && taskObject.duration * 90 / 60 > 60 * 0.65 ** depth ? `${taskObject.duration * 90 / 60}px` : "") + "; padding-left: " + escape(10 * 0.8 ** depth) + "px;"}"><div class="${"current-task-flexbox svelte-t4v7r0"}"><div style="${"font-size: " + escape(1.5 * 0.85 ** depth) + "rem; font-family: aktiv-grotesk, sans-serif;"}" class="${[
+      ].join(" ").trim()}" style="${"margin-left: " + escape(depth === 1 ? "0" : "20") + "px; margin-bottom: 10px; width: " + escape(350 * 0.8 ** depth) + "px; height: " + escape(taskObject.duration && !doChildrenHaveDuration && taskObject.duration * 90 / 60 > taskObject.children.length * 60 * 0.7 ** depth && taskObject.duration * 90 / 60 > 60 * 0.65 ** depth ? `${taskObject.duration * 90 / 60}px` : "") + "; padding-left: " + escape(10 * 0.8 ** depth) + "px;"}"><div class="${"current-task-flexbox svelte-t4v7r0"}"><div style="${"font-size: " + escape(1.7 * 0.76 ** depth) + "rem; font-family: aktiv-grotesk, sans-serif;"}" class="${[
         "keep-on-same-line name-of-task svelte-t4v7r0",
         (!taskObject.isDone && taskObject.startTime && taskObject.startDate ? "scheduled-orange" : "") + " " + (taskObject.isDone ? "crossed-out" : "")
       ].join(" ").trim()}">${`<div class="${"truncate svelte-t4v7r0"}" style="${"width: " + escape(350 * 0.85 ** depth) + "px"}">${escape(taskObject.name)}</div>`}</div></div>
@@ -44133,18 +44133,16 @@ ${!taskObject.isDeleted && !taskObject.isDone && !(taskObject.startTime && taskO
     };
     TaskElement = create_ssr_component(($$result, $$props, $$bindings, slots) => {
       let { fontSize = 1 } = $$props;
-      let { name: name5 = "" } = $$props;
       let { offsetFromTop } = $$props;
       let { offsetFromLeft = 0 } = $$props;
       let { height = 15 } = $$props;
       let { duration = 15 } = $$props;
-      let { task = null } = $$props;
       let { calendarStartTime = "" } = $$props;
+      let { name: name5 = "" } = $$props;
+      let { task = null } = $$props;
       createEventDispatcher();
       if ($$props.fontSize === void 0 && $$bindings.fontSize && fontSize !== void 0)
         $$bindings.fontSize(fontSize);
-      if ($$props.name === void 0 && $$bindings.name && name5 !== void 0)
-        $$bindings.name(name5);
       if ($$props.offsetFromTop === void 0 && $$bindings.offsetFromTop && offsetFromTop !== void 0)
         $$bindings.offsetFromTop(offsetFromTop);
       if ($$props.offsetFromLeft === void 0 && $$bindings.offsetFromLeft && offsetFromLeft !== void 0)
@@ -44153,10 +44151,12 @@ ${!taskObject.isDeleted && !taskObject.isDone && !(taskObject.startTime && taskO
         $$bindings.height(height);
       if ($$props.duration === void 0 && $$bindings.duration && duration !== void 0)
         $$bindings.duration(duration);
-      if ($$props.task === void 0 && $$bindings.task && task !== void 0)
-        $$bindings.task(task);
       if ($$props.calendarStartTime === void 0 && $$bindings.calendarStartTime && calendarStartTime !== void 0)
         $$bindings.calendarStartTime(calendarStartTime);
+      if ($$props.name === void 0 && $$bindings.name && name5 !== void 0)
+        $$bindings.name(name5);
+      if ($$props.task === void 0 && $$bindings.task && task !== void 0)
+        $$bindings.task(task);
       $$result.css.add(css$3);
       return `<div class="${["scheduled-task svelte-1at2tfe", task.isDone ? "green" : ""].join(" ").trim()}" style="${"top: " + escape(offsetFromTop) + "px; height: " + escape(height) + "px; left: " + escape(offsetFromLeft) + "px; font-size: " + escape(fontSize) + "rem;"}"><div draggable="${"true"}" style="${"width: 11vw"}">${escape(task.name)}</div>
 
@@ -44172,22 +44172,23 @@ ${!taskObject.isDeleted && !taskObject.isDone && !(taskObject.startTime && taskO
 </div>`;
     });
     css$2 = {
-      code: ".svelte-xbksim::-webkit-scrollbar{width:0;background-color:#aaa}.time-indicator.svelte-xbksim{top:-5px;margin-right:4px;font-size:0.7rem;position:absolute}",
+      code: ".svelte-1ksya56::-webkit-scrollbar{width:0;background-color:#aaa}.green-text.svelte-1ksya56{color:green}.red-text.svelte-1ksya56{color:red}.time-indicator.svelte-1ksya56{top:-5px;margin-right:4px;font-size:0.7rem;position:absolute}",
       map: null
     };
     pixelsPerHour = 80;
     numOfHourBlocksDisplayed = 16;
     CalendarDayView = create_ssr_component(($$result, $$props, $$bindings, slots) => {
-      let { scheduledTasks } = $$props;
+      let { scheduledTasksToday } = $$props;
       createEventDispatcher();
       const getDate = getDateOfToday;
       const pixelsPerMinute = 80 / 60;
       let timesOfDay = [];
       let calendarStartTime = "";
+      let tasksThatAlreadyHappened;
       function decideCalendarStartTime() {
         const today = new Date();
         const currentMinutesFromMidnight = today.getHours() * 60;
-        for (const task of scheduledTasks) {
+        for (const task of scheduledTasksToday) {
           const hhOfStart = task.startTime.substring(0, 2);
           const taskStartMinutesFromMidnight = parseInt(hhOfStart) * 60;
           const taskEndMinutesFromMidnight = taskStartMinutesFromMidnight + task.duration;
@@ -44219,18 +44220,35 @@ ${!taskObject.isDeleted && !taskObject.isDone && !(taskObject.startTime && taskO
         const hoursOffset = Number(hh) + Number(mm) / 60 - parseInt(calendarStartTime.substring(0, 2));
         return hoursOffset * pixelsPerHour;
       }
-      if ($$props.scheduledTasks === void 0 && $$bindings.scheduledTasks && scheduledTasks !== void 0)
-        $$bindings.scheduledTasks(scheduledTasks);
+      if ($$props.scheduledTasksToday === void 0 && $$bindings.scheduledTasksToday && scheduledTasksToday !== void 0)
+        $$bindings.scheduledTasksToday(scheduledTasksToday);
       $$result.css.add(css$2);
+      {
+        if (calendarStartTime) {
+          tasksThatAlreadyHappened = scheduledTasksToday.filter((task) => task.startTime < calendarStartTime);
+        }
+      }
       return `
-<div style="${"overflow-y: scroll; overflow-x: hidden; height: 77vh"}" class="${"svelte-xbksim"}"><div id="${"calendar-day-container"}" style="${"position: relative; width: 12vw; height: " + escape(pixelsPerHour * numOfHourBlocksDisplayed) + "px"}" class="${"svelte-xbksim"}"><div style="${"margin-top: 27px; font-weight: 600"}" class="${"svelte-xbksim"}">${escape(getDate())}</div>
-    
-    ${calendarStartTime ? `${each(timesOfDay, (timeOfDay, i2) => {
-        return `<div class="${"time-indicator svelte-xbksim"}" style="${"top: " + escape(30 + pixelsPerHour * i2) + "px;"}">${escape(timeOfDay.substring(0, 5))}
-        </div>`;
+<div style="${"height: 77vh"}" class="${"svelte-1ksya56"}"><div style="${"margin-top: 8px; font-weight: 600;"}" class="${"svelte-1ksya56"}">Passed tasks:
+  </div>
+
+  ${each(tasksThatAlreadyHappened, (task) => {
+        return `<div style="${"display: flex; align-items: center;"}" class="${[
+          "svelte-1ksya56",
+          (task.isDone ? "green-text" : "") + " " + (!task.isDone ? "red-text" : "")
+        ].join(" ").trim()}"><input type="${"checkbox"}" class="${"svelte-1ksya56"}"${add_attribute("checked", task.isDone, 1)}>
+      <div style="${"font-size: 0.82rem;"}" class="${"svelte-1ksya56"}">${escape(task.name)}</div>
+    </div>`;
       })}
 
-      ${each(scheduledTasks, (task, i2) => {
+  <div style="${"overflow-y: scroll; overflow-x: hidden; height: 60vh; margin-top: 12px;"}" class="${"svelte-1ksya56"}"><div style="${"margin-top: " + escape(0) + "px; font-weight: 600"}" class="${"svelte-1ksya56"}">${escape(getDate())}</div>
+
+    <div id="${"calendar-day-container"}" style="${"position: relative; height: " + escape(pixelsPerHour * numOfHourBlocksDisplayed) + "px; width: 12vw;"}" class="${"svelte-1ksya56"}">${calendarStartTime ? `${each(timesOfDay, (timeOfDay, i2) => {
+        return `<div class="${"time-indicator svelte-1ksya56"}" style="${"top: " + escape(pixelsPerHour * i2) + "px;"}">${escape(timeOfDay.substring(0, 5))}
+          </div>`;
+      })}
+
+        ${each(scheduledTasksToday, (task, i2) => {
         return `${validate_component(TaskElement, "TaskElement").$$render($$result, {
           task,
           offsetFromTop: computeOffset(task),
@@ -44238,7 +44256,7 @@ ${!taskObject.isDeleted && !taskObject.isDone && !(taskObject.startTime && taskO
           fontSize: 0.8,
           offsetFromLeft: 30
         }, {}, {})}`;
-      })}` : ``}</div>
+      })}` : ``}</div></div>
 </div>`;
     });
     css$1 = {
@@ -44267,7 +44285,7 @@ ${!taskObject.isDeleted && !taskObject.isDone && !(taskObject.startTime && taskO
   `;
     });
     css5 = {
-      code: ".calendar-section-container.svelte-1ih468c{display:flex;justify-content:space-evenly;width:36vw;background-color:white;border:1px solid green;border-top-right-radius:20px;border-bottom-right-radius:20px;padding-left:8px}#background-image-holder.svelte-1ih468c{background-repeat:no-repeat;background-size:100% 100%}.svelte-1ih468c::-webkit-scrollbar{width:0;height:0;background-color:#aaa}.fixed-height-container-for-scrolling.svelte-1ih468c{height:77vh;width:70vw;background-color:white;border:1px solid green;border-top-left-radius:20px;border-bottom-left-radius:20px;padding-top:14px;padding-left:30px}.todo-list.svelte-1ih468c{width:100%;height:77vh;display:flex;overflow-x:auto}.task-container.svelte-1ih468c{border:0px solid;margin-bottom:25px;padding-left:0;padding-top:16px;padding-bottom:10px;padding-right:0;overflow:none}",
+      code: ".calendar-section-container.svelte-1e5e9i8{display:flex;justify-content:space-evenly;width:36vw;background-color:white;border:1px solid green;border-top-right-radius:20px;border-bottom-right-radius:20px;padding-left:8px}#background-image-holder.svelte-1e5e9i8{background-repeat:no-repeat;background-size:100% 100%}.svelte-1e5e9i8::-webkit-scrollbar{width:0;height:0;background-color:#aaa}.fixed-height-container-for-scrolling.svelte-1e5e9i8{height:60vh;width:70vw;background-color:white;border:1px solid green;border-top-left-radius:20px;border-bottom-left-radius:20px;padding-top:14px;padding-left:30px}.todo-list.svelte-1e5e9i8{width:100%;height:77vh;display:flex;overflow-x:auto}.task-container.svelte-1e5e9i8{border:0px solid;margin-bottom:25px;padding-left:0;padding-top:16px;padding-bottom:10px;padding-right:0;overflow:none}",
       map: null
     };
     U5Buseru5D = create_ssr_component(($$result, $$props, $$bindings, slots) => {
@@ -44300,6 +44318,17 @@ ${!taskObject.isDeleted && !taskObject.isDone && !(taskObject.startTime && taskO
             applyFunc: (task2) => futureScheduledTasks.push(task2)
           });
         }
+      }
+      async function recollectScheduledButIncompletedTasks() {
+        let root = { name: "root", children: allTasks };
+        traverseAndUpdateTree({
+          node: root,
+          fulfilsCriteria: (task) => task.startDate < dateOfToday && !task.isDone,
+          applyFunc: (task) => {
+            task.startDate = "";
+            task.startTime = "";
+          }
+        });
       }
       async function fetchTasks() {
         const user2 = await getDoc(doc(db, userDocPath));
@@ -44357,7 +44386,8 @@ ${!taskObject.isDeleted && !taskObject.isDone && !(taskObject.startTime && taskO
                 recursivelyRepeatTasks2(child);
               }
             };
-            console.log("running repeating task algorithm");
+            console.log("new day, running repeat algorithm and process un-finished tasks");
+            recollectScheduledButIncompletedTasks();
             const today = new Date();
             const habitPoolToResolveConflict = [];
             for (const task of allTasks) {
@@ -44393,22 +44423,22 @@ ${!taskObject.isDeleted && !taskObject.isDone && !(taskObject.startTime && taskO
         taskObject: clickedTask
       }, {}, {})}
 
-<div id="${"background-image-holder"}" style="${"height: 100vh; padding-left: 120px; padding-right: 120px;"}" class="${"svelte-1ih468c"}"><div style="${"height: 100px;"}" class="${"svelte-1ih468c"}"></div>
+<div id="${"background-image-holder"}" style="${"height: 100vh; padding-left: 120px; padding-right: 120px;"}" class="${"svelte-1e5e9i8"}"><div style="${"height: 100px;"}" class="${"svelte-1e5e9i8"}"></div>
 
-  <div style="${"position: absolute; top: 30px; left: 30px;"}" class="${"svelte-1ih468c"}"><span class="${"material-icons svelte-1ih468c"}" style="${"margin-left: auto; margin-right: 0; color: white"}">${escape("music_off")}</span></div>
+  <div style="${"position: absolute; top: 30px; left: 30px;"}" class="${"svelte-1e5e9i8"}"><span class="${"material-icons svelte-1e5e9i8"}" style="${"margin-left: auto; margin-right: 0; color: white"}">${escape("music_off")}</span></div>
 
-  <div style="${"display: flex; padding-left: 0; padding-top: 0px"}" class="${"svelte-1ih468c"}"><div class="${"fixed-height-container-for-scrolling svelte-1ih468c"}"><div class="${"todo-list svelte-1ih468c"}">${allTasks ? `${each(allTasks, (task) => {
-        return `${!task.isDeleted ? `<div class="${"task-container svelte-1ih468c"}">${validate_component(RecursiveTask_1, "RecursiveTask").$$render($$result, { taskObject: task, depth: 1 }, {}, {})}
+  <div style="${"display: flex; padding-left: 0; padding-top: 0px"}" class="${"svelte-1e5e9i8"}"><div class="${"fixed-height-container-for-scrolling svelte-1e5e9i8"}"><div class="${"todo-list svelte-1e5e9i8"}">${allTasks ? `${each(allTasks, (task) => {
+        return `${!task.isDeleted ? `<div class="${"task-container svelte-1e5e9i8"}">${validate_component(RecursiveTask_1, "RecursiveTask").$$render($$result, { taskObject: task, depth: 1 }, {}, {})}
               </div>` : ``}`;
       })}
           
           
-          <div style="${"height: 200px;"}" class="${"svelte-1ih468c"}">${``}</div>` : ``}</div></div>
+          <div style="${"height: 200px;"}" class="${"svelte-1e5e9i8"}">${``}</div>` : ``}</div></div>
 
-    <div class="${"calendar-section-container svelte-1ih468c"}">${validate_component(CalendarDayView, "CalendarDayView").$$render($$result, { scheduledTasks: todayScheduledTasks }, {}, {})}
+    <div class="${"calendar-section-container svelte-1e5e9i8"}">${validate_component(CalendarDayView, "CalendarDayView").$$render($$result, { scheduledTasksToday: todayScheduledTasks }, {}, {})}
       ${validate_component(FutureOverview, "FutureOverview").$$render($$result, { futureScheduledTasks }, {}, {})}</div></div></div>
 
-<audio class="${"svelte-1ih468c"}"${add_attribute("this", AudioElem, 0)}></audio>`;
+<audio class="${"svelte-1e5e9i8"}"${add_attribute("this", AudioElem, 0)}></audio>`;
     });
   }
 });
@@ -44425,9 +44455,9 @@ var entry4, js4, css6;
 var init__4 = __esm({
   ".svelte-kit/output/server/nodes/3.js"() {
     init_index_svelte2();
-    entry4 = "pages/_user_/index.svelte-4b335b16.js";
-    js4 = ["pages/_user_/index.svelte-4b335b16.js", "chunks/vendor-94da56df.js", "chunks/db-66132ac0.js"];
-    css6 = ["assets/pages/_user_/index.svelte-a586d4b2.css"];
+    entry4 = "pages/_user_/index.svelte-87ad2479.js";
+    js4 = ["pages/_user_/index.svelte-87ad2479.js", "chunks/vendor-94da56df.js", "chunks/db-66132ac0.js"];
+    css6 = ["assets/pages/_user_/index.svelte-90d0a5c1.css"];
   }
 });
 
@@ -45893,7 +45923,7 @@ var manifest = {
   assets: new Set(["background-picture.png", "favicon.png", "illiyard-moor-lofi.mp3", "illiyard-moor.jpg", "illiyard-moor.mp3", "maplestory-orange-blurred.jpg", "maplestory-orange.jpg", "maplestory-watercolor.jpg", "ms-leafre-lofi.mp3"]),
   _: {
     mime: { ".png": "image/png", ".mp3": "audio/mpeg", ".jpg": "image/jpeg" },
-    entry: { "file": "start-7b6c88d4.js", "js": ["start-7b6c88d4.js", "chunks/vendor-94da56df.js", "chunks/singletons-a6a7384f.js"], "css": [] },
+    entry: { "file": "start-a5584742.js", "js": ["start-a5584742.js", "chunks/vendor-94da56df.js", "chunks/singletons-a6a7384f.js"], "css": [] },
     nodes: [
       () => Promise.resolve().then(() => (init__(), __exports)),
       () => Promise.resolve().then(() => (init__2(), __exports2)),
