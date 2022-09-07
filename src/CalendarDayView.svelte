@@ -54,7 +54,7 @@
       {/each}
     {/if}
 
-    <!-- A red line indicates the current time -->
+    <!-- A red line that indicates the current time -->
     {#if currentTimeInHHMM}
       <hr style="
         border-top: 1px solid red; 
