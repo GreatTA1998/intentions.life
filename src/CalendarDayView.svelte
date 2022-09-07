@@ -3,14 +3,18 @@
   so the absolute positionings will count from the right place (no need to fully understand yet) 
 
   height: 200% is just so it's high enough to contain all the absolute elements
+
+  without border-box, the padding on top will add ON TOP OF 100% height 
 -->
-<div style="height: 50vh">
-  <div style="margin-top: 26px; font-weight: 600;">
-    Passed tasks:
-  </div>
+<div style="height: 100%; overflow-y: scroll; overflow-x: hidden; padding-top: 28px; box-sizing: border-box">
+  {#if tasksThatAlreadyHappened.length > 0}
+    <div style="font-weight: 600;">
+      Passed tasks:
+    </div>
+  {/if}
 
   {#each tasksThatAlreadyHappened as task}
-    <div style="display: flex; align-items: center;" class:green-text={task.isDone} class:red-text={!task.isDone}>
+    <div style="display: flex; align-items: center; margin-bottom: 12px" class:green-text={task.isDone} class:red-text={!task.isDone}>
       <input 
         type="checkbox" 
         bind:checked={task.isDone}
@@ -20,38 +24,47 @@
     </div>
   {/each}
 
-  <div style="overflow-y: scroll; overflow-x: hidden; height: 46vh; margin-top: 12px;">
-    <div style="font-weight: 600">
-      {getDate()}
-    </div>
+  <div style="font-weight: 600">
+    {getDate()}
+  </div>
 
-    <div 
-      id="calendar-day-container" 
-      style="position: relative; height: {pixelsPerHour * numOfHourBlocksDisplayed}px; width: 12vw; "
-      on:drop={(e) => drop_handler(e)}
-      on:dragover={dragover_handler}
-    >
+  <div 
+    id="calendar-day-container" 
+    style="position: relative; height: {pixelsPerHour * numOfHourBlocksDisplayed}px; width: 12vw; "
+    on:drop={(e) => drop_handler(e)}
+    on:dragover={dragover_handler}
+  >
+    {#if calendarStartTime}
+      {#each timesOfDay as timeOfDay, i}
+        <div class="time-indicator" style="top: {pixelsPerHour * i}px;">
+          {timeOfDay.substring(0, 5)}
+        </div>
+      {/each}
 
-      {#if calendarStartTime}
-        {#each timesOfDay as timeOfDay, i}
-          <div class="time-indicator" style="top: {pixelsPerHour * i}px;">
-            {timeOfDay.substring(0, 5)}
-          </div>
-        {/each}
+      {#each scheduledTasksToday.filter(task => task.startTime > calendarStartTime) as task, i}
+        <TaskElement
+          {task}
+          offsetFromTop={computeOffset(task)}
+          height={task.duration * pixelsPerMinute || 30}
+          fontSize={0.8}
+          offsetFromLeft={30}
+          on:task-click
+          on:task-duration-adjusted
+        />
+      {/each}
+    {/if}
 
-        {#each scheduledTasksToday as task, i}
-          <TaskElement  
-            {task}
-            offsetFromTop={computeOffset(task)}
-            height={task.duration * pixelsPerMinute || 30}
-            fontSize={0.8}
-            offsetFromLeft={30}
-            on:task-click
-            on:task-duration-adjusted
-          />
-        {/each}
-      {/if}
-    </div>
+    <!-- A red line indicates the current time -->
+    {#if currentTimeInHHMM}
+      <hr style="
+        border-top: 1px solid red; 
+        position: absolute; 
+        top: {computeOffset({ startTime: currentTimeInHHMM })}px;
+        left: 32px;
+        width: 8vw;  
+      "
+      >
+    {/if}
   </div>
 </div>
 
@@ -74,14 +87,29 @@
 
   let calendarStartTime = ''
   let tasksThatAlreadyHappened
+  let currentTimeInHHMM = ''
 
   $: if (calendarStartTime) {
     tasksThatAlreadyHappened = scheduledTasksToday.filter(task => task.startTime < calendarStartTime)
   }
 
   function toggleIsDone (task) { 
-    console.log('task =', task)
     dispatch('task-done', { taskName: task.name })
+  }
+
+  const one_sec = 1000 // milliseconds
+  updateCurrentTime()
+  setInterval(updateCurrentTime, 60 * one_sec)
+  function updateCurrentTime () {
+    const today = new Date()
+    let hh = today.getHours()
+    hh = `${hh < 10 ? '0' : ''}` + hh
+
+    let mm = today.getMinutes()
+    mm = `${mm < 10 ? '0' : ''}` + mm
+    
+    let result = hh + ':' + mm
+    currentTimeInHHMM = result
   }
 
   // Start either from the current hour, or the current ongoing task's start time
@@ -94,7 +122,7 @@
     const currentMinutesFromMidnight = today.getHours() * 60 // `getHour()` between 0-23
     // for all tasks, check if it "includes" current time
     for (const task of scheduledTasksToday) {
-    const hhOfStart = task.startTime.substring(0, 2)
+      const hhOfStart = task.startTime.substring(0, 2)
       const taskStartMinutesFromMidnight = parseInt(hhOfStart) * 60
       const taskEndMinutesFromMidnight = taskStartMinutesFromMidnight + task.duration 
       if (taskStartMinutesFromMidnight < currentMinutesFromMidnight && currentMinutesFromMidnight < taskEndMinutesFromMidnight) {
@@ -148,8 +176,6 @@
    * TODO: ensure the drop package is a valid task
    */
   function drop_handler (e) {
-    console.log('drop detected')
-
     e.preventDefault()
     const element = document.getElementById("calendar-day-container")
     var position = element.getBoundingClientRect();
@@ -179,10 +205,7 @@
       hh = `0${hh}`
     }
 
-    console.log('origin =', origin)
-
     const scheduledTime = `${hh}:${mm}` 
-    console.log('scheduledTime =', scheduledTime)
 
     dispatch('task-scheduled', {
       taskName: e.dataTransfer.getData('text/plain'),

@@ -32,7 +32,7 @@
   </div>
 
   <div style="display: flex; padding-left: 0; padding-top: 0px">
-    <div class="fixed-height-container-for-scrolling">
+    <div class="todo-container">
       <div class="todo-list">
         {#if allTasks}
           {#each allTasks as task}
@@ -52,7 +52,7 @@
           {/each}
           
           <!-- CREATE NEW TASK (invisible but hoverable region) -->
-          <div style="height: 200px;"
+          <div style="height: 200px; width: 200px"
             on:mouseenter={() => isShowingCreateButton = true}
             on:mouseleave={() => isShowingCreateButton = false}
           >
@@ -517,31 +517,16 @@
     display: flex; 
     justify-content: space-evenly; 
     width: 36vw; 
+    height: 60vh;
     background-color: white; 
     border: 1px solid green; 
     border-top-right-radius: 20px; 
     border-bottom-right-radius: 20px;
     padding-left: 8px;
+    box-sizing: border-box;
   }
 
-  #background-image-holder {
-    /* background-image: url('maplestory-orange.jpg'); */
-    /* background-image: url('https://i.imgur.com/ShnqIpJ.jpeg'); */
-    background-repeat: no-repeat;
-    background-size: 100% 100%;
-  }
-
-  /* #radio-player-with-art {
-    background-image: url('../maplestory-watercolor.jpg')
-  } */
-
-  *::-webkit-scrollbar {
-    width: 0;
-    height: 0;
-    background-color: #aaa; /* or add it to the track */
-  }
-
-  .fixed-height-container-for-scrolling {
+  .todo-container {
     height: 60vh;
     width: 70vw;
     background-color: white; 
@@ -550,14 +535,16 @@
     border-bottom-left-radius: 20px; 
     padding-top: 14px; 
     padding-left: 30px;
+    overflow-y: scroll;
+    overflow-x: scroll;
+    box-sizing: border-box;
     /* background-image: linear-gradient(rgba(255,255,255,0.7), rgba(255,255,255,0.5)), url('../illiyard-moor.jpg'); */
     /* opacity: 0.5; */
-    /* overflow-y: scroll; */
   }
 
   .todo-list {
     width: 100%; 
-    height: 77vh;
+    /* height: 77vh; */
     display: flex; 
     overflow-x: auto;
   }
@@ -570,6 +557,23 @@
     padding-bottom: 10px; 
     padding-right: 0; 
     overflow: none;
+  }
+
+  #background-image-holder {
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    /* background-image: url('maplestory-orange.jpg'); */
+    /* background-image: url('https://i.imgur.com/ShnqIpJ.jpeg'); */
+  }
+
+  /* #radio-player-with-art {
+    background-image: url('../maplestory-watercolor.jpg')
+  } */
+
+  *::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    background-color: #aaa; /* or add it to the track */
   }
 
   .plus {
