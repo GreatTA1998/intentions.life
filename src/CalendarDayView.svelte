@@ -21,7 +21,7 @@
           bind:checked={task.isDone}
           on:click={() => toggleIsDone(task)}
         >
-        <div style="font-size: 0.82rem;">
+        <div on:click={() => dispatch('task-click', { task })} style="font-size: 0.82rem;">
           {task.name}
         </div>
       </div>

@@ -232,7 +232,7 @@ function repeatOnDayOfWeek ({ dayNumber }) {
 
     overflow-y: scroll;
     z-index: 5;
-    width: 70%;
+    width: 50%;
     height: 50%;
     border-radius: 10px;
     background-color: white;
