@@ -6,25 +6,29 @@
 
   without border-box, the padding on top will add ON TOP OF 100% height 
 -->
-<div style="height: 100%; overflow-y: scroll; overflow-x: hidden; padding-top: 28px; box-sizing: border-box">
+<div style="height: 100%; overflow-y: scroll; overflow-x: hidden; padding-top: 26px; box-sizing: border-box">
   {#if tasksThatAlreadyHappened.length > 0}
-    <div style="font-weight: 600;">
-      Passed tasks:
+    <div style="font-weight: 600; margin-bottom: 2px;">
+      Passed tasks
     </div>
   {/if}
 
-  {#each tasksThatAlreadyHappened as task}
-    <div style="display: flex; align-items: center; margin-bottom: 12px" class:green-text={task.isDone} class:red-text={!task.isDone}>
-      <input 
-        type="checkbox" 
-        bind:checked={task.isDone}
-        on:click={() => toggleIsDone(task)}
-      >
-      <div style="font-size: 0.82rem;">{task.name}</div>
-    </div>
-  {/each}
+  <div style="padding-bottom: 8px;">
+    {#each tasksThatAlreadyHappened as task}
+      <div style="display: flex; align-items: center;" class:green-text={task.isDone} class:red-text={!task.isDone}>
+        <input
+          type="checkbox"
+          bind:checked={task.isDone}
+          on:click={() => toggleIsDone(task)}
+        >
+        <div style="font-size: 0.82rem;">
+          {task.name}
+        </div>
+      </div>
+    {/each}
+  </div>
 
-  <div style="font-weight: 600">
+  <div style="font-weight: 600;">
     {getDate()}
   </div>
 
@@ -61,7 +65,7 @@
         position: absolute; 
         top: {computeOffset({ startTime: currentTimeInHHMM })}px;
         left: 32px;
-        width: 8vw;  
+        width: 10vw;  
       "
       >
     {/if}

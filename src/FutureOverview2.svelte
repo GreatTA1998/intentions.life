@@ -1,31 +1,31 @@
 <div style="height: 60vh; overflow-y: scroll; overflow-x: hidden">
-  <div style="width: 12vw; margin-left: 0px; margin-top: 27px; position: relative; height: 1600px" >
-    {#each futureScheduledTasks as task, i}
-      <div style="position: relative; height: {minimumContainerHeight + (task.duration * pixelsPerMinute || 15)}px; margin-top: 25px;">
+  <div style="width: 12vw; margin-left: 0px; margin-top: 27px; height: 1600px" >
+    {#each Object.keys(datesToTasks) as date}
+      <div style="margin-bottom: 40px;">
         <div>
-          <b>{task.startDate}</b>
+          <b>{date}</b>
         </div>
 
-        <TaskElement  
-          {task}
-          fontSize={0.8}
-          offsetFromTop={20}
-          height={task.duration * pixelsPerMinute || 15}
-          on:task-click
-          on:task-duration-adjusted
-        />
+        {#each datesToTasks[date] as task}
+          <div on:click={() => dispatch('task-click', { task })} style="display: flex; align-items: center;">
+            <div style="font-size: 0.82rem; color: grey;">
+              {task.name + ' '}({task.startTime})
+            </div>
+          </div>
+        {/each}
       </div>
-      <div class="broken-axis"></div>
-
     {/each}
   </div>
 </div>
-  <!-- Broken axis design <Just do a different border-line variant> -->
-  <!-- That's it, everything is just a combination of `Task` and `Broken Axis` -->
-<script>
-import TaskElement from './TaskElement.svelte'
 
+<script>
 export let futureScheduledTasks 
+
+import { createEventDispatcher } from 'svelte'
+
+let datesToTasks = {} 
+
+const dispatch = createEventDispatcher()
 
 $: if (futureScheduledTasks) {
   futureScheduledTasks.sort((t1, t2) => {
@@ -34,11 +34,23 @@ $: if (futureScheduledTasks) {
       return convertToPureMinutes(t1.startTime) - convertToPureMinutes(t2.startTime)
     }
   })
+
+  const temp = {} 
+  for (const task of futureScheduledTasks) {
+    if (!temp[task.startDate]) {
+      temp[task.startDate] = [task]
+    } else {
+      temp[task.startDate].push(task)
+    }
+  }
+  datesToTasks = {...temp}
+  console.log('datesToTasks = ', datesToTasks)
 }
 
 function convertToPureMinutes (hhmm) {
   const hh = hhmm.substring(0, 2)
   const mm = hhmm.substring(3, 5)
+  console.log(parseInt(hh) * 60 + parseInt(mm))
   return parseInt(hh) * 60 + parseInt(mm)
 }
 

@@ -23,15 +23,15 @@
 {/key}
 
 <div id="background-image-holder" style="height: 100vh; padding-left: 120px; padding-right: 120px;">
-  <div style="height: 100px;"></div>
+  <div style="height: 10vh"></div>
 
-  <div on:click={toggleMusic} style="position: absolute; top: 30px; left: 30px;">
-    <span  class="material-icons" style="margin-left: auto; margin-right: 0; color: white">
+  <a role="button" on:click={toggleMusic} class="float">
+    <span class="material-icons my-float" style="color: white">
       {isMusicPlaying ? 'music_note' : 'music_off'}
     </span>
-  </div>
+  </a>
 
-  <div style="display: flex; padding-left: 0; padding-top: 0px">
+  <div style="display: flex; padding-left: 0; padding-top: 0px;">
     <div class="todo-container">
       <div class="todo-list">
         {#if allTasks}
@@ -76,6 +76,23 @@
     </div>
 
     <div class="calendar-section-container">
+      <!-- Playground  -->
+      <!-- <div style="position: relative">
+        {#each todayScheduledTasks as task, i}
+          <TaskElement
+            {task}
+            offsetFromTop={30 * i}
+            height={30}
+            fontSize={0.8}
+            offsetFromLeft={30 * i}
+            on:task-click
+            on:task-duration-adjusted
+          >
+          
+        </TaskElement>
+        {/each}
+    </div> -->
+
       <CalendarDayView
         scheduledTasksToday={todayScheduledTasks}
         on:task-done={(e) => markNodeAsDone(e.detail.taskName)}
@@ -83,11 +100,20 @@
         on:task-duration-adjusted={(e) => mutateOneNode2(e.detail)}
         on:task-click={(e) => openDetailedCard(e.detail)}
       />
-      <FutureOverview
+
+      
+      <FutureOverview2
         {futureScheduledTasks}
         on:task-duration-adjusted={(e) => mutateOneNode2(e.detail)}
         on:task-click={(e) => openDetailedCard(e.detail)}
       />
+
+      <!-- 
+      <FutureOverview
+        {futureScheduledTasks}
+        on:task-duration-adjusted={(e) => mutateOneNode2(e.detail)}
+        on:task-click={(e) => openDetailedCard(e.detail)}
+      /> -->
     </div>
   </div>
 </div>
@@ -100,11 +126,13 @@
   import RecursiveTask from '../../RecursiveTask.svelte'
   import CalendarDayView from '../../CalendarDayView.svelte'
   import FutureOverview from '../../FutureOverview.svelte'
+  import FutureOverview2 from '../../FutureOverview2.svelte'
   import DetailedCardPopup from '../../DetailedCardPopup.svelte'
   import { onMount } from 'svelte'
   import db from '../../db.js'
   import { doc, getDoc, updateDoc } from 'firebase/firestore'
   import { getDateOfToday, getDateOfTomorrow } from '../../helpers.js'
+  import TaskElement from '../../TaskElement.svelte'
 
   const userDocPath = `users/${userID}`
   let isTypingNewTask = false
@@ -143,13 +171,11 @@
   // I once tried `allTasks = []`, it wiped my entire task tree because it synced the empty [] (which it thinks is fully fetched) with the database.task
   // AF(null) --> unfetched 
   // AF([]) --> fresh new todo-list
-  let sortedAllTasks = [] 
   let lastRanRepeatAtDate = ''
   let dateOfToday = getDateOfToday()
   let todayScheduledTasks = []
   let futureScheduledTasks = [] // AF([])
 
-  let scheduledTasks2 = []
   let newTopLevelTask = ''
   let isTypingNewRootTask = false
   let isShowingCreateButton = false
@@ -361,11 +387,6 @@
       return d1.getTime() - d2.getTime()
     })
 
-    // finished tasks go to the bottom
-    sortedAllTasks = allTasks.sort((t1, t2) => {
-      return !!t1.isDone - !!t2.isDone // `isDone` can be undefined, which screws up the subtraction
-    })
-
     // HANDLE TASKS THAT REPEAT
     // can't use `return` in reactive expression https://github.com/sveltejs/svelte/issues/2828
     if (lastRanRepeatAtDate !== dateOfToday) {
@@ -435,11 +456,13 @@
       // but there's already a task there, so the actual deadline becomes 00:00 - task.duration
       // now you just repeat it until no tasks are left
       let trueEndOfDay = 1440 
+      const pixelsBetweenEachHabit = 30
+
       for (const habit of habitPoolToResolveConflict) {
         // convert everything into minutes, so military time 
         // 00:00: start of new day := 0 minutes
         // 24:00: end of new day := 1440 minutes
-        trueEndOfDay -= (habit.duration || 5) // note `.duration` is already in minutes
+        trueEndOfDay -= ((habit.duration || 5) + pixelsBetweenEachHabit) // note `.duration` is already in minutes
 
         // convert to 'hh:mm' format
         const militaryHours = trueEndOfDay / 60
@@ -597,5 +620,22 @@
     background-position:center;
     background-size: 50% 2px,2px 50%; /*thickness = 2px, length = 50% (25px)*/
     background-repeat:no-repeat;
+  }
+
+  .float{
+    position:fixed;
+    width:60px;
+    height:60px;
+    top:40px;
+    left:40px;
+    background-color: grey;  
+    color:#FFF;
+    border-radius:50px;
+    text-align:center;
+    box-shadow: 0px 0px 2px 2px white;
+  }
+
+  .my-float{
+    margin-top: 19px;
   }
 </style>
