@@ -44,13 +44,11 @@ $: if (futureScheduledTasks) {
     }
   }
   datesToTasks = {...temp}
-  console.log('datesToTasks = ', datesToTasks)
 }
 
 function convertToPureMinutes (hhmm) {
   const hh = hhmm.substring(0, 2)
   const mm = hhmm.substring(3, 5)
-  console.log(parseInt(hh) * 60 + parseInt(mm))
   return parseInt(hh) * 60 + parseInt(mm)
 }
 

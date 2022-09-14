@@ -6,14 +6,14 @@
 
   without border-box, the padding on top will add ON TOP OF 100% height 
 -->
-<div style="height: 100%; overflow-y: scroll; overflow-x: hidden; padding-top: 26px; box-sizing: border-box">
+<div id="scroll-container">
   {#if tasksThatAlreadyHappened.length > 0}
     <div style="font-weight: 600; margin-bottom: 2px;">
       Passed tasks
     </div>
   {/if}
 
-  <div style="padding-bottom: 8px;">
+  <div style="padding-bottom: 16px;">
     {#each tasksThatAlreadyHappened as task}
       <div style="display: flex; align-items: center;" class:green-text={task.isDone} class:red-text={!task.isDone}>
         <input
@@ -34,17 +34,21 @@
 
   <div 
     id="calendar-day-container" 
-    style="position: relative; height: {pixelsPerHour * numOfHourBlocksDisplayed}px; width: 12vw; "
+    style="position: relative; 
+           height: {pixelsPerHour * numOfHourBlocksDisplayed}px; 
+           width: 12vw;"
     on:drop={(e) => drop_handler(e)}
     on:dragover={dragover_handler}
   >
     {#if calendarStartTime}
+      <!-- Calendar blocks -->
       {#each timesOfDay as timeOfDay, i}
         <div class="time-indicator" style="top: {pixelsPerHour * i}px;">
           {timeOfDay.substring(0, 5)}
         </div>
       {/each}
 
+      <!-- Scheduled tasks -->
       {#each scheduledTasksToday.filter(task => task.startTime > calendarStartTime) as task, i}
         <TaskElement
           {task}
@@ -92,6 +96,10 @@
   let calendarStartTime = ''
   let tasksThatAlreadyHappened
   let currentTimeInHHMM = ''
+
+  function print (message) {
+    console.log(message)
+  }
 
   $: if (calendarStartTime) {
     tasksThatAlreadyHappened = scheduledTasksToday.filter(task => task.startTime < calendarStartTime)
@@ -181,15 +189,15 @@
    */
   function drop_handler (e) {
     e.preventDefault()
+    const ScrollContainer = document.getElementById('scroll-container')
     const element = document.getElementById("calendar-day-container")
-    var position = element.getBoundingClientRect();
-    var x = position.left;
-    var y = position.top;
-
-    // `n` represents time in PURE hours e.g. 8.24, 13.90
-    // `e.layerY` gives the Y-coordinate with respect to the current container
-    // otherwise the multiple scrolling contexts messes it up
-    let n = e.layerY / pixelsPerHour
+    
+    // compute y-offset
+    // TODO: in practice there is a small discrepancy between where the drop is and where the mouse is 
+    // because the user aims with the image corner whereas the code reads the precise mouse pointer location
+    const trueY = ScrollContainer.scrollTop + e.clientY - element.offsetTop 
+  
+    let n = trueY / pixelsPerHour
     const decimal = n - Math.floor(n)
     const integer = Math.trunc(n)
     
@@ -220,6 +228,10 @@
 </script>
 
 <style>
+  #scroll-container {
+    height: 100%; overflow-y: scroll; overflow-x: hidden; padding-top: 26px; box-sizing: border-box
+  }
+
   *::-webkit-scrollbar {
     width: 0;
     background-color: #aaa; /* or add it to the track */
@@ -236,7 +248,6 @@
   /* VERDICT: absolute works
   "Independence" is the best word you can ever hear in programming */
   .time-indicator {
-    /* position: relative;  */
     top: -5px; 
     margin-right: 4px;
     font-size: 0.7rem;

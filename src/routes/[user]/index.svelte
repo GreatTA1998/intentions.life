@@ -52,7 +52,7 @@
           {/each}
           
           <!-- CREATE NEW TASK (invisible but hoverable region) -->
-          <div style="height: 200px; width: 200px"
+          <div style="height: 100%; width: 200px"
             on:mouseenter={() => isShowingCreateButton = true}
             on:mouseleave={() => isShowingCreateButton = false}
           >
@@ -152,8 +152,10 @@
 
   // let background images 
   let bgImageURLs = [
-    'https://i.imgur.com/rzkUMW8.jpeg', // cute monsters
     'https://i.imgur.com/ShnqIpJ.jpeg', // airships 
+    // 'https://i.imgur.com/fBRcIsg.jpeg', //https://images7.alphacoders.com/751/751199.jpg', // https://wall.alphacoders.com/tag/kimi-no-na-wa.-wallpapers 
+                                                      // https://images7.alphacoders.com/751/751199.jpg
+    'https://i.imgur.com/rzkUMW8.jpeg', // cute monsters
     // 'https://i.imgur.com/ifP3xPg.jpeg' // forest (too dark I think)
   ]
   let chosenBgImageURL
@@ -165,6 +167,8 @@
 
     chosenMusicFile = musicFiles[getRandomInt(2)]
     AudioElem.src = chosenMusicFile
+
+    fetchTasks()
   })
 
   let allTasks = null // WARNING, DON'T INITIALIZE TO []
@@ -240,8 +244,16 @@
         fulfilsCriteria: (task) => task.name === name,
         applyFunc: (task) => { 
           task.isDone = !task.isDone
-          if (task.isDone) task.completionCount = task.completionCount + 1 || 1
-          else task.completionCount = task.completionCount - 1 || 0 
+          if (task.isDone) { 
+            task.completionCount = task.completionCount + 1 || 1
+            if (task.daysBeforeRepeating) {
+              task.lastCompletionDate = getDateOfToday()
+            }
+          }
+          else {
+            task.completionCount = task.completionCount - 1 || 0 
+            // TO-DO: think of consequences of not undoing `lastCompletionDate`
+          }
         }
       })
     }
@@ -254,7 +266,6 @@
   }
 
   async function deleteSubtree (name) {
-    console.log('deleteSubtree =', name)
     let root = { 
       name: 'root',
       children: allTasks
@@ -319,7 +330,6 @@
 
     for (const task of allTasks) {
       if (helper(task)) { // the sub-task only exists in ONE of the root tasks, so only one of the `helper()` calls will return true
-        console.log('successfully mutated allTasks, =', allTasks)
         break
       }
     }
@@ -350,7 +360,6 @@
 
     for (const task of allTasks) {
       if (helper(task)) { // the sub-task only exists in ONE of the root tasks, so only one of the `helper()` calls will return true
-        console.log('successfully mutated allTasks, =', allTasks)
         break
       }
     }
@@ -368,14 +377,16 @@
     const user = await getDoc(
       doc(db, userDocPath)
     )
-    allTasks = user.data().allTasks
-    lastRanRepeatAtDate = user.data().lastRanRepeatAtDate
+    if (user.exists()) {
+      allTasks = user.data().allTasks
+      lastRanRepeatAtDate = user.data().lastRanRepeatAtDate
+    }
+    else {
+      alert('Cannot find user')
+    }
   }
-  fetchTasks()
 
   $: if (allTasks) {
-    // FIND SCHEDULED TASK
-    console.log('collecting scheduled tasks to be displayed...')
     collectTodayScheduledTasksToArray()
 
     collectFutureScheduledTasksToArray()
@@ -399,7 +410,8 @@
       //  If it is, place it at 7 pm. Easiest game of my life.
       const today = new Date() // use `getDay()` to get 0 to 6 number
       const habitPoolToResolveConflict = []
-
+      
+      // TODO: deprecate. You can represent week-based repeating events by decomposing it into regular repeating events
       // mutate repeating tasks
       function recursivelyRepeatTasks (node) {
         if (node.repeatsOnDaysOfWeek) {
@@ -427,9 +439,12 @@
       //  Schedule it at the end of the day
       //  Visualize "debt" by not allowing overlap 
       function recursivelyRepeatTasks2 (node) {
-        if (node.daysBeforeRepeating) {
-          // if `daysBeforeRepeating` is 4, we need to see if 4 days have gone past already
-          const d1 = new Date(`node.lastCompletionDate/${2022}`)
+        // a task can set to repeat, but it has to be scheduled and done once before 
+        // it has a `lastCompletionDate` property and will be "auto-shifted" periodically
+        // into the future
+        if (node.daysBeforeRepeating && node.lastCompletionDate) {
+          // `lastCompletionDate` is in mm/dd/yyyy format
+          const d1 = new Date(`${node.lastCompletionDate}/2022`)
           const d2 = new Date()
           const millisec_diff = d2.getTime() - d1.getTime()
           const day_diff = Math.ceil(millisec_diff / (1000 * 3600 * 24))
@@ -451,12 +466,11 @@
         recursivelyRepeatTasks2(task)
       }
 
-      console.log('pool for resolve conflict =', habitPoolToResolveConflict)
       // initially deadline is end of day, 00:00
       // but there's already a task there, so the actual deadline becomes 00:00 - task.duration
       // now you just repeat it until no tasks are left
       let trueEndOfDay = 1440 
-      const pixelsBetweenEachHabit = 30
+      const pixelsBetweenEachHabit = 20
 
       for (const habit of habitPoolToResolveConflict) {
         // convert everything into minutes, so military time 

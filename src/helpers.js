@@ -1,6 +1,8 @@
 import { detach } from "svelte/internal";
 
 // copied from https://www.w3resource.com/javascript-exercises/javascript-basic-exercise-3.php
+// TODO: rename, and enable it to take arbitrary Date object and return a 
+// mm:dd string
 export function getDateOfToday () {
   const today = new Date()    
   let dd = today.getDate()

@@ -7,15 +7,14 @@
          left: {offsetFromLeft}px;
          font-size: {fontSize}rem;"
 >
-  <div draggable="true" on:dragstart={(e) => dragstart_handler(e, task.name)} style="width: 11vw">
+  <div draggable="true" on:dragstart={(e) => dragstart_handler(e, task.name)} style="width: 11vw; cursor: pointer;">
     {task.name} 
   </div>
 
   <!-- Continuation of re-scheduling zone -->
-  <!-- border: 2px solid red; -->
   <slot>
     <div  
-      style="height: {height - 20 - 10}px; width: 11vw" 
+      style="height: {height - 20 - 10}px; width: 11vw;" 
       draggable="true" on:dragstart={(e) => dragstart_handler(e, task.name)}
     >
 
@@ -23,11 +22,10 @@
   </slot>
 
   <!-- Bottom region for adjusting duration -->
-  <!-- border: 2px solid black; -->
   <div draggable="true"
     on:dragstart={(e) => mousedown_handler(e)}
     on:dragend={(e) => mouseup_handler(e, task)}
-    style="height: 8px; width: 11vw; position: absolute; bottom: 0; left: -3px; cursor: ns-resize;"
+    style="height: {Math.max(height/4, 8)}px; width: 2vw; position: absolute; bottom: 0; left: -3px; cursor: ns-resize;"
   >
 
   </div>
@@ -36,14 +34,11 @@
 <script>
   import { createEventDispatcher } from 'svelte'
 
+  export let task = null
   export let fontSize = 1
   export let offsetFromTop
   export let offsetFromLeft = 0
-  export let height = 15 //
-  export let duration = 15
-  export let calendarStartTime = ''
-  export let name = ''
-  export let task = null
+  export let height = 15 
 
   const dispatch = createEventDispatcher()
   let startY = 0
