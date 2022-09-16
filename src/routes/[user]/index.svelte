@@ -32,7 +32,10 @@
   </a>
 
   <div style="display: flex; padding-left: 0; padding-top: 0px;">
-    <div class="todo-container">
+    <div class="todo-container" 
+      on:drop={(e) => unscheduleTask(e)}
+      on:dragover={(e) => dragover_handler(e)}
+    >
       <div class="todo-list">
         {#if allTasks}
           {#each allTasks as task}
@@ -546,6 +549,31 @@
       { allTasks }
     )
     allTasks = [...allTasks]
+  }
+
+  function dragover_handler (e) {
+    e.preventDefault()
+  }
+
+  // unscheduling back to to-do
+  function unscheduleTask (e) {
+    e.preventDefault()
+    const taskName = e.dataTransfer.getData('text/plain')
+    for (const task of allTasks) {
+      traverseAndUpdateTree({
+        node: task,
+        fulfilsCriteria: (task) => task.name === taskName,
+        applyFunc: (task) => { 
+          task.startTime = ''
+          task.startDate = ''
+        }
+      })
+    }
+    allTasks = [...allTasks]
+    updateDoc(
+      doc(db, userDocPath),
+      { allTasks }
+    )
   }
 </script>
 

@@ -38,7 +38,7 @@
            height: {pixelsPerHour * numOfHourBlocksDisplayed}px; 
            width: 12vw;"
     on:drop={(e) => drop_handler(e)}
-    on:dragover={dragover_handler}
+    on:dragover={(e) => dragover_handler(e)}
   >
     {#if calendarStartTime}
       <!-- Calendar blocks -->
