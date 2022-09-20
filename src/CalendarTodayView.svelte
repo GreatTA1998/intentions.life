@@ -1,40 +1,29 @@
-<!-- 
-  You need the relative scrolling container to be different from `calendar-day-container`,
-  so the absolute positionings will count from the right place (no need to fully understand yet) 
-
-  height: 200% is just so it's high enough to contain all the absolute elements
-
-  without border-box, the padding on top will add ON TOP OF 100% height 
--->
 <div id="scroll-container">
-  {#if tasksThatAlreadyHappened.length > 0}
-    <div style="font-weight: 600; margin-bottom: 2px;">
-      Passed tasks
-    </div>
-  {/if}
+  <div style="font-family: serif; margin-bottom: 1px;">
+    {getDate()}
+  </div>
 
   <div style="padding-bottom: 16px;">
     {#each tasksThatAlreadyHappened as task}
-      <div style="display: flex; align-items: center;" class:green-text={task.isDone} class:red-text={!task.isDone}>
+      <!-- class:red-text={!task.isDone} -->
+      <div style="display: flex; align-items: center; opacity: 0.5" class:green-text={task.isDone}>
         <input
+          style="margin-left: 0; accent-color: green"
           type="checkbox"
           bind:checked={task.isDone}
           on:click={() => toggleIsDone(task)}
         >
-        <div on:click={() => dispatch('task-click', { task })} style="font-size: 0.82rem;">
+        <div on:click={() => dispatch('task-click', { task })} style="font-family: sans-serif; font-size: 0.8rem;">
           {task.name}
         </div>
       </div>
     {/each}
   </div>
 
-  <div style="font-weight: 600;">
-    {getDate()}
-  </div>
-
   <div 
     id="calendar-day-container" 
     style="position: relative; 
+           margin-top: 4px;
            height: {pixelsPerHour * numOfHourBlocksDisplayed}px; 
            width: 12vw;"
     on:drop={(e) => drop_handler(e)}
@@ -228,8 +217,20 @@
 </script>
 
 <style>
-  #scroll-container {
-    height: 100%; overflow-y: scroll; overflow-x: hidden; padding-top: 26px; box-sizing: border-box
+/* 
+  You need the relative scrolling container to be different from `calendar-day-container`,
+  so the absolute positionings will count from the right place (no need to fully understand yet) 
+
+  height: 200% is just so it's high enough to contain all the absolute elements
+
+  without border-box, the padding on top will add ON TOP OF 100% height  
+*/
+#scroll-container {
+    height: 100%; 
+    overflow-y: scroll; 
+    overflow-x: hidden; 
+    padding-top: 27px; 
+    box-sizing: border-box
   }
 
   *::-webkit-scrollbar {

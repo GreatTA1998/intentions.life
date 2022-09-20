@@ -22,7 +22,12 @@
   >
     <div class="current-task-flexbox">
       <div 
-        style="font-size: {1.7 * (0.76 ** depth)}rem; font-family: aktiv-grotesk, sans-serif;"
+        style="
+          font-size: {2 * (0.74 ** depth)}rem; 
+          font-family: sans-serif; 
+          font-weight: {800 - (100 * depth)};
+          color: rgb({20 + depth * 40}, {20 + depth * 40}, {20 + depth * 40});
+        "
         class="keep-on-same-line name-of-task" 
         class:scheduled-orange={!taskObject.isDone && taskObject.startTime && taskObject.startDate}
         class:crossed-out={taskObject.isDone} 
@@ -37,7 +42,11 @@
             {taskObject.name}
           </div>
         {:else} 
-          <input bind:value={newTaskName} on:keypress={detectEnterKey3}>
+          <!-- TO-DO: newTaskName refers to EDIT, not a new sub-task -->
+          <input 
+            bind:value={newTaskName} 
+            on:keypress={detectEnterKey3}
+          >
         {/if}
       </div>
     </div>
@@ -66,7 +75,13 @@
           </div>
         {:else}
           <div style="display: flex; align-items: center; margin-left: 20px;">
-            <input placeholder="Type sub-task" bind:value={newTask} on:keypress={detectEnterKey} style="width: 100%; margin-left: 5px"/>
+            <input 
+              bind:this={newSubtaskInput}
+              placeholder="Type sub-task" 
+              bind:value={newTask}
+              on:keypress={detectEnterKey} 
+              style="width: 100%; margin-left: 5px"
+            />
           </div>
         {/if}
       {/if}
@@ -76,7 +91,7 @@
 
 <script>
   import RecursiveTask from './RecursiveTask.svelte'
-  import { createEventDispatcher, onMount } from 'svelte'
+  import { createEventDispatcher, onMount, tick } from 'svelte'
   import { getDateOfToday } from './helpers'
   import DetailedCardPopup from './DetailedCardPopup.svelte'
 
@@ -102,8 +117,18 @@
 
   let isDeletingTask = false
 
+  let newSubtaskInput
+
   // if children have duration then it'll contradict the parent's height duration, so childrens take precedence
   $: doChildrenHaveDuration = taskObject.children.filter(child => child.duration).length > 0
+
+  $: {
+    if (isTypingNewTask) {
+      tick().then(() => {
+        newSubtaskInput.focus()
+      })
+    }
+  }
 
   function dragstart_handler(e, taskName) {
     e.dataTransfer.setData("text/plain", taskName);
@@ -229,6 +254,16 @@
 
     })
   }
+
+  function focusOnMount (node) {
+    console.log('action found!')
+    node.focus()
+    // need an "action object"
+    return {
+
+    }
+  }
+
 </script>
 
 <style>

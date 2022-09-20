@@ -96,27 +96,19 @@
         {/each}
     </div> -->
 
-      <CalendarDayView
+      <CalendarTodayView
         scheduledTasksToday={todayScheduledTasks}
         on:task-done={(e) => markNodeAsDone(e.detail.taskName)}
         on:task-scheduled={(e) => mutateOneNode(e.detail)}
         on:task-duration-adjusted={(e) => mutateOneNode2(e.detail)}
         on:task-click={(e) => openDetailedCard(e.detail)}
       />
-
-      
-      <FutureOverview2
-        {futureScheduledTasks}
-        on:task-duration-adjusted={(e) => mutateOneNode2(e.detail)}
-        on:task-click={(e) => openDetailedCard(e.detail)}
-      />
-
-      <!-- 
+  
       <FutureOverview
         {futureScheduledTasks}
         on:task-duration-adjusted={(e) => mutateOneNode2(e.detail)}
         on:task-click={(e) => openDetailedCard(e.detail)}
-      /> -->
+      />
     </div>
   </div>
 </div>
@@ -127,9 +119,8 @@
   export let userID // GxBbopqXHW0qgjKEwU4z
 
   import RecursiveTask from '../../RecursiveTask.svelte'
-  import CalendarDayView from '../../CalendarDayView.svelte'
+  import CalendarTodayView from '../../CalendarTodayView.svelte'
   import FutureOverview from '../../FutureOverview.svelte'
-  import FutureOverview2 from '../../FutureOverview2.svelte'
   import DetailedCardPopup from '../../DetailedCardPopup.svelte'
   import { onMount } from 'svelte'
   import db from '../../db.js'
@@ -587,7 +578,6 @@
     border: 1px solid green; 
     border-top-right-radius: 20px; 
     border-bottom-right-radius: 20px;
-    padding-left: 8px;
     box-sizing: border-box;
   }
 

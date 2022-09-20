@@ -225,15 +225,16 @@ function repeatOnDayOfWeek ({ dayNumber }) {
 <style>
   .detailed-card {
     position: fixed;
-    top: 50%;
+    top: 40%;
     left: 50%;
     transform: translate(-50%, -50%);
     width: 50%;
 
     overflow-y: scroll;
     z-index: 5;
-    width: 50%;
-    height: 50%;
+    width: 40%;
+    min-width: 200px;
+    height: 40%;
     border-radius: 10px;
     background-color: white;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);

@@ -7,7 +7,10 @@
          left: {offsetFromLeft}px;
          font-size: {fontSize}rem;"
 >
-  <div draggable="true" on:dragstart={(e) => dragstart_handler(e, task.name)} style="width: 11vw; cursor: pointer;">
+  <div 
+    draggable="true" on:dragstart={(e) => dragstart_handler(e, task.name)} 
+    style="width: 11vw; cursor: pointer; font-family: sans-serif; color: rgb(120, 120, 120)"
+  >
     {task.name} 
   </div>
 
@@ -48,12 +51,22 @@
     e.dataTransfer.setData("text/plain", taskName)
   }
 
+  function getTrueY (e) {
+    const ScrollContainer = document.getElementById('scroll-container')
+    const element = document.getElementById("calendar-day-container")
+    
+    // compute y-offset
+    // TODO: in practice there is a small discrepancy between where the drop is and where the mouse is 
+    // because the user aims with the image corner whereas the code reads the precise mouse pointer location
+    return  ScrollContainer.scrollTop + e.clientY - element.offsetTop
+  }
+
   function mousedown_handler (e) {
-    startY = e.offsetY
+    startY = getTrueY(e) // e.offsetYW
   }
 
   function mouseup_handler (e, task) {
-    // alert(`From ${startY} to ${e.offsetY}`)
+    const newY = getTrueY(e)
 
     // quickfix
     if (!task.duration) {
@@ -61,7 +74,7 @@
     }
 
     const minutesPerPixel = 60 / 90
-    const durationChange = (e.offsetY - startY) * minutesPerPixel
+    const durationChange = (newY - startY) * minutesPerPixel
 
     dispatch('task-duration-adjusted', {
       taskName: task.name,
