@@ -1,9 +1,9 @@
-{#if hasFetchedUser}
+{#if !$hasFetchedUser}
+  <div>Fetching your info...</div>
+{:else}
   <slot>
 
   </slot>
-{:else}
-  <div>Fetching your info...</div>
 {/if}
 
 <script>
@@ -95,7 +95,7 @@
       })
       goto('/' + $user.uid)
     }
-    
+    console.log("setting hasfetched user to true")
     hasFetchedUser.set(true) 
   })
 </script>
