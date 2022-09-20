@@ -125,7 +125,9 @@
   $: {
     if (isTypingNewTask) {
       tick().then(() => {
-        newSubtaskInput.focus()
+        if (newSubtaskInput) {// quick-fix {
+          newSubtaskInput.focus()
+        }
       })
     }
   }
