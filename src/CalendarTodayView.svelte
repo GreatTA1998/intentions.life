@@ -20,24 +20,18 @@
     {/each}
   </div>
 
-  <div 
-    id="calendar-day-container" 
-    style="position: relative; 
-           margin-top: 4px;
-           height: {pixelsPerHour * numOfHourBlocksDisplayed}px; 
-           width: 12vw;"
+  <div id="calendar-day-container" 
+    style="height: {pixelsPerHour * numOfHourBlocksDisplayed}px; "
     on:drop={(e) => drop_handler(e)}
     on:dragover={(e) => dragover_handler(e)}
   >
     {#if calendarStartTime}
-      <!-- Calendar blocks -->
       {#each timesOfDay as timeOfDay, i}
         <div class="time-indicator" style="top: {pixelsPerHour * i}px;">
           {timeOfDay.substring(0, 5)}
         </div>
       {/each}
 
-      <!-- Scheduled tasks -->
       {#each scheduledTasksToday.filter(task => task.startTime > calendarStartTime) as task, i}
         <TaskElement
           {task}
@@ -225,6 +219,30 @@
 
   without border-box, the padding on top will add ON TOP OF 100% height  
 */
+@media only screen and (max-width : 480px) {
+  #scroll-container {
+    width: 200px;
+  }
+  #calendar-day-container {
+    width: 100px;
+  }
+}
+
+@media only screen and (min-width : 480px) {
+  #scroll-container {
+    width: 12vw;
+  }
+  #calendar-day-container {
+    width: 12vw;
+  }
+} 
+
+#calendar-day-container {
+  position: relative; 
+  margin-top: 4px;
+
+}
+
 #scroll-container {
     height: 100%; 
     overflow-y: scroll; 

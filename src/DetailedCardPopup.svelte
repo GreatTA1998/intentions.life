@@ -1,15 +1,15 @@
 {#if isOpen}
-  <div class="detailed-card">
+  <div id="detailed-card">
     <div style="display: flex">
       <input 
         type="text" 
         class="google-calendar-event-title" 
         bind:value={titleOfTask} 
         on:input={handleInput2}
-        style="width: 96%; margin-left: 10px"
+        style="width: 97%; margin-left: 10px; margin-right: 10px; box-sizing: border-box;"
       >
         
-      <span on:click={() => dispatch('card-close')} class="material-icons" style="margin-left: auto; margin-right: 0">
+      <span on:click={() => dispatch('card-close')} class="material-icons" style="margin-left: auto; margin-right: 0; margin-top: 5px; color: black;">
         close
       </span>
     </div>
@@ -35,88 +35,48 @@
         on:input={handleInput}
         rows="5"
         placeholder="notes"
-        style="margin-left: 10px; width: 100%; max-width: 97%;"
+        style="margin-left: 10px; width: 97%; margin-right: 10px; box-sizing: border-box;"
       />
     </div>
 
     <div style="display: flex; margin-left: 10px">
       <div>
         {#if !isSchedulingTask}
-          <button on:click={() => isSchedulingTask = true}>
+          <a on:click={() => isSchedulingTask = true}>
             Schedule
-          </button>
+          </a>
         {:else}
           <input bind:value={newStartDate} placeholder={getDateOfToday()} style="width: 40px"/>
           <input bind:value={newStartTime} placeholder="13:00" style="width: 40px" on:keypress={detectEnterKey5}/>
         {/if}
         <!-- Repeating tasks -->
         {#if !isTypingRepeatFrequency}
-          <button on:click={() => isTypingRepeatFrequency = true} style="margin-left: 0px;">
+          <a on:click={() => isTypingRepeatFrequency = true} style="margin-left: 0px;">
             Repeat task
-          </button>
+          </a>
         {:else}
           <!-- TODO: design repeat menu -->
           <!-- Can't choose both -->
           <div style="display: flex">
             Repeats every <input bind:value={daysBeforeRepeating} style="width: 20px;" placeholder="0" on:keypress={detectEnterKey4}> days 
           </div>
-
-          <!-- <div style="display: flex">
-            <div>
-              <button on:click={() => repeatOnDayOfWeek({ dayNumber: 1 })}
-                class:selected="{taskObject.repeatsOnDaysOfWeek && taskObject.repeatsOnDaysOfWeek[0]}"
-              >
-                M
-              </button>
-              <button on:click={() => repeatOnDayOfWeek({ dayNumber: 2 })}
-                class:selected="{taskObject.repeatsOnDaysOfWeek && taskObject.repeatsOnDaysOfWeek[1]}"  
-              >
-                T
-              </button>
-              <button on:click={() => repeatOnDayOfWeek({ dayNumber: 3 })}
-                class:selected="{taskObject.repeatsOnDaysOfWeek && taskObject.repeatsOnDaysOfWeek[2]}"  
-              >
-                W
-              </button>
-              <button on:click={() => repeatOnDayOfWeek({ dayNumber: 4 })}
-                class:selected="{taskObject.repeatsOnDaysOfWeek && taskObject.repeatsOnDaysOfWeek[3]}"
-              >
-                R
-              </button>
-              <button on:click={() => repeatOnDayOfWeek({ dayNumber: 5 })}
-                class:selected="{taskObject.repeatsOnDaysOfWeek && taskObject.repeatsOnDaysOfWeek[4]}"  
-              >
-                F
-              </button>
-              <button on:click={() => repeatOnDayOfWeek({ dayNumber: 6 })} 
-                class:selected="{taskObject.repeatsOnDaysOfWeek && taskObject.repeatsOnDaysOfWeek[5]}"
-              >
-                S
-              </button>
-              <button on:click={() => repeatOnDayOfWeek({ dayNumber: 7 })} 
-                class:selected="{taskObject.repeatsOnDaysOfWeek && taskObject.repeatsOnDaysOfWeek[6]}"
-              >
-                S
-              </button>
-            </div>
-          </div> -->
         {/if}
       </div>
       <div style="margin-left: auto; margin-right: 16px">
         <!-- class="material-icons" style="margin-left: 5px; font-size: {2.5 * (0.7 ** depth)}rem;" -->
-        <button on:click={() => dispatch('task-delete')}>
+        <a on:click={() => dispatch('task-delete')}>
           Delete
-        </button>
+        </a>
 
         <!-- I don't care this looks bad -->
-        <button on:click={() => dispatch('task-done')}>
+        <a on:click={() => dispatch('task-done')}>
           Done
-        </button>
+        </a>
       </div>
     </div>
 
     <!-- This is the section where you show everything regardless of whether it is scheduled or not -->
-    <div style="font-size: 1rem; margin-top: 12px; margin-left: 12px; font-weight: 600">
+    <div style="font-size: 0.9rem; margin-top: 24px; margin-left: 12px; font-weight: 600; font-family: sans-serif;">
       Full task history:
     </div>
 
@@ -131,10 +91,11 @@
 {/if}
 
 <script>
-import { createEventDispatcher, onMount } from 'svelte'
+import { createEventDispatcher, onMount, onDestroy, tick } from 'svelte'
 import _ from 'lodash'
 import RecursiveBulletPoint from './RecursiveBulletPoint.svelte';
 import { getDateOfToday } from './helpers';
+import { browser } from '$app/env'
 
 export let taskObject 
 export let isOpen = false
@@ -223,7 +184,7 @@ function repeatOnDayOfWeek ({ dayNumber }) {
 </script>
 
 <style>
-  .detailed-card {
+  #detailed-card {
     position: fixed;
     top: 40%;
     left: 50%;
@@ -266,7 +227,7 @@ function repeatOnDayOfWeek ({ dayNumber }) {
   }
 
   .google-calendar-event-time {
-    font-family: Roboto,Arial,sans-serif;
+    font-family: serif;
     font-size: 14px;
     font-weight: 400;
     letter-spacing: .2px;
@@ -276,7 +237,7 @@ function repeatOnDayOfWeek ({ dayNumber }) {
 
   .google-calendar-event-title {
     font-family: Roboto,Arial,sans-serif;
-    font-size: 18px;
+    font-size: 24px;
     font-weight: 400;
     letter-spacing: .2px;
     line-height: 20px;
@@ -294,5 +255,32 @@ function repeatOnDayOfWeek ({ dayNumber }) {
   'wght' 400,
   'GRAD' 0,
   'opsz' 48
+}
+
+a {
+  flex: 1;
+  background-color: #333;
+  color: #fff;
+  border: 1px solid;
+  padding-top: 2px; 
+  padding-bottom: 2px;
+  padding-left: 6px;
+  padding-right: 6px;
+  border-radius: 4px;
+  text-align: center;
+  text-decoration: none;
+  transition: all 0.5s ease-out;
+
+  font-family: sans-serif;
+  font-size: 0.9rem;
+
+  margin-top: 2px;
+  height: 5px;
+}
+
+a:hover,
+a:focus {
+  background-color: #fff;
+  color: #333;
 }
 </style>

@@ -1,5 +1,5 @@
-<div style="height: 60vh; overflow-y: scroll; overflow-x: hidden">
-  <div style="width: 12vw; margin-left: 0px; margin-top: 27px; height: 1600px" >
+<div id="future-overview-scroll-parent">
+  <div class="future-overview-scroll-container">
     {#each Object.keys(datesToTasks) as date}
       <div style="margin-bottom: 40px;">
         <div>
@@ -76,6 +76,32 @@ const minimumContainerHeight = 20
   *::-webkit-scrollbar {
     width: 0;
     background-color: #aaa; /* or add it to the track */
+  }
+
+  #future-overview-scroll-parent {
+    overflow-y: scroll; 
+    overflow-x: hidden;
+  }
+
+  .future-overview-scroll-container {
+    margin-left: 0px; 
+    margin-top: 27px; 
+    height: 1600px
+  }
+
+  /* Small Devices, Tablets and bigger devices */
+  @media only screen and (max-width : 480px) {
+    #future-overview-scroll-parent {
+      height: 100%; 
+      width: 200px;
+    }
+  }
+
+  @media only screen and (min-width : 480px) {
+    #future-overview-scroll-parent {
+      height: 60vh;
+      width: 12vw; 
+    }
   }
 
   .scheduled-task {

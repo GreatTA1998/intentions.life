@@ -93,12 +93,9 @@
   import RecursiveTask from './RecursiveTask.svelte'
   import { createEventDispatcher, onMount, tick } from 'svelte'
   import { getDateOfToday } from './helpers'
-  import DetailedCardPopup from './DetailedCardPopup.svelte'
 
   export let taskObject
   export let depth
-
-  let isDetailedCardOpen = false
 
   const dispatch = createEventDispatcher()
   let isEditingTaskName = false

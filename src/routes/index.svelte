@@ -1,64 +1,29 @@
 {#if hasFetchedUser}
-  <h1 style="margin-left: 80px">
-    Life Organizer
-  </h1>
+  <div id="background-image-holder" style="font-family: sans-serif; height: 100vh; display: flex; justify-content: center; align-items: center;">
+    <div style="background-color: white; width: 50vw; min-width: 200px; height: 70vh; border-radius: 10px;">
+      <h1 style="margin-left: 60px; font-family: sans-serif; color: #1b1b1b; font-size: 4rem;">
+        Life Organizer
+      </h1>
 
-  <div style="display: flex; align-items: center; margin-left: 80px">
-    <button on:click={() => goto('GxBbopqXHW0qgjKEwU4z')}>
-      Play around
-    </button>
-    <div style="margin-left: 10px;">
-    or log-in with phone
+      <div style="display: flex; align-items: center; margin-left: 60px; margin-right: 60px;">
+        <a on:click={() => goto('GxBbopqXHW0qgjKEwU4z')} style="margin-right: 40px;">
+          Play around
+        </a>
+
+        <a on:click={() => isSigningIn = true}>
+          Sign in
+        </a>
+        <!-- <div style="margin-left: 10px;">
+          or sign-in with phone
+        </div> -->
+        {#if isSigningIn}
+          <PhoneLogin canTakeInternationalNumbers/>  
+        {/if}
+      </div>
+
+      <div style="margin-left: 80px; margin-right: 80px">
+      </div>
     </div>
-
-    <PhoneLogin canTakeInternationalNumbers/>  
-  </div>
-
-  <div style="margin-left: 80px; margin-right: 80px">
-    <h2>Writing on paper & Google Calendar just isn't good enough</h2>
-    <p>
-    Life is complicated because almost everything matters. That job interview matters, but so does not forgetting to drink water, or meditating a little. How about that package you ordered 3 days ago? Or the 7 emails you're awaiting on a follow-up? Have you visited your grandparents? Should you start a new hobby? Oh you forgot to pay taxes.
-
-    Calendars and lists has made things better, but the most widely-used apps have truly non-sensical designs that further complicates things. For example, Google Tasks' to-do lists have no concept of "levels", like a desktop with no folders - every time you read it you get lost in the details instead of a balanced overview on your fundamental priorities. 
-    <br>
-    <br>
-
-    On Google Calendar, it invents unnecessary concepts. It insists that "tasks" and "events" are different: one describes a todo-item, and one describes a calendar-item. Events can have adjustable durations, but tasks cannot! Moreover, a task can exist on a calendar, but an event cannot exist on a to-do.
-    <br>
-    <br>
-
-    These are only the tip of the iceberg. All the non-sensical designs compound to create a system that is only good for some situations in our life, and the rest - we'll just have to use our brains or other methods to make up the difference.
-
-    I believe that with common-sense designs, it's possible to use one simple app that handles every situation in life. 
-    </p>
-
-    <h2>life-organizer = hierarchical todo + calendar</h2>
-    <p>
-    Everything is a task / sub-task. A task is starts unscheduled - you drag it onto the calendar to schedule it (computer recommended). Lastly, tasks can repeat. That's all you need! Consider common life situations:
-    <br>
-    <br>
-    Email follow-ups:
-      - Send the email 
-      - Create a task called "follow-up with that email" scheduled for 1 - 7 days. 
-      - Follow-ups = sub-task + deadline
-    <br>
-    <br>
-    Important deadlines:
-      - Just schedule the task!
-      - Deadlines = scheduled task (with start time dependent on its duration)
-    <br>
-    <br>
-    Habits:
-      - Specify how the task repeats e.g. "Push-ups" every 2 days
-      - If the time is flexible, it's equivalent to a deadline, and scheduled on the calendar 
-      - Habits = repeat + deadline
-    <br>
-    <br>
-    Message notifications (work in progress):
-      - If someone messages you on zen-messenger, it appears as a task
-
-    I challenge you to find a situation that cannot be handled with some combination of sub-task, schedule and repeat.
-    </p>
   </div>
 {/if}
 
@@ -66,4 +31,48 @@
   import { goto } from '$app/navigation'
   import PhoneLogin from '../PhoneLogin.svelte'
   import { hasFetchedUser } from '../store.js'
+  import { onMount } from 'svelte'
+
+  let isSigningIn
+
+  onMount(() => {
+    let bgImageURLs = [
+      'https://i.imgur.com/ShnqIpJ.jpeg', // airships 
+      // 'https://i.imgur.com/rzkUMW8.jpeg', // cute monsters
+    ]
+    let chosenBgImageURL
+    chosenBgImageURL = bgImageURLs[getRandomInt(2)]
+    const div = document.getElementById("background-image-holder")
+    div.style['background-image'] = `url(${chosenBgImageURL})`
+  })
+
+  function getRandomInt(max) {
+    return Math.floor(Math.random() * max);
+  }
 </script>
+
+<style>
+#background-image-holder {
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  /* background-image: url('maplestory-orange.jpg'); */
+  /* background-image: url('https://i.imgur.com/ShnqIpJ.jpeg'); */
+}
+
+a {
+  flex: 1;
+  background-color: #333;
+  color: #fff;
+  border: 1px solid;
+  padding: 0.5rem;
+  text-align: center;
+  text-decoration: none;
+  transition: all 0.5s ease-out;
+}
+
+a:hover,
+a:focus {
+  background-color: #fff;
+  color: #333;
+}
+</style>

@@ -1,6 +1,6 @@
 <div 
   on:click={() => dispatch('task-click', { task })}
-  class="scheduled-task" 
+  class="scheduled-task clickable-task" 
   class:green={task.isDone}
   style="top: {offsetFromTop}px; 
          height: {height}px; 
@@ -8,17 +8,20 @@
          font-size: {fontSize}rem;"
 >
   <div 
-    draggable="true" on:dragstart={(e) => dragstart_handler(e, task.name)} 
-    style="width: 11vw; cursor: pointer; font-family: sans-serif; color: rgb(120, 120, 120)"
+    class="task-name"
+    draggable="true" 
+    on:dragstart={(e) => dragstart_handler(e, task.name)} 
   >
     {task.name} 
   </div>
 
   <!-- Continuation of re-scheduling zone -->
   <slot>
-    <div  
-      style="height: {height - 20 - 10}px; width: 11vw;" 
-      draggable="true" on:dragstart={(e) => dragstart_handler(e, task.name)}
+    <div 
+      class="task-drag-zone"
+      style="height: {height - 20 - 10}px;" 
+      draggable="true" 
+      on:dragstart={(e) => dragstart_handler(e, task.name)}
     >
 
     </div>
@@ -97,4 +100,31 @@
 .green {
   border-left: 2px solid green;
 }
+
+.task-drag-zone {
+  width: 11vw;
+}
+
+.task-name {
+  width: 11vw; cursor: pointer; font-family: sans-serif; color: rgb(120, 120, 120);
+}
+
+  /* Small Devices, Tablets and bigger devices */
+  @media only screen and (max-width : 480px) {
+    .task-drag-zone {
+      width: 150px;
+    }
+    .task-name {
+      width: 150px
+    }
+  }
+
+  @media only screen and (min-width : 480px) {
+    .task-drag-zone {
+      width: 11vw;
+    }
+    .task-name {
+      width: 11vw;
+    }
+  }
 </style>

@@ -9,29 +9,29 @@
 </script>
 
 {#key clickedTask}
-  <DetailedCardPopup 
-    isOpen={isDetailedCardOpen}
-    taskObject={clickedTask}
-    on:card-close={() => isDetailedCardOpen = false}
-    on:task-done={() => markNodeAsDone(clickedTask.name)}
-    on:task-delete={() => deleteSubtree(clickedTask.name)}
-    on:task-repeat={updateFirestoreAndTriggerReactivity}
-    on:task-schedule={updateFirestoreAndTriggerReactivity}
-    on:task-title-update={updateFirestoreAndTriggerReactivity}
-    on:task-notes-update={updateFirestoreAndTriggerReactivity}
-  />
+  {#if isDetailedCardOpen}
+    <DetailedCardPopup 
+      isOpen={isDetailedCardOpen}
+      taskObject={clickedTask}
+      on:card-close={() => isDetailedCardOpen = false}
+      on:task-done={() => markNodeAsDone(clickedTask.name)}
+      on:task-delete={() => deleteSubtree(clickedTask.name)}
+      on:task-repeat={updateFirestoreAndTriggerReactivity}
+      on:task-schedule={updateFirestoreAndTriggerReactivity}
+      on:task-title-update={updateFirestoreAndTriggerReactivity}
+      on:task-notes-update={updateFirestoreAndTriggerReactivity}
+    />
+  {/if}
 {/key}
 
-<div id="background-image-holder" style="height: 100vh; padding-left: 120px; padding-right: 120px;">
-  <div style="height: 10vh"></div>
-
+<div id="background-image-holder" style="height: 100vh;">
   <a role="button" on:click={toggleMusic} class="float">
     <span class="material-icons my-float" style="color: white">
       {isMusicPlaying ? 'music_note' : 'music_off'}
     </span>
   </a>
 
-  <div style="display: flex; padding-left: 0; padding-top: 0px;">
+  <div class="flex-container">
     <div class="todo-container" 
       on:drop={(e) => unscheduleTask(e)}
       on:dragover={(e) => dragover_handler(e)}
@@ -126,7 +126,6 @@
   import db from '../../db.js'
   import { doc, getDoc, updateDoc } from 'firebase/firestore'
   import { getDateOfToday, getDateOfTomorrow } from '../../helpers.js'
-  import TaskElement from '../../TaskElement.svelte'
 
   const userDocPath = `users/${userID}`
   let isTypingNewTask = false
@@ -572,24 +571,59 @@
   .calendar-section-container {
     display: flex; 
     justify-content: space-evenly; 
-    width: 36vw; 
-    height: 60vh;
     background-color: white; 
-    border: 1px solid green; 
-    border-top-right-radius: 20px; 
-    border-bottom-right-radius: 20px;
     box-sizing: border-box;
   }
 
+
+  @media only screen and (max-width : 480px) {
+    .flex-container {
+      width: 200%
+    }
+    .todo-container {
+      width: 600px;
+      height: 100%;
+    }
+    .calendar-section-container {
+      width: 800px;
+      height: 100%;
+    }
+  }
+
+  /* Small Devices, Tablets and bigger devices */
+  @media only screen and (min-width : 480px) {
+    .todo-container {
+      width: 70vw;
+      height: 60vh;
+      border: 1px solid green; 
+      border-top-left-radius: 20px; 
+      border-bottom-left-radius: 20px; 
+      padding-top: 14px; 
+      padding-left: 30px;
+    }
+    #background-image-holder {
+      box-sizing: border-box;
+      padding-top: 10vh;
+      padding-left: 120px; 
+      padding-right: 120px;
+    }
+    .calendar-section-container {
+      width: 36vw; 
+      height: 60vh;
+      border: 1px solid green; 
+      border-top-right-radius: 20px; 
+      border-bottom-right-radius: 20px;
+    }
+  }
+
+  .flex-container {
+    display: flex; 
+    padding-left: 0; 
+    padding-top: 0px;
+  }
+
   .todo-container {
-    height: 60vh;
-    width: 70vw;
     background-color: white; 
-    border: 1px solid green; 
-    border-top-left-radius: 20px; 
-    border-bottom-left-radius: 20px; 
-    padding-top: 14px; 
-    padding-left: 30px;
     overflow-y: scroll;
     overflow-x: scroll;
     box-sizing: border-box;
