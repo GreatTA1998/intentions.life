@@ -125,10 +125,11 @@
   import { onMount } from 'svelte'
   import db from '../../db.js'
   import { doc, getDoc, updateDoc } from 'firebase/firestore'
-  import { getDateOfToday, getDateOfTomorrow } from '../../helpers.js'
+  import { getDateOfToday, getDateOfTomorrow, getDateInMMDD } from '../../helpers.js'
 
   const userDocPath = `users/${userID}`
   let isTypingNewTask = false
+  const habitPoolToResolveConflict = []
 
   function getRandomInt(max) {
     return Math.floor(Math.random() * max);
@@ -145,11 +146,7 @@
 
   // let background images 
   let bgImageURLs = [
-    'https://i.imgur.com/ShnqIpJ.jpeg', // airships 
-    // 'https://i.imgur.com/fBRcIsg.jpeg', //https://images7.alphacoders.com/751/751199.jpg', // https://wall.alphacoders.com/tag/kimi-no-na-wa.-wallpapers 
-                                                      // https://images7.alphacoders.com/751/751199.jpg
-    'https://i.imgur.com/rzkUMW8.jpeg', // cute monsters
-    // 'https://i.imgur.com/ifP3xPg.jpeg' // forest (too dark I think)
+    'https://i.imgur.com/ShnqIpJ.jpeg' // airships 
   ]
   let chosenBgImageURL
 
@@ -296,10 +293,31 @@
     }
     traverseAndUpdateTree({
       node: root,
-      fulfilsCriteria: (task) => task.startDate < dateOfToday && !task.isDone,
+      fulfilsCriteria: (task) => task.startDate < dateOfToday,
       applyFunc: (task) => {
-        task.startDate = ''
-        task.startTime = ''
+        if (task.daysBeforeRepeating && task.repeatType === 'event' && task.startDate) {
+          // temporary for dealing with corrupted data
+          if (typeof task.startDate !== 'string') {
+            task.startDate = getDateOfToday()
+          }
+          // `setDate` is really `setDay` https://stackoverflow.com/a/69390193/7812829
+          function addDays(date, number) {
+            console.log('date =', date)
+            const newDate = new Date(date)
+            const dayOfMonth = Number(date.substring(3, 5))
+            console.log('dayOfMonth =', dayOfMonth)
+            return new Date(newDate.setDate(dayOfMonth + number)) // getDate is an integer number, i.e. the day of the month 1 to 31
+          }
+          console.log('before, task.startDate =', task.startDate)
+          const newDateObject = addDays(task.startDate, task.daysBeforeRepeating) 
+          task.startDate = getDateInMMDD(newDateObject)
+          console.log('after, task.endDate =', task.startDate)
+        }
+        // handle one-off tasks that isn't done - this will return to the to-do
+        else if (!task.isDone) {
+          task.startDate = ''
+          task.startTime = ''
+        }
         // this means the task will re-appear on the unscheduled todo-list
       }
     })
@@ -381,113 +399,87 @@
 
   $: if (allTasks) {
     collectTodayScheduledTasksToArray()
-
     collectFutureScheduledTasksToArray()
-    // sort it from earliest to latest
     futureScheduledTasks.sort((task1, task2) => {
       const d1 = new Date(task1.startDate)
       const d2 = new Date(task2.startDate)
-
-      return d1.getTime() - d2.getTime()
+      return d1.getTime() - d2.getTime() // most recent to the top??
     })
 
     // HANDLE TASKS THAT REPEAT
     // can't use `return` in reactive expression https://github.com/sveltejs/svelte/issues/2828
     if (lastRanRepeatAtDate !== dateOfToday) {
       console.log('new day, running repeat algorithm and process un-finished tasks')
-      
       recollectScheduledButIncompletedTasks()
-
-      //  1. Handle repeating Twitch streams e.g. Mon, Wed, Fri 7 pm
-      //  Figure out if it's Wednesday or Saturday etc. with `Date.getDate()` method 
-      //  If it is, place it at 7 pm. Easiest game of my life.
-      const today = new Date() // use `getDay()` to get 0 to 6 number
-      const habitPoolToResolveConflict = []
-      
-      // TODO: deprecate. You can represent week-based repeating events by decomposing it into regular repeating events
-      // mutate repeating tasks
-      function recursivelyRepeatTasks (node) {
-        if (node.repeatsOnDaysOfWeek) {
-          if (node.repeatsOnDaysOfWeek[today.getDay()]) { 
-            if (node.lastCompletionDate !== dateOfToday) {
-              node.isDone = false
-              node.startDate = dateOfToday
-              if (!node.startTime) {
-                habitPoolToResolveConflict.push(node)
-              }
-            }
-          }
-        }
-        for (const child of node.children) {
-          recursivelyRepeatTasks(child)
-        }
-      }
-
-      // actually call the function on the root nodes
       for (const task of allTasks) {
-        recursivelyRepeatTasks(task)
+        recursivelyRepeatHabits(task)
       }
+      scheduleHabitsWithoutClashing()
 
-      //  #2 Handle repeating habits e.g. meditate every 3 day, run every 7 days
-      //  Schedule it at the end of the day
-      //  Visualize "debt" by not allowing overlap 
-      function recursivelyRepeatTasks2 (node) {
-        // a task can set to repeat, but it has to be scheduled and done once before 
-        // it has a `lastCompletionDate` property and will be "auto-shifted" periodically
-        // into the future
-        if (node.daysBeforeRepeating && node.lastCompletionDate) {
-          // `lastCompletionDate` is in mm/dd/yyyy format
-          const d1 = new Date(`${node.lastCompletionDate}/2022`)
-          const d2 = new Date()
-          const millisec_diff = d2.getTime() - d1.getTime()
-          const day_diff = Math.ceil(millisec_diff / (1000 * 3600 * 24))
-          if (day_diff >= node.daysBeforeRepeating) {
-            node.isDone = false 
-            node.startDate = dateOfToday 
-            if (!node.startTime) {
-              habitPoolToResolveConflict.push(node)
-            }
-          }
-        }
-        for (const child of node.children) {
-          recursivelyRepeatTasks2(child)
-        }
-      }
-
-      // actually call the function on root nodes of tree
-      for (const task of allTasks) {
-        recursivelyRepeatTasks2(task)
-      }
-
-      // initially deadline is end of day, 00:00
-      // but there's already a task there, so the actual deadline becomes 00:00 - task.duration
-      // now you just repeat it until no tasks are left
-      let trueEndOfDay = 1440 
-      const pixelsBetweenEachHabit = 20
-
-      for (const habit of habitPoolToResolveConflict) {
-        // convert everything into minutes, so military time 
-        // 00:00: start of new day := 0 minutes
-        // 24:00: end of new day := 1440 minutes
-        trueEndOfDay -= ((habit.duration || 5) + pixelsBetweenEachHabit) // note `.duration` is already in minutes
-
-        // convert to 'hh:mm' format
-        const militaryHours = trueEndOfDay / 60
-        const integerPart = parseInt(militaryHours)
-        const decimalPart = militaryHours - integerPart
-        const hh = integerPart
-        let mm = Math.round(decimalPart * 60) 
-        if (mm < 10) mm = `0${mm}`
-        habit.startTime = `${hh}:${mm}`
-        console.log(`habit ${habit.name} starts =`, habit.startTime)
-      }
-
-      // UPDATE FIRESTORE
       updateDoc(
         doc(db, userDocPath),
-        { allTasks, lastRanRepeatAtDate: dateOfToday  }
+        { allTasks, lastRanRepeatAtDate: dateOfToday }
       )
       allTasks = [...allTasks]
+    }
+  }
+
+  // NOTE: it works by mutating the task nodes directly, it assumes aliasing
+  function scheduleHabitsWithoutClashing () {
+    // initially deadline is end of day, 00:00
+    // but there's already a task there, so the actual deadline becomes 00:00 - task.duration
+    // now you just repeat it until no tasks are left
+    let trueEndOfDay = 1440 
+    const pixelsBetweenEachHabit = 20
+    for (const habit of habitPoolToResolveConflict) {
+      // convert everything into minutes, so military time 
+      // 00:00: start of new day := 0 minutes
+      // 24:00: end of new day := 1440 minutes
+      trueEndOfDay -= ((habit.duration || 5) + pixelsBetweenEachHabit) // note `.duration` is already in minutes
+
+      // convert to 'hh:mm' format
+      const militaryHours = trueEndOfDay / 60
+      const integerPart = parseInt(militaryHours)
+      const decimalPart = militaryHours - integerPart
+      const hh = integerPart
+      let mm = Math.round(decimalPart * 60) 
+      if (mm < 10) mm = `0${mm}`
+      habit.startTime = `${hh}:${mm}`
+      console.log(`habit ${habit.name} starts =`, habit.startTime)
+    }
+  }
+
+  //  #2 Handle repeating habits e.g. meditate every 3 day, run every 7 days
+  //  Schedule it at the end of the day
+  //  Visualize "debt" by not allowing overlap 
+  function recursivelyRepeatHabits (node) {
+    // a task can set to repeat, but it has to be scheduled and done once before 
+    // it has a `lastCompletionDate` property and will be "auto-shifted" periodically
+    // into the future
+    if (node.repeatType === 'event') {
+      return
+    }
+    // want to be backwards compatible, soem of our existing habits aren't initialized
+    if (node.daysBeforeRepeating && node.lastCompletionDate) {
+      // `lastCompletionDate` is in mm/dd/yyyy format
+      // we don't care if the habit was completed or not, we just record the "missed" batting average
+      const d1 = new Date(`${node.startDate}/2022`)
+      const d2 = new Date() // use `getDay()` to get 0 to 6 number
+      const millisec_diff = d2.getTime() - d1.getTime()
+      const day_diff = Math.ceil(millisec_diff / (1000 * 3600 * 24))
+      if (day_diff >= node.daysBeforeRepeating) {
+        if (!node.isDone) {
+          node.missedCount = (node.missedCount += 1) || 1
+        }
+        node.isDone = false 
+        node.startDate = dateOfToday 
+        if (!node.startTime) {
+          habitPoolToResolveConflict.push(node)
+        }
+      }
+    }
+    for (const child of node.children) {
+      recursivelyRepeatHabits(child)
     }
   }
 
@@ -592,24 +584,24 @@
 
   /* Small Devices, Tablets and bigger devices */
   @media only screen and (min-width : 480px) {
+    #background-image-holder {
+      box-sizing: border-box;
+      padding-top: 20vh;
+      padding-left: 10vw; 
+      padding-right: 10vw;
+    }
     .todo-container {
       width: 70vw;
-      height: 60vh;
+      height: 50vh;
+      padding-top: 14px; 
+      padding-left: 30px;
       border: 1px solid green; 
       border-top-left-radius: 20px; 
       border-bottom-left-radius: 20px; 
-      padding-top: 14px; 
-      padding-left: 30px;
-    }
-    #background-image-holder {
-      box-sizing: border-box;
-      padding-top: 10vh;
-      padding-left: 120px; 
-      padding-right: 120px;
     }
     .calendar-section-container {
       width: 36vw; 
-      height: 60vh;
+      height: 50vh;
       border: 1px solid green; 
       border-top-right-radius: 20px; 
       border-bottom-right-radius: 20px;

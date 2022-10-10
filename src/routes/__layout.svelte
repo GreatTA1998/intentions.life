@@ -95,7 +95,6 @@
       })
       goto('/' + $user.uid)
     }
-    console.log("setting hasfetched user to true")
     hasFetchedUser.set(true) 
   })
 </script>

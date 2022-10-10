@@ -22,9 +22,7 @@
 
     <div class="google-calendar-event-detail" style="margin-top: 12px; margin-left: 16px;">
       {#if taskObject.daysBeforeRepeating}
-        Repeats every {taskObject.daysBeforeRepeating} days, completed {taskObject.completionCount || 0} times
-      {:else if taskObject.repeatsOnDaysOfWeek}
-        Repeats {taskObject.repeatsOnDaysOfWeek}
+        { taskObject.repeatType || ''}  repeats every {taskObject.daysBeforeRepeating} days, completed {taskObject.completionCount || 0} times
       {/if}
     </div>
 
@@ -55,13 +53,27 @@
             Repeat task
           </a>
         {:else}
-          <!-- TODO: design repeat menu -->
-          <!-- Can't choose both -->
           <div style="display: flex">
-            Repeats every <input bind:value={daysBeforeRepeating} style="width: 20px;" placeholder="0" on:keypress={detectEnterKey4}> days 
+            Repeat every 
+            <input 
+              bind:value={daysBeforeRepeating} 
+              style="width: 20px;" 
+              placeholder="0" 
+              on:keypress={detectEnterKey4}
+            > 
+            days 
           </div>
+
+          <a on:click={setTaskAsHabit}>
+            Habit
+          </a>
+
+          <a on:click={setTaskAsEvent}>
+            Event
+          </a>
         {/if}
       </div>
+
       <div style="margin-left: auto; margin-right: 16px">
         <!-- class="material-icons" style="margin-left: 5px; font-size: {2.5 * (0.7 ** depth)}rem;" -->
         <a on:click={() => dispatch('task-delete')}>
@@ -138,14 +150,13 @@ function detectEnterKey4 (e) {
     if (!daysBeforeRepeating) {
       alert('Task is reset and will no longer repeat')
       taskObject.daysBeforeRepeating = 0
+      taskObject.repeatType = ''
     } 
     else {
       taskObject.daysBeforeRepeating = daysBeforeRepeating
-      // schedule it right away by starting today
-
-      taskObject.startDate = getDateOfToday()
-      // TODO: some form of conflict resolution algorithm for all deadlined tasks
-      taskObject.startTime = '23:30' // quick-fix for now, this is of course not correct for all cases
+      if (!taskObject.repeatType) {
+        taskObject.repeatType = 'habit'
+      }
     }
     dispatch('task-repeat')
     daysBeforeRepeating = 0
@@ -172,13 +183,14 @@ function detectEnterKey5 (e) {
   }
 }
 
-function repeatOnDayOfWeek ({ dayNumber }) {
-  if (!taskObject.repeatsOnDaysOfWeek) {
-    taskObject.repeatsOnDaysOfWeek = [false,false,false,false,false,false,false]
-  } 
-  taskObject.repeatsOnDaysOfWeek[dayNumber - 1] = !taskObject.repeatsOnDaysOfWeek[dayNumber - 1]
-  
-  // dispatch the event so it updates the database
+function setTaskAsEvent () {
+  taskObject.repeatType = 'event'
+  // they all just update the Firestore anyway there is no difference
+  dispatch('task-repeat')
+} 
+
+function setTaskAsHabit () {
+  taskObject.repeatType = 'habit'
   dispatch('task-repeat')
 }
 </script>
