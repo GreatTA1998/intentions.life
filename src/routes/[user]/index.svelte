@@ -16,10 +16,10 @@
       on:card-close={() => isDetailedCardOpen = false}
       on:task-done={() => markNodeAsDone(clickedTask.name)}
       on:task-delete={() => deleteSubtree(clickedTask.name)}
-      on:task-repeat={updateFirestoreAndTriggerReactivity}
-      on:task-schedule={updateFirestoreAndTriggerReactivity}
-      on:task-title-update={updateFirestoreAndTriggerReactivity}
-      on:task-notes-update={updateFirestoreAndTriggerReactivity}
+      on:task-repeat={updateEntireTaskTree}
+      on:task-schedule={updateEntireTaskTree}
+      on:task-title-update={(e) => changeNameOfATask(e.detail)}
+      on:task-notes-update={(e) => changeNotesOfATask(e.detail)}
     />
   {/if}
 {/key}
@@ -32,7 +32,6 @@
   </a>
 
   <div class="flex-container">
-    
     <div class="calendar-section-container">
       <!-- Playground  -->
       <!-- <div style="position: relative">
@@ -46,7 +45,6 @@
             on:task-click
             on:task-duration-adjusted
           >
-          
         </TaskElement>
         {/each}
     </div> -->
@@ -66,7 +64,6 @@
       />
     </div>
 
-
     <div class="todo-container" 
       on:drop={(e) => unscheduleTask(e)}
       on:dragover={(e) => dragover_handler(e)}
@@ -79,9 +76,9 @@
                 <RecursiveTask 
                   on:task-click={(e) => openDetailedCard(e.detail)}
                   on:task-create={(e) => modifyTaskTree(e, task)} 
-                  on:task-done={updateFirestoreAndTriggerReactivity}
-                  on:task-delete={updateFirestoreAndTriggerReactivity}
-                  on:task-repeating={updateFirestoreAndTriggerReactivity}
+                  on:task-done={updateEntireTaskTree}
+                  on:task-delete={updateEntireTaskTree}
+                  on:task-repeating={updateEntireTaskTree}
                   taskObject={task}
                   depth={1}
                 />
@@ -126,9 +123,10 @@
   import DetailedCardPopup from '../../DetailedCardPopup.svelte'
   import { onMount } from 'svelte'
   import db from '../../db.js'
-  import { doc, getDoc, updateDoc } from 'firebase/firestore'
-  import { getDateOfToday, getDateOfTomorrow, getDateInMMDD } from '../../helpers.js'
+  import { doc, getDoc, onSnapshot, updateDoc } from 'firebase/firestore'
+  import { getDateOfToday, getDateOfTomorrow, getDateInMMDD, getRandomID } from '../../helpers.js'
 
+  let unsubUserDocListener
   const userDocPath = `users/${userID}`
   let isTypingNewTask = false
   const habitPoolToResolveConflict = []
@@ -197,6 +195,34 @@
     }
   }
 
+  async function changeNotesOfATask ({ id, newNotes }) {
+    for (const task of allTasks) {
+      traverseAndUpdateTree({
+        node: task,
+        fulfilsCriteria: (task) => task.id === id, 
+        applyFunc: (task) => task.notes = newNotes
+      })
+    }
+    await updateDoc(
+      doc(db, userDocPath),
+      { allTasks }
+    )
+  } 
+
+  async function changeNameOfATask ({ id, newName }) {
+    for (const task of allTasks) {
+      traverseAndUpdateTree({
+        node: task,
+        fulfilsCriteria: (task) => task.id === id, 
+        applyFunc: (task) => task.name = newName
+      })
+    }
+    await updateDoc(
+      doc(db, userDocPath),
+      { allTasks }
+    )
+  } 
+
   // useful helper function for task update operations
   function traverseAndUpdateTree ({ node, fulfilsCriteria, applyFunc }) {
     if (fulfilsCriteria(node)) {
@@ -254,7 +280,6 @@
       doc(db, userDocPath),
       { allTasks }
     )
-    allTasks = [...allTasks]
   }
 
   async function deleteSubtree (name) {
@@ -284,7 +309,6 @@
       doc(db, userDocPath),
       { allTasks }
     )
-    allTasks = [...allTasks]
   }
 
 
@@ -351,9 +375,6 @@
       doc(db, userDocPath),
       { allTasks }
     )
-
-    // manually trigger reactivity because mutations can't be detected
-    allTasks = [...allTasks]
   }
 
   async function mutateOneNode2 ({ taskName, duration }) {
@@ -381,21 +402,18 @@
       doc(db, userDocPath),
       { allTasks }
     )
-
-    // manually trigger reactivity because mutations can't be detected
-    allTasks = [...allTasks]
   }
 
   async function fetchTasks () { 
-    const user = await getDoc(
-      doc(db, userDocPath)
-    )
-    if (user.exists()) {
-      allTasks = user.data().allTasks
-      lastRanRepeatAtDate = user.data().lastRanRepeatAtDate
-    }
-    else {
-      alert('Cannot find user')
+    try {
+      unsubUserDocListener = onSnapshot(doc(db, userDocPath), snapshot => {
+        console.log('snapshot detected =', snapshot.data())
+        allTasks = [...snapshot.data().allTasks]
+        lastRanRepeatAtDate = snapshot.data().lastRanRepeatAtDate
+      })
+    } catch (error) {
+      alert("Can't retrieve user info, see console for details:", error)
+      console.error(error)
     }
   }
 
@@ -422,7 +440,6 @@
         doc(db, userDocPath),
         { allTasks, lastRanRepeatAtDate: dateOfToday }
       )
-      allTasks = [...allTasks]
     }
   }
 
@@ -499,7 +516,8 @@
       ...allTasks, 
       { name: newTopLevelTask,
         duration: 15, // minutes 
-        children: [] 
+        children: [],
+        id: getRandomID()
       }
     ]
 
@@ -507,8 +525,6 @@
       doc(db, userDocPath),
       { allTasks: newValue }
     )
-    
-    allTasks = [...newValue]
 
     newTopLevelTask = ''
     isTypingNewTask = false
@@ -519,20 +535,18 @@
     const { updatedChildren } = e.detail
     task.children = [...updatedChildren]
 
-    updateFirestoreAndTriggerReactivity()
+    updateEntireTaskTree()
   }
 
   // change the pointer to the updatedChildren
   // allTasks' subtree is mutated, and it will correctly reference it,
     
   // but the reactivity system does not KNOW when exactly it has been mutated, 
-  function updateFirestoreAndTriggerReactivity () {
-    // NOTE: `allTasks` has been mutated (and is already correct), but the reactivity system doesn't know that
+  function updateEntireTaskTree () {
     updateDoc(
       doc(db, userDocPath),
       { allTasks }
     )
-    allTasks = [...allTasks]
   }
 
   function dragover_handler (e) {
@@ -553,7 +567,6 @@
         }
       })
     }
-    allTasks = [...allTasks]
     updateDoc(
       doc(db, userDocPath),
       { allTasks }

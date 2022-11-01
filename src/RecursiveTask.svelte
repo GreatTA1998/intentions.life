@@ -92,7 +92,7 @@
 <script>
   import RecursiveTask from './RecursiveTask.svelte'
   import { createEventDispatcher, onMount, tick } from 'svelte'
-  import { getDateOfToday } from './helpers'
+  import { getDateOfToday, getRandomID } from './helpers'
 
   export let taskObject
   export let depth
@@ -203,7 +203,7 @@
 
   function createNewChild (name) {
     sendUpNewChildrenPayload(
-      [...taskObject.children, { name, children: [] }]
+      [...taskObject.children, { name, children: [], id: getRandomID() }]
     )
   }
 

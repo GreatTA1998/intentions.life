@@ -106,7 +106,7 @@
 import { createEventDispatcher, onMount, onDestroy, tick } from 'svelte'
 import _ from 'lodash'
 import RecursiveBulletPoint from './RecursiveBulletPoint.svelte';
-import { getDateOfToday } from './helpers';
+import { getDateOfToday, getRandomID } from './helpers';
 import { browser } from '$app/env'
 
 export let taskObject 
@@ -125,24 +125,27 @@ const dispatch = createEventDispatcher()
 let notesAboutTask = taskObject.notes || ''
 let titleOfTask = taskObject.name || ''
 
-const handleInput = _.throttle(e => {
-  notesAboutTask = e.target.value;
-  saveNotes()
-}, 500) // milliseconds
 
-const handleInput2 = _.throttle(e => {
-  titleOfTask = e.target.value;
-  saveTitle()
-}, 500) // milliseconds
+const throttledSaveTitle = _.throttle(saveTitle, 500)
+const throttledSaveNotes = _.throttle(saveNotes, 500)
+
+function handleInput (e) {
+  notesAboutTask = e.target.value
+  throttledSaveNotes()
+}
+
+const handleInput2 = function (e) {
+  titleOfTask = e.target.value
+  throttledSaveTitle()
+}
 
 function saveNotes () {
   taskObject.notes = notesAboutTask
-  dispatch('task-notes-update')
+  dispatch('task-notes-update', { id: taskObject.id, newNotes: notesAboutTask })
 }
 
 function saveTitle () {
-  taskObject.name = titleOfTask 
-  dispatch('task-title-update')
+  dispatch('task-title-update', { id: taskObject.id, newName: titleOfTask })
 }
 
 function detectEnterKey4 (e) {
