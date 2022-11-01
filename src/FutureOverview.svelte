@@ -31,7 +31,7 @@ const dispatch = createEventDispatcher()
 
 $: if (futureScheduledTasks) {
   futureScheduledTasks.sort((t1, t2) => {
-    if (t1.startDate !== t2.startDate) return 0
+    if (t1.startDate !== t2.startDate) return t1.startDate < t2.startDate ? -1 : 1
     else {
       return convertToPureMinutes(t1.startTime) - convertToPureMinutes(t2.startTime)
     }
