@@ -32,6 +32,41 @@
   </a>
 
   <div class="flex-container">
+    
+    <div class="calendar-section-container">
+      <!-- Playground  -->
+      <!-- <div style="position: relative">
+        {#each todayScheduledTasks as task, i}
+          <TaskElement
+            {task}
+            offsetFromTop={30 * i}
+            height={30}
+            fontSize={0.8}
+            offsetFromLeft={30 * i}
+            on:task-click
+            on:task-duration-adjusted
+          >
+          
+        </TaskElement>
+        {/each}
+    </div> -->
+
+      <CalendarTodayView
+        scheduledTasksToday={todayScheduledTasks}
+        on:task-done={(e) => markNodeAsDone(e.detail.taskName)}
+        on:task-scheduled={(e) => mutateOneNode(e.detail)}
+        on:task-duration-adjusted={(e) => mutateOneNode2(e.detail)}
+        on:task-click={(e) => openDetailedCard(e.detail)}
+      />
+  
+      <FutureOverview
+        {futureScheduledTasks}
+        on:task-duration-adjusted={(e) => mutateOneNode2(e.detail)}
+        on:task-click={(e) => openDetailedCard(e.detail)}
+      />
+    </div>
+
+
     <div class="todo-container" 
       on:drop={(e) => unscheduleTask(e)}
       on:dragover={(e) => dragover_handler(e)}
@@ -76,39 +111,6 @@
           </div>
         {/if}
       </div>
-    </div>
-
-    <div class="calendar-section-container">
-      <!-- Playground  -->
-      <!-- <div style="position: relative">
-        {#each todayScheduledTasks as task, i}
-          <TaskElement
-            {task}
-            offsetFromTop={30 * i}
-            height={30}
-            fontSize={0.8}
-            offsetFromLeft={30 * i}
-            on:task-click
-            on:task-duration-adjusted
-          >
-          
-        </TaskElement>
-        {/each}
-    </div> -->
-
-      <CalendarTodayView
-        scheduledTasksToday={todayScheduledTasks}
-        on:task-done={(e) => markNodeAsDone(e.detail.taskName)}
-        on:task-scheduled={(e) => mutateOneNode(e.detail)}
-        on:task-duration-adjusted={(e) => mutateOneNode2(e.detail)}
-        on:task-click={(e) => openDetailedCard(e.detail)}
-      />
-  
-      <FutureOverview
-        {futureScheduledTasks}
-        on:task-duration-adjusted={(e) => mutateOneNode2(e.detail)}
-        on:task-click={(e) => openDetailedCard(e.detail)}
-      />
     </div>
   </div>
 </div>
@@ -596,15 +598,15 @@
       padding-top: 14px; 
       padding-left: 30px;
       border: 1px solid green; 
-      border-top-left-radius: 20px; 
-      border-bottom-left-radius: 20px; 
+      border-top-right-radius: 20px; 
+      border-bottom-right-radius: 20px; 
     }
     .calendar-section-container {
       width: 36vw; 
       height: 50vh;
       border: 1px solid green; 
-      border-top-right-radius: 20px; 
-      border-bottom-right-radius: 20px;
+      border-top-left-radius: 20px; 
+      border-bottom-left-radius: 20px;
     }
   }
 

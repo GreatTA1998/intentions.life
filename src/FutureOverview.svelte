@@ -4,14 +4,21 @@
       <div style="margin-bottom: 40px;">
         <div>
           <div style="font-family: serif; font-size: 1rem; margin-bottom: 2px;">
-            {date}
+            {date} {getDayOfWeek(date)}.
           </div>
         </div>
 
         {#each datesToTasks[date] as task}
-          <div on:click={() => dispatch('task-click', { task })} style="display: flex; align-items: center;">
-            <div style="font-family: sans-serif; font-size: 0.8rem; color: rgb(120, 120, 120);">
-              {task.name + ' '}({task.startTime})
+          <div
+            on:click={() => dispatch('task-click', { task })} 
+            style="display: flex; align-items: center; flex-wrap: nowrap;"
+          >
+            <div 
+              style="font-family: sans-serif; font-size: 0.8rem; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"
+              class:grey-text={task.daysBeforeRepeating}
+              class:purple-text={!task.daysBeforeRepeating}
+            >
+              <span style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">{task.name + ' '}</span>({task.startTime})
             </div>
           </div>
         {/each}
@@ -24,6 +31,7 @@
 export let futureScheduledTasks 
 
 import { createEventDispatcher } from 'svelte'
+import { getDayOfWeek } from './helpers.js'
 
 let datesToTasks = {} 
 
@@ -102,6 +110,14 @@ const minimumContainerHeight = 20
       height: 60vh;
       width: 12vw; 
     }
+  }
+
+  .black-text {
+    color: rgb(120, 120, 120)
+  }
+
+  .purple-text {
+    color: purple;
   }
 
   .scheduled-task {

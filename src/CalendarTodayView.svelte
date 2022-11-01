@@ -1,6 +1,6 @@
 <div id="scroll-container">
   <div style="font-family: serif; margin-bottom: 1px;">
-    {getDate()}
+    {getDate()} {getDayOfWeek()}.
   </div>
 
   <div style="padding-bottom: 16px;">
@@ -79,6 +79,13 @@
   let calendarStartTime = ''
   let tasksThatAlreadyHappened
   let currentTimeInHHMM = ''
+
+  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getDay
+  function getDayOfWeek () {
+    const today = new Date()
+    const options = { weekday: 'short' }
+    return new Intl.DateTimeFormat('en-US', options).format(today)
+  }
 
   function print (message) {
     console.log(message)
