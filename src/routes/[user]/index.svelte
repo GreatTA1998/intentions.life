@@ -186,8 +186,8 @@
     })
   }
 
-  let isFirstTime = true
-
+  // DON'T DELETE BELOW: CONVENIENT FOR DEBUGGING
+  // let isFirstTime = true
   async function listenToTasks () { 
     try {
       unsubUserDocListener = onSnapshot(doc(db, userDocPath), async snapshot => {
@@ -195,10 +195,12 @@
         // HANDLE TASKS THAT REPEAT
         // can't use `return` in reactive expression https://github.com/sveltejs/svelte/issues/2828
         
-        // if (lastRanRepeatAtDate !== dateOfToday) {
-        if (isFirstTime) {
+        // yes, this reset algorithm won't run unless you open the app
+        // we explicitly assume we'll open organize-life every day : ) which simplifies the code 
+        if (lastRanRepeatAtDate !== dateOfToday) {
+        // if (isFirstTime) {
           console.log('new day, resetting tasks')
-          isFirstTime = false
+          // isFirstTime = false
           const copy = [...snapshot.data().allTasks]
           resetScheduledButIncompleteTasks(copy)
 
@@ -212,8 +214,6 @@
             lastRanRepeatAtDate: dateOfToday 
           })
         }
-
-        // }
         allTasks = [...snapshot.data().allTasks]
       })
     } catch (error) {
@@ -222,26 +222,37 @@
     }
   }
 
-  //  TO-DO: find a way to work with better libraries
-  //  #2 Handle repeating habits e.g. meditate every 3 day, run every 7 days
-  //  Schedule it at the end of the day
-  //  Visualize "debt" by not allowing overlap 
+  /**
+   *  Handle repeating habits e.g. meditate every 3 day, run every 7 days
+   *  Schedule it at the end of the day
+   *  Visualize "debt" by not allowing overlap 
+   *  @see https://explain.mit.edu/mDbUrvjy4pe8Q5s5wyoD/2bePUmmRDGP6KR61Hgqa
+   */
+  //  TO-DO: 
+  //     - Use a date manipulation / date arithmetic library e.g. moment.js
   function recursivelyResetRepeatingTasks (node) {
     // a task can set to repeat, but it has to be scheduled and done once before 
     // it has a `lastCompletionDate` property and will be "auto-shifted" periodically
     // into the future
     // want to be backwards compatible, some of our existing habits aren't initialized
     if (node.daysBeforeRepeating && node.startDate && node.startTime) {
-      console.log('node =', node.name)
       // `lastCompletionDate` is in mm/dd/yyyy format
       // we don't care if the habit was completed or not, we just record the "missed" batting average
       const d1 = new Date(`${node.startDate}/2022`)
       const d2 = new Date() // use `getDay()` to get 0 to 6 number
+
+      // standardize both dates to 8 am
+      // (we only care about new day cycles to reset habits, not the exact time elapsed)
+      d1.setHours(8) 
+      d1.setMinutes(0)
+      d1.setMilliseconds(0)
+      d2.setHours(8)
+      d2.setMinutes(0)
+      d2.setMilliseconds(0)
+
       const millisec_diff = d2.getTime() - d1.getTime()
-      // Math.ceil
-      const day_diff = millisec_diff / (1000 * 3600 * 24)
-      console.log('day_diff =', day_diff)
-      if (day_diff >= node.daysBeforeRepeating) {
+      const day_diff = Math.round(millisec_diff / (1000 * 3600 * 24))
+      if (Math.round(day_diff) >= node.daysBeforeRepeating) {
         if (!node.isDone) {
           node.missedCount = (node.missedCount += 1) || 1
           // note: if it's completed, the `completionCount` would've already been updated
@@ -253,17 +264,16 @@
         const dateObject = new Date()
         const mm = parseInt(node.startDate.substring(0, 2)) // setMonth is 0-indexed
         const dd = parseInt(node.startDate.substring(3, 5)) // `setDate` is NOT 0-indexed
-        console.log("mm dd =", mm, dd)
         dateObject.setMonth(mm - 1)
         dateObject.setDate(dd)
-        console.log("this is the original time =", dateObject)
         
         // shift forward that date by `daysBeforeRepeating`
         // https://stackoverflow.com/a/54844661/7812829
         const newDateObject = new Date(dateObject.getTime() + node.daysBeforeRepeating * 24 * 60 * 60 * 1000)
         node.startDate = getDateInMMDD(newDateObject)
-        console.log('habit newly scheduled for =', node.startDate)
 
+        // TO-DO: this wasn't designed for habits to be pre-scheduled in advance, 
+        // its correctness assumed habits would be generated just-in-time each day
         if (node.repeatType === 'habit' && node.startDate === getDateOfToday()) {
           habitPoolToResolveConflict.push(node)
         }
