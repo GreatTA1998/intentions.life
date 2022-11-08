@@ -138,6 +138,7 @@
   let chosenMusicFile
   let musicFiles = [
     'illiyard-moor.mp3',
+    'illiyard-moor-lofi.mp3',
     'ms-leafre-lofi.mp3'
   ]
 
@@ -154,7 +155,7 @@
     const div = document.getElementById("background-image-holder")
     div.style['background-image'] = `url(${chosenBgImageURL})`
 
-    chosenMusicFile = musicFiles[getRandomInt(2)]
+    chosenMusicFile = musicFiles[getRandomInt(3)]
     AudioElem.src = chosenMusicFile
 
     listenToTasks()
