@@ -17,7 +17,7 @@
         ? `${taskObject.duration * 90/60}px` : ''};
       padding-left: {10 * 0.8 ** depth}px;
     "
-    on:dragstart|self={(e) => dragstart_handler(e, taskObject.name)}
+    on:dragstart|self={(e) => dragstart_handler(e, taskObject.id)}
     on:pointerleave={hideOptions}
   >
     <div class="current-task-flexbox">
@@ -129,8 +129,8 @@
     }
   }
 
-  function dragstart_handler(e, taskName) {
-    e.dataTransfer.setData("text/plain", taskName);
+  function dragstart_handler(e, id) {
+    e.dataTransfer.setData("text/plain", id);
   }
 
   /**

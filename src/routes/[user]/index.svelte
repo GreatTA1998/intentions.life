@@ -545,17 +545,14 @@
   // unscheduling back to to-do
   function unscheduleTask (e) {
     e.preventDefault()
-    const taskName = e.dataTransfer.getData('text/plain')
-    for (const task of allTasks) {
-      helperFunction({
-        node: task,
-        fulfilsCriteria: (task) => task.name === taskName,
-        applyFunc: (task) => { 
-          task.startTime = ''
-          task.startDate = ''
-        }
-      })
-    }
+    const id = e.dataTransfer.getData('text/plain')
+    traverseAndUpdateTree({
+      fulfilsCriteria: (task) => task.id === id,
+      applyFunc: (task) => { 
+        task.startTime = ''
+        task.startDate = ''
+      }
+    })
     updateDoc(
       doc(db, userDocPath),
       { allTasks }
