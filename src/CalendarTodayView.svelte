@@ -96,7 +96,7 @@
   }
 
   function toggleIsDone (task) { 
-    dispatch('task-done', { taskName: task.name })
+    dispatch('task-done', { taskName: task.name, id: task.id })
   }
 
   const one_sec = 1000 // milliseconds
@@ -210,7 +210,7 @@
     const scheduledTime = `${hh}:${mm}` 
 
     dispatch('task-scheduled', {
-      taskName: e.dataTransfer.getData('text/plain'),
+      id: e.dataTransfer.getData('text/plain'),
       timeOfDay: scheduledTime,
       dateScheduled: getDate()
     })

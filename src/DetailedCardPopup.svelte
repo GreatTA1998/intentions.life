@@ -22,7 +22,9 @@
 
     <div class="google-calendar-event-detail" style="margin-top: 12px; margin-left: 16px;">
       {#if taskObject.daysBeforeRepeating}
-        { taskObject.repeatType || ''}  repeats every {taskObject.daysBeforeRepeating} days, completed {taskObject.completionCount || 0} times
+        { taskObject.repeatType || ''}  repeats every {taskObject.daysBeforeRepeating} days, 
+        completed {taskObject.completionCount || 0} times, 
+        missed { taskObject.missedCount || 0} times
       {/if}
     </div>
 
@@ -180,7 +182,7 @@ function detectEnterKey5 (e) {
       taskObject.startDate = newStartDate
       taskObject.startTime = newStartTime
     }
-    dispatch('task-schedule')
+    dispatch('task-schedule', { id: taskObject.id, newStartDate, newStartTime })
     newStartDate = ''
     newStartTime = ''
   }

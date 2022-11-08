@@ -10,7 +10,7 @@
   <div 
     class="task-name"
     draggable="true" 
-    on:dragstart={(e) => dragstart_handler(e, task.name)} 
+    on:dragstart={(e) => dragstart_handler(e, task.id)} 
   >
     {task.name} 
   </div>
@@ -21,7 +21,7 @@
       class="task-drag-zone"
       style="height: {height - 20 - 10}px;" 
       draggable="true" 
-      on:dragstart={(e) => dragstart_handler(e, task.name)}
+      on:dragstart={(e) => dragstart_handler(e, task.id)}
     >
 
     </div>
@@ -50,8 +50,8 @@
   let startY = 0
   const pixelsPerMinute = 90/60
 
-  function dragstart_handler(e, taskName) {
-    e.dataTransfer.setData("text/plain", taskName)
+  function dragstart_handler(e, id) {
+    e.dataTransfer.setData("text/plain", id)
   }
 
   function getTrueY (e) {
@@ -81,6 +81,7 @@
 
     dispatch('task-duration-adjusted', {
       taskName: task.name,
+      id: task.id,
       duration: Math.max(1, task.duration + durationChange) // can't have a 0 duration event
     })
   }

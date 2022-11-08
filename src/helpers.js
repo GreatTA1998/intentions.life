@@ -9,8 +9,8 @@ export function getDayOfWeek (MMDDString) {
 }
 
 export function getDateInMMDD (dateClassObject) {
-  let dd = dateClassObject.getDate()
-  let mm = dateClassObject.getMonth() + 1
+  let dd = dateClassObject.getDate() // between 1 to 31
+  let mm = dateClassObject.getMonth() + 1 // 0 to 11
   if (dd < 10) dd = '0' + dd 
   if (mm < 10) mm = '0' + mm
   return `${mm}/${dd}`

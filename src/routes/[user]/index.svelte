@@ -14,10 +14,10 @@
       isOpen={isDetailedCardOpen}
       taskObject={clickedTask}
       on:card-close={() => isDetailedCardOpen = false}
-      on:task-done={() => markNodeAsDone(clickedTask.name)}
-      on:task-delete={() => deleteSubtree(clickedTask.name)}
+      on:task-done={() => markNodeAsDone(clickedTask.id)}
+      on:task-delete={() => deleteSubtree(clickedTask.id)}
       on:task-repeat={updateEntireTaskTree}
-      on:task-schedule={updateEntireTaskTree}
+      on:task-schedule={(e) => scheduleATask(e.detail)}
       on:task-title-update={(e) => changeNameOfATask(e.detail)}
       on:task-notes-update={(e) => changeNotesOfATask(e.detail)}
     />
@@ -51,15 +51,15 @@
 
       <CalendarTodayView
         scheduledTasksToday={todayScheduledTasks}
-        on:task-done={(e) => markNodeAsDone(e.detail.taskName)}
-        on:task-scheduled={(e) => mutateOneNode(e.detail)}
-        on:task-duration-adjusted={(e) => mutateOneNode2(e.detail)}
+        on:task-done={(e) => markNodeAsDone(e.detail.id)}
+        on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
+        on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
         on:task-click={(e) => openDetailedCard(e.detail)}
       />
   
       <FutureOverview
         {futureScheduledTasks}
-        on:task-duration-adjusted={(e) => mutateOneNode2(e.detail)}
+        on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
         on:task-click={(e) => openDetailedCard(e.detail)}
       />
     </div>
@@ -85,9 +85,9 @@
               </div>
             {/if}
           {/each}
-          
+
           <!-- CREATE NEW TASK (invisible but hoverable region) -->
-          <div style="height: 100%; width: 200px"
+          <div style="height: 200px; width: 200px;"
             on:mouseenter={() => isShowingCreateButton = true}
             on:mouseleave={() => isShowingCreateButton = false}
           >
@@ -144,21 +144,20 @@
   let AudioElem
   let isMusicPlaying = false
 
-  // let background images 
   let bgImageURLs = [
     'https://i.imgur.com/ShnqIpJ.jpeg' // airships 
   ]
   let chosenBgImageURL
 
   onMount(() => {
-    chosenBgImageURL = bgImageURLs[getRandomInt(2)]
+    chosenBgImageURL = bgImageURLs[getRandomInt(1)]
     const div = document.getElementById("background-image-holder")
     div.style['background-image'] = `url(${chosenBgImageURL})`
 
     chosenMusicFile = musicFiles[getRandomInt(2)]
     AudioElem.src = chosenMusicFile
 
-    fetchTasks()
+    listenToTasks()
   })
 
   let allTasks = null // WARNING, DON'T INITIALIZE TO []
@@ -177,6 +176,103 @@
   let isDetailedCardOpen = false
   let clickedTask = {}
 
+  $: if (allTasks) {
+    collectTodayScheduledTasksToArray()
+    collectFutureScheduledTasksToArray()
+    futureScheduledTasks.sort((task1, task2) => {
+      const d1 = new Date(task1.startDate)
+      const d2 = new Date(task2.startDate)
+      return d1.getTime() - d2.getTime() // most recent to the top??
+    })
+  }
+
+  let isFirstTime = true
+
+  async function listenToTasks () { 
+    try {
+      unsubUserDocListener = onSnapshot(doc(db, userDocPath), async snapshot => {
+        lastRanRepeatAtDate = snapshot.data().lastRanRepeatAtDate
+        // HANDLE TASKS THAT REPEAT
+        // can't use `return` in reactive expression https://github.com/sveltejs/svelte/issues/2828
+        
+        // if (lastRanRepeatAtDate !== dateOfToday) {
+        if (isFirstTime) {
+          console.log('new day, resetting tasks')
+          isFirstTime = false
+          const copy = [...snapshot.data().allTasks]
+          resetScheduledButIncompleteTasks(copy)
+
+          for (const task of copy) {
+            recursivelyResetRepeatingTasks(task)
+          }
+          scheduleHabitsWithoutClashing() // this will mutate tasks in `copy`
+
+          updateDoc(doc(db, userDocPath), { 
+            allTasks: copy, 
+            lastRanRepeatAtDate: dateOfToday 
+          })
+        }
+
+        // }
+        allTasks = [...snapshot.data().allTasks]
+      })
+    } catch (error) {
+      alert("Can't retrieve user info, see console for details:", error)
+      console.error(error)
+    }
+  }
+
+  //  TO-DO: find a way to work with better libraries
+  //  #2 Handle repeating habits e.g. meditate every 3 day, run every 7 days
+  //  Schedule it at the end of the day
+  //  Visualize "debt" by not allowing overlap 
+  function recursivelyResetRepeatingTasks (node) {
+    // a task can set to repeat, but it has to be scheduled and done once before 
+    // it has a `lastCompletionDate` property and will be "auto-shifted" periodically
+    // into the future
+    // want to be backwards compatible, some of our existing habits aren't initialized
+    if (node.daysBeforeRepeating && node.startDate && node.startTime) {
+      console.log('node =', node.name)
+      // `lastCompletionDate` is in mm/dd/yyyy format
+      // we don't care if the habit was completed or not, we just record the "missed" batting average
+      const d1 = new Date(`${node.startDate}/2022`)
+      const d2 = new Date() // use `getDay()` to get 0 to 6 number
+      const millisec_diff = d2.getTime() - d1.getTime()
+      // Math.ceil
+      const day_diff = millisec_diff / (1000 * 3600 * 24)
+      console.log('day_diff =', day_diff)
+      if (day_diff >= node.daysBeforeRepeating) {
+        if (!node.isDone) {
+          node.missedCount = (node.missedCount += 1) || 1
+          // note: if it's completed, the `completionCount` would've already been updated
+        } else {
+          node.isDone = false 
+        }
+
+        // construct the date object that reflects the task's startDate
+        const dateObject = new Date()
+        const mm = parseInt(node.startDate.substring(0, 2)) // setMonth is 0-indexed
+        const dd = parseInt(node.startDate.substring(3, 5)) // `setDate` is NOT 0-indexed
+        console.log("mm dd =", mm, dd)
+        dateObject.setMonth(mm - 1)
+        dateObject.setDate(dd)
+        console.log("this is the original time =", dateObject)
+        
+        // shift forward that date by `daysBeforeRepeating`
+        // https://stackoverflow.com/a/54844661/7812829
+        const newDateObject = new Date(dateObject.getTime() + node.daysBeforeRepeating * 24 * 60 * 60 * 1000)
+        node.startDate = getDateInMMDD(newDateObject)
+        console.log('habit newly scheduled for =', node.startDate)
+
+        if (node.repeatType === 'habit' && node.startDate === getDateOfToday()) {
+          habitPoolToResolveConflict.push(node)
+        }
+      }
+    }
+    for (const child of node.children) {
+      recursivelyResetRepeatingTasks(child)
+    }
+  }
 
   function openDetailedCard ({ task }) {
     clickedTask = task
@@ -195,86 +291,91 @@
     }
   }
 
-  async function changeNotesOfATask ({ id, newNotes }) {
-    for (const task of allTasks) {
-      traverseAndUpdateTree({
-        node: task,
-        fulfilsCriteria: (task) => task.id === id, 
-        applyFunc: (task) => task.notes = newNotes
-      })
+  function traverseAndUpdateTree ({ fulfilsCriteria, applyFunc }) {
+    const artificialRootNode = {
+      name: 'root',
+      children: allTasks
     }
-    await updateDoc(
-      doc(db, userDocPath),
-      { allTasks }
-    )
-  } 
-
-  async function changeNameOfATask ({ id, newName }) {
-    for (const task of allTasks) {
-      traverseAndUpdateTree({
-        node: task,
-        fulfilsCriteria: (task) => task.id === id, 
-        applyFunc: (task) => task.name = newName
-      })
-    }
-    await updateDoc(
-      doc(db, userDocPath),
-      { allTasks }
-    )
-  } 
+    helperFunction({ node: artificialRootNode, fulfilsCriteria, applyFunc })
+  }
 
   // useful helper function for task update operations
-  function traverseAndUpdateTree ({ node, fulfilsCriteria, applyFunc }) {
+  function helperFunction ({ node, fulfilsCriteria, applyFunc }) {
     if (fulfilsCriteria(node)) {
       applyFunc(node)
     } 
     for (const child of node.children) {
-      traverseAndUpdateTree({ node: child, fulfilsCriteria, applyFunc })
+      helperFunction({ node: child, fulfilsCriteria, applyFunc })
     }
   }
 
-  function collectTodayScheduledTasksToArray () {
-    todayScheduledTasks = []
-    for (const task of allTasks) {
-      traverseAndUpdateTree({
-        node: task,
-        fulfilsCriteria: (task) => task.startDate === getDateOfToday() && task.startTime, 
-        applyFunc: (task) => todayScheduledTasks.push(task)
-      })
-    }
+  async function scheduleATask (id, newStartTime, newStartDate) {
+    traverseAndUpdateTree({
+      fulfilsCriteria: (task) => task.id === id, 
+      applyFunc: (task) => {
+        task.startDate = newStartDate
+        task.startTime = newStartTime
+      }
+    })
+    await updateDoc(doc(db, userDocPath), {
+      allTasks
+    })
+  }
+
+  async function changeNotesOfATask ({ id, newNotes }) {
+    traverseAndUpdateTree({
+      fulfilsCriteria: (task) => task.id === id, 
+      applyFunc: (task) => task.notes = newNotes
+    })
+    await updateDoc(doc(db, userDocPath), { 
+      allTasks 
+    })
   } 
 
-  function collectFutureScheduledTasksToArray () {
-    futureScheduledTasks = [] 
-    for (const task of allTasks) {
-      traverseAndUpdateTree({
-        node: task,
-        fulfilsCriteria: (task) => task.startDate && task.startTime && task.startDate > getDateOfToday(),
-        applyFunc: (task) => futureScheduledTasks.push(task)
-      })
-    }
-  }
+  async function changeNameOfATask ({ id, newName }) {
+    traverseAndUpdateTree({
+      fulfilsCriteria: (task) => task.id === id, 
+      applyFunc: (task) => task.name = newName
+    })
+    await updateDoc(doc(db, userDocPath), { 
+      allTasks 
+    })
+  } 
 
-  async function markNodeAsDone (name) {
-    for (const task of allTasks) {
-      traverseAndUpdateTree({ 
-        node: task, 
-        fulfilsCriteria: (task) => task.name === name,
-        applyFunc: (task) => { 
-          task.isDone = !task.isDone
-          if (task.isDone) { 
-            task.completionCount = task.completionCount + 1 || 1
-            if (task.daysBeforeRepeating) {
-              task.lastCompletionDate = getDateOfToday()
-            }
-          }
-          else {
-            task.completionCount = task.completionCount - 1 || 0 
-            // TO-DO: think of consequences of not undoing `lastCompletionDate`
+  function collectTodayScheduledTasksToArray () {
+    todayScheduledTasks = [] // reset
+    traverseAndUpdateTree({
+      fulfilsCriteria: (task) => task.startDate === getDateOfToday() && task.startTime, 
+      applyFunc: (task) => todayScheduledTasks = [...todayScheduledTasks, task]
+    })
+  } 
+
+  // quick-fix for NaN/NaN bug
+  function collectFutureScheduledTasksToArray () {
+    futureScheduledTasks = [] // reset 
+    traverseAndUpdateTree({
+      fulfilsCriteria: (task) => task.startDate && task.startDate !== 'NaN/NaN' && task.startTime && task.startDate > getDateOfToday(), // 'NaN' quick-fix bug
+      applyFunc: (task) => futureScheduledTasks = [...futureScheduledTasks, task]
+    })
+  }
+  
+  async function markNodeAsDone (id) {
+    traverseAndUpdateTree({ 
+      fulfilsCriteria: (task) => task.id === id,
+      applyFunc: (task) => { 
+        task.isDone = !task.isDone
+        if (task.isDone) { 
+          task.completionCount = task.completionCount + 1 || 1
+          if (task.daysBeforeRepeating) {
+            task.lastCompletionDate = getDateOfToday()
           }
         }
-      })
-    }
+        else {
+          task.completionCount = task.completionCount - 1 || 0 
+          // TO-DO: think of consequences of not undoing `lastCompletionDate`
+        }
+      }
+    })
     // update database
     await updateDoc(
       doc(db, userDocPath),
@@ -282,19 +383,15 @@
     )
   }
 
-  async function deleteSubtree (name) {
-    let root = { 
-      name: 'root',
-      children: allTasks
-    }
+
+  async function deleteSubtree (id) {
     traverseAndUpdateTree({
-      node: root,
-      fulfilsCriteria: (task) => task.children.filter(c => c.name === name).length >= 1, // inequality is important because sometimes 2 or more tasks have the same name
+      fulfilsCriteria: (task) => task.children.filter(child => child.id === id).length >= 1, // inequality is important because sometimes 2 or more tasks have the same name
       applyFunc: (task) => { 
         let idx = null
         // do not use `forEach` it might mutate the array while it iterates even if you use return statements etc. it's unintuitive code
         for (let i = 0; i < task.children.length; i++) {
-          if (task.children[i].name === name) {
+          if (task.children[i].id === id) {
             idx = i
             break
           }
@@ -304,143 +401,58 @@
         }
       }
     })
-
-    await updateDoc(
-      doc(db, userDocPath),
-      { allTasks }
-    )
+    await updateDoc(doc(db, userDocPath), { 
+      allTasks 
+    })
   }
 
-
-  async function recollectScheduledButIncompletedTasks () {
-    let root = { 
-      name: 'root',
-      children: allTasks
+  /*
+    When a task is scheduled but missed, there are 2 possibilities:
+      - It's a special i.e. non-repeating event: return it to the to-do
+      - It's a repeating event: just increment the miss count 
+  */
+  async function resetScheduledButIncompleteTasks (taskTree) {
+    const rootNode = {
+      name: 'root 2',
+      children: taskTree
     }
-    traverseAndUpdateTree({
-      node: root,
+    helperFunction({
+      node: rootNode,
       fulfilsCriteria: (task) => task.startDate < dateOfToday,
       applyFunc: (task) => {
-        if (task.daysBeforeRepeating && task.repeatType === 'event' && task.startDate) {
-          // temporary for dealing with corrupted data
-          if (typeof task.startDate !== 'string') {
-            task.startDate = getDateOfToday()
-          }
-          // `setDate` is really `setDay` https://stackoverflow.com/a/69390193/7812829
-          function addDays(date, number) {
-            console.log('date =', date)
-            const newDate = new Date(date)
-            const dayOfMonth = Number(date.substring(3, 5))
-            console.log('dayOfMonth =', dayOfMonth)
-            return new Date(newDate.setDate(dayOfMonth + number)) // getDate is an integer number, i.e. the day of the month 1 to 31
-          }
-          console.log('before, task.startDate =', task.startDate)
-          const newDateObject = addDays(task.startDate, task.daysBeforeRepeating) 
-          task.startDate = getDateInMMDD(newDateObject)
-          console.log('after, task.endDate =', task.startDate)
-        }
         // handle one-off tasks that isn't done - this will return to the to-do
-        else if (!task.isDone) {
+        if (!task.daysBeforeRepeating && !task.isDone) {
           task.startDate = ''
           task.startTime = ''
+          // this means the task will re-appear on the unscheduled todo-list
         }
-        // this means the task will re-appear on the unscheduled todo-list
       }
     })
   }
 
-  async function mutateOneNode ({ taskName, timeOfDay, dateScheduled }) {
-    // search for the particular node, mutate it, then update the database
-    function helper (node) {
-      if (node.name === taskName) {
-        node.startTime = timeOfDay
-        node.startDate = dateScheduled
-        return true
+  // TO-DO: make it id-based
+  async function changeTaskStartTime ({ id, timeOfDay, dateScheduled }) {
+    traverseAndUpdateTree({
+      fulfilsCriteria: (task) => task.id === id,
+      applyFunc: (task) => {
+        task.startTime = timeOfDay 
+        task.startDate = dateScheduled
       }
-      else {
-        for (const child of node.children) {
-          if (helper(child)) return true
-        }
-        return false
-      }
-    }
-
-    for (const task of allTasks) {
-      if (helper(task)) { // the sub-task only exists in ONE of the root tasks, so only one of the `helper()` calls will return true
-        break
-      }
-    }
-
-    await updateDoc(
-      doc(db, userDocPath),
-      { allTasks }
-    )
-  }
-
-  async function mutateOneNode2 ({ taskName, duration }) {
-    // search for the particular node, mutate it, then update the database
-    function helper (node) {
-      if (node.name === taskName) {
-        node.duration = duration
-        return true
-      }
-      else {
-        for (const child of node.children) {
-          if (helper(child)) return true
-        }
-        return false
-      }
-    }
-
-    for (const task of allTasks) {
-      if (helper(task)) { // the sub-task only exists in ONE of the root tasks, so only one of the `helper()` calls will return true
-        break
-      }
-    }
-
-    await updateDoc(
-      doc(db, userDocPath),
-      { allTasks }
-    )
-  }
-
-  async function fetchTasks () { 
-    try {
-      unsubUserDocListener = onSnapshot(doc(db, userDocPath), snapshot => {
-        console.log('snapshot detected =', snapshot.data())
-        allTasks = [...snapshot.data().allTasks]
-        lastRanRepeatAtDate = snapshot.data().lastRanRepeatAtDate
-      })
-    } catch (error) {
-      alert("Can't retrieve user info, see console for details:", error)
-      console.error(error)
-    }
-  }
-
-  $: if (allTasks) {
-    collectTodayScheduledTasksToArray()
-    collectFutureScheduledTasksToArray()
-    futureScheduledTasks.sort((task1, task2) => {
-      const d1 = new Date(task1.startDate)
-      const d2 = new Date(task2.startDate)
-      return d1.getTime() - d2.getTime() // most recent to the top??
     })
+    await updateDoc(doc(db, userDocPath), { 
+      allTasks 
+    })
+  }
 
-    // HANDLE TASKS THAT REPEAT
-    // can't use `return` in reactive expression https://github.com/sveltejs/svelte/issues/2828
-    if (lastRanRepeatAtDate !== dateOfToday) {
-      console.log('new day, running repeat algorithm and process un-finished tasks')
-      recollectScheduledButIncompletedTasks()
-      for (const task of allTasks) {
-        recursivelyRepeatHabits(task)
-      }
-      scheduleHabitsWithoutClashing()
-
-      updateDoc(
-        doc(db, userDocPath),
-        { allTasks, lastRanRepeatAtDate: dateOfToday }
-      )
-    }
+  async function changeTaskDuration ({ taskName, id, duration }) {
+    traverseAndUpdateTree({
+      fulfilsCriteria: (task) => task.id === id,
+      applyFunc: (task) => task.duration = duration
+    })
+    await updateDoc(
+      doc(db, userDocPath),
+      { allTasks }
+    )
   }
 
   // NOTE: it works by mutating the task nodes directly, it assumes aliasing
@@ -465,40 +477,6 @@
       if (mm < 10) mm = `0${mm}`
       habit.startTime = `${hh}:${mm}`
       console.log(`habit ${habit.name} starts =`, habit.startTime)
-    }
-  }
-
-  //  #2 Handle repeating habits e.g. meditate every 3 day, run every 7 days
-  //  Schedule it at the end of the day
-  //  Visualize "debt" by not allowing overlap 
-  function recursivelyRepeatHabits (node) {
-    // a task can set to repeat, but it has to be scheduled and done once before 
-    // it has a `lastCompletionDate` property and will be "auto-shifted" periodically
-    // into the future
-    if (node.repeatType === 'event') {
-      return
-    }
-    // want to be backwards compatible, soem of our existing habits aren't initialized
-    if (node.daysBeforeRepeating && node.lastCompletionDate) {
-      // `lastCompletionDate` is in mm/dd/yyyy format
-      // we don't care if the habit was completed or not, we just record the "missed" batting average
-      const d1 = new Date(`${node.startDate}/2022`)
-      const d2 = new Date() // use `getDay()` to get 0 to 6 number
-      const millisec_diff = d2.getTime() - d1.getTime()
-      const day_diff = Math.ceil(millisec_diff / (1000 * 3600 * 24))
-      if (day_diff >= node.daysBeforeRepeating) {
-        if (!node.isDone) {
-          node.missedCount = (node.missedCount += 1) || 1
-        }
-        node.isDone = false 
-        node.startDate = dateOfToday 
-        if (!node.startTime) {
-          habitPoolToResolveConflict.push(node)
-        }
-      }
-    }
-    for (const child of node.children) {
-      recursivelyRepeatHabits(child)
     }
   }
 
@@ -558,7 +536,7 @@
     e.preventDefault()
     const taskName = e.dataTransfer.getData('text/plain')
     for (const task of allTasks) {
-      traverseAndUpdateTree({
+      helperFunction({
         node: task,
         fulfilsCriteria: (task) => task.name === taskName,
         applyFunc: (task) => { 

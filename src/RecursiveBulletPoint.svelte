@@ -7,6 +7,7 @@
   {#if taskObject.daysBeforeRepeating}
     (repeats every {taskObject.daysBeforeRepeating} days)
     (completed {taskObject.completionCount || 0} times)
+    (missed {taskObject.missedCount || 0} times)
   {:else if taskObject.isDone}
     (completed)
   {/if}
