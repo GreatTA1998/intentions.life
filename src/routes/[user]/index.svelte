@@ -24,10 +24,25 @@
   {/if}
 {/key}
 
+{#if isGoalsAndPostersPopupOpen}
+  <GoalsAndPostersPopup
+    isOpen={isGoalsAndPostersPopupOpen}
+    {goalsAndPosters}
+    on:card-close={() => isGoalsAndPostersPopupOpen = false}
+    on:goals-and-posters-update={(e) => changeGoalsAndPosters(e.detail)}
+  />
+{/if}
+
 <div id="background-image-holder" style="height: 100vh;">
   <a role="button" on:click={toggleMusic} class="float">
     <span class="material-icons my-float" style="color: white">
       {isMusicPlaying ? 'music_note' : 'music_off'}
+    </span>
+  </a>
+
+  <a role="button" on:click={() => isGoalsAndPostersPopupOpen = !isGoalsAndPostersPopupOpen} class="float" style="top: 120px">
+    <span class="material-icons my-float" style="color: white">
+      sports_score
     </span>
   </a>
 
@@ -121,6 +136,7 @@
   import CalendarTodayView from '../../CalendarTodayView.svelte'
   import FutureOverview from '../../FutureOverview.svelte'
   import DetailedCardPopup from '../../DetailedCardPopup.svelte'
+  import GoalsAndPostersPopup from '../../GoalsAndPostersPopup.svelte'
   import { onMount } from 'svelte'
   import db from '../../db.js'
   import { doc, getDoc, onSnapshot, updateDoc } from 'firebase/firestore'
@@ -131,36 +147,19 @@
   let isTypingNewTask = false
   const habitPoolToResolveConflict = []
 
-  function getRandomInt(max) {
-    return Math.floor(Math.random() * max);
-  }
-
+  let AudioElem
+  let isMusicPlaying = false
   let chosenMusicFile
   let musicFiles = [
     'illiyard-moor.mp3',
     'illiyard-moor-lofi.mp3',
     'ms-leafre-lofi.mp3'
   ]
-
-  let AudioElem
-  let isMusicPlaying = false
-
   let bgImageURLs = [
     'https://i.imgur.com/ShnqIpJ.jpeg' // airships 
   ]
+
   let chosenBgImageURL
-
-  onMount(() => {
-    chosenBgImageURL = bgImageURLs[getRandomInt(1)]
-    const div = document.getElementById("background-image-holder")
-    div.style['background-image'] = `url(${chosenBgImageURL})`
-
-    chosenMusicFile = musicFiles[getRandomInt(3)]
-    AudioElem.src = chosenMusicFile
-
-    listenToTasks()
-  })
-
   let allTasks = null // WARNING, DON'T INITIALIZE TO []
   // I once tried `allTasks = []`, it wiped my entire task tree because it synced the empty [] (which it thinks is fully fetched) with the database.task
   // AF(null) --> unfetched 
@@ -175,7 +174,24 @@
   let isShowingCreateButton = false
 
   let isDetailedCardOpen = false
+  let isGoalsAndPostersPopupOpen = false
   let clickedTask = {}
+  let goalsAndPosters = ''
+
+  onMount(() => {
+    function getRandomInt(max) {
+      return Math.floor(Math.random() * max);
+    }
+
+    chosenBgImageURL = bgImageURLs[getRandomInt(1)]
+    const div = document.getElementById("background-image-holder")
+    div.style['background-image'] = `url(${chosenBgImageURL})`
+
+    chosenMusicFile = musicFiles[getRandomInt(3)]
+    AudioElem.src = chosenMusicFile
+
+    listenToTasks()
+  })
 
   $: if (allTasks) {
     collectTodayScheduledTasksToArray()
@@ -187,12 +203,21 @@
     })
   }
 
+  function changeGoalsAndPosters ({ newGoalsAndPosters }) {
+    // update user property
+
+    updateDoc(doc(db, userDocPath), {
+      goalsAndPosters: newGoalsAndPosters
+    })
+  }
+
   // DON'T DELETE BELOW: CONVENIENT FOR DEBUGGING
   // let isFirstTime = true
   async function listenToTasks () { 
     try {
       unsubUserDocListener = onSnapshot(doc(db, userDocPath), async snapshot => {
         lastRanRepeatAtDate = snapshot.data().lastRanRepeatAtDate
+        goalsAndPosters = snapshot.data().goalsAndPosters || ''
         // HANDLE TASKS THAT REPEAT
         // can't use `return` in reactive expression https://github.com/sveltejs/svelte/issues/2828
         
