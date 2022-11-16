@@ -204,8 +204,6 @@
   }
 
   function changeGoalsAndPosters ({ newGoalsAndPosters }) {
-    // update user property
-
     updateDoc(doc(db, userDocPath), {
       goalsAndPosters: newGoalsAndPosters
     })
@@ -221,14 +219,14 @@
         // HANDLE TASKS THAT REPEAT
         // can't use `return` in reactive expression https://github.com/sveltejs/svelte/issues/2828
         
-        // yes, this reset algorithm won't run unless you open the app
+        // yes, this reset algorithm won't run unless you ofpen the app
         // we explicitly assume we'll open organize-life every day : ) which simplifies the code 
         if (lastRanRepeatAtDate !== dateOfToday) {
         // if (isFirstTime) {
           console.log('new day, resetting tasks')
           // isFirstTime = false
           const copy = [...snapshot.data().allTasks]
-          resetScheduledButIncompleteTasks(copy)
+          resetScheduledButMissedNonRepeatingTasks(copy) 
 
           for (const task of copy) {
             recursivelyResetRepeatingTasks(task)
@@ -272,13 +270,14 @@
       d1.setHours(8) 
       d1.setMinutes(0)
       d1.setMilliseconds(0)
+
       d2.setHours(8)
       d2.setMinutes(0)
       d2.setMilliseconds(0)
 
       const millisec_diff = d2.getTime() - d1.getTime()
       const day_diff = Math.round(millisec_diff / (1000 * 3600 * 24))
-      if (Math.round(day_diff) >= node.daysBeforeRepeating) {
+      if (Math.round(day_diff) >= node.daysBeforeRepeating) { // WARN: node.daysBeforeRepeating is sometimes a string e.g. "1", which could cause unexpected errors in the future
         if (!node.isDone) {
           node.missedCount = (node.missedCount += 1) || 1
           // note: if it's completed, the `completionCount` would've already been updated
@@ -447,7 +446,7 @@
       - It's a special i.e. non-repeating event: return it to the to-do
       - It's a repeating event: just increment the miss count 
   */
-  async function resetScheduledButIncompleteTasks (taskTree) {
+  async function resetScheduledButMissedNonRepeatingTasks (taskTree) {
     const rootNode = {
       name: 'root 2',
       children: taskTree
