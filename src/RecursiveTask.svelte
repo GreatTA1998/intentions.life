@@ -8,7 +8,7 @@
     class:orange-duration-line={!taskObject.isDone && taskObject.startTime && taskObject.startDate}
     class:green-duration-line={taskObject.isDone}
     style="
-      margin-left: {depth <= 2 ? '2' : '20'}px; 
+      margin-left: {depth === 1 ? '0' : '20'}px; 
       margin-bottom: 10px; 
       width: {350 * 0.8 ** depth}px; 
       height: {taskObject.duration && !doChildrenHaveDuration 
