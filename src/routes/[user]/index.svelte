@@ -87,16 +87,30 @@
         {#if allTasks}
           {#each allTasks as task}
             {#if !task.isDeleted}
-              <div class="task-container">
-                <RecursiveTask 
-                  on:task-click={(e) => openDetailedCard(e.detail)}
-                  on:task-create={(e) => modifyTaskTree(e, task)} 
-                  on:task-done={updateEntireTaskTree}
-                  on:task-delete={updateEntireTaskTree}
-                  on:task-repeating={updateEntireTaskTree}
-                  taskObject={task}
-                  depth={1}
-                />
+              <div class="task-tree-column" style="width: 1000px;">
+                <div on:click={() => openDetailedCard({ task })}
+                  style="
+                  font-size: 1.48rem;
+                  font-family: sans-serif;
+                  font-weight: 700;
+                  color: rgb(60, 60, 60);"
+                > 
+                  {task.name}
+                </div>
+
+                <div class="task-container">
+                  {#each task.children as child, i}
+                    <RecursiveTask 
+                      taskObject={child}
+                      depth={2}
+                      on:task-create={(e) => modifyTaskTree(e, task)}
+                      on:task-click
+                      on:task-done
+                      on:task-delete
+                      on:task-repeating
+                    />
+                  {/each}
+                </div>
               </div>
             {/if}
           {/each}
