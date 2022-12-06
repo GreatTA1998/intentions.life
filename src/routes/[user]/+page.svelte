@@ -1,12 +1,4 @@
-<script context="module">
-  export function load ({ params }) {
-    return {
-      props: {
-        userID: params.user // my user ID: GxBbopqXHW0qgjKEwU4z
-      }
-    }
-  }  
-</script>
+
 
 {#key clickedTask}
   {#if isDetailedCardOpen}
@@ -130,7 +122,9 @@
 <audio bind:this={AudioElem}></audio>
 
 <script>
-  export let userID // GxBbopqXHW0qgjKEwU4z
+  export let data
+  let { userID } = data; // GxBbopqXHW0qgjKEwU4z
+  $: ({ userID } = data); // so it stays in sync when `data` changes
 
   import RecursiveTask from '../../RecursiveTask.svelte'
   import CalendarTodayView from '../../CalendarTodayView.svelte'

@@ -5,7 +5,7 @@
     class="elementToFadeInAndOut center"
   >
     <img 
-      src="/ola-full-size.jpg" 
+      src="/ola-full-size.JPG" 
       class="app-loading-logo center"
       alt="logo"
     />
