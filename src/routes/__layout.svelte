@@ -1,11 +1,3 @@
-<!-- {#if !$hasFetchedUser}
-  <div>Fetching your info...</div>
-{:else}
-  <slot>
-
-  </slot>
-{/if} -->
-
 {#if !$hasLogoExited}
   <div 
     id="loading-screen-logo-start"
