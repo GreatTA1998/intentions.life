@@ -1,18 +1,46 @@
-{#if !$hasFetchedUser}
+<!-- {#if !$hasFetchedUser}
   <div>Fetching your info...</div>
 {:else}
   <slot>
 
   </slot>
+{/if} -->
+
+{#if !$hasLogoExited}
+  <div 
+    id="loading-screen-logo-start"
+    style="opacity: 0; width: 30vw; height: 30vh"
+    class="elementToFadeInAndOut center"
+  >
+    <img 
+      src="/ola-full-size.jpg" 
+      class="app-loading-logo center"
+      alt="logo"
+    />
+  </div>
 {/if}
+
+<div class:invisible={!$hasLogoExited}>
+  <slot>
+
+  </slot>
+</div>
 
 <script>
   import db from '../db.js'
   import { page } from '$app/stores'
-  import { hasFetchedUser, user } from '../store.js'
+  import { hasFetchedUser, user, hasLogoExited } from '../store.js'
   import { goto } from '$app/navigation'
   import { getAuth, onAuthStateChanged } from 'firebase/auth'
   import { getFirestore, doc, deleteDoc, getDoc, setDoc, updateDoc, increment } from 'firebase/firestore'
+  import { onMount } from 'svelte'
+
+  onMount(() => {
+    const Elem = document.getElementById('loading-screen-logo-start')
+    Elem.addEventListener('animationend', (e) => {
+      hasLogoExited.set(true)
+    })
+  })
 
   onAuthStateChanged(getAuth(), async (resultUser) => {
     if (!resultUser) {
@@ -98,3 +126,45 @@
     hasFetchedUser.set(true) 
   })
 </script>
+
+<style>
+  .invisible {
+    display: none; 
+  }
+  /* From Prabhakar's centering solution that works for iOS unlike StackOverflow
+  https://github.com/project-feynman/v3/blob/d864f54d9a69e6cdf0beb7818e8b07a85cebb7eb/src/components/SeeExplanation.vue */
+  .center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%)
+  }
+  .elementToFadeInAndOut {
+    animation: fadeInOut 1s ease-out 1 forwards;
+  }
+  @keyframes fadeInOut {
+    0% {
+      opacity: 0;
+    }
+    50% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+  @media screen and (min-width: 320px) {
+    .app-loading-logo {
+      width: 110px; 
+      height: 110px;
+      border-radius: 18px;
+    }
+  }
+  @media screen and (min-width: 768px) {
+    .app-loading-logo {
+      width: 250px;
+      height: 250px;
+      border-radius: 40px;
+    }
+  }
+</style>

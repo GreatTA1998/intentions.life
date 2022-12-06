@@ -1,5 +1,5 @@
 <div id="scroll-container">
-  <div style="font-family: serif; margin-bottom: 1px;">
+  <div style="font-family: serif; font-size: 1.8rem; margin-bottom: 1px;">
     {getDate()} {getDayOfWeek()}.
   </div>
 
@@ -254,7 +254,7 @@
     height: 100%; 
     overflow-y: scroll; 
     overflow-x: hidden; 
-    padding-top: 27px; 
+    padding-top: 22px; 
     box-sizing: border-box
   }
 

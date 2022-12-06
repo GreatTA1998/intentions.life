@@ -74,6 +74,10 @@
             Event
           </a>
         {/if}
+
+        <a on:click={toggleIsGoal} style="margin-left: 0px;">
+          Set as goal
+        </a>
       </div>
 
       <div style="margin-left: auto; margin-right: 16px">
@@ -186,6 +190,11 @@ function detectEnterKey5 (e) {
     newStartDate = ''
     newStartTime = ''
   }
+}
+
+function toggleIsGoal () {
+  taskObject.isGoal = !taskObject.isGoal // !undefined or !null evaluates to true
+  dispatch('task-repeat')
 }
 
 function setTaskAsEvent () {

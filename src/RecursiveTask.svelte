@@ -4,7 +4,7 @@
   <div 
     draggable="true"
     class="scheduled-task"
-    class:black-duration-line={!taskObject.isDone && !(taskObject.startTime && taskObject.startDate)}
+    class:black-duration-line={!taskObject.isDone && !(taskObject.startTime && taskObject.startDate) && !isGoal}
     class:orange-duration-line={!taskObject.isDone && taskObject.startTime && taskObject.startDate}
     class:green-duration-line={taskObject.isDone}
     style="
@@ -23,10 +23,10 @@
     <div class="current-task-flexbox">
       <div 
         style="
-          font-size: {2 * (0.74 ** depth)}rem; 
+          font-size: {2.5 * (0.65 ** (depth))}rem; 
           font-family: sans-serif; 
           font-weight: {800 - (100 * depth)};
-          color: rgb({20 + depth * 40}, {20 + depth * 40}, {20 + depth * 40});
+          color: rgb({20 + depth * 30}, {20 + depth * 30}, {20 + depth * 30});
         "
         class="keep-on-same-line name-of-task" 
         class:scheduled-orange={!taskObject.isDone && taskObject.startTime && taskObject.startDate}
@@ -37,7 +37,9 @@
             on:click={() => dispatch('task-click', { task: taskObject })} 
             on:pointerenter={showOptions}
             class="truncate"
-            style="width: {350 * (0.85 ** depth)}px"
+            class:my-uppercase={isGoal}
+            class:transparent-grey={isGoal}
+            style="width: {350 * (0.85 ** depth)}px;"
           >
             {taskObject.name}
           </div>
@@ -51,7 +53,7 @@
       </div>
     </div>
 
-    <div style="margin-top: {20 * (0.7 ** depth)}px;">
+    <div style="margin-top: {10 * (0.7 ** depth)}px;">
       {#each taskObject.children as child, i}
         <RecursiveTask 
           taskObject={child}
@@ -97,7 +99,10 @@
   export let taskObject
   export let depth
 
+  $: isGoal = !!taskObject.isGoal // !! necessary because `.isGoal` can be undefined
+
   const dispatch = createEventDispatcher()
+
   let isEditingTaskName = false
   let newTaskName = ''
 
@@ -289,7 +294,6 @@
     display: flex; 
     align-items: center;
     position: relative; 
-    height: 12px;
     /* max-width: 600px; */
   }
 
@@ -337,5 +341,9 @@
     /* border-left: 2px solid green; */
     padding-left: 2px;
     font-size: 0.8rem;
+  }
+
+  .my-uppercase {
+    text-transform: uppercase;
   }
 </style>
