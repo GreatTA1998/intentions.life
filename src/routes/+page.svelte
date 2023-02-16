@@ -36,14 +36,14 @@
   let isSigningIn
 
   onMount(() => {
-    let bgImageURLs = [
-      'https://i.imgur.com/ShnqIpJ.jpeg', // airships 
-      // 'https://i.imgur.com/rzkUMW8.jpeg', // cute monsters
-    ]
-    let chosenBgImageURL
-    chosenBgImageURL = bgImageURLs[getRandomInt(2)]
-    const div = document.getElementById("background-image-holder")
-    div.style['background-image'] = `url(${chosenBgImageURL})`
+    // let bgImageURLs = [
+    //   'https://i.imgur.com/ShnqIpJ.jpeg', // airships 
+    //   // 'https://i.imgur.com/rzkUMW8.jpeg', // cute monsters
+    // ]
+    // let chosenBgImageURL
+    // chosenBgImageURL = bgImageURLs[getRandomInt(2)]
+    // const div = document.getElementById("background-image-holder")
+    // div.style['background-image'] = `url(${chosenBgImageURL})`
   })
 
   function getRandomInt(max) {
@@ -55,6 +55,9 @@
 #background-image-holder {
   background-repeat: no-repeat;
   background-size: 100% 100%;
+  background-image: linear-gradient(rgba(255, 255, 255, 0.91), rgba(255, 255, 255, 0.91)), 
+    url('https://i.imgur.com/ShnqIpJ.jpeg');
+
   /* background-image: url('maplestory-orange.jpg'); */
   /* background-image: url('https://i.imgur.com/ShnqIpJ.jpeg'); */
 }

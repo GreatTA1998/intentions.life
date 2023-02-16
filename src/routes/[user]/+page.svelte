@@ -26,19 +26,20 @@
 {/if}
 
 <div id="background-image-holder" style="height: 100vh;">
-  <a role="button" on:click={toggleMusic} class="float">
+  <a role="button" on:click={toggleMusic} class="float" style="z-index: 10">
     <span class="material-icons my-float" style="color: white">
       {isMusicPlaying ? 'music_note' : 'music_off'}
     </span>
   </a>
 
-  <a role="button" on:click={() => isGoalsAndPostersPopupOpen = !isGoalsAndPostersPopupOpen} class="float" style="top: 120px">
+  <a role="button" on:click={() => isGoalsAndPostersPopupOpen = !isGoalsAndPostersPopupOpen} class="float" style="top: 120px; z-index: 10">
     <span class="material-icons my-float" style="color: white">
       sports_score
     </span>
   </a>
 
-  <div class="flex-container">
+    <div class="flex-container blur">
+
     <div class="calendar-section-container">
       <!-- Playground  -->
       <!-- <div style="position: relative">
@@ -179,7 +180,7 @@
 
     chosenBgImageURL = bgImageURLs[getRandomInt(1)]
     const div = document.getElementById("background-image-holder")
-    div.style['background-image'] = `url(${chosenBgImageURL})`
+    // div.style['background-image'] = `url(${chosenBgImageURL})`
 
     chosenMusicFile = musicFiles[getRandomInt(3)]
     AudioElem.src = chosenMusicFile
@@ -579,13 +580,32 @@
 </script>
 
 <style>
-  .calendar-section-container {
-    display: flex; 
-    justify-content: space-evenly; 
-    background-color: white; 
-    box-sizing: border-box;
+  /* Small Devices, Tablets and bigger devices */
+  @media only screen and (min-width : 480px) {
+    #background-image-holder {
+      height: 100vh;
+      box-sizing: border-box;
+    }
+    .todo-container {
+      background: transparent;
+      width: 70vw;
+      height: 100vh;
+      padding-top: 14px; 
+      padding-left: 30px;
+      border: 1px solid green; 
+      border-top: none;
+      border-right: none;
+    }
+    .calendar-section-container {
+      background: transparent; 
+      width: 36vw; 
+      height: 50vh;
+      border: 1px solid green; 
+      border-left: none;
+      border-top: none;
+      border-bottom: none;
+    }
   }
-
 
   @media only screen and (max-width : 480px) {
     .flex-container {
@@ -601,50 +621,47 @@
     }
   }
 
-  /* Small Devices, Tablets and bigger devices */
-  @media only screen and (min-width : 480px) {
-    #background-image-holder {
-      box-sizing: border-box;
-      padding-top: 20vh;
-      padding-left: 10vw; 
-      padding-right: 10vw;
-    }
-    .todo-container {
-      width: 70vw;
-      height: 50vh;
-      padding-top: 14px; 
-      padding-left: 30px;
-      border: 1px solid green; 
-      border-top-right-radius: 20px; 
-      border-bottom-right-radius: 20px; 
-    }
-    .calendar-section-container {
-      width: 36vw; 
-      height: 50vh;
-      border: 1px solid green; 
-      border-top-left-radius: 20px; 
-      border-bottom-left-radius: 20px;
-    }
+  .calendar-section-container {
+    height: 100vh;
+    display: flex; 
+    justify-content: space-evenly; 
+    /* background-color: white;  */
+    box-sizing: border-box;
   }
 
   .flex-container {
+    height: 100vh;
     display: flex; 
     padding-left: 0; 
     padding-top: 0px;
+    background: transparent; 
+  }
+
+  #background-image-holder {
+    /* 0.91 is perfect, literally perfect. The background literally is one-with the white */
+    /* linear-gradient is used to make background image more transparent
+      NOTE: blur effect is defined in .blur {}
+    */
+    background-image: linear-gradient(rgba(255, 255, 255, 0.91), rgba(255, 255, 255, 0.91)), 
+    url('https://i.imgur.com/ShnqIpJ.jpeg');
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+  }
+
+  .blur {
+    backdrop-filter: blur(0px);
+    height: 100vh; 
+    width: 100vw;
   }
 
   .todo-container {
-    background-color: white; 
     overflow-y: scroll;
     overflow-x: scroll;
     box-sizing: border-box;
-    /* background-image: linear-gradient(rgba(255,255,255,0.7), rgba(255,255,255,0.5)), url('../illiyard-moor.jpg'); */
-    /* opacity: 0.5; */
   }
 
   .todo-list {
     width: 100%; 
-    /* height: 77vh; */
     display: flex; 
     overflow-x: auto;
   }
@@ -658,14 +675,6 @@
     padding-right: 0; 
     overflow: none;
   }
-
-  #background-image-holder {
-    background-repeat: no-repeat;
-    background-size: 100% 100%;
-    /* background-image: url('maplestory-orange.jpg'); */
-    /* background-image: url('https://i.imgur.com/ShnqIpJ.jpeg'); */
-  }
-
   /* #radio-player-with-art {
     background-image: url('../maplestory-watercolor.jpg')
   } */
@@ -704,7 +713,7 @@
     width:60px;
     height:60px;
     top:40px;
-    left:40px;
+    right:40px;
     background-color: grey;  
     color:#FFF;
     border-radius:50px;

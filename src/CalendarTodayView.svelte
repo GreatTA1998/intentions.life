@@ -69,8 +69,8 @@
   const dispatch = createEventDispatcher()
   const getDate = getDateOfToday
 
-  const pixelsPerHour = 80
-  const pixelsPerMinute = 80 / 60
+  const pixelsPerHour = 160
+  const pixelsPerMinute = pixelsPerHour / 60
   const numOfHourBlocksDisplayed = 16
 
   let timesOfDay = []

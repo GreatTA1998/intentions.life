@@ -81,6 +81,21 @@ const minimumContainerHeight = 20
 </script>
 
 <style>
+  /* Small Devices, Tablets and bigger devices */
+  @media only screen and (max-width : 480px) {
+    #future-overview-scroll-parent {
+      height: 100%; 
+      width: 200px;
+    }
+  }
+
+  @media only screen and (min-width : 480px) {
+    #future-overview-scroll-parent {
+      height: 100vh;
+      width: 12vw; 
+    }
+  }
+
   *::-webkit-scrollbar {
     width: 0;
     background-color: #aaa; /* or add it to the track */
@@ -95,21 +110,6 @@ const minimumContainerHeight = 20
     margin-left: 0px; 
     margin-top: 27px; 
     height: 1600px
-  }
-
-  /* Small Devices, Tablets and bigger devices */
-  @media only screen and (max-width : 480px) {
-    #future-overview-scroll-parent {
-      height: 100%; 
-      width: 200px;
-    }
-  }
-
-  @media only screen and (min-width : 480px) {
-    #future-overview-scroll-parent {
-      height: 60vh;
-      width: 12vw; 
-    }
   }
 
   .black-text {
