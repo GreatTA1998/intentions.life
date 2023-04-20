@@ -64,6 +64,13 @@
         on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
         on:task-click={(e) => openDetailedCard(e.detail)}
       />
+
+      {#if allTasks}
+        <UnscheduledTasksForToday
+          {allTasks}
+          on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
+        />
+      {/if}
   
       <FutureOverview
         {futureScheduledTasks}
@@ -127,6 +134,7 @@
   let { userID } = data; // GxBbopqXHW0qgjKEwU4z
   $: ({ userID } = data); // so it stays in sync when `data` changes
 
+  import UnscheduledTasksForToday from '$lib/UnscheduledTasksForToday.svelte'
   import RecursiveTask from '../../RecursiveTask.svelte'
   import CalendarTodayView from '../../CalendarTodayView.svelte'
   import FutureOverview from '../../FutureOverview.svelte'
@@ -213,6 +221,9 @@
         
         // yes, this reset algorithm won't run unless you open the app
         // we explicitly assume we'll open organize-life every day : ) which simplifies the code 
+
+        // this is the base case condition, otherwise infinite recursion will happen
+        // as we are inside a snapshot listener
         if (lastRanRepeatAtDate !== dateOfToday) {
         // if (isFirstTime) {
           console.log('new day, resetting tasks')
@@ -592,7 +603,7 @@
     }
     .todo-container {
       background: transparent;
-      width: 70vw;
+      width: 55vw;
       height: 100vh;
       padding-top: 14px; 
       padding-left: 30px;
@@ -602,7 +613,7 @@
     }
     .calendar-section-container {
       background: transparent; 
-      width: 36vw; 
+      width: 45vw; 
       height: 50vh;
       border: 1px solid green; 
       border-left: none;

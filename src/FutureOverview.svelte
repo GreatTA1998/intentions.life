@@ -1,4 +1,7 @@
 <div id="future-overview-scroll-parent">
+  <h3 style="font-family: sans-serif; margin-top: 26px;">
+    Future overview
+  </h3>
   <div class="future-overview-scroll-container">
     {#each Object.keys(datesToTasks) as date}
       <div style="margin-bottom: 40px;">

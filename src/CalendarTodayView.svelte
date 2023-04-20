@@ -247,7 +247,6 @@
 #calendar-day-container {
   position: relative; 
   margin-top: 4px;
-
 }
 
 #scroll-container {
