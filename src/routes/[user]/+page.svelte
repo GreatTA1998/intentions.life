@@ -135,7 +135,7 @@
   import { onMount } from 'svelte'
   import db from '../../db.js'
   import { doc, getDoc, onSnapshot, updateDoc } from 'firebase/firestore'
-  import { getDateOfToday, getDateOfTomorrow, getDateInMMDD, getRandomID } from '../../helpers.js'
+  import { getRandomInt, getDateOfToday, getDateOfTomorrow, getDateInMMDD, getRandomID } from '../../helpers.js'
 
   let unsubUserDocListener
   const userDocPath = `users/${userID}`
@@ -174,10 +174,6 @@
   let goalsAndPosters = ''
 
   onMount(() => {
-    function getRandomInt(max) {
-      return Math.floor(Math.random() * max);
-    }
-
     chosenBgImageURL = bgImageURLs[getRandomInt(1)]
     const div = document.getElementById("background-image-holder")
     // div.style['background-image'] = `url(${chosenBgImageURL})`
@@ -188,6 +184,7 @@
     listenToTasks()
   })
 
+  // TO-DO: you don't necessarily want to re-run this everytime `allTasks` changes
   $: if (allTasks) {
     collectTodayScheduledTasksToArray()
     collectFutureScheduledTasksToArray()
@@ -214,7 +211,7 @@
         // HANDLE TASKS THAT REPEAT
         // can't use `return` in reactive expression https://github.com/sveltejs/svelte/issues/2828
         
-        // yes, this reset algorithm won't run unless you ofpen the app
+        // yes, this reset algorithm won't run unless you open the app
         // we explicitly assume we'll open organize-life every day : ) which simplifies the code 
         if (lastRanRepeatAtDate !== dateOfToday) {
         // if (isFirstTime) {
@@ -257,7 +254,7 @@
     if (node.daysBeforeRepeating && node.startDate && node.startTime) {
       // `lastCompletionDate` is in mm/dd/yyyy format
       // we don't care if the habit was completed or not, we just record the "missed" batting average
-      const d1 = new Date(`${node.startDate}/2022`)
+      const d1 = new Date(`${node.startDate}/${node.startYYYY || '2022'}`)
       const d2 = new Date() // use `getDay()` to get 0 to 6 number
 
       // standardize both dates to 8 am
@@ -382,9 +379,14 @@
 
   // quick-fix for NaN/NaN bug
   function collectFutureScheduledTasksToArray () {
+    const yearNumber = new Date().getFullYear()
     futureScheduledTasks = [] // reset 
     traverseAndUpdateTree({
-      fulfilsCriteria: (task) => task.startDate && task.startDate !== 'NaN/NaN' && task.startTime && task.startDate > getDateOfToday(), // 'NaN' quick-fix bug
+      fulfilsCriteria: (task) => { 
+        return (task.startDate && task.startDate !== 'NaN/NaN') && 
+                 (task.startTime && task.startDate > getDateOfToday()) &&
+                   (task.startYYYY === yearNumber.toString())
+      }, // 'NaN' quick-fix bug
       applyFunc: (task) => futureScheduledTasks = [...futureScheduledTasks, task]
     })
   }
@@ -465,8 +467,10 @@
     traverseAndUpdateTree({
       fulfilsCriteria: (task) => task.id === id,
       applyFunc: (task) => {
+        const yearNumber = new Date().getFullYear()
         task.startTime = timeOfDay 
         task.startDate = dateScheduled
+        task.startYYYY = yearNumber.toString()
       }
     })
     await updateDoc(doc(db, userDocPath), { 

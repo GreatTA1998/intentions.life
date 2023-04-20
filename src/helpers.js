@@ -1,3 +1,7 @@
+export function getRandomInt(max) {
+  return Math.floor(Math.random() * max);
+}
+
 export function getDayOfWeek (MMDDString) {
   const d = new Date()
   d.setMonth(parseInt(MMDDString.substring(0, 2)) - 1) // `-1` because setMonth() is 0-indexed whereas MMDD is 1-indexed

@@ -1,6 +1,6 @@
 <div id="scroll-container">
-  <div style="font-family: serif; font-size: 1.8rem; margin-bottom: 1px;">
-    {getDate()} {getDayOfWeek()}.
+  <div style="font-family: sans-serif; font-size: 1.8rem; margin-bottom: 1px;">
+    {getDayOfWeek()}. {getDate()} {new Date().getFullYear()}
   </div>
 
   <div style="padding-bottom: 16px;">

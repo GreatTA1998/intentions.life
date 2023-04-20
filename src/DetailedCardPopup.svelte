@@ -184,6 +184,8 @@ function detectEnterKey5 (e) {
     else {
       taskObject.startDate = newStartDate
       taskObject.startTime = newStartTime
+      const yearNumber = new Date().getFullYear()
+      taskObject.startYYYY = yearNumber.toString()
     }
     dispatch('task-schedule', { id: taskObject.id, newStartDate, newStartTime })
     newStartDate = ''
