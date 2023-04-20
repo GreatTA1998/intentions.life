@@ -111,7 +111,7 @@
 <script>
 import { createEventDispatcher, onMount, onDestroy, tick } from 'svelte'
 import _ from 'lodash'
-import RecursiveBulletPoint from './RecursiveBulletPoint.svelte';
+import RecursiveBulletPoint from './lib/RecursiveBulletPoint.svelte';
 import { getDateOfToday, getRandomID } from './helpers';
 
 export let taskObject 

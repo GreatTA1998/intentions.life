@@ -1,13 +1,12 @@
-<div style="position: relative;">
+<div style="position: relative; height: 100vh; border: 2px solid black;"
+on:drop={(e) => drop_handler(e)}
+on:dragover={(e) => dragover_handler(e)}
+>
   <h3 style="font-family: sans-serif; margin-top: 28px;">
     Today's tasks
   </h3>
 
-  <div
-    style="height: 100vh; border: 2px solid black;" 
-    on:drop={(e) => drop_handler(e)}
-    on:dragover={(e) => dragover_handler(e)}
-  >
+  <div>
     {#each todayUnscheduledTasks as task, i}
       <TaskElement
         {task}

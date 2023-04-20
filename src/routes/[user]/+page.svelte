@@ -25,6 +25,15 @@
   />
 {/if}
 
+{#if isJournalPopupOpen}
+  <JournalPopup
+    isOpen={isJournalPopupOpen}
+    journal={userDoc.journal}
+    on:card-close={() => isJournalPopupOpen = false}
+    on:journal-update={(e) => changeJournal(e.detail)}
+  />
+{/if}
+
 <div id="background-image-holder" style="height: 100vh;">
   <a role="button" on:click={toggleMusic} class="float" style="z-index: 10">
     <span class="material-icons my-float" style="color: white">
@@ -35,6 +44,12 @@
   <a role="button" on:click={() => isGoalsAndPostersPopupOpen = !isGoalsAndPostersPopupOpen} class="float" style="top: 120px; z-index: 10">
     <span class="material-icons my-float" style="color: white">
       sports_score
+    </span>
+  </a>
+
+  <a role="button" on:click={() => isJournalPopupOpen = !isJournalPopupOpen} class="float" style="top: 200px; z-index: 10">
+    <span class="material-icons my-float" style="color: white">
+      auto_stories
     </span>
   </a>
 
@@ -69,6 +84,8 @@
         <UnscheduledTasksForToday
           {allTasks}
           on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
+          on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
+          on:task-click={(e) => openDetailedCard(e.detail)}
         />
       {/if}
   
@@ -139,13 +156,15 @@
   import CalendarTodayView from '../../CalendarTodayView.svelte'
   import FutureOverview from '../../FutureOverview.svelte'
   import DetailedCardPopup from '../../DetailedCardPopup.svelte'
-  import GoalsAndPostersPopup from '../../GoalsAndPostersPopup.svelte'
+  import GoalsAndPostersPopup from '$lib/GoalsAndPostersPopup.svelte'
   import { onMount } from 'svelte'
   import db from '../../db.js'
   import { doc, getDoc, onSnapshot, updateDoc } from 'firebase/firestore'
   import { getRandomInt, getDateOfToday, getDateOfTomorrow, getDateInMMDD, getRandomID } from '../../helpers.js'
+  import JournalPopup from '$lib/JournalPopup.svelte'
 
   let unsubUserDocListener
+  let userDoc = null 
   const userDocPath = `users/${userID}`
   let isTypingNewTask = false
   const habitPoolToResolveConflict = []
@@ -178,6 +197,7 @@
 
   let isDetailedCardOpen = false
   let isGoalsAndPostersPopupOpen = false
+  let isJournalPopupOpen = false
   let clickedTask = {}
   let goalsAndPosters = ''
 
@@ -208,12 +228,19 @@
       goalsAndPosters: newGoalsAndPosters
     })
   }
+  
+  function changeJournal({ newJournal }) {
+    updateDoc(doc(db, userDocPath), {
+      journal: newJournal
+    })
+  }
 
   // DON'T DELETE BELOW: CONVENIENT FOR DEBUGGING
   // let isFirstTime = true
   async function listenToTasks () { 
     try {
       unsubUserDocListener = onSnapshot(doc(db, userDocPath), async snapshot => {
+        userDoc = snapshot.data()
         lastRanRepeatAtDate = snapshot.data().lastRanRepeatAtDate
         goalsAndPosters = snapshot.data().goalsAndPosters || ''
         // HANDLE TASKS THAT REPEAT
