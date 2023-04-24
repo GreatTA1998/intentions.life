@@ -35,42 +35,46 @@
 {/if}
 
 <div id="background-image-holder" style="height: 100vh;">
-  <a role="button" on:click={toggleMusic} class="float" style="z-index: 10">
-    <span class="material-icons my-float" style="color: white">
+  <a role="button" on:click={toggleMusic} class="float  mika-hover" style="bottom: 210px; z-index: 10;">
+    <span class="material-icons my-float">
       {isMusicPlaying ? 'music_note' : 'music_off'}
     </span>
   </a>
 
-  <a role="button" on:click={() => isGoalsAndPostersPopupOpen = !isGoalsAndPostersPopupOpen} class="float" style="top: 120px; z-index: 10">
-    <span class="material-icons my-float" style="color: white">
-      sports_score
+  <a role="button" on:click={() => isGoalsAndPostersPopupOpen = !isGoalsAndPostersPopupOpen} class="float  mika-hover" style="bottom: 130px; z-index: 10">
+    <span class="material-icons my-float">
+     flag
     </span>
   </a>
 
-  <a role="button" on:click={() => isJournalPopupOpen = !isJournalPopupOpen} class="float" style="top: 200px; z-index: 10">
-    <span class="material-icons my-float" style="color: white">
+  <a role="button" on:click={() => isJournalPopupOpen = !isJournalPopupOpen} class="float mika-hover" style="bottom: 50px; z-index: 10">
+    <span class="material-icons my-float">
       auto_stories
     </span>
   </a>
 
-    <div class="flex-container blur">
+  <div style="font-family: roboto, sans-serif; font-size: 2.2rem; padding: 30px 0px 0px 55px;  color: #323232;">
+    {getDayOfWeek()}. {getDateOfToday()} {new Date().getFullYear()}
+  </div>
 
-    <div class="calendar-section-container">
-      <!-- Playground  -->
-      <!-- <div style="position: relative">
-        {#each todayScheduledTasks as task, i}
-          <TaskElement
-            {task}
-            offsetFromTop={30 * i}
-            height={30}
-            fontSize={0.8}
-            offsetFromLeft={30 * i}
-            on:task-click
-            on:task-duration-adjusted
-          >
-        </TaskElement>
-        {/each}
-    </div> -->
+  <div class="flex-container blur">
+
+  <div class="calendar-section-container">
+    <!-- Playground  -->
+    <!-- <div style="position: relative">
+      {#each todayScheduledTasks as task, i}
+        <TaskElement
+          {task}
+          offsetFromTop={30 * i}
+          height={30}
+          fontSize={0.8}
+          offsetFromLeft={30 * i}
+          on:task-click
+          on:task-duration-adjusted
+        >
+      </TaskElement>
+      {/each}
+  </div> -->
 
       <CalendarTodayView
         scheduledTasksToday={todayScheduledTasks}
@@ -100,6 +104,7 @@
       on:drop={(e) => unscheduleTask(e)}
       on:dragover={(e) => dragover_handler(e)}
     >
+
       <div class="todo-list">
         {#if allTasks}
           {#each allTasks as task}
@@ -162,6 +167,14 @@
   import { doc, getDoc, onSnapshot, updateDoc } from 'firebase/firestore'
   import { getRandomInt, getDateOfToday, getDateOfTomorrow, getDateInMMDD, getRandomID } from '../../helpers.js'
   import JournalPopup from '$lib/JournalPopup.svelte'
+
+
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getDay
+  function getDayOfWeek () {
+    const today = new Date()
+    const options = { weekday: 'short' }
+    return new Intl.DateTimeFormat('en-US', options).format(today)
+  }
 
   let unsubUserDocListener
   let userDoc = null 
@@ -629,20 +642,21 @@
       box-sizing: border-box;
     }
     .todo-container {
+      font-family: Roboto, sans-serif;
       background: transparent;
-      width: 55vw;
+      width: 50vw;
       height: 100vh;
-      padding-top: 14px; 
-      padding-left: 30px;
-      border: 1px solid green; 
+      padding-top: 15px; 
+      padding-left: 20px;
+      border: none; 
       border-top: none;
       border-right: none;
     }
     .calendar-section-container {
       background: transparent; 
-      width: 45vw; 
+      width: 40vw;
       height: 50vh;
-      border: 1px solid green; 
+      border: none; 
       border-left: none;
       border-top: none;
       border-bottom: none;
@@ -666,6 +680,7 @@
   .calendar-section-container {
     height: 100vh;
     display: flex; 
+    margin-left: 30px;
     justify-content: space-evenly; 
     /* background-color: white;  */
     box-sizing: border-box;
@@ -684,8 +699,8 @@
     /* linear-gradient is used to make background image more transparent
       NOTE: blur effect is defined in .blur {}
     */
-    background-image: linear-gradient(rgba(255, 255, 255, 0.91), rgba(255, 255, 255, 0.91)), 
-    url('https://i.imgur.com/ShnqIpJ.jpeg');
+    background-image: linear-gradient(rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.91)), 
+    url('https://64.media.tumblr.com/e3c4ae5e8aa3f64b1652bfda70448cc7/tumblr_ptdfkwN1hC1utvtoj_500.jpg');
     background-repeat: no-repeat;
     background-size: 100% 100%;
   }
@@ -752,18 +767,31 @@
 
   .float{
     position:fixed;
-    width:60px;
-    height:60px;
-    top:40px;
-    right:40px;
-    background-color: grey;  
-    color:#FFF;
+    width: 55px;
+    height: 55px;
+    bottom: 40px;
+    right: 40px;
+    background-color: transparent;  
+    color: #6D6D6D;
     border-radius:50px;
     text-align:center;
-    box-shadow: 0px 0px 2px 2px white;
+    box-shadow: 0px 0px 2px 2px #6D6D6D;
   }
 
   .my-float{
-    margin-top: 19px;
+    margin-top: 15px;
   }
+
+  .mika-hover {
+    color: #6D6D6D;
+  }
+
+  .mika-hover:hover{
+    color: #000;
+  }
+
+  .float:hover{
+    box-shadow: 0px 0px 2px 2px #000;
+  }
+
 </style>

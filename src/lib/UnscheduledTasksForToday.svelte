@@ -1,19 +1,19 @@
-<div style="position: relative; height: 100vh; border: 2px solid black;"
-on:drop={(e) => drop_handler(e)}
-on:dragover={(e) => dragover_handler(e)}
+<div style="position: relative; height: 100vh; border: none; solid black;"
+  on:drop={(e) => drop_handler(e)}
+  on:dragover={(e) => dragover_handler(e)}
 >
-  <h3 style="font-family: sans-serif; margin-top: 28px;">
-    Today's tasks
-  </h3>
+  <div style="font-family: Roboto, sans-serif; font-weight:bold; color: #323232; font-size: 1.2rem; margin-top: 30px;">
+    Today's Tasks
+  </div>
 
   <div>
     {#each todayUnscheduledTasks as task, i}
       <TaskElement
         {task}
-        offsetFromTop={80 + 30 * i}
+        offsetFromTop={95 + 30 * i}
         height={task.duration * pixelsPerMinute || 30}
         fontSize={0.8}
-        offsetFromLeft={30}
+        offsetFromLeft={2}
         on:task-click
         on:task-duration-adjusted
       />

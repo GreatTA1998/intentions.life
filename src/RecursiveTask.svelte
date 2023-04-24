@@ -8,7 +8,7 @@
     class:orange-duration-line={!taskObject.isDone && taskObject.startTime && taskObject.startDate}
     class:green-duration-line={taskObject.isDone}
     style="
-      margin-left: {depth === 1 ? '0' : '20'}px; 
+      margin-left: {depth === 1 ? '0' : '5'}px; 
       margin-bottom: 10px; 
       width: {350 * 0.8 ** depth}px; 
       height: {taskObject.duration && !doChildrenHaveDuration 
@@ -23,8 +23,8 @@
     <div class="current-task-flexbox">
       <div 
         style="
-          font-size: {2.5 * (0.65 ** (depth))}rem; 
-          font-family: sans-serif; 
+          font-size: {1.26 * (0.8 ** (depth-1))}rem; 
+          font-family: Roboto,sans-serif; 
           font-weight: {800 - (100 * depth)};
           color: rgb({20 + depth * 30}, {20 + depth * 30}, {20 + depth * 30});
         "
@@ -39,7 +39,7 @@
             class="truncate"
             class:my-uppercase={isGoal}
             class:transparent-grey={isGoal}
-            style="width: {350 * (0.85 ** depth)}px;"
+            style="width: {350 * (0.85 ** depth)}px; color: {depth === 1 ? '#323232' : '#6D6D6D'};"
           >
             {taskObject.name}
           </div>
@@ -71,7 +71,7 @@
           <!-- `padding-bottom` accounts for the text fonts are just not vertically centered, see https://stackoverflow.com/questions/21580059/text-is-not-vertically-centered -->
           <div 
             on:click={() => isTypingNewTask = true} 
-            style="margin-left: 20px; margin-right: 20px; margin-bottom: 10px; border-left: 2px solid grey; color: grey; padding-left: 5px; padding-bottom: {8 * 0.68 ** (depth + 1)}px; font-size: {1.5 * (0.85 ** (depth + 1))}rem;"
+            style="margin-left: 20px; margin-right: 20px; margin-bottom: 10px; border-left: 2px solid grey; color: #6D6D6D; padding-left: 5px; padding-bottom: {8 * 0.68 ** (depth + 1)}px; font-size: {1.5 * (0.85 ** (depth + 1))}rem;"
           >
             new sub-task
           </div>

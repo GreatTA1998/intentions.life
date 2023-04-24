@@ -1,16 +1,16 @@
 {#if isOpen}
-  <div class="my-popup-window">
+  <div class="my-popup-window" use:clickOutside on:click_outside={() => dispatch('card-close')}>
     <div style="display: flex;">
-      <h1 class="google-calendar-event-title">
-        My journal
-      </h1>
-      <span on:click={() => dispatch('card-close')} class="material-icons" style="margin-left: auto; margin-right: 0; margin-top: 5px; color: black;">
+      <h3 class="google-calendar-event-title"  style="margin-left: 50px; color: #323232;">
+        My Journal
+      </h3>
+      <span on:click={() => dispatch('card-close')} class="material-icons" style="margin-left: auto; margin-right: 10px; margin-top: 10px; color: #323232;">
         close
       </span>
     </div>
 
     <div style="display: flex">
-      <div class="journal-left-navigation">
+      <div class="journal-left-navigation" style="font-family: Roboto,Arial,sans-serif; font-size:16px; color: #6D6D6D;">
         {#each Object.keys(journal) as date}
           <div on:click={() => currentlySelectedDate = date} class:blue-highlight={date === currentlySelectedDate}>
             {date}
@@ -23,7 +23,8 @@
         <textarea 
           bind:value={journal[currentlySelectedDate]}
           on:input={handleInput}
-          rows="20"
+          rows="38"
+          cols="120"
           placeholder="notes"
           style="margin-left: 10px; width: 97%; margin-right: 10px; box-sizing: border-box;"
         />
@@ -35,7 +36,7 @@
 <script>
 import { createEventDispatcher, onMount, onDestroy, tick } from 'svelte'
 import _ from 'lodash'
-import { getDateOfToday, getRandomID } from '/src/helpers.js';
+import { getDateOfToday, getRandomID, clickOutside } from '/src/helpers.js';
 
 export let journal
 export let isOpen = false
@@ -79,7 +80,10 @@ function saveJournalPage () {
 
 <style>
   .blue-highlight {
-    background-color: lightgrey;
+    font-family: Roboto,Arial,sans-serif;
+    font-size: 16px;
+    background-color: none;
+    color: #0085FF;
   }
 
   .my-popup-window {
@@ -116,7 +120,7 @@ function saveJournalPage () {
     font-weight: 400;
     letter-spacing: .2px;
     line-height: 20px;
-    color: #3c4043;
+    color: #6D6D6D;
   }
 
   *::-webkit-scrollbar {
@@ -139,6 +143,6 @@ function saveJournalPage () {
     font-weight: 400;
     letter-spacing: .2px;
     line-height: 20px;
-    color: #3c4043;
+    color: #6D6D6D;
   } 
 </style>

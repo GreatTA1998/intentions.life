@@ -1,12 +1,12 @@
 <div id="future-overview-scroll-parent">
-  <h3 style="font-family: sans-serif; margin-top: 26px;">
-    Future overview
-  </h3>
+  <div style="font-family: Roboto, sans-serif; margin-top: 30px; margin-bottom: 40px; font-weight:bold; color: #323232; font-size: 1.2rem;">
+    Future Tasks
+  </div>
   <div class="future-overview-scroll-container">
     {#each Object.keys(datesToTasks) as date}
-      <div style="margin-bottom: 40px;">
+      <div style="margin-top: 20px; margin-bottom: 20px;">
         <div>
-          <div style="font-family: serif; font-size: 1rem; margin-bottom: 2px;">
+          <div style="font-family:Roboto, sans-serif; ; font-size: 1rem; margin-bottom: 2px; color:#6D6D6D">
             {date} {getDayOfWeek(date)}.
           </div>
         </div>
@@ -95,7 +95,7 @@ const minimumContainerHeight = 20
   @media only screen and (min-width : 480px) {
     #future-overview-scroll-parent {
       height: 100vh;
-      width: 12vw; 
+      width: 10vw; 
     }
   }
 
@@ -111,16 +111,16 @@ const minimumContainerHeight = 20
 
   .future-overview-scroll-container {
     margin-left: 0px; 
-    margin-top: 27px; 
-    height: 1600px
+    margin-top: 10px; 
+    height: 80vh;
   }
 
   .black-text {
-    color: rgb(120, 120, 120)
+    color: #6D6D6D;
   }
 
   .purple-text {
-    color: purple;
+    color: #6D6D6D;
   }
 
   .scheduled-task {

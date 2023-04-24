@@ -1,10 +1,10 @@
 {#if isOpen}
-  <div class="my-popup-window">
+  <div class="my-popup-window" use:clickOutside on:click_outside={() => dispatch('card-close')}>
     <div style="display: flex;">
-      <h1 class="google-calendar-event-title">
-        Goals & encouraging words
+      <h1 class="google-calendar-event-title" style="margin-left: 40px">
+        Goals & Encouraging Words
       </h1>
-      <span on:click={() => dispatch('card-close')} class="material-icons" style="margin-left: auto; margin-right: 0; margin-top: 5px; color: black;">
+      <span on:click={() => dispatch('card-close')} class="material-icons" style="margin-left: auto; margin-right: 10px; margin-top: 10px; color: #323232;">
         close
       </span>
     </div>
@@ -14,9 +14,9 @@
       <textarea 
         bind:value={notesAboutTask}
         on:input={handleInput}
-        rows="20"
-        placeholder="notes"
-        style="margin-left: 10px; width: 97%; margin-right: 10px; box-sizing: border-box;"
+        rows="30"
+        placeholder="Type in here... "
+        style="display: block; margin: auto; width: 90%; box-sizing: border-box;"
       />
     </div>
   </div>
@@ -26,7 +26,7 @@
 import { createEventDispatcher, onMount, onDestroy, tick } from 'svelte'
 import _ from 'lodash'
 import RecursiveBulletPoint from './RecursiveBulletPoint.svelte';
-import { getDateOfToday, getRandomID } from '../helpers';
+import { getDateOfToday, getRandomID, clickOutside } from '../helpers';
 
 export let goalsAndPosters
 export let isOpen = false

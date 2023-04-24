@@ -31,7 +31,9 @@
 
 <style>
   .task-completed {
-    color: green;
+    font-family:Roboto, sans-serif;
+    font-size: 14px;
+    color: #0085FF;
   }
 
   .task-scheduled {

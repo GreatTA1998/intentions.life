@@ -1,11 +1,12 @@
-{#if isOpen}
-  <div id="detailed-card">
+
+  <div id="detailed-card" bind:this={elem} use:clickOutside on:click_outside={handleClickOutside}>
     <div style="display: flex">
       <input 
         type="text" 
         class="google-calendar-event-title" 
         bind:value={titleOfTask} 
         on:input={handleInput2}
+        placeholder="Untitled"
         style="width: 97%; margin-left: 10px; margin-right: 10px; box-sizing: border-box;"
       >
         
@@ -34,8 +35,8 @@
         bind:value={notesAboutTask}
         on:input={handleInput}
         rows="5"
-        placeholder="notes"
-        style="margin-left: 10px; width: 97%; margin-right: 10px; box-sizing: border-box;"
+        placeholder="Type in details..."
+        style="margin-left: 10px; width: 95%; margin-right: 10px; margin-bottom: 10px; box-sizing: border-box;"
       />
     </div>
 
@@ -94,7 +95,7 @@
     </div>
 
     <!-- This is the section where you show everything regardless of whether it is scheduled or not -->
-    <div style="font-size: 0.9rem; margin-top: 24px; margin-left: 12px; font-weight: 600; font-family: sans-serif;">
+    <div style="font-size: 0.9rem; margin-top: 24px; margin-left: 12px; font-weight: 600; font-family: roboto, sans-serif;">
       Full task history:
     </div>
 
@@ -106,16 +107,15 @@
       </div>
     {/each}
   </div>
-{/if}
 
 <script>
 import { createEventDispatcher, onMount, onDestroy, tick } from 'svelte'
 import _ from 'lodash'
 import RecursiveBulletPoint from './lib/RecursiveBulletPoint.svelte';
-import { getDateOfToday, getRandomID } from './helpers';
+import { getDateOfToday, getRandomID, clickOutside } from './helpers.js'
 
 export let taskObject 
-export let isOpen = false
+// export let isOpen = false
 
 let depth = 1
 
@@ -129,10 +129,18 @@ const dispatch = createEventDispatcher()
 
 let notesAboutTask = taskObject.notes || ''
 let titleOfTask = taskObject.name || ''
+let elem
 
+onDestroy(() => {
+  document.removeEventListener('click', (e) => onClickOutsideOrInside(e))
+})
 
 const throttledSaveTitle = _.throttle(saveTitle, 500)
 const throttledSaveNotes = _.throttle(saveNotes, 500)
+
+function handleClickOutside (e) {
+  dispatch('card-close')
+}
 
 function handleInput (e) {
   notesAboutTask = e.target.value
@@ -143,6 +151,7 @@ const handleInput2 = function (e) {
   titleOfTask = e.target.value
   throttledSaveTitle()
 }
+
 
 function saveNotes () {
   taskObject.notes = notesAboutTask
@@ -212,8 +221,10 @@ function setTaskAsHabit () {
 
 <style>
   #detailed-card {
+    font-family: Roboto,Arial,sans-serif;
+    font-size: 14px;
     position: fixed;
-    top: 40%;
+    top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     width: 50%;
@@ -222,7 +233,7 @@ function setTaskAsHabit () {
     z-index: 5;
     width: 40%;
     min-width: 200px;
-    height: 40%;
+    height: 60%;
     border-radius: 10px;
     background-color: white;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
@@ -235,7 +246,6 @@ function setTaskAsHabit () {
     border: none;
     border-bottom: 1px solid #000000;
     outline: none;
-
     padding: 2px 0px;
   }
 
@@ -254,7 +264,7 @@ function setTaskAsHabit () {
   }
 
   .google-calendar-event-time {
-    font-family: serif;
+    font-family: Roboto,Arial,sans-serif;
     font-size: 14px;
     font-weight: 400;
     letter-spacing: .2px;
@@ -285,29 +295,28 @@ function setTaskAsHabit () {
 }
 
 a {
+  font-family: Roboto,Arial,sans-serif;
   flex: 1;
-  background-color: #333;
+  background-color: #323232;
   color: #fff;
-  border: 1px solid;
-  padding-top: 2px; 
-  padding-bottom: 2px;
+  padding-top: 5px; 
+  padding-bottom: 5px;
   padding-left: 6px;
   padding-right: 6px;
-  border-radius: 4px;
+  border-radius: 6px;
   text-align: center;
   text-decoration: none;
-  transition: all 0.5s ease-out;
-
+  transition: all 0.2s ease-out;
+   border: 1px solid #000;
   font-family: sans-serif;
-  font-size: 0.9rem;
-
-  margin-top: 2px;
+  font-size: 1rem;
   height: 5px;
 }
 
 a:hover,
 a:focus {
+  border: 1px solid #000;
   background-color: #fff;
-  color: #333;
+  color: #323232;
 }
 </style>

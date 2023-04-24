@@ -103,11 +103,12 @@
 }
 
 .task-drag-zone {
-  width: 11vw;
+  width: 10vw;
 }
 
 .task-name {
-  width: 11vw; cursor: pointer; font-family: sans-serif; color: rgb(120, 120, 120);
+  font-family: Roboto, sans-serif; 
+  width: 11vw; cursor: pointer; font-family: sans-serif; color: #6D6D6D;
 }
 
   /* Small Devices, Tablets and bigger devices */

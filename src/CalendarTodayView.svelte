@@ -1,14 +1,11 @@
 <div id="scroll-container">
-  <div style="font-family: sans-serif; font-size: 1.8rem; margin-bottom: 1px;">
-    {getDayOfWeek()}. {getDate()} {new Date().getFullYear()}
-  </div>
 
   <div style="padding-bottom: 16px;">
     {#each tasksThatAlreadyHappened as task}
       <!-- class:red-text={!task.isDone} -->
-      <div style="display: flex; align-items: center; opacity: 0.5" class:green-text={task.isDone}>
+      <div style="display: flex; align-items: center; opacity: 1; margin-top: 10px;" class:green-text={task.isDone}>
         <input
-          style="margin-left: 0; accent-color: green"
+          style="margin-left: 0; accent-color: #0085FF"
           type="checkbox"
           bind:checked={task.isDone}
           on:click={() => toggleIsDone(task)}
@@ -21,7 +18,7 @@
   </div>
 
   <div id="calendar-day-container" 
-    style="height: {pixelsPerHour * numOfHourBlocksDisplayed}px; "
+    style="height: {pixelsPerHour * numOfHourBlocksDisplayed}px; font-family: Roboto, sans-serif; margin-bottom: 1px; color: #6D6D6D; "
     on:drop={(e) => drop_handler(e)}
     on:dragover={(e) => dragover_handler(e)}
   >
@@ -38,7 +35,7 @@
           offsetFromTop={computeOffset(task)}
           height={task.duration * pixelsPerMinute || 30}
           fontSize={0.8}
-          offsetFromLeft={30}
+          offsetFromLeft={32}
           on:task-click
           on:task-duration-adjusted
         />
@@ -48,7 +45,7 @@
     <!-- A red line that indicates the current time -->
     {#if currentTimeInHHMM}
       <hr style="
-        border-top: 1px solid red; 
+        border-top: 1px solid orange; 
         position: absolute; 
         top: {computeOffset({ startTime: currentTimeInHHMM })}px;
         left: 32px;
@@ -263,10 +260,11 @@
   }
 
   .green-text {
-    color: green;
+    color: #0085FF;
   }
 
   .red-text {
+    font-family: Roboto, Arial,sans-serif;
     color: red;
   }
 
