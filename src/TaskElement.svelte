@@ -11,6 +11,7 @@
     class="task-name"
     draggable="true" 
     on:dragstart={(e) => dragstart_handler(e, task.id)} 
+    class:smallest-text={task.duration === 1}
   >
     {task.name} 
   </div>
@@ -31,7 +32,7 @@
   <div draggable="true"
     on:dragstart={(e) => mousedown_handler(e)}
     on:dragend={(e) => mouseup_handler(e, task)}
-    style="height: {Math.max(height/4, 8)}px; width: 2vw; position: absolute; bottom: 0; left: -3px; cursor: ns-resize;"
+    style="height: {height/8}px; width: 2vw; position: absolute; bottom: 0; left: -3px; cursor: ns-resize;"
   >
 
   </div>
@@ -39,6 +40,7 @@
 
 <script>
   import { createEventDispatcher } from 'svelte'
+  import { getTrueY, PIXELS_PER_HOUR, PIXELS_PER_MINUTE } from '/src/helpers.js'
 
   export let task = null
   export let fontSize = 1
@@ -54,18 +56,8 @@
     e.dataTransfer.setData("text/plain", id)
   }
 
-  function getTrueY (e) {
-    const ScrollContainer = document.getElementById('scroll-container')
-    const element = document.getElementById("calendar-day-container")
-    
-    // compute y-offset
-    // TODO: in practice there is a small discrepancy between where the drop is and where the mouse is 
-    // because the user aims with the image corner whereas the code reads the precise mouse pointer location
-    return  ScrollContainer.scrollTop + e.clientY - element.offsetTop
-  }
-
   function mousedown_handler (e) {
-    startY = getTrueY(e) // e.offsetYW
+    startY = getTrueY(e)
   }
 
   function mouseup_handler (e, task) {
@@ -76,7 +68,7 @@
       task.duration = 10
     }
 
-    const minutesPerPixel = 60 / 90
+    const minutesPerPixel = 60 / PIXELS_PER_HOUR
     const durationChange = (newY - startY) * minutesPerPixel
 
     dispatch('task-duration-adjusted', {
@@ -128,5 +120,10 @@
     .task-name {
       width: 11vw;
     }
+  }
+
+  .smallest-text {
+    font-size: 0.6rem;
+    color: black;
   }
 </style>

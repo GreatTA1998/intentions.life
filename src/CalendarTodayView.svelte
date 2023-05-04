@@ -1,5 +1,4 @@
 <div id="scroll-container">
-
   <div style="padding-bottom: 16px;">
     {#each tasksThatAlreadyHappened as task}
       <!-- class:red-text={!task.isDone} -->
@@ -17,14 +16,15 @@
     {/each}
   </div>
 
+  <!-- This is a relative container -->
   <div id="calendar-day-container" 
-    style="height: {pixelsPerHour * numOfHourBlocksDisplayed}px; font-family: Roboto, sans-serif; margin-bottom: 1px; color: #6D6D6D; "
+    style="height: {PIXELS_PER_HOUR * numOfHourBlocksDisplayed}px; font-family: Roboto, sans-serif; margin-bottom: 1px; color: #6D6D6D; "
     on:drop={(e) => drop_handler(e)}
     on:dragover={(e) => dragover_handler(e)}
   >
     {#if calendarStartTime}
       {#each timesOfDay as timeOfDay, i}
-        <div class="time-indicator" style="top: {pixelsPerHour * i}px;">
+        <div class="time-indicator" style="top: {-6 + (PIXELS_PER_HOUR * i)}px;">
           {timeOfDay.substring(0, 5)}
         </div>
       {/each}
@@ -33,12 +33,26 @@
         <TaskElement
           {task}
           offsetFromTop={computeOffset(task)}
-          height={task.duration * pixelsPerMinute || 30}
+          height={task.duration * PIXELS_PER_MINUTE || 30}
           fontSize={0.8}
           offsetFromLeft={32}
           on:task-click
           on:task-duration-adjusted
         />
+      {/each}
+
+      <!-- Again, because we're using absolute positioning for above elements, their positionings are independent from each other -->
+      {#each {length: 60 * 12} as _, i}
+        <div 
+          class="atomic-minute" 
+          style="height: {PIXELS_PER_MINUTE}px; box-sizing: border-box; margin-right: 0; margin-left: auto; width: 82%"
+          class:visible-line={(i % 60) === 0}
+          class:highlighted-background={highlightedMinute === i}
+          on:dragenter={() => highlightedMinute = i}
+          on:dragend={() => console.log('dragend') }
+          on:dragover={(e) => dragover_handler(e)}
+        >
+        </div>
       {/each}
     {/if}
 
@@ -58,7 +72,7 @@
 
 <script>
   import { createEventDispatcher } from 'svelte'
-  import { getDateOfToday } from './helpers.js'
+  import { getDateOfToday, getTrueY, PIXELS_PER_HOUR, PIXELS_PER_MINUTE } from './helpers.js'
   import TaskElement from './TaskElement.svelte'
 
   export let scheduledTasksToday
@@ -66,10 +80,9 @@
   const dispatch = createEventDispatcher()
   const getDate = getDateOfToday
 
-  const pixelsPerHour = 160
-  const pixelsPerMinute = pixelsPerHour / 60
   const numOfHourBlocksDisplayed = 16
 
+  let highlightedMinute = null 
   let timesOfDay = []
   let startY = 0
 
@@ -158,7 +171,7 @@
     const hh = startTime.slice(0, 2)
     const mm = startTime.slice(3, 5)
     const hoursOffset = Number(hh) + (Number(mm) / 60) - parseInt(calendarStartTime.substring(0, 2)) // 8 refers to "8 am"
-    return hoursOffset * pixelsPerHour
+    return hoursOffset * PIXELS_PER_HOUR
   }
 
   function dragover_handler (e) {
@@ -173,19 +186,17 @@
    * because the drop_handler is defined outside of those hour <divs>
    * 
    * TODO: ensure the drop package is a valid task
+   * 
+   *     
+    // TODO: in practice there is a small discrepancy between where the drop is and where the mouse is 
+    // because the user aims with the image corner whereas the code reads the precise mouse pointer location
    */
   function drop_handler (e) {
     e.preventDefault()
-    const ScrollContainer = document.getElementById('scroll-container')
-    const element = document.getElementById("calendar-day-container")
-    
-    // compute y-offset
-    // TODO: in practice there is a small discrepancy between where the drop is and where the mouse is 
-    // because the user aims with the image corner whereas the code reads the precise mouse pointer location
-    const containerDistanceFromTopOfPage = element.getBoundingClientRect().top
-    const trueY = - containerDistanceFromTopOfPage + ScrollContainer.scrollTop + e.clientY 
-  
-    let n = trueY / pixelsPerHour
+    highlightedMinute = null
+
+    const trueY = getTrueY(e)
+    let n = trueY / PIXELS_PER_HOUR
     const decimal = n - Math.floor(n)
     const integer = Math.trunc(n)
     
@@ -216,6 +227,10 @@
 </script>
 
 <style>
+.highlighted-background {
+  background: rgb(82, 180, 251);
+}
+
 /* 
   You need the relative scrolling container to be different from `calendar-day-container`,
   so the absolute positionings will count from the right place (no need to fully understand yet) 
@@ -280,5 +295,9 @@
     position: absolute;
     /* height: 90px;
     width: 100%; */
+  }
+
+  .visible-line {
+    border-top: 1px solid grey;
   }
 </style>

@@ -71,3 +71,14 @@ export function getRandomID () {
   }
   return autoId;
 }
+
+export function getTrueY (e) {
+  const ScrollContainer = document.getElementById('scroll-container')
+  const element = document.getElementById("calendar-day-container")
+  const containerDistanceFromTopOfPage = element.getBoundingClientRect().top
+  const trueY = - containerDistanceFromTopOfPage + ScrollContainer.scrollTop + e.clientY 
+  return trueY
+}
+
+export const PIXELS_PER_HOUR = 600
+export const PIXELS_PER_MINUTE = PIXELS_PER_HOUR / 60
