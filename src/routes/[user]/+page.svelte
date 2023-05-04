@@ -54,7 +54,7 @@
   </a>
 
   <div style="font-family: roboto, sans-serif; font-size: 2.2rem; padding: 30px 0px 0px 55px;  color: #323232;">
-    {getDayOfWeek()}. {getDateOfToday()} {new Date().getFullYear()}
+    {getDayOfWeek()} {getDateOfToday()} {new Date().getFullYear()}
   </div>
 
   <div class="flex-container blur">
@@ -172,7 +172,7 @@
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getDay
   function getDayOfWeek () {
     const today = new Date()
-    const options = { weekday: 'short' }
+    const options = { weekday: 'long' } // can be short for Mon. instead of Monday
     return new Intl.DateTimeFormat('en-US', options).format(today)
   }
 
@@ -699,8 +699,8 @@
     /* linear-gradient is used to make background image more transparent
       NOTE: blur effect is defined in .blur {}
     */
-    background-image: linear-gradient(rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.91)), 
-    url('https://64.media.tumblr.com/e3c4ae5e8aa3f64b1652bfda70448cc7/tumblr_ptdfkwN1hC1utvtoj_500.jpg');
+    /* background-image: linear-gradient(rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.91)), 
+    url('https://64.media.tumblr.com/e3c4ae5e8aa3f64b1652bfda70448cc7/tumblr_ptdfkwN1hC1utvtoj_500.jpg'); */
     background-repeat: no-repeat;
     background-size: 100% 100%;
   }

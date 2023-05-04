@@ -182,7 +182,8 @@
     // compute y-offset
     // TODO: in practice there is a small discrepancy between where the drop is and where the mouse is 
     // because the user aims with the image corner whereas the code reads the precise mouse pointer location
-    const trueY = ScrollContainer.scrollTop + e.clientY - element.offsetTop 
+    const containerDistanceFromTopOfPage = element.getBoundingClientRect().top
+    const trueY = - containerDistanceFromTopOfPage + ScrollContainer.scrollTop + e.clientY 
   
     let n = trueY / pixelsPerHour
     const decimal = n - Math.floor(n)
