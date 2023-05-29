@@ -10,6 +10,7 @@
     {#each todayUnscheduledTasks as task, i}
       <TaskElement
         {task}
+        disableAbsolutePosition={true}
         offsetFromTop={95 + 30 * i}
         height={task.duration * pixelsPerMinute || 30}
         fontSize={0.8}
@@ -17,6 +18,7 @@
         on:task-click
         on:task-duration-adjusted
       />
+      <br>
     {/each}
   </div>
 </div>

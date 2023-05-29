@@ -78,26 +78,38 @@
 
       <CalendarTodayView
         scheduledTasksToday={todayScheduledTasks}
+        pixelsPerHour={isGirlfriendMode ? MIKA_PIXELS_PER_HOUR : PIXELS_PER_HOUR }
         on:task-done={(e) => markNodeAsDone(e.detail.id)}
         on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
         on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
         on:task-click={(e) => openDetailedCard(e.detail)}
       />
 
-      {#if allTasks}
-        <UnscheduledTasksForToday
-          {allTasks}
-          on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
-          on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
-          on:task-click={(e) => openDetailedCard(e.detail)}
-        />
-      {/if}
-  
-      <FutureOverview
-        {futureScheduledTasks}
-        on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
-        on:task-click={(e) => openDetailedCard(e.detail)}
-      />
+      <div>
+        <button on:click={() => isGirlfriendMode = false}>
+          Boyfriend mode
+        </button>
+        <button on:click={() => isGirlfriendMode = true}>
+          Girlfriend mode
+        </button>
+
+        <div style="display: flex">  
+          {#if allTasks}
+            <UnscheduledTasksForToday
+              {allTasks}
+              on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
+              on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
+              on:task-click={(e) => openDetailedCard(e.detail)}
+            />
+          {/if}
+      
+          <FutureOverview
+            {futureScheduledTasks}
+            on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
+            on:task-click={(e) => openDetailedCard(e.detail)}
+          />
+        </div>
+      </div>
     </div>
 
     <div class="todo-container" 
@@ -161,6 +173,7 @@
   import CalendarTodayView from '../../CalendarTodayView.svelte'
   import FutureOverview from '../../FutureOverview.svelte'
   import DetailedCardPopup from '../../DetailedCardPopup.svelte'
+  import { MIKA_PIXELS_PER_HOUR, PIXELS_PER_HOUR } from '../../helpers.js'
   import GoalsAndPostersPopup from '$lib/GoalsAndPostersPopup.svelte'
   import { onMount } from 'svelte'
   import db from '../../db.js'
@@ -168,13 +181,14 @@
   import { getRandomInt, getDateOfToday, getDateOfTomorrow, getDateInMMDD, getRandomID } from '../../helpers.js'
   import JournalPopup from '$lib/JournalPopup.svelte'
 
-
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getDay
   function getDayOfWeek () {
     const today = new Date()
     const options = { weekday: 'long' } // can be short for Mon. instead of Monday
     return new Intl.DateTimeFormat('en-US', options).format(today)
   }
+
+  let isGirlfriendMode = false
 
   let unsubUserDocListener
   let userDoc = null 

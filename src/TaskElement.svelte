@@ -1,52 +1,65 @@
-<div 
-  on:click={() => dispatch('task-click', { task })}
-  class="scheduled-task clickable-task" 
-  class:green={task.isDone}
-  style="top: {offsetFromTop}px; 
-         height: {height}px; 
-         left: {offsetFromLeft}px;
-         font-size: {fontSize}rem;"
->
+{#if offsetFromTop || disableAbsolutePosition}
   <div 
-    class="task-name"
-    draggable="true" 
-    on:dragstart={(e) => dragstart_handler(e, task.id)} 
-    class:smallest-text={task.duration === 1}
+    on:click={() => dispatch('task-click', { task })}
+    class="scheduled-task clickable-task" 
+    class:green={task.isDone}
+    style="top: {disableAbsolutePosition ? '0;' : `${offsetFromTop}px`};
+          position: {disableAbsolutePosition ? 'static' : 'absolute'};
+          height: {height}px; 
+          left: {offsetFromLeft}px;
+          font-size: {fontSize}rem;
+          "
   >
-    {task.name} 
-  </div>
-
-  <!-- Continuation of re-scheduling zone -->
-  <slot>
     <div 
-      class="task-drag-zone"
-      style="height: {height - 20 - 10}px;" 
+      class="task-name"
       draggable="true" 
-      on:dragstart={(e) => dragstart_handler(e, task.id)}
+      on:dragstart={(e) => dragstart_handler(e, task.id)} 
+      class:smallest-text={task.duration === 1}
+    >
+      {task.name} 
+    </div>
+
+    <!-- Continuation of re-scheduling zone -->
+    <slot>
+      <div 
+        class="task-drag-zone"
+        style="height: {height - 20 - 10}px;" 
+        draggable="true" 
+        on:dragstart={(e) => dragstart_handler(e, task.id)}
+      >
+
+      </div>
+    </slot>
+
+    <!-- Bottom region for adjusting duration -->
+    <div draggable="true"
+      on:dragstart={(e) => mousedown_handler(e)}
+      on:dragend={(e) => mouseup_handler(e, task)}
+      style="height: {height/8}px; width: 2vw; position: absolute; bottom: 0; left: -3px; cursor: ns-resize;"
     >
 
     </div>
-  </slot>
-
-  <!-- Bottom region for adjusting duration -->
-  <div draggable="true"
-    on:dragstart={(e) => mousedown_handler(e)}
-    on:dragend={(e) => mouseup_handler(e, task)}
-    style="height: {height/8}px; width: 2vw; position: absolute; bottom: 0; left: -3px; cursor: ns-resize;"
-  >
-
   </div>
-</div>
+{/if}
 
 <script>
   import { createEventDispatcher } from 'svelte'
-  import { getTrueY, PIXELS_PER_HOUR, PIXELS_PER_MINUTE } from '/src/helpers.js'
+  import { getTrueY, computeOffset } from '/src/helpers.js'
+
+  export let pixelsPerHour
+
+  $: PIXELS_PER_HOUR = pixelsPerHour
+  $: PIXELS_PER_MINUTE = PIXELS_PER_HOUR / 60
+  $: offsetFromTop = computeOffset(task, PIXELS_PER_HOUR, calendarStartTime)
 
   export let task = null
   export let fontSize = 1
-  export let offsetFromTop
   export let offsetFromLeft = 0
-  export let height = 15 
+  export let height
+  export let disableAbsolutePosition = false
+  export let calendarStartTime
+
+  let offsetFromTop
 
   const dispatch = createEventDispatcher()
   let startY = 0
@@ -82,7 +95,7 @@
 <style>
 .scheduled-task {
   /* font-size: 0.8rem; */
-  display: inline;
+  /* display: inline; */
   position: absolute;
   margin-left: 2px;
   border-left: 2px solid grey;

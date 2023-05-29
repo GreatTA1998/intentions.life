@@ -1,3 +1,46 @@
+// how far, INCLUDING SCROLL, the actual position on the calendar is
+// // containerDistanceFromTopOfPage should be fixed, and not be affected by scrolling
+// so it's the e.clientY + initialOffset + scrollOffset 
+
+// TO-DO: fix this
+
+export function getTrueY (e) {
+  const ScrollContainer = document.getElementById('scroll-container')
+  const element = document.getElementById("calendar-day-container")
+  const containerDistanceFromTopOfPage = element.getBoundingClientRect().top
+  const trueY = e.clientY - containerDistanceFromTopOfPage + ScrollContainer.scrollTop
+  console.log('e.clientY =', e.clientY)
+  console.log('containerDistanceFromTopOfPage =', containerDistanceFromTopOfPage)
+  console.log('ScrollContainer.scrollTop =', ScrollContainer.scrollTop)
+  console.log("trueY =", trueY)
+  return trueY
+}
+
+export const MIKA_PIXELS_PER_HOUR = 200
+export const MIKA_PIXELS_PER_MINUTE = MIKA_PIXELS_PER_HOUR / 60
+
+export const PIXELS_PER_HOUR = 600
+export const PIXELS_PER_MINUTE = PIXELS_PER_HOUR / 60
+
+// compute's the offset from top if the task is displayed absolutely (not used if positioned statically e.g. "in today's unscheduled tasks")
+export function computeOffset ({ startTime }, pxPerHour, calendarStartTime) {
+  if (!calendarStartTime) {
+    return
+  }
+
+  // compute how many hours ahead of calendar's starting hour
+  // TODO: this breaks when the scheduled time is "lower" than the calendar's startTime i.e. need to pad 24 on top of it
+  const hh = startTime.slice(0, 2)
+  const mm = startTime.slice(3, 5)
+
+  const hoursOffset = Number(hh) + (Number(mm) / 60) - parseInt(calendarStartTime.substring(0, 2)) // 8 refers to "8 am"
+
+  // offsetFromTop = hoursOffset * pxPerHour
+  // console.log('offsetFromTop =', offsetFromTop)
+
+  return hoursOffset * pxPerHour
+}
+
 /** Dispatch event on click outside of node */
 // Thank god for the person who wrote took 30 minutes of debugging and still no avail
 // https://svelte.dev/repl/0ace7a508bd843b798ae599940a91783?version=3.16.7
@@ -71,14 +114,3 @@ export function getRandomID () {
   }
   return autoId;
 }
-
-export function getTrueY (e) {
-  const ScrollContainer = document.getElementById('scroll-container')
-  const element = document.getElementById("calendar-day-container")
-  const containerDistanceFromTopOfPage = element.getBoundingClientRect().top
-  const trueY = - containerDistanceFromTopOfPage + ScrollContainer.scrollTop + e.clientY 
-  return trueY
-}
-
-export const PIXELS_PER_HOUR = 600
-export const PIXELS_PER_MINUTE = PIXELS_PER_HOUR / 60

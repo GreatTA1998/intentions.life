@@ -32,10 +32,12 @@
       {#each scheduledTasksToday.filter(task => task.startTime > calendarStartTime) as task, i}
         <TaskElement
           {task}
+          {calendarStartTime}
           offsetFromTop={computeOffset(task)}
-          height={task.duration * PIXELS_PER_MINUTE || 30}
+          height={task.duration * PIXELS_PER_MINUTE || 30 * PIXELS_PER_MINUTE}
           fontSize={0.8}
           offsetFromLeft={32}
+          {pixelsPerHour}
           on:task-click
           on:task-duration-adjusted
         />
@@ -61,7 +63,7 @@
       <hr style="
         border-top: 1px solid orange; 
         position: absolute; 
-        top: {computeOffset({ startTime: currentTimeInHHMM })}px;
+        top: {computeOffset({ startTime: currentTimeInHHMM }, PIXELS_PER_HOUR, calendarStartTime)}px;
         left: 32px;
         width: 10vw;  
       "
@@ -72,10 +74,14 @@
 
 <script>
   import { createEventDispatcher } from 'svelte'
-  import { getDateOfToday, getTrueY, PIXELS_PER_HOUR, PIXELS_PER_MINUTE } from './helpers.js'
+  import { getDateOfToday, getTrueY } from './helpers.js'
   import TaskElement from './TaskElement.svelte'
 
   export let scheduledTasksToday
+  export let pixelsPerHour 
+
+  $: PIXELS_PER_HOUR = pixelsPerHour
+  $: PIXELS_PER_MINUTE = PIXELS_PER_HOUR / 60
 
   const dispatch = createEventDispatcher()
   const getDate = getDateOfToday
