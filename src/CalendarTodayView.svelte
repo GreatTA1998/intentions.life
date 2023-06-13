@@ -1,4 +1,4 @@
-<div id="scroll-container" style="margin-top: 10px;">
+<div id="scroll-container" style="position: relative; width: 13vw">
   <!-- <div style="padding-bottom: 16px;">
     {#each tasksThatAlreadyHappened as task}
       <div style="display: flex; align-items: center; opacity: 1; margin-top: 10px;" class:green-text={task.isDone}>
@@ -27,10 +27,9 @@
   >
     {#if calendarStartTime}
       {#each timesOfDay as timeOfDay, i}
-        <!-- First hour is not displayed because otherwise it'd be cut-off -->
-          <div class="time-indicator" style="top: {-6 + (PIXELS_PER_HOUR * i)}px;">
-            {timeOfDay.substring(0, 5)}
-          </div>
+        <div class="timestamp-number" style="top: {-6 + 6 + (PIXELS_PER_HOUR * i)}px;">
+          {timeOfDay.substring(0, 5)}
+        </div>
       {/each}
 
       {#each scheduledTasksToday.filter(task => task.startTime >= calendarStartTime) as task, i}
@@ -45,13 +44,15 @@
           on:task-duration-adjusted
         />
       {/each}
+        
+      <!-- This offsets the fact that the timestamp needs a -6 margin to not be cut off from the top edge of the container -->
+      <div style="margin-top: 6px;"></div>
 
       <!-- Again, because we're using absolute positioning for above elements, their positionings are independent from each other -->
       {#each {length: 60 * 12} as _, i}
         <div 
-          class="atomic-minute" 
-          style="height: {PIXELS_PER_MINUTE}px; box-sizing: border-box; margin-right: 0; margin-left: auto; width: 82%"
           class:visible-line={(i % 60) === 0}
+          style="height: {PIXELS_PER_MINUTE}px; box-sizing: border-box; margin-right: 0; margin-left: auto; width: 82%"
           class:highlighted-background={highlightedMinute === i}
           on:dragenter={() => highlightedMinute = i}
           on:dragend={() => console.log('dragend') }
@@ -109,9 +110,6 @@
   $: if (calendarStartTime) {
     tasksThatAlreadyHappened = scheduledTasksToday.filter(task => task.startTime < calendarStartTime)
   }
-
-  $: console.log("scheduledTasksToday =", scheduledTasksToday)
-  $: console.log('calendarStartTime =', calendarStartTime)
 
   function toggleIsDone (task) { 
     dispatch('task-done', { taskName: task.name, id: task.id })
@@ -287,17 +285,13 @@
   }
 } 
 
-#calendar-day-container {
-  position: relative; 
-  /* margin-top: 4px; */
-}
 
 #scroll-container {
     height: 100%; 
     overflow-y: scroll; 
     overflow-x: hidden; 
     /* padding-top: 22px;  */
-    box-sizing: border-box
+    box-sizing: border-box;
   }
 
   .green-text {
@@ -311,7 +305,7 @@
 
   /* VERDICT: absolute works
   "Independence" is the best word you can ever hear in programming */
-  .time-indicator {
+  .timestamp-number {
     top: -5px; 
     margin-right: 4px;
     font-size: 0.7rem;
@@ -323,6 +317,6 @@
   }
 
   .visible-line {
-    border-top: 1px solid grey;
+    border-top: 1px solid rgb(195, 195, 195);
   }
 </style>

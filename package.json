@@ -17,6 +17,7 @@
   "dependencies": {
     "firebase": "^9.6.5",
     "lodash": "^4.17.21",
+    "plaid": "^14.0.0",
     "svelte-portal": "^2.2.0"
   }
 }

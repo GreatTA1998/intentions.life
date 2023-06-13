@@ -72,6 +72,40 @@ export function getDayOfWeek (MMDDString) {
   ).format(d)
 }
 
+// copied from chatGPT
+export function getNicelyFormattedDate () {
+  const date = new Date(); // Get the current date
+  const options = { 
+    month: 'long',  // Display the full month name (e.g., "April")
+    day: 'numeric', // Display the day of the month (e.g., "16")
+    ordinal: 'numeric' // Display the ordinal suffix (e.g., "th")
+  };
+
+  const suffix = getDaySuffix(date.getDate())
+
+  const formattedDate = date.toLocaleDateString('en-US', options);
+  const formattedDateWithSuffix = formattedDate.replace((/\b(\d+)\b/g, `$1${suffix}`))
+  const withSuffix = formattedDate + suffix
+  console.log('withSuffix =', withSuffix)
+  return withSuffix
+}
+
+function getDaySuffix (day) {
+  if (day >= 11 && day <= 13) {
+    return 'th'
+  }
+  switch (day % 10) {
+    case 1:
+      return 'st'
+    case 2:
+      return 'nd'
+    case 3:
+      return 'rd'
+    default: 
+      return 'th'
+  }
+}
+
 export function getDateInMMDD (dateClassObject) {
   let dd = dateClassObject.getDate() // between 1 to 31
   let mm = dateClassObject.getMonth() + 1 // 0 to 11

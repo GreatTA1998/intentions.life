@@ -1,9 +1,9 @@
-<div style="position: relative; height: 100vh; border: none; solid black;"
+<div style="position: relative; height: 100vh; border: none; solid black; width: 12vw"
   on:drop={(e) => drop_handler(e)}
   on:dragover={(e) => dragover_handler(e)}
 >
-  <div style="font-family: Roboto, sans-serif; font-weight:bold; color: #323232; font-size: 1.2rem; margin-top: 30px;">
-    Today's Tasks
+  <div style="font-family: Roboto, sans-serif; font-weight:bold; color: #323232; font-size: 1.2rem; margin-top: 10px;">
+    Today's tasks
   </div>
 
   <div>

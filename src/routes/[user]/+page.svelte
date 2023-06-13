@@ -66,22 +66,24 @@
     </span>
   </a>
 
-  <div style="font-family: roboto, sans-serif; font-size: 2.2rem; padding: 30px 0px 0px 55px;  color: #323232;">
-    {getDayOfWeek()} {getDateOfToday()} {new Date().getFullYear()}
+  <div style="margin-left: 69px; margin-top: 47px; display: flex; align-items: center;">
+    <div class="mika-rectangle" class:selected-rectangle={isGirlfriendMode === false} on:click={() => isGirlfriendMode = false}>
+      Day
+    </div>
+    <div class="mika-rectangle" class:selected-rectangle={isGirlfriendMode === true} on:click={() => isGirlfriendMode = true}>
+      Week
+    </div>
+    <div class="mika-rectangle">
+      Month
+    </div>
   </div>
 
-  <div style="margin-left: 55px;">
-    <button on:click={() => isGirlfriendMode = false}>
-      Day overview
-    </button>
-  
-    <button on:click={() => isGirlfriendMode = true}>
-      Week overview
-    </button>
+  <!--  {getDayOfWeek()}, {getDateOfToday()} {new Date().getFullYear()} -->
+  <div style="font-family: Inter; font-weight: 700; font-size: 32px; margin-left: 10px; padding: 30px 0px 0px 55px; color: #6D6D6D">
+    {getDayOfWeek()}, { getNicelyFormattedDate() }, { new Date().getFullYear() }
   </div>
 
   <div class="flex-container blur">
-
 
   <div class="calendar-section-container">
     <!-- Playground  -->
@@ -113,7 +115,7 @@
       />
 
       <div>
-        <div style="display: flex">  
+        <div style="display: flex; width: 24vw;">  
           {#if allTasks}
             <UnscheduledTasksForToday
               {allTasks}
@@ -122,6 +124,8 @@
               on:task-click={(e) => openDetailedCard(e.detail)}
             />
           {/if}
+
+          <div style="width: 2vw"></div>
       
           <FutureOverview
             {futureScheduledTasks}
@@ -193,7 +197,7 @@
   import CalendarTodayView from '../../CalendarTodayView.svelte'
   import FutureOverview from '../../FutureOverview.svelte'
   import DetailedCardPopup from '../../DetailedCardPopup.svelte'
-  import { MIKA_PIXELS_PER_HOUR, PIXELS_PER_HOUR } from '../../helpers.js'
+  import { MIKA_PIXELS_PER_HOUR, PIXELS_PER_HOUR, getNicelyFormattedDate } from '../../helpers.js'
   import GoalsAndPostersPopup from '$lib/GoalsAndPostersPopup.svelte'
   import { onMount } from 'svelte'
   import db from '../../db.js'
@@ -673,6 +677,23 @@
 </script>
 
 <style>
+  .mika-rectangle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 121px; 
+    height: 40px;
+    color: #6D6D6D;
+    border: 1px solid #D9D9D9;
+    vertical-align: middle;
+    font-family: sans-serif;
+  }
+
+  .selected-rectangle {
+    background: #6D6D6D;
+    color: white;
+  }
+
   /* Small Devices, Tablets and bigger devices */
   @media only screen and (min-width : 480px) {
     #background-image-holder {
@@ -718,10 +739,11 @@
   .calendar-section-container {
     height: 100vh;
     display: flex; 
-    margin-left: 30px;
+    margin-left: 50px;
     justify-content: space-evenly; 
     /* background-color: white;  */
     box-sizing: border-box;
+    padding-top: 30px;
   }
 
   .flex-container {

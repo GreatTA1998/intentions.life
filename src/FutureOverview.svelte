@@ -1,6 +1,6 @@
-<div id="future-overview-scroll-parent">
-  <div style="font-family: Roboto, sans-serif; margin-top: 30px; margin-bottom: 40px; font-weight:bold; color: #323232; font-size: 1.2rem;">
-    Future Tasks
+<div id="future-overview-scroll-parent" style="width: 16vw;">
+  <div style="white-space: nowrap; font-family: Roboto, sans-serif; margin-top: 10px; margin-bottom: 40px; font-weight:bold; color: #323232; font-size: 1.2rem;">
+    Upcoming this week
   </div>
   <div class="future-overview-scroll-container">
     {#each Object.keys(datesToTasks) as date}
