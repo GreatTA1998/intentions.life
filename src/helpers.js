@@ -9,7 +9,6 @@
 
 export function getTrueY (e) {
   const ScrollContainer = document.getElementById('scroll-container')
-  console.log("ScrollContainer.getBoundingClientRect =", ScrollContainer.getBoundingClientRect().top)
   return e.clientY + ScrollContainer.scrollTop - ScrollContainer.getBoundingClientRect().top - ScrollContainer.style.paddingTop
 }
 
@@ -79,15 +78,10 @@ export function getNicelyFormattedDate () {
     month: 'long',  // Display the full month name (e.g., "April")
     day: 'numeric', // Display the day of the month (e.g., "16")
     ordinal: 'numeric' // Display the ordinal suffix (e.g., "th")
-  };
-
+  }
+  const formattedDate = date.toLocaleDateString('en-US', options)
   const suffix = getDaySuffix(date.getDate())
-
-  const formattedDate = date.toLocaleDateString('en-US', options);
-  const formattedDateWithSuffix = formattedDate.replace((/\b(\d+)\b/g, `$1${suffix}`))
-  const withSuffix = formattedDate + suffix
-  console.log('withSuffix =', withSuffix)
-  return withSuffix
+  return formattedDate + suffix
 }
 
 function getDaySuffix (day) {
@@ -104,6 +98,19 @@ function getDaySuffix (day) {
     default: 
       return 'th'
   }
+}
+
+export function getDateInMMDDYYYY (dateClassObject) {
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  let mm = today.getMonth() + 1; // Months start at 0!
+  let dd = today.getDate();
+
+  if (dd < 10) dd = '0' + dd;
+  if (mm < 10) mm = '0' + mm;
+
+  const formattedToday = dd + '/' + mm + '/' + yyyy;
+  return formattedToday
 }
 
 export function getDateInMMDD (dateClassObject) {

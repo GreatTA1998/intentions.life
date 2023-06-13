@@ -89,7 +89,7 @@
 
         <!-- I don't care this looks bad -->
         <a on:click={() => dispatch('task-done')}>
-          Done
+          Completed
         </a>
       </div>
     </div>

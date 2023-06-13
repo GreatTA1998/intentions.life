@@ -67,13 +67,16 @@
   </a>
 
   <div style="margin-left: 69px; margin-top: 47px; display: flex; align-items: center;">
+    <div class="mika-rectangle" on:click={() => alert('Coming soon')}>
+      Hour
+    </div>
     <div class="mika-rectangle" class:selected-rectangle={isGirlfriendMode === false} on:click={() => isGirlfriendMode = false}>
       Day
     </div>
     <div class="mika-rectangle" class:selected-rectangle={isGirlfriendMode === true} on:click={() => isGirlfriendMode = true}>
       Week
     </div>
-    <div class="mika-rectangle">
+    <div class="mika-rectangle" on:click={() => alert('Coming soon')}>
       Month
     </div>
   </div>
@@ -101,8 +104,6 @@
         </TaskElement>
         {/each}
     </div> -->
-
-
     <!-- <ExperimentalPlayground/> -->
 
       <CalendarTodayView
@@ -119,7 +120,7 @@
           {#if allTasks}
             <UnscheduledTasksForToday
               {allTasks}
-              on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
+              on:task-dragged={(e) => changeTaskDeadline(e.detail)}
               on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
               on:task-click={(e) => openDetailedCard(e.detail)}
             />
@@ -271,6 +272,8 @@
   $: if (allTasks) {
     collectTodayScheduledTasksToArray()
     collectFutureScheduledTasksToArray()
+    // TO-DO: don't include all the tasks in the future, only if it is bounded by < 7 days for the week view, and < 30 days for the month view
+    
     futureScheduledTasks.sort((task1, task2) => {
       const d1 = new Date(task1.startDate)
       const d2 = new Date(task2.startDate)
@@ -571,15 +574,28 @@
     })
   }
 
+  async function changeTaskDeadline ({ id, deadlineTime, deadlineDate }) {
+    traverseAndUpdateTree({
+      fulfilsCriteria: (task) => task.id === id, 
+      applyFunc: (task) => {
+        task.deadlineTime = deadlineTime
+        task.deadlineDate = deadlineDate
+        task.startTime = ''
+      }
+    })
+    await updateDoc(doc(db, userDocPath), { 
+      allTasks 
+    })
+  }
+
   async function changeTaskDuration ({ taskName, id, duration }) {
     traverseAndUpdateTree({
       fulfilsCriteria: (task) => task.id === id,
       applyFunc: (task) => task.duration = duration
     })
-    await updateDoc(
-      doc(db, userDocPath),
-      { allTasks }
-    )
+    await updateDoc(doc(db, userDocPath), { 
+      allTasks 
+    })
   }
 
   // NOTE: it works by mutating the task nodes directly, it assumes aliasing
@@ -667,6 +683,8 @@
       applyFunc: (task) => { 
         task.startTime = ''
         task.startDate = ''
+        task.deadlineTime = '' 
+        task.deadlineDate = ''
       }
     })
     updateDoc(
