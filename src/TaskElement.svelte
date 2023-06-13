@@ -1,3 +1,4 @@
+<!-- offset from top  -->
 {#if offsetFromTop || disableAbsolutePosition}
   <div 
     on:click={() => dispatch('task-click', { task })}
@@ -47,17 +48,16 @@
   import { getTrueY, computeOffset } from '/src/helpers.js'
 
   export let pixelsPerHour
-
-  $: PIXELS_PER_HOUR = pixelsPerHour
-  $: PIXELS_PER_MINUTE = PIXELS_PER_HOUR / 60
-  $: offsetFromTop = computeOffset(task, PIXELS_PER_HOUR, calendarStartTime)
-
   export let task = null
   export let fontSize = 1
   export let offsetFromLeft = 0
   export let height
   export let disableAbsolutePosition = false
   export let calendarStartTime
+
+  $: PIXELS_PER_HOUR = pixelsPerHour
+  $: PIXELS_PER_MINUTE = PIXELS_PER_HOUR / 60
+  $: offsetFromTop = computeOffset(task, PIXELS_PER_HOUR, calendarStartTime)
 
   let offsetFromTop
 

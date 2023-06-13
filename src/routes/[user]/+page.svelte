@@ -34,6 +34,13 @@
   />
 {/if}
 
+{#if isFinancePopupOpen}
+  <FinancePopup
+    isOpen={isFinancePopupOpen}
+    on:card-close={() => isFinancePopupOpen = false}
+  />
+{/if}
+
 <div id="background-image-holder" style="height: 100vh;">
   <a role="button" on:click={toggleMusic} class="float  mika-hover" style="bottom: 210px; z-index: 10;">
     <span class="material-icons my-float">
@@ -53,28 +60,48 @@
     </span>
   </a>
 
+  <a role="button" on:click={() => isFinancePopupOpen = !isFinancePopupOpen} class="float mika-hover" style="bottom: 290px; z-index: 10">
+    <span class="material-icons my-float">
+      attach_money
+    </span>
+  </a>
+
   <div style="font-family: roboto, sans-serif; font-size: 2.2rem; padding: 30px 0px 0px 55px;  color: #323232;">
     {getDayOfWeek()} {getDateOfToday()} {new Date().getFullYear()}
   </div>
 
+  <div style="margin-left: 55px;">
+    <button on:click={() => isGirlfriendMode = false}>
+      Day overview
+    </button>
+  
+    <button on:click={() => isGirlfriendMode = true}>
+      Week overview
+    </button>
+  </div>
+
   <div class="flex-container blur">
+
 
   <div class="calendar-section-container">
     <!-- Playground  -->
-    <!-- <div style="position: relative">
-      {#each todayScheduledTasks as task, i}
-        <TaskElement
-          {task}
-          offsetFromTop={30 * i}
-          height={30}
-          fontSize={0.8}
-          offsetFromLeft={30 * i}
-          on:task-click
-          on:task-duration-adjusted
-        >
-      </TaskElement>
-      {/each}
-  </div> -->
+      <!-- <div style="position: relative">
+        {#each todayScheduledTasks as task, i}
+          <TaskElement
+            {task}
+            offsetFromTop={30 * i}
+            height={30}
+            fontSize={0.8}
+            offsetFromLeft={30 * i}
+            on:task-click
+            on:task-duration-adjusted
+          >
+        </TaskElement>
+        {/each}
+    </div> -->
+
+
+    <!-- <ExperimentalPlayground/> -->
 
       <CalendarTodayView
         scheduledTasksToday={todayScheduledTasks}
@@ -86,13 +113,6 @@
       />
 
       <div>
-        <button on:click={() => isGirlfriendMode = false}>
-          Boyfriend mode
-        </button>
-        <button on:click={() => isGirlfriendMode = true}>
-          Girlfriend mode
-        </button>
-
         <div style="display: flex">  
           {#if allTasks}
             <UnscheduledTasksForToday
@@ -180,6 +200,8 @@
   import { doc, getDoc, onSnapshot, updateDoc } from 'firebase/firestore'
   import { getRandomInt, getDateOfToday, getDateOfTomorrow, getDateInMMDD, getRandomID } from '../../helpers.js'
   import JournalPopup from '$lib/JournalPopup.svelte'
+  import FinancePopup from '$lib/FinancePopup.svelte'
+  import ExperimentalPlayground from '$lib/ExperimentalPlayground.svelte'
 
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getDay
   function getDayOfWeek () {
@@ -187,6 +209,8 @@
     const options = { weekday: 'long' } // can be short for Mon. instead of Monday
     return new Intl.DateTimeFormat('en-US', options).format(today)
   }
+
+  let isFinancePopupOpen = false
 
   let isGirlfriendMode = false
 

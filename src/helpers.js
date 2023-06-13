@@ -4,17 +4,15 @@
 
 // TO-DO: fix this
 
+
+// e.clientY := coordinates relative to VIEWPORT, so doesn't matter if root page is scrolled
+
 export function getTrueY (e) {
   const ScrollContainer = document.getElementById('scroll-container')
-  const element = document.getElementById("calendar-day-container")
-  const containerDistanceFromTopOfPage = element.getBoundingClientRect().top
-  const trueY = e.clientY - containerDistanceFromTopOfPage + ScrollContainer.scrollTop
-  console.log('e.clientY =', e.clientY)
-  console.log('containerDistanceFromTopOfPage =', containerDistanceFromTopOfPage)
-  console.log('ScrollContainer.scrollTop =', ScrollContainer.scrollTop)
-  console.log("trueY =", trueY)
-  return trueY
+  console.log("ScrollContainer.getBoundingClientRect =", ScrollContainer.getBoundingClientRect().top)
+  return e.clientY + ScrollContainer.scrollTop - ScrollContainer.getBoundingClientRect().top - ScrollContainer.style.paddingTop
 }
+
 
 export const MIKA_PIXELS_PER_HOUR = 200
 export const MIKA_PIXELS_PER_MINUTE = MIKA_PIXELS_PER_HOUR / 60
@@ -37,8 +35,7 @@ export function computeOffset ({ startTime }, pxPerHour, calendarStartTime) {
 
   // offsetFromTop = hoursOffset * pxPerHour
   // console.log('offsetFromTop =', offsetFromTop)
-
-  return hoursOffset * pxPerHour
+  return (hoursOffset * pxPerHour) || 1 // quickfix so computeOffset doesn't return a falsy value
 }
 
 /** Dispatch event on click outside of node */

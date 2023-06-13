@@ -1,7 +1,6 @@
-<div id="scroll-container">
-  <div style="padding-bottom: 16px;">
+<div id="scroll-container" style="margin-top: 10px;">
+  <!-- <div style="padding-bottom: 16px;">
     {#each tasksThatAlreadyHappened as task}
-      <!-- class:red-text={!task.isDone} -->
       <div style="display: flex; align-items: center; opacity: 1; margin-top: 10px;" class:green-text={task.isDone}>
         <input
           style="margin-left: 0; accent-color: #0085FF"
@@ -14,26 +13,30 @@
         </div>
       </div>
     {/each}
-  </div>
+  </div> -->
 
   <!-- This is a relative container -->
   <div id="calendar-day-container" 
-    style="height: {PIXELS_PER_HOUR * numOfHourBlocksDisplayed}px; font-family: Roboto, sans-serif; margin-bottom: 1px; color: #6D6D6D; "
+    style="height: {PIXELS_PER_HOUR * numOfHourBlocksDisplayed}px; 
+      font-family: Roboto, sans-serif; 
+      margin-bottom: 1px; 
+      color: #6D6D6D;
+    "
     on:drop={(e) => drop_handler(e)}
     on:dragover={(e) => dragover_handler(e)}
   >
     {#if calendarStartTime}
       {#each timesOfDay as timeOfDay, i}
-        <div class="time-indicator" style="top: {-6 + (PIXELS_PER_HOUR * i)}px;">
-          {timeOfDay.substring(0, 5)}
-        </div>
+        <!-- First hour is not displayed because otherwise it'd be cut-off -->
+          <div class="time-indicator" style="top: {-6 + (PIXELS_PER_HOUR * i)}px;">
+            {timeOfDay.substring(0, 5)}
+          </div>
       {/each}
 
-      {#each scheduledTasksToday.filter(task => task.startTime > calendarStartTime) as task, i}
+      {#each scheduledTasksToday.filter(task => task.startTime >= calendarStartTime) as task, i}
         <TaskElement
           {task}
           {calendarStartTime}
-          offsetFromTop={computeOffset(task)}
           height={task.duration * PIXELS_PER_MINUTE || 30 * PIXELS_PER_MINUTE}
           fontSize={0.8}
           offsetFromLeft={32}
@@ -103,13 +106,12 @@
     return new Intl.DateTimeFormat('en-US', options).format(today)
   }
 
-  function print (message) {
-    console.log(message)
-  }
-
   $: if (calendarStartTime) {
     tasksThatAlreadyHappened = scheduledTasksToday.filter(task => task.startTime < calendarStartTime)
   }
+
+  $: console.log("scheduledTasksToday =", scheduledTasksToday)
+  $: console.log('calendarStartTime =', calendarStartTime)
 
   function toggleIsDone (task) { 
     dispatch('task-done', { taskName: task.name, id: task.id })
@@ -209,7 +211,9 @@
     // calculate minutes i.e. `mm` 
     let minutesOffset = decimal * 60
     let mm 
-    if (minutesOffset < 10) { //minutesOffset = minutesOffset.toPrecision(1)
+    if (minutesOffset < 1) {
+      mm = '00'
+    } else if (minutesOffset < 10) {
       mm = `0${minutesOffset.toPrecision(1)}`
     } else {
       mm = minutesOffset.toPrecision(2)
@@ -233,6 +237,26 @@
 </script>
 
 <style>
+/* Notion scrollbar styles */
+::-webkit-scrollbar {
+  background: transparent;
+}
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: #D3D1CB;
+}
+::-webkit-scrollbar-track {
+  background: #EDECE9;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+
 .highlighted-background {
   background: rgb(82, 180, 251);
 }
@@ -265,20 +289,15 @@
 
 #calendar-day-container {
   position: relative; 
-  margin-top: 4px;
+  /* margin-top: 4px; */
 }
 
 #scroll-container {
     height: 100%; 
     overflow-y: scroll; 
     overflow-x: hidden; 
-    padding-top: 22px; 
+    /* padding-top: 22px;  */
     box-sizing: border-box
-  }
-
-  *::-webkit-scrollbar {
-    width: 0;
-    background-color: #aaa; /* or add it to the track */
   }
 
   .green-text {

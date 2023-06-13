@@ -2,34 +2,16 @@
   <div class="my-popup-window" use:clickOutside on:click_outside={() => dispatch('card-close')}>
     <div style="display: flex;">
       <h3 class="google-calendar-event-title"  style="margin-left: 50px; color: #323232;">
-        My Journal
+        My finance dashboard
       </h3>
       <span on:click={() => dispatch('card-close')} class="material-icons" style="margin-left: auto; margin-right: 10px; margin-top: 10px; color: #323232;">
         close
       </span>
     </div>
 
-    <div style="display: flex">
-      <div class="journal-left-navigation" style="font-family: Roboto,Arial,sans-serif; font-size:16px; color: #6D6D6D;">
-        {#each Object.keys(journal) as date}
-          <div on:click={() => currentlySelectedDate = date} class:blue-highlight={date === currentlySelectedDate}>
-            {date}
-          </div>
-        {/each}
-      </div>
+      <!-- PLAID API -->
 
-      <div stle="float: left; width: 80%">
-        <!-- cols="48" determines width -->
-        <textarea 
-          bind:value={journal[currentlySelectedDate]}
-          on:input={handleInput}
-          rows="38"
-          cols="120"
-          placeholder="notes"
-          style="margin-left: 10px; width: 97%; margin-right: 10px; box-sizing: border-box;"
-        />
-      </div>
-    </div>
+
   </div>
 {/if}
 
@@ -41,41 +23,36 @@ import { getDateOfToday, getRandomID, clickOutside } from '/src/helpers.js';
 export let journal
 export let isOpen = false
 
+import { Configuration, PlaidApi, PlaidEnvironments } from 'plaid';
+import { PLAID_CLIENT_ID, PLAID_SECRET } from '../.secrets.js'
+
+const configuration = new Configuration({
+  basePath: PlaidEnvironments.sandbox,
+  baseOptions: {
+    headers: {
+      'PLAID-CLIENT-ID': PLAID_CLIENT_ID,
+      'PLAID-SECRET': PLAID_SECRET,
+    },
+  },
+});
+
+
+const client = new PlaidApi(configuration);
+console.log('client =', client)
+
+const plaidClient = client
+
+async function getStarted () {
+  const response = await plaidClient.itemPublicTokenExchange({ public_token });
+  const access_token = response.data.access_token;
+  const accounts_response = await plaidClient.accountsGet({ access_token });
+  const accounts = accounts_response.data.accounts;
+}
+
+getStarted()
+
 const dispatch = createEventDispatcher()
 const todayDateMMDD = getDateOfToday()
-
-const throttledSaveJournalPage = _.throttle(saveJournalPage, 500)
-
-createTodayJournal() // won't do anything if it already exists, I know this is bad because it isn't atomic
-let currentlySelectedDate = todayDateMMDD
-
-function createTodayJournal () {
-  if (!journal) { // backwards compatibility
-    journal = {}
-  }
-  else {
-    for (const journalDates of Object.keys(journal)) {
-      if (journalDates === todayDateMMDD) {
-        return
-      }
-    }
-
-  }
-  journal[todayDateMMDD] = '- Happenings\n\n\n- Grateful for\n\n\n- Findings\n\n\n- Intentions'
-  dispatch('journal-update', journal)
-}
-
-
-function handleInput (e) {
-  journal[currentlySelectedDate] = e.target.value
-  throttledSaveJournalPage()
-}
-
-function saveJournalPage () {
-  dispatch('journal-update', { newJournal: journal })
-}
-
-
 </script>
 
 <style>
@@ -121,6 +98,11 @@ function saveJournalPage () {
     letter-spacing: .2px;
     line-height: 20px;
     color: #6D6D6D;
+  }
+
+  *::-webkit-scrollbar {
+    width: 0;
+    background-color: #aaa; /* or add it to the track */
   }
 
   .google-calendar-event-time {

@@ -258,11 +258,6 @@ function setTaskAsHabit () {
     color: #3c4043;
   }
 
-  *::-webkit-scrollbar {
-    width: 0;
-    background-color: #aaa; /* or add it to the track */
-  }
-
   .google-calendar-event-time {
     font-family: Roboto,Arial,sans-serif;
     font-size: 14px;
