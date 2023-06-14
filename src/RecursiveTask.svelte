@@ -72,7 +72,7 @@
       {/each}
 
       {#if isTypingNewTask}
-        <div style="display: flex; align-items: center; margin-left: 20px;">
+        <div style="display: flex; align-items: center; margin-left: 5px;">
           <input 
             bind:this={newSubtaskInput}
             placeholder="Type sub-task" 
