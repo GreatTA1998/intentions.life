@@ -17,6 +17,7 @@ const PLAID_CLIENT_ID = '60a82f4b2dd19f0010a1abd3'
 const PLAID_SECRET = '0f281a6c787cb66c211224dcb9bc50'
 
 const PLAID_PRODUCTS = 'auth,transactions,balance'
+const PLAID_COUNTRY_CODES = 'US,CA'
 
 const {onRequest} = require("firebase-functions/v2/https");
 const logger = require("firebase-functions/logger");
@@ -37,7 +38,8 @@ console.log('client =', client)
 
 const plaidClient = client
 
-async function createLinkToken () {
+exports.createLinkToken = functions.https.onCall(async (request, response) => {
+  console.log('calling createLinkToken()')
   const configs = {
     user: {
       // This should correspond to a unique id for the current user.
@@ -50,13 +52,33 @@ async function createLinkToken () {
   };
   const createTokenResponse = await client.linkTokenCreate(configs)
   console.log("createTokenResponse =", createTokenResponse)
-}
-
-exports.createLinkToken = functions.https.onCall((request, response) => {
-  response.set('Access-Control-Allow-Origin', '*');
-  console.log('calling createLinkToken()')
   createLinkToken()
 })
+
+exports.exchangeLinkTokenForAccessToken = functions.https.onCall(async (request, response) => {
+  console.log('exchangLinkTokenForAccessToken')
+  const PUBLIC_TOKEN = request.body.public_token
+  console.log('PUBLIC TOKEN =', PUBLIC_TOKEN)
+  const tokenResponse = await client.itemPublicTokenExchange({
+    public_token: PUBLIC_TOKEN,
+  })
+  const ACCESS_TOKEN = tokenResponse.data.access_token;
+  const ITEM_ID = tokenResponse.data.item_id;
+  return  response.json({
+    // the 'access_token' is a private token, DO NOT pass this token to the frontend in your production environment
+    access_token: ACCESS_TOKEN,
+    item_id: ITEM_ID,
+    error: null,
+  })
+})
+
+// TO-DO
+//  - Figure out how to what part of the code is responsible for the Plaid Link UI 
+//  - Trade the link token for a public token 
+//  - Trade the public token for an access token which you store on Firebase or hard-code in your codebase
+//  - Fix the hover and indentation issue for creating new sub-tasks
+//  - Implement hour, day, week, month modes properly
+//  - Fix infinite bugs
 
 
 // Create and deploy your first functions

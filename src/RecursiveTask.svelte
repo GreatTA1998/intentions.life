@@ -8,7 +8,6 @@
     class:orange-duration-line={!taskObject.isDone && taskObject.startTime && taskObject.startDate}
     class:green-duration-line={taskObject.isDone}
     style="
-      border: 3px solid blue;
       margin-left: {depth === 1 ? '0' : '5'}px; 
       margin-bottom: 10px; 
       width: {350 * 0.8 ** depth}px; 
@@ -19,8 +18,6 @@
       padding-left: {10 * 0.8 ** depth}px;
     "
     on:dragstart|self={(e) => dragstart_handler(e, taskObject.id)}
-    on:pointerenter={showOptions}
-    on:pointerleave={hideOptions}
   >
     <div class="current-task-flexbox">
       <div 
@@ -36,16 +33,21 @@
       >
         {#if !isEditingTaskName}
           <!-- on:pointerenter={showOptions} -->
-          <div 
-
-            on:click={() => dispatch('task-click', { task: taskObject })} 
-            class="truncate"
-            class:my-uppercase={isGoal}
-            class:transparent-grey={isGoal}
-            style="width: {350 * (0.85 ** depth)}px; color: {depth === 1 ? '#323232' : '#6D6D6D'}; border: 2px solid orange;"
-          >
-            {taskObject.name}
-          </div>
+          <div style="display: flex; align-items: center;">
+            <!-- width: {350 * (0.85 ** depth)}px;  -->
+            <div 
+              on:click={() => dispatch('task-click', { task: taskObject })} 
+              class="truncate"
+              class:my-uppercase={isGoal}
+              class:transparent-grey={isGoal}
+              style="color: {depth === 1 ? '#323232' : '#6D6D6D'};"
+            >
+              {taskObject.name}
+            </div>
+            <span class="material-icons" on:click={() => isTypingNewTask = true} style="font-size: 1rem;">
+              add
+            </span>
+          </div>     
         {:else} 
           <!-- TO-DO: newTaskName refers to EDIT, not a new sub-task -->
           <input 
@@ -69,26 +71,16 @@
         />
       {/each}
 
-      {#if isShowingOptions}
-        {#if !isTypingNewTask}
-          <!-- `padding-bottom` accounts for the text fonts are just not vertically centered, see https://stackoverflow.com/questions/21580059/text-is-not-vertically-centered -->
-          <div 
-            on:click={() => isTypingNewTask = true} 
-            style="margin-left: 20px; margin-right: 20px; margin-bottom: 10px; border-left: 2px solid grey; color: #6D6D6D; padding-left: 5px; padding-bottom: {8 * 0.68 ** (depth + 1)}px; font-size: {1.5 * (0.85 ** (depth + 1))}rem;"
-          >
-            new sub-task
-          </div>
-        {:else}
-          <div style="display: flex; align-items: center; margin-left: 20px;">
-            <input 
-              bind:this={newSubtaskInput}
-              placeholder="Type sub-task" 
-              bind:value={newTask}
-              on:keypress={detectEnterKey} 
-              style="width: 100%; margin-left: 5px"
-            />
-          </div>
-        {/if}
+      {#if isTypingNewTask}
+        <div style="display: flex; align-items: center; margin-left: 20px;">
+          <input 
+            bind:this={newSubtaskInput}
+            placeholder="Type sub-task" 
+            bind:value={newTask}
+            on:keypress={detectEnterKey} 
+            style="width: 100%; margin-left: 5px; z-index: 1"
+          />
+        </div>
       {/if}
     </div>
   </div>    
@@ -221,13 +213,6 @@
     })
   }
 
-  function showOptions () {
-    isShowingOptions = true
-  }
-
-  function hideOptions () {
-    isShowingOptions = false
-  }
 
   function markAsDone () {
     taskObject.isDone = !taskObject.isDone
