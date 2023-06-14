@@ -8,10 +8,7 @@
         close
       </span>
     </div>
-
-      <!-- PLAID API -->
-
-
+    <!-- PLAID API -->
   </div>
 {/if}
 
@@ -19,40 +16,25 @@
 import { createEventDispatcher, onMount, onDestroy, tick } from 'svelte'
 import _ from 'lodash'
 import { getDateOfToday, getRandomID, clickOutside } from '/src/helpers.js';
+import { getFunctions, httpsCallable } from "firebase/functions";
 
-export let journal
 export let isOpen = false
 
-import { Configuration, PlaidApi, PlaidEnvironments } from 'plaid';
-import { PLAID_CLIENT_ID, PLAID_SECRET } from '../.secrets.js'
-
-const configuration = new Configuration({
-  basePath: PlaidEnvironments.sandbox,
-  baseOptions: {
-    headers: {
-      'PLAID-CLIENT-ID': PLAID_CLIENT_ID,
-      'PLAID-SECRET': PLAID_SECRET,
-    },
-  },
-});
-
-
-const client = new PlaidApi(configuration);
-console.log('client =', client)
-
-const plaidClient = client
-
-async function getStarted () {
-  const response = await plaidClient.itemPublicTokenExchange({ public_token });
-  const access_token = response.data.access_token;
-  const accounts_response = await plaidClient.accountsGet({ access_token });
-  const accounts = accounts_response.data.accounts;
-}
-
-getStarted()
-
 const dispatch = createEventDispatcher()
-const todayDateMMDD = getDateOfToday()
+
+const functions = getFunctions();
+const createLinkToken = httpsCallable(functions, 'createLinkToken');
+
+console.log("calling the cloud function")
+createLinkToken({ })
+  .then((result) => {
+    // Read result of the Cloud Function.
+    /** @type {any} */
+    const data = result.data;
+    const sanitizedMessage = data.text;
+    console.log("result =", result)
+    console.log("result.data =", result.data)
+  });
 </script>
 
 <style>

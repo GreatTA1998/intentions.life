@@ -66,82 +66,68 @@
     </span>
   </a>
 
-  <div style="margin-left: 69px; margin-top: 47px; display: flex; align-items: center;">
-    <div class="mika-rectangle" on:click={() => alert('Coming soon')}>
-      Hour
-    </div>
-    <div class="mika-rectangle" class:selected-rectangle={isGirlfriendMode === false} on:click={() => isGirlfriendMode = false}>
-      Day
-    </div>
-    <div class="mika-rectangle" class:selected-rectangle={isGirlfriendMode === true} on:click={() => isGirlfriendMode = true}>
-      Week
-    </div>
-    <div class="mika-rectangle" on:click={() => alert('Coming soon')}>
-      Month
-    </div>
-  </div>
+  <div style="display: flex"> 
+    <!-- 1st flex child -->
+    <div style="width: 44vw">
+      <div style="margin-left: 69px; margin-top: 47px; display: flex; align-items: center;">
+        <div class="mika-rectangle" on:click={() => alert('Coming soon')}>
+          Hour
+        </div>
+        <div class="mika-rectangle" class:selected-rectangle={isGirlfriendMode === false} on:click={() => isGirlfriendMode = false}>
+          Day
+        </div>
+        <div class="mika-rectangle" class:selected-rectangle={isGirlfriendMode === true} on:click={() => isGirlfriendMode = true}>
+          Week
+        </div>
+        <div class="mika-rectangle" on:click={() => alert('Coming soon')}>
+          Month
+        </div>
+      </div>
 
-  <!--  {getDayOfWeek()}, {getDateOfToday()} {new Date().getFullYear()} -->
-  <div style="font-family: Inter; font-weight: 700; font-size: 32px; margin-left: 10px; padding: 30px 0px 0px 55px; color: #6D6D6D">
-    {getDayOfWeek()}, { getNicelyFormattedDate() }, { new Date().getFullYear() }
-  </div>
+      <div style="font-family: Inter; font-weight: 700; font-size: 32px; margin-left: 10px; padding: 30px 0px 0px 55px; color: #6D6D6D">
+        {getDayOfWeek()}, { getNicelyFormattedDate() }, { new Date().getFullYear() }
+      </div>
 
-  <div class="flex-container blur">
-
-  <div class="calendar-section-container">
-    <!-- Playground  -->
-      <!-- <div style="position: relative">
-        {#each todayScheduledTasks as task, i}
-          <TaskElement
-            {task}
-            offsetFromTop={30 * i}
-            height={30}
-            fontSize={0.8}
-            offsetFromLeft={30 * i}
-            on:task-click
-            on:task-duration-adjusted
-          >
-        </TaskElement>
-        {/each}
-    </div> -->
-    <!-- <ExperimentalPlayground/> -->
-
-      <CalendarTodayView
-        scheduledTasksToday={todayScheduledTasks}
-        pixelsPerHour={isGirlfriendMode ? MIKA_PIXELS_PER_HOUR : PIXELS_PER_HOUR }
-        on:task-done={(e) => markNodeAsDone(e.detail.id)}
-        on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
-        on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
-        on:task-click={(e) => openDetailedCard(e.detail)}
-      />
-
-      <div>
-        <div style="display: flex; width: 24vw;">  
-          {#if allTasks}
-            <UnscheduledTasksForToday
-              {allTasks}
-              on:task-dragged={(e) => changeTaskDeadline(e.detail)}
-              on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
-              on:task-click={(e) => openDetailedCard(e.detail)}
-            />
-          {/if}
-
-          <div style="width: 2vw"></div>
-      
-          <FutureOverview
-            {futureScheduledTasks}
+      <div class="flex-container blur">
+        <div class="calendar-section-container">
+          <CalendarTodayView
+            scheduledTasksToday={todayScheduledTasks}
+            pixelsPerHour={isGirlfriendMode ? MIKA_PIXELS_PER_HOUR : PIXELS_PER_HOUR }
+            on:task-done={(e) => markNodeAsDone(e.detail.id)}
+            on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
             on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
             on:task-click={(e) => openDetailedCard(e.detail)}
           />
+          <div>
+            <div style="display: flex; width: 24vw;">  
+              {#if allTasks}
+                <UnscheduledTasksForToday
+                  {allTasks}
+                  on:task-dragged={(e) => changeTaskDeadline(e.detail)}
+                  on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
+                  on:task-click={(e) => openDetailedCard(e.detail)}
+                />
+              {/if}
+    
+              <div style="width: 2vw"></div>
+          
+              <FutureOverview
+                {futureScheduledTasks}
+                on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
+                on:task-click={(e) => openDetailedCard(e.detail)}
+              />
+            </div>
+          </div>
         </div>
       </div>
     </div>
+    <!-- end of 1st flex child -->
 
     <div class="todo-container" 
+      style="box-shadow: -2px 0px 10px 1px #aaaaaa;" 
       on:drop={(e) => unscheduleTask(e)}
       on:dragover={(e) => dragover_handler(e)}
     >
-
       <div class="todo-list">
         {#if allTasks}
           {#each allTasks as task}
@@ -184,6 +170,7 @@
       </div>
     </div>
   </div>
+  <!-- End of flexbox -->
 </div>
 
 <audio bind:this={AudioElem}></audio>
@@ -273,7 +260,7 @@
     collectTodayScheduledTasksToArray()
     collectFutureScheduledTasksToArray()
     // TO-DO: don't include all the tasks in the future, only if it is bounded by < 7 days for the week view, and < 30 days for the month view
-    
+
     futureScheduledTasks.sort((task1, task2) => {
       const d1 = new Date(task1.startDate)
       const d2 = new Date(task2.startDate)
@@ -793,6 +780,8 @@
     overflow-y: scroll;
     overflow-x: scroll;
     box-sizing: border-box;
+    width: 100%;
+    height: 150vh;
   }
 
   .todo-list {

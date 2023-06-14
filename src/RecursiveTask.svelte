@@ -8,6 +8,7 @@
     class:orange-duration-line={!taskObject.isDone && taskObject.startTime && taskObject.startDate}
     class:green-duration-line={taskObject.isDone}
     style="
+      border: 3px solid blue;
       margin-left: {depth === 1 ? '0' : '5'}px; 
       margin-bottom: 10px; 
       width: {350 * 0.8 ** depth}px; 
@@ -18,6 +19,7 @@
       padding-left: {10 * 0.8 ** depth}px;
     "
     on:dragstart|self={(e) => dragstart_handler(e, taskObject.id)}
+    on:pointerenter={showOptions}
     on:pointerleave={hideOptions}
   >
     <div class="current-task-flexbox">
@@ -33,13 +35,14 @@
         class:crossed-out={taskObject.isDone} 
       >
         {#if !isEditingTaskName}
+          <!-- on:pointerenter={showOptions} -->
           <div 
+
             on:click={() => dispatch('task-click', { task: taskObject })} 
-            on:pointerenter={showOptions}
             class="truncate"
             class:my-uppercase={isGoal}
             class:transparent-grey={isGoal}
-            style="width: {350 * (0.85 ** depth)}px; color: {depth === 1 ? '#323232' : '#6D6D6D'};"
+            style="width: {350 * (0.85 ** depth)}px; color: {depth === 1 ? '#323232' : '#6D6D6D'}; border: 2px solid orange;"
           >
             {taskObject.name}
           </div>
