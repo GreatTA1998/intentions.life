@@ -49,6 +49,11 @@ let accounts = []
 let ACCESS_TOKEN = 'access-development-d8846a38-5ee5-478f-b597-afc6bf3586b0'
 
 onMount(async () => {
+  // auto fetch account balances
+  if (ACCESS_TOKEN) {
+    checkHowMuchMoneyLeft(ACCESS_TOKEN)
+  }
+
   const result = await firebaseFunctionsVersion()
   const link_token = result.data.link_token
   console.log('link_token =', link_token)
