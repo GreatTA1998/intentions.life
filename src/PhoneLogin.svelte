@@ -104,7 +104,6 @@
 
 		function onSignInSubmit () {
 			const phoneNumber = `${countryCode} ${phoneNumSegment1}-${phoneNumSegment2}-${phoneNumSegment3}`
-			print(getAuth(), phoneNumber, appVerifier)
 			signInWithPhoneNumber(getAuth(), phoneNumber, appVerifier)
 				.then((confirmationResult) => {
 					console.log('confirmation result =', confirmationResult)

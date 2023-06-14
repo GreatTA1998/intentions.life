@@ -1,7 +1,6 @@
-<div id="scroll-container">
-  <div style="padding-bottom: 16px;">
+<div id="scroll-container" style="position: relative; width: 13vw">
+  <!-- <div style="padding-bottom: 16px;">
     {#each tasksThatAlreadyHappened as task}
-      <!-- class:red-text={!task.isDone} -->
       <div style="display: flex; align-items: center; opacity: 1; margin-top: 10px;" class:green-text={task.isDone}>
         <input
           style="margin-left: 0; accent-color: #0085FF"
@@ -14,26 +13,29 @@
         </div>
       </div>
     {/each}
-  </div>
+  </div> -->
 
   <!-- This is a relative container -->
   <div id="calendar-day-container" 
-    style="height: {PIXELS_PER_HOUR * numOfHourBlocksDisplayed}px; font-family: Roboto, sans-serif; margin-bottom: 1px; color: #6D6D6D; "
+    style="height: {PIXELS_PER_HOUR * numOfHourBlocksDisplayed}px; 
+      font-family: Roboto, sans-serif; 
+      margin-bottom: 1px; 
+      color: #6D6D6D;
+    "
     on:drop={(e) => drop_handler(e)}
     on:dragover={(e) => dragover_handler(e)}
   >
     {#if calendarStartTime}
       {#each timesOfDay as timeOfDay, i}
-        <div class="time-indicator" style="top: {-6 + (PIXELS_PER_HOUR * i)}px;">
+        <div class="timestamp-number" style="top: {-6 + 6 + (PIXELS_PER_HOUR * i)}px;">
           {timeOfDay.substring(0, 5)}
         </div>
       {/each}
 
-      {#each scheduledTasksToday.filter(task => task.startTime > calendarStartTime) as task, i}
+      {#each scheduledTasksToday.filter(task => task.startTime >= calendarStartTime) as task, i}
         <TaskElement
           {task}
           {calendarStartTime}
-          offsetFromTop={computeOffset(task)}
           height={task.duration * PIXELS_PER_MINUTE || 30 * PIXELS_PER_MINUTE}
           fontSize={0.8}
           offsetFromLeft={32}
@@ -42,13 +44,15 @@
           on:task-duration-adjusted
         />
       {/each}
+        
+      <!-- This offsets the fact that the timestamp needs a -6 margin to not be cut off from the top edge of the container -->
+      <div style="margin-top: 6px;"></div>
 
       <!-- Again, because we're using absolute positioning for above elements, their positionings are independent from each other -->
       {#each {length: 60 * 12} as _, i}
         <div 
-          class="atomic-minute" 
-          style="height: {PIXELS_PER_MINUTE}px; box-sizing: border-box; margin-right: 0; margin-left: auto; width: 82%"
           class:visible-line={(i % 60) === 0}
+          style="height: {PIXELS_PER_MINUTE}px; box-sizing: border-box; margin-right: 0; margin-left: auto; width: 82%"
           class:highlighted-background={highlightedMinute === i}
           on:dragenter={() => highlightedMinute = i}
           on:dragend={() => console.log('dragend') }
@@ -101,10 +105,6 @@
     const today = new Date()
     const options = { weekday: 'short' }
     return new Intl.DateTimeFormat('en-US', options).format(today)
-  }
-
-  function print (message) {
-    console.log(message)
   }
 
   $: if (calendarStartTime) {
@@ -209,7 +209,9 @@
     // calculate minutes i.e. `mm` 
     let minutesOffset = decimal * 60
     let mm 
-    if (minutesOffset < 10) { //minutesOffset = minutesOffset.toPrecision(1)
+    if (minutesOffset < 1) {
+      mm = '00'
+    } else if (minutesOffset < 10) {
       mm = `0${minutesOffset.toPrecision(1)}`
     } else {
       mm = minutesOffset.toPrecision(2)
@@ -233,6 +235,26 @@
 </script>
 
 <style>
+/* Notion scrollbar styles */
+::-webkit-scrollbar {
+  background: transparent;
+}
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: #D3D1CB;
+}
+::-webkit-scrollbar-track {
+  background: #EDECE9;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+
 .highlighted-background {
   background: rgb(82, 180, 251);
 }
@@ -263,22 +285,13 @@
   }
 } 
 
-#calendar-day-container {
-  position: relative; 
-  margin-top: 4px;
-}
 
 #scroll-container {
     height: 100%; 
     overflow-y: scroll; 
     overflow-x: hidden; 
-    padding-top: 22px; 
-    box-sizing: border-box
-  }
-
-  *::-webkit-scrollbar {
-    width: 0;
-    background-color: #aaa; /* or add it to the track */
+    /* padding-top: 22px;  */
+    box-sizing: border-box;
   }
 
   .green-text {
@@ -292,7 +305,7 @@
 
   /* VERDICT: absolute works
   "Independence" is the best word you can ever hear in programming */
-  .time-indicator {
+  .timestamp-number {
     top: -5px; 
     margin-right: 4px;
     font-size: 0.7rem;
@@ -304,6 +317,6 @@
   }
 
   .visible-line {
-    border-top: 1px solid grey;
+    border-top: 1px solid rgb(195, 195, 195);
   }
 </style>

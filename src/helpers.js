@@ -4,17 +4,14 @@
 
 // TO-DO: fix this
 
+
+// e.clientY := coordinates relative to VIEWPORT, so doesn't matter if root page is scrolled
+
 export function getTrueY (e) {
   const ScrollContainer = document.getElementById('scroll-container')
-  const element = document.getElementById("calendar-day-container")
-  const containerDistanceFromTopOfPage = element.getBoundingClientRect().top
-  const trueY = e.clientY - containerDistanceFromTopOfPage + ScrollContainer.scrollTop
-  console.log('e.clientY =', e.clientY)
-  console.log('containerDistanceFromTopOfPage =', containerDistanceFromTopOfPage)
-  console.log('ScrollContainer.scrollTop =', ScrollContainer.scrollTop)
-  console.log("trueY =", trueY)
-  return trueY
+  return e.clientY + ScrollContainer.scrollTop - ScrollContainer.getBoundingClientRect().top - ScrollContainer.style.paddingTop
 }
+
 
 export const MIKA_PIXELS_PER_HOUR = 200
 export const MIKA_PIXELS_PER_MINUTE = MIKA_PIXELS_PER_HOUR / 60
@@ -37,8 +34,7 @@ export function computeOffset ({ startTime }, pxPerHour, calendarStartTime) {
 
   // offsetFromTop = hoursOffset * pxPerHour
   // console.log('offsetFromTop =', offsetFromTop)
-
-  return hoursOffset * pxPerHour
+  return (hoursOffset * pxPerHour) || 1 // quickfix so computeOffset doesn't return a falsy value
 }
 
 /** Dispatch event on click outside of node */
@@ -73,6 +69,48 @@ export function getDayOfWeek (MMDDString) {
     'en-US', 
     { weekday: 'short' }
   ).format(d)
+}
+
+// copied from chatGPT
+export function getNicelyFormattedDate () {
+  const date = new Date(); // Get the current date
+  const options = { 
+    month: 'long',  // Display the full month name (e.g., "April")
+    day: 'numeric', // Display the day of the month (e.g., "16")
+    ordinal: 'numeric' // Display the ordinal suffix (e.g., "th")
+  }
+  const formattedDate = date.toLocaleDateString('en-US', options)
+  const suffix = getDaySuffix(date.getDate())
+  return formattedDate + suffix
+}
+
+function getDaySuffix (day) {
+  if (day >= 11 && day <= 13) {
+    return 'th'
+  }
+  switch (day % 10) {
+    case 1:
+      return 'st'
+    case 2:
+      return 'nd'
+    case 3:
+      return 'rd'
+    default: 
+      return 'th'
+  }
+}
+
+export function getDateInMMDDYYYY (dateClassObject) {
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  let mm = today.getMonth() + 1; // Months start at 0!
+  let dd = today.getDate();
+
+  if (dd < 10) dd = '0' + dd;
+  if (mm < 10) mm = '0' + mm;
+
+  const formattedToday = dd + '/' + mm + '/' + yyyy;
+  return formattedToday
 }
 
 export function getDateInMMDD (dateClassObject) {

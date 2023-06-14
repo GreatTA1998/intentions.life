@@ -89,7 +89,7 @@
 
         <!-- I don't care this looks bad -->
         <a on:click={() => dispatch('task-done')}>
-          Done
+          Completed
         </a>
       </div>
     </div>
@@ -256,11 +256,6 @@ function setTaskAsHabit () {
     letter-spacing: .2px;
     line-height: 20px;
     color: #3c4043;
-  }
-
-  *::-webkit-scrollbar {
-    width: 0;
-    background-color: #aaa; /* or add it to the track */
   }
 
   .google-calendar-event-time {

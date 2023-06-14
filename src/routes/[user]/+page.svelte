@@ -34,6 +34,13 @@
   />
 {/if}
 
+{#if isFinancePopupOpen}
+  <FinancePopup
+    isOpen={isFinancePopupOpen}
+    on:card-close={() => isFinancePopupOpen = false}
+  />
+{/if}
+
 <div id="background-image-holder" style="height: 100vh;">
   <a role="button" on:click={toggleMusic} class="float  mika-hover" style="bottom: 210px; z-index: 10;">
     <span class="material-icons my-float">
@@ -53,70 +60,74 @@
     </span>
   </a>
 
-  <div style="font-family: roboto, sans-serif; font-size: 2.2rem; padding: 30px 0px 0px 55px;  color: #323232;">
-    {getDayOfWeek()} {getDateOfToday()} {new Date().getFullYear()}
-  </div>
+  <a role="button" on:click={() => isFinancePopupOpen = !isFinancePopupOpen} class="float mika-hover" style="bottom: 290px; z-index: 10">
+    <span class="material-icons my-float">
+      attach_money
+    </span>
+  </a>
 
-  <div class="flex-container blur">
+  <div style="display: flex"> 
+    <!-- 1st flex child -->
+    <div style="width: 44vw">
+      <div style="margin-left: 69px; margin-top: 47px; display: flex; align-items: center;">
+        <div class="mika-rectangle" on:click={() => alert('Coming soon')}>
+          Hour
+        </div>
+        <div class="mika-rectangle" class:selected-rectangle={isGirlfriendMode === false} on:click={() => isGirlfriendMode = false}>
+          Day
+        </div>
+        <div class="mika-rectangle" class:selected-rectangle={isGirlfriendMode === true} on:click={() => isGirlfriendMode = true}>
+          Week
+        </div>
+        <div class="mika-rectangle" on:click={() => alert('Coming soon')}>
+          Month
+        </div>
+      </div>
 
-  <div class="calendar-section-container">
-    <!-- Playground  -->
-    <!-- <div style="position: relative">
-      {#each todayScheduledTasks as task, i}
-        <TaskElement
-          {task}
-          offsetFromTop={30 * i}
-          height={30}
-          fontSize={0.8}
-          offsetFromLeft={30 * i}
-          on:task-click
-          on:task-duration-adjusted
-        >
-      </TaskElement>
-      {/each}
-  </div> -->
+      <div style="font-family: Inter; font-weight: 700; font-size: 32px; margin-left: 10px; padding: 30px 0px 0px 55px; color: #6D6D6D">
+        {getDayOfWeek()}, { getNicelyFormattedDate() }, { new Date().getFullYear() }
+      </div>
 
-      <CalendarTodayView
-        scheduledTasksToday={todayScheduledTasks}
-        pixelsPerHour={isGirlfriendMode ? MIKA_PIXELS_PER_HOUR : PIXELS_PER_HOUR }
-        on:task-done={(e) => markNodeAsDone(e.detail.id)}
-        on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
-        on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
-        on:task-click={(e) => openDetailedCard(e.detail)}
-      />
-
-      <div>
-        <button on:click={() => isGirlfriendMode = false}>
-          Boyfriend mode
-        </button>
-        <button on:click={() => isGirlfriendMode = true}>
-          Girlfriend mode
-        </button>
-
-        <div style="display: flex">  
-          {#if allTasks}
-            <UnscheduledTasksForToday
-              {allTasks}
-              on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
-              on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
-              on:task-click={(e) => openDetailedCard(e.detail)}
-            />
-          {/if}
-      
-          <FutureOverview
-            {futureScheduledTasks}
+      <div class="flex-container blur">
+        <div class="calendar-section-container">
+          <CalendarTodayView
+            scheduledTasksToday={todayScheduledTasks}
+            pixelsPerHour={isGirlfriendMode ? MIKA_PIXELS_PER_HOUR : PIXELS_PER_HOUR }
+            on:task-done={(e) => markNodeAsDone(e.detail.id)}
+            on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
             on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
             on:task-click={(e) => openDetailedCard(e.detail)}
           />
+          <div>
+            <div style="display: flex; width: 24vw;">  
+              {#if allTasks}
+                <UnscheduledTasksForToday
+                  {allTasks}
+                  on:task-dragged={(e) => changeTaskDeadline(e.detail)}
+                  on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
+                  on:task-click={(e) => openDetailedCard(e.detail)}
+                />
+              {/if}
+    
+              <div style="width: 2vw"></div>
+          
+              <FutureOverview
+                {futureScheduledTasks}
+                on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
+                on:task-click={(e) => openDetailedCard(e.detail)}
+              />
+            </div>
+          </div>
         </div>
       </div>
     </div>
+    <!-- end of 1st flex child -->
 
     <div class="todo-container" 
+      style="box-shadow: -2px 0px 10px 1px #aaaaaa;" 
       on:drop={(e) => unscheduleTask(e)}
       on:dragover={(e) => dragover_handler(e)}
     >
-
       <div class="todo-list">
         {#if allTasks}
           {#each allTasks as task}
@@ -159,6 +170,7 @@
       </div>
     </div>
   </div>
+  <!-- End of flexbox -->
 </div>
 
 <audio bind:this={AudioElem}></audio>
@@ -173,13 +185,15 @@
   import CalendarTodayView from '../../CalendarTodayView.svelte'
   import FutureOverview from '../../FutureOverview.svelte'
   import DetailedCardPopup from '../../DetailedCardPopup.svelte'
-  import { MIKA_PIXELS_PER_HOUR, PIXELS_PER_HOUR } from '../../helpers.js'
+  import { MIKA_PIXELS_PER_HOUR, PIXELS_PER_HOUR, getNicelyFormattedDate } from '../../helpers.js'
   import GoalsAndPostersPopup from '$lib/GoalsAndPostersPopup.svelte'
   import { onMount } from 'svelte'
   import db from '../../db.js'
   import { doc, getDoc, onSnapshot, updateDoc } from 'firebase/firestore'
   import { getRandomInt, getDateOfToday, getDateOfTomorrow, getDateInMMDD, getRandomID } from '../../helpers.js'
   import JournalPopup from '$lib/JournalPopup.svelte'
+  import FinancePopup from '$lib/FinancePopup.svelte'
+  import ExperimentalPlayground from '$lib/ExperimentalPlayground.svelte'
 
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getDay
   function getDayOfWeek () {
@@ -187,6 +201,8 @@
     const options = { weekday: 'long' } // can be short for Mon. instead of Monday
     return new Intl.DateTimeFormat('en-US', options).format(today)
   }
+
+  let isFinancePopupOpen = false
 
   let isGirlfriendMode = false
 
@@ -243,6 +259,8 @@
   $: if (allTasks) {
     collectTodayScheduledTasksToArray()
     collectFutureScheduledTasksToArray()
+    // TO-DO: don't include all the tasks in the future, only if it is bounded by < 7 days for the week view, and < 30 days for the month view
+
     futureScheduledTasks.sort((task1, task2) => {
       const d1 = new Date(task1.startDate)
       const d2 = new Date(task2.startDate)
@@ -543,15 +561,28 @@
     })
   }
 
+  async function changeTaskDeadline ({ id, deadlineTime, deadlineDate }) {
+    traverseAndUpdateTree({
+      fulfilsCriteria: (task) => task.id === id, 
+      applyFunc: (task) => {
+        task.deadlineTime = deadlineTime
+        task.deadlineDate = deadlineDate
+        task.startTime = ''
+      }
+    })
+    await updateDoc(doc(db, userDocPath), { 
+      allTasks 
+    })
+  }
+
   async function changeTaskDuration ({ taskName, id, duration }) {
     traverseAndUpdateTree({
       fulfilsCriteria: (task) => task.id === id,
       applyFunc: (task) => task.duration = duration
     })
-    await updateDoc(
-      doc(db, userDocPath),
-      { allTasks }
-    )
+    await updateDoc(doc(db, userDocPath), { 
+      allTasks 
+    })
   }
 
   // NOTE: it works by mutating the task nodes directly, it assumes aliasing
@@ -639,6 +670,8 @@
       applyFunc: (task) => { 
         task.startTime = ''
         task.startDate = ''
+        task.deadlineTime = '' 
+        task.deadlineDate = ''
       }
     })
     updateDoc(
@@ -649,6 +682,23 @@
 </script>
 
 <style>
+  .mika-rectangle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 121px; 
+    height: 40px;
+    color: #6D6D6D;
+    border: 1px solid #D9D9D9;
+    vertical-align: middle;
+    font-family: sans-serif;
+  }
+
+  .selected-rectangle {
+    background: #6D6D6D;
+    color: white;
+  }
+
   /* Small Devices, Tablets and bigger devices */
   @media only screen and (min-width : 480px) {
     #background-image-holder {
@@ -694,10 +744,11 @@
   .calendar-section-container {
     height: 100vh;
     display: flex; 
-    margin-left: 30px;
+    margin-left: 50px;
     justify-content: space-evenly; 
     /* background-color: white;  */
     box-sizing: border-box;
+    padding-top: 30px;
   }
 
   .flex-container {
@@ -729,6 +780,8 @@
     overflow-y: scroll;
     overflow-x: scroll;
     box-sizing: border-box;
+    width: 100%;
+    height: 150vh;
   }
 
   .todo-list {
