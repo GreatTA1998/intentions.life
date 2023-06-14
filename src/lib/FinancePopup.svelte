@@ -8,7 +8,17 @@
         close
       </span>
     </div>
-    <!-- PLAID API -->
+
+    <!-- PLAID LINK --> 
+    {#if openPlaidLinkUI}
+      <button on:click={() => openPlaidLinkUI()}>Open Plaid Link</button>
+
+      <button on:click={() => checkHowMuchMoneyLeft(ACCESS_TOKEN)}>Get balance</button>
+    {/if}
+
+    {#each accounts as account}
+      {account.name} {account.balances.available}
+    {/each}
   </div>
 {/if}
 
@@ -17,24 +27,75 @@ import { createEventDispatcher, onMount, onDestroy, tick } from 'svelte'
 import _ from 'lodash'
 import { getDateOfToday, getRandomID, clickOutside } from '/src/helpers.js';
 import { getFunctions, httpsCallable } from "firebase/functions";
+import { getTokenForPlaidLinkUI } from '/src/plaidHelpers.js'
 
 export let isOpen = false
 
+const functions = getFunctions();
 const dispatch = createEventDispatcher()
 
-const functions = getFunctions();
-const createLinkToken = httpsCallable(functions, 'createLinkToken');
+// TO-DO:
+//   1. createLinkToken () (you need the API keys, which is why they recommend using a server)
+//   2. initialize the Link UI (call Plaid.create({})), see https://plaid.com/docs/link/web/
+//   3. exchange the resulting public token from the user flow, and get a permanent access token (just copy the code from the quickstart)
 
-console.log("calling the cloud function")
-createLinkToken({ })
-  .then((result) => {
-    // Read result of the Cloud Function.
-    /** @type {any} */
-    const data = result.data;
-    const sanitizedMessage = data.text;
-    console.log("result =", result)
-    console.log("result.data =", result.data)
-  });
+// The actual calls to Plaid are from Cloud Functions, because 
+// of security restrictions from Plaid not allowing client requests,
+// and the fact that we use API secrets for Plaid that must not be run on 
+// the browser, which are always considered as compromised
+
+let openPlaidLinkUI = null
+let accounts = [] 
+let ACCESS_TOKEN = 'access-development-d8846a38-5ee5-478f-b597-afc6bf3586b0'
+
+onMount(async () => {
+  const result = await firebaseFunctionsVersion()
+  const link_token = result.data.link_token
+  console.log('link_token =', link_token)
+  async function onLoginSuccessCallback (publicToken, metadata) {
+    console.log('publicToken =', publicToken)
+    const exchangePublicTokenForAccessToken = httpsCallable(functions, 'exchangePublicTokenForAccessToken')
+    const result = await exchangePublicTokenForAccessToken({ publicToken })
+    console.log('accessToken =', result.data.access_token)
+    ACCESS_TOKEN = result.data.access_token
+  }
+  const { open } = initializePlaidUI(link_token, onLoginSuccessCallback) // `open` refers to OPENING the Plaid UI element itself to start the loginflow
+  openPlaidLinkUI = open
+})
+
+async function checkHowMuchMoneyLeft (accessToken) {
+  const getBalance = httpsCallable(functions, 'getBalance')
+  const balanceResult = await getBalance({ accessToken })
+  console.log("balanceResult =", balanceResult)
+  accounts = balanceResult.data.accounts
+}
+
+async function firebaseFunctionsVersion () {
+  return new Promise(resolve => {
+    // STEP 1
+    const functions = getFunctions();
+    const createLinkToken = httpsCallable(functions, 'createLinkToken');
+    console.log("calling the cloud function")
+    createLinkToken({ })
+      .then((result) => {
+        console.log("result =", result)
+        resolve(result) // result is an object with 3 properties: { expiration , link_token, request_id }
+      });
+  })
+}
+
+function initializePlaidUI (linkToken, onLoginSuccessCallback) {
+  const handler = Plaid.create({
+    token: linkToken,
+    onSuccess: onLoginSuccessCallback,
+    onLoad: () => {},
+    onExit: (err, metadata) => {},
+    onEvent: (eventName, metadata) => {},
+    //required for OAuth; if not using OAuth, set to null or omit:
+    // receivedRedirectUri: window.location.href,
+  })
+  return handler
+}
 </script>
 
 <style>
