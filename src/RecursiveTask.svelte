@@ -34,13 +34,12 @@
         {#if !isEditingTaskName}
           <!-- on:pointerenter={showOptions} -->
           <div style="display: flex; align-items: center;">
-            <!-- width: {350 * (0.85 ** depth)}px;  -->
             <div 
               on:click={() => dispatch('task-click', { task: taskObject })} 
               class="truncate"
               class:my-uppercase={isGoal}
               class:transparent-grey={isGoal}
-              style="color: {depth === 1 ? '#323232' : '#6D6D6D'};"
+              style="max-width: {340 * (0.85 ** depth)}px; color: {depth === 1 ? '#323232' : '#6D6D6D'};"
             >
               {taskObject.name}
             </div>
