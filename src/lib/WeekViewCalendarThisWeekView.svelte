@@ -49,7 +49,7 @@
     <!-- RED LINE INDICATOR -->
     {#if currentTimeInHHMM}
       <hr style="
-        border-top: 1px solid orange; 
+        border-top: 2px solid orange; 
         position: absolute; 
         top: {computeOffset({ startTime: currentTimeInHHMM, startDate: getDateInMMDD(new Date()) }, pixelsPerDay, calendarStartTime)}px;
         left: 32px;
@@ -288,12 +288,12 @@
 
 
 #scroll-container {
-    height: 100%; 
-    overflow-y: scroll; 
-    overflow-x: hidden; 
-    /* padding-top: 22px;  */
-    box-sizing: border-box;
-  }
+  height: 100%;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  /* padding-top: 22px;  */
+  box-sizing: border-box;
+}
 
   .green-text {
     color: #0085FF;
