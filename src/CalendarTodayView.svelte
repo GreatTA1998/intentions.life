@@ -49,7 +49,7 @@
       <div style="margin-top: 6px;"></div>
 
       <!-- Again, because we're using absolute positioning for above elements, their positionings are independent from each other -->
-      {#each {length: 60 * 12} as _, i}
+      {#each {length: 60 * numOfHourBlocksDisplayed} as _, i}
         <div 
           class:visible-line={(i % 60) === 0}
           style="height: {PIXELS_PER_MINUTE}px; box-sizing: border-box; margin-right: 0; margin-left: auto; width: 82%"
@@ -67,7 +67,7 @@
       <hr 
         use:scrollToElement
       style="
-        border-top: 1px solid orange; 
+        border-top: 2px solid orange; 
         position: absolute; 
         top: {computeOffset({ startTime: currentTimeInHHMM }, PIXELS_PER_HOUR, calendarStartTime)}px;
         left: 32px;

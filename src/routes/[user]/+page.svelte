@@ -3,8 +3,8 @@
 {#key clickedTask}
   {#if isDetailedCardOpen}
     <DetailedCardPopup 
-      isOpen={isDetailedCardOpen}
       taskObject={clickedTask}
+      on:task-click={(e) => openDetailedCard(e.detail)}
       on:card-close={() => isDetailedCardOpen = false}
       on:task-done={() => markNodeAsDone(clickedTask.id)}
       on:task-delete={() => deleteSubtree(clickedTask.id)}
@@ -12,6 +12,7 @@
       on:task-schedule={(e) => scheduleATask(e.detail)}
       on:task-title-update={(e) => changeNameOfATask(e.detail)}
       on:task-notes-update={(e) => changeNotesOfATask(e.detail)}
+      on:task-dragged={(e) => changeTaskDeadline(e.detail)}
     />
   {/if}
 {/key}
@@ -202,12 +203,12 @@
   import CalendarTodayView from '../../CalendarTodayView.svelte'
   import FutureOverview from '../../FutureOverview.svelte'
   import DetailedCardPopup from '../../DetailedCardPopup.svelte'
-  import { MIKA_PIXELS_PER_HOUR, PIXELS_PER_HOUR, getNicelyFormattedDate } from '../../helpers.js'
+  import { MIKA_PIXELS_PER_HOUR, PIXELS_PER_HOUR, getNicelyFormattedDate, computeDayDifference } from '../../helpers.js'
   import GoalsAndPostersPopup from '$lib/GoalsAndPostersPopup.svelte'
   import { onMount } from 'svelte'
   import db from '../../db.js'
   import { doc, getDoc, onSnapshot, updateDoc } from 'firebase/firestore'
-  import { getRandomInt, getDateOfToday, getDateOfTomorrow, getDateInMMDD, getRandomID } from '../../helpers.js'
+  import { getRandomInt, getDateOfToday, getDateOfTomorrow, getDateInMMDD, getDateInDDMMYYYY, getRandomID } from '../../helpers.js'
   import JournalPopup from '$lib/JournalPopup.svelte'
   import FinancePopup from '$lib/FinancePopup.svelte'
   import ExperimentalPlayground from '$lib/ExperimentalPlayground.svelte'
@@ -308,6 +309,10 @@
     })
   }
 
+
+  // FOR DEBUGGING PURPOSES, TURN IT ON TO TRUE TO RUN SCRIPT ONCE
+  let testRunOnce = false
+
   // DON'T DELETE BELOW: CONVENIENT FOR DEBUGGING
   // let isFirstTime = true
   async function listenToTasks () { 
@@ -324,7 +329,8 @@
 
         // this is the base case condition, otherwise infinite recursion will happen
         // as we are inside a snapshot listener
-        if (lastRanRepeatAtDate !== dateOfToday) {
+        if (lastRanRepeatAtDate !== dateOfToday || testRunOnce) {
+          testRunOnce = false
         // if (isFirstTime) {
           console.log('new day, resetting tasks')
           // isFirstTime = false
@@ -351,62 +357,54 @@
 
   /**
    *  Handle repeating habits e.g. meditate every 3 day, run every 7 days
-   *  Schedule it at the end of the day
-   *  Visualize "debt" by not allowing overlap 
    *  @see https://explain.mit.edu/mDbUrvjy4pe8Q5s5wyoD/2bePUmmRDGP6KR61Hgqa
    */
   //  TO-DO: 
   //     - Use a date manipulation / date arithmetic library e.g. moment.js
   function recursivelyResetRepeatingTasks (node) {
-    // a task can set to repeat, but it has to be scheduled and done once before 
-    // it has a `lastCompletionDate` property and will be "auto-shifted" periodically
-    // into the future
-    // want to be backwards compatible, some of our existing habits aren't initialized
-    if (node.daysBeforeRepeating && node.startDate && node.startTime) {
-      // `lastCompletionDate` is in mm/dd/yyyy format
-      // we don't care if the habit was completed or not, we just record the "missed" batting average
-      const d1 = new Date(`${node.startDate}/${node.startYYYY || '2022'}`)
-      const d2 = new Date() // use `getDay()` to get 0 to 6 number
+    // TO-DO: handle repeating events 
+    
+    // FULL LOGIC FOR HABITS
+    // A habit should always repeat regardless of whether it was done or not
+    // `daysBeforeRepeating` and `deadlineDate` are the key quantities we will use
 
-      // standardize both dates to 8 am
-      // (we only care about new day cycles to reset habits, not the exact time elapsed)
-      d1.setHours(8) 
-      d1.setMinutes(0)
-      d1.setMilliseconds(0)
+    // This can be easily corrected/upgraded by running it once per day with Cloud Functions,
+    // but the core logic works
 
-      d2.setHours(8)
-      d2.setMinutes(0)
-      d2.setMilliseconds(0)
+    // for now we ignore hour mode and the implications of more specific `deadlineTime`
+    if (node.repeatType === 'habit' && node.daysBeforeRepeating && node.deadlineDate && node.deadlineTime) {
+      console.log('habit being reset =', node)
+      // update stats for this habit
+      if (!node.isDone) {
+        node.missedCount = (node.missedCount += 1) || 1
+      } else {
+        // note: if it's completed, the `completionCount` would've already been updated
+      }
+      node.isDone = false 
+      
+      // WE COMPARE deadlineDate + daysBeforeRepeating vs today
+      const { daysBeforeRepeating, deadlineDate, deadlineTime } = node
 
-      const millisec_diff = d2.getTime() - d1.getTime()
-      const day_diff = Math.round(millisec_diff / (1000 * 3600 * 24))
-      if (Math.round(day_diff) >= node.daysBeforeRepeating) { // WARN: node.daysBeforeRepeating is sometimes a string e.g. "1", which could cause unexpected errors in the future
-        if (!node.isDone) {
-          node.missedCount = (node.missedCount += 1) || 1
-          // note: if it's completed, the `completionCount` would've already been updated
-        } else {
-          node.isDone = false 
-        }
+      const [dd, mm, yyyy] = deadlineDate.split('/')
+      const d1 = new Date(yyyy, mm - 1, dd) // mm is 0 indxed when initializing (I KNOW)
+      d1.setDate(d1.getDate() + Number(daysBeforeRepeating))
 
-        // construct the date object that reflects the task's startDate
-        const dateObject = new Date()
-        const mm = parseInt(node.startDate.substring(0, 2)) // setMonth is 0-indexed
-        const dd = parseInt(node.startDate.substring(3, 5)) // `setDate` is NOT 0-indexed
-        dateObject.setMonth(mm - 1)
-        dateObject.setDate(dd)
-        
-        // shift forward that date by `daysBeforeRepeating`
-        // https://stackoverflow.com/a/54844661/7812829
-        const newDateObject = new Date(dateObject.getTime() + node.daysBeforeRepeating * 24 * 60 * 60 * 1000)
-        node.startDate = getDateInMMDD(newDateObject)
+      const today = new Date()
+   
+      const dayDiff = computeDayDifference(d1, today)
+      if (node.name === 'Exercise') {
+        console.log('d1, d2 =', d1, today)
+        console.log('dayDiff =', dayDiff)
+      }
 
-        // TO-DO: this wasn't designed for habits to be pre-scheduled in advance, 
-        // its correctness assumed habits would be generated just-in-time each day
-        if (node.repeatType === 'habit' && node.startDate === getDateOfToday()) {
-          habitPoolToResolveConflict.push(node)
-        }
+      if (dayDiff >= 0) { // i.e. today is larger than the next repeating date for the habit
+        node.deadlineDate = getDateInDDMMYYYY(today)
+        console.log('successfully shifted new deadline for habit =', node)
+        // we leave `deadlineTime` untouched for now
       }
     }
+    
+    // RECURSIVELY CALL FOR CHILDREN TASKS
     for (const child of node.children) {
       recursivelyResetRepeatingTasks(child)
     }
@@ -512,36 +510,26 @@
     thisWeekScheduledTasks = [] // reset
     traverseAndUpdateTree({
       fulfilsCriteria: (task) => {
-        const msPerDay = 1000 * 60 * 60 * 24
-        // if it's within 7 days of today, regardless of what time it is
         if (!task.startDate) return false
-        let utc1
-        if (task.startDate.length === 5) { // i.e mm:dd format 
+        
+        // create d2 date object
+        let d2 
+        if (task.startDate.length === 5) {
           const yyyy = new Date().getFullYear()
-          const [mm, dd] = task.startDate.split('/') // note historically we store 'mm/dd' american format, but we will no longer do this 
-          utc1 = Date.UTC(yyyy, mm, dd)
+          const [mm, dd] = task.startDate.split('/')
+          d2 = new Date(yyyy, mm, dd) 
         } else {
           const [dd, mm, yyyy] = task.startDate.split('/')
-          utc1 = Date.UTC(yyyy, mm, dd) 
+          d2 = new Date(yyyy, mm, dd) 
         }
         const today = new Date()
-        let dayDiff
 
+        const d1 = new Date(today.getFullYear(), 1 + today.getMonth(), today.getDate())
         // the reason for +1 see Stackoverflow, getMonth() is zero-indexed which VERY stupid
-        // https://stackoverflow.com/a/18624336
-        let utc2 = Date.UTC(today.getFullYear(), 1 + today.getMonth(), today.getDate())
-        dayDiff = Math.floor(utc1 - utc2) / msPerDay
+        // // https://stackoverflow.com/a/18624336
 
-        // FOR DEBUGGING PURPOSES
-        // const testTasks = ['Sell HP monitor', 'Dad arrives ', 'Korean League game', 'Mets practice']
-        // if (testTasks.includes(task.name)) {
-          // console.log('task.name =', task.name)
-          // console.log('daydiff =', dayDiff)
-          // if (dayDiff <= 7 && dayDiff >= 0) {
-          //   console.log("TRUE for task =", task)
-          // }
-        // }
-        return dayDiff <= 7 && dayDiff >= 0
+        const dayDiff = computeDayDifference(d1, d2)
+        return dayDiff >= 0 && dayDiff <= 7 
       }, 
       applyFunc: (task) => thisWeekScheduledTasks = [...thisWeekScheduledTasks, task]
     })

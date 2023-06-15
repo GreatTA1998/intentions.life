@@ -1,4 +1,5 @@
 <div 
+  on:click={() => dispatch('task-click', { task: taskObject })}
   class:task-completed={taskObject.isDone}
   class:task-scheduled={!taskObject.isDone && taskObject.startDate && taskObject.startTime}
 >
@@ -25,8 +26,11 @@
 
 <script>
   import RecursiveBulletPoint from './RecursiveBulletPoint.svelte'
+  import { createEventDispatcher } from 'svelte'
 
   export let taskObject 
+
+  const dispatch = createEventDispatcher()
 </script>
 
 <style>

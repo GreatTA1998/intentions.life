@@ -29,6 +29,12 @@
       {/if}
     </div>
 
+    {#if taskObject.deadlineDate}
+      <div style="margin-left: 16px">
+        deadline: {taskObject.deadlineDate}
+      </div>
+    {/if}
+
     <div stle="float: left; width: 80%">
       <!-- cols="48" determines width -->
       <textarea 
@@ -79,6 +85,15 @@
         <a on:click={toggleIsGoal} style="margin-left: 0px;">
           Set as goal
         </a>
+
+        {#if !isTypingDeadline}
+          <a on:click={() => isTypingDeadline = true}>
+            Set deadline
+          </a>
+        {:else}
+          <input bind:value={newDeadlineDate} placeholder={getDateInDDMMYYYY(new Date())} style="width: 80px"/>
+          <input bind:value={newDeadlineTime} placeholder="15:00" style="width: 40px" on:keypress={dispatchNewDeadline}/>
+        {/if}
       </div>
 
       <div style="margin-left: auto; margin-right: 16px">
@@ -101,7 +116,10 @@
 
     {#each taskObject.children as child}
       <div style="margin-left: 12px;">
-      <RecursiveBulletPoint taskObject={child}>
+      <RecursiveBulletPoint 
+        taskObject={child}
+        on:task-click
+      >
       
       </RecursiveBulletPoint>
       </div>
@@ -112,17 +130,21 @@
 import { createEventDispatcher, onMount, onDestroy, tick } from 'svelte'
 import _ from 'lodash'
 import RecursiveBulletPoint from './lib/RecursiveBulletPoint.svelte';
-import { getDateOfToday, getRandomID, clickOutside } from './helpers.js'
+import { getDateOfToday, getRandomID, clickOutside, getDateInDDMMYYYY } from './helpers.js'
 
 export let taskObject 
-// export let isOpen = false
 
 let depth = 1
 
 let newStartDate 
 let newStartTime
+
+let newDeadlineDate
+let newDeadlineTime
+
 let isSchedulingTask = false
 let isTypingRepeatFrequency = false
+let isTypingDeadline = false
 let daysBeforeRepeating = 7
 
 const dispatch = createEventDispatcher()
@@ -205,6 +227,38 @@ function detectEnterKey5 (e) {
     dispatch('task-schedule', { id: taskObject.id, newStartDate, newStartTime })
     newStartDate = ''
     newStartTime = ''
+  }
+}
+
+function dispatchNewDeadline (e) {
+  if (e.charCode === 13) {
+    if (!newDeadlineDate && !newDeadlineTime) {
+      taskObject.deadlineDate = '' 
+      taskObject.deadlineTime = ''
+    }
+    else if (!newDeadlineDate || !newDeadlineTime) {
+      alert('Need BOTH date and time')
+    } 
+    else {
+      taskObject.deadlineDate = newDeadlineDate
+      taskObject.deadlineTime = newDeadlineTime
+
+      // I'll leave these lines in case they're useful 
+      const yearNumber = new Date().getFullYear()
+      taskObject.startYYYY = yearNumber.toString()
+    }
+
+    // `task-dragged` is an unideal name, but good for `unscheduledTasksForToday`
+    dispatch('task-dragged', {
+      id: taskObject.id,
+      timeOfDay: '',
+      dateScheduled: getDateOfToday(),
+      deadlineTime: newDeadlineTime, // 
+      deadlineDate: newDeadlineDate
+    })
+
+    newDeadlineDate = ''
+    newDeadlineTime = ''
   }
 }
 

@@ -2,9 +2,6 @@
 // // containerDistanceFromTopOfPage should be fixed, and not be affected by scrolling
 // so it's the e.clientY + initialOffset + scrollOffset 
 
-// TO-DO: fix this
-
-
 // e.clientY := coordinates relative to VIEWPORT, so doesn't matter if root page is scrolled
 
 export function getTrueY (e) {
@@ -13,7 +10,7 @@ export function getTrueY (e) {
 }
 
 
-export const MIKA_PIXELS_PER_HOUR = 120
+export const MIKA_PIXELS_PER_HOUR = 100
 export const MIKA_PIXELS_PER_MINUTE = MIKA_PIXELS_PER_HOUR / 60
 
 export const PIXELS_PER_HOUR = 600
@@ -100,7 +97,7 @@ function getDaySuffix (day) {
   }
 }
 
-export function getDateInMMDDYYYY (dateClassObject) {
+export function getDateInDDMMYYYY (dateClassObject) {
   const today = new Date();
   const yyyy = today.getFullYear();
   let mm = today.getMonth() + 1; // Months start at 0!
@@ -151,4 +148,22 @@ export function getRandomID () {
     autoId += chars.charAt(Math.floor(Math.random() * chars.length));
   }
   return autoId;
+}
+
+// The reliable way to create date object is new Date(yyyy, mm, dd)
+// where `yyyy`, `mm` and `dd` are all integers
+
+
+// return d2 - d1
+// Based on https://stackoverflow.com/a/15289883/7812829
+// UTC computations are time-zone safe because UTC never observes Daylight Savings Time
+export function computeDayDifference (dateClassObject1, dateClassObject2) {
+  const msPerDay = 1000 * 60 * 60 * 24
+  const d1 = dateClassObject1
+  const d2 = dateClassObject2
+  
+  const utc1 = Date.UTC(d1.getFullYear(), d1.getMonth(), d1.getDate())
+  const utc2 = Date.UTC(d2.getFullYear(), d2.getMonth(), d2.getDate())
+
+  return Math.floor((utc2 - utc1) / msPerDay)
 }

@@ -4,7 +4,7 @@
 >
   <!-- color: #6D6D6D;  -->
   <div style="font-family: Inter;font-size: 16px; margin-bottom: 12px;">
-    Today's tasks
+    Not yet scheduled 
   </div>
 
   <div style="height: 70vh">
@@ -25,7 +25,7 @@
 </div>
 
 <script>
-  import { getDateOfToday, getDateInMMDDYYYY } from '/src/helpers.js'
+  import { getDateOfToday, getDateInDDMMYYYY } from '/src/helpers.js'
   import { createEventDispatcher } from 'svelte'
   import TaskElement from '/src/TaskElement.svelte'
 
@@ -54,22 +54,14 @@
   // TO-DO: this scale needs to be consistent with the current mode, e.g. hour, day or week view.
   const pixelsPerHour = 160
   const pixelsPerMinute = pixelsPerHour / 60
-  let todayUnscheduledTasks = [] 
   let tasksDueToday = [] 
 
-  $: if (allTasks) {
-    todayUnscheduledTasks = []
-    traverseAndUpdateTree({
-      fulfilsCriteria: (task) => task.startDate === getDateOfToday() && !task.startTime, 
-      applyFunc: (task) => todayUnscheduledTasks  = [...todayUnscheduledTasks, task]
-    })
-  }
 
   $: if (allTasks) {
     tasksDueToday = []
     traverseAndUpdateTree({
       fulfilsCriteria: (task) => { 
-        return task.deadlineDate === getDateInMMDDYYYY(new Date()) && !task.startTime // i.e. not yet scheduled
+        return task.deadlineDate === getDateInDDMMYYYY(new Date()) && !task.startTime // i.e. not yet scheduled
       },
       applyFunc: (task) => tasksDueToday = [...tasksDueToday, task]
     })
@@ -96,7 +88,7 @@
 
   function drop_handler (e) {
     e.preventDefault()
-    const ddmmyyyy = getDateInMMDDYYYY(new Date())
+    const ddmmyyyy = getDateInDDMMYYYY(new Date())
 
     dispatch('task-dragged', {
       id: e.dataTransfer.getData('text/plain'),
