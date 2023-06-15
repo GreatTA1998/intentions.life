@@ -71,7 +71,7 @@
         position: absolute; 
         top: {computeOffset({ startTime: currentTimeInHHMM }, PIXELS_PER_HOUR, calendarStartTime)}px;
         left: 32px;
-        width: 10vw;  
+        width: 11vw;  
       "
       >
     {/if}
