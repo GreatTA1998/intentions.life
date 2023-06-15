@@ -851,7 +851,6 @@
   .blur {
     backdrop-filter: blur(0px);
     height: 100vh; 
-    width: 100vw;
   }
 
   .todo-container {
