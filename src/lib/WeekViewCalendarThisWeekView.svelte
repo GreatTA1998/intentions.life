@@ -34,7 +34,7 @@
     <div style="margin-top: 6px;"></div>
 
     <!-- Again, because we're using absolute positioning for above elements, their positionings are independent from each other -->
-    {#each {length: 60 * 12} as _, i}
+    {#each {length: 60 * numOfHourBlocksDisplayed} as _, i}
       <div 
         class:visible-line={(i % 60) === 0}
         style="height: {pixelsPerDay / 60}px; box-sizing: border-box; margin-right: 0; margin-left: auto; width: 82%"
@@ -72,7 +72,7 @@
   const dispatch = createEventDispatcher()
   const getDate = getDateOfToday
 
-  const numOfHourBlocksDisplayed = 16
+  const numOfHourBlocksDisplayed = 7
 
   let highlightedMinute = null 
   let daysOfWeek = null

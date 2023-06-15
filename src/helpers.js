@@ -13,7 +13,7 @@ export function getTrueY (e) {
 }
 
 
-export const MIKA_PIXELS_PER_HOUR = 200
+export const MIKA_PIXELS_PER_HOUR = 120
 export const MIKA_PIXELS_PER_MINUTE = MIKA_PIXELS_PER_HOUR / 60
 
 export const PIXELS_PER_HOUR = 600
