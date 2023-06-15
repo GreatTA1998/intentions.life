@@ -64,7 +64,9 @@
 
     <!-- A red line that indicates the current time -->
     {#if currentTimeInHHMM}
-      <hr style="
+      <hr 
+        use:scrollToElement
+      style="
         border-top: 1px solid orange; 
         position: absolute; 
         top: {computeOffset({ startTime: currentTimeInHHMM }, PIXELS_PER_HOUR, calendarStartTime)}px;
@@ -90,7 +92,7 @@
   const dispatch = createEventDispatcher()
   const getDate = getDateOfToday
 
-  const numOfHourBlocksDisplayed = 16
+  const numOfHourBlocksDisplayed = 18
 
   let highlightedMinute = null 
   let timesOfDay = []
@@ -99,6 +101,22 @@
   let calendarStartTime = ''
   let tasksThatAlreadyHappened
   let currentTimeInHHMM = ''
+
+  let ScrollContainer
+
+  function scrollToElement (node) {
+    setTimeout(
+      () => {
+        ScrollContainer = document.getElementById("scroll-container")
+        const redIndicatorY = computeOffset({ startTime: currentTimeInHHMM }, PIXELS_PER_HOUR, calendarStartTime) // exact same as the red line indicator's offset computation
+        ScrollContainer.scrollTop = redIndicatorY
+      },
+      1000
+    )
+    return {
+
+    }
+  }
 
   // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getDay
   function getDayOfWeek () {
@@ -130,6 +148,8 @@
     currentTimeInHHMM = result
   }
 
+  // always start from 7 am
+
   // Start either from the current hour, or the current ongoing task's start time
   //   - if it's 8 pm, but there's an ongoing task that started at 7 pm and hasn't ended
   //     we start the calendar at 7 pm to not suddenly lose sight of the task
@@ -153,7 +173,9 @@
       calendarStartTime = `${currentH < 10 ? '0' : ''}` + `${currentH}:00`
     }
 
-    let currentHour = today.getHours() // get the integer i.e. 0 to 23
+    calendarStartTime = '07:00'
+
+    let currentHour = 7 // today.getHours() // get the integer i.e. 0 to 23
     // now generate 16 hours of time (so it covers, for example, 8 am - midnight)
     for (let i = 0; i < numOfHourBlocksDisplayed; i++) {
       if (currentHour === 24) {
