@@ -73,10 +73,12 @@
         <div class="mika-rectangle" on:click={() => alert('Coming soon')}>
           Hour
         </div>
-        <div class="mika-rectangle" class:selected-rectangle={isGirlfriendMode === false} on:click={() => isGirlfriendMode = false}>
+        <div class="mika-rectangle" class:selected-rectangle={currentMode === 'dayMode'} on:click={() => currentMode = 'dayMode'}>
           Day
         </div>
-        <div class="mika-rectangle" class:selected-rectangle={isGirlfriendMode === true} on:click={() => isGirlfriendMode = true}>
+        <div on:click={() => currentMode = 'weekMode'} class="mika-rectangle" 
+            class:selected-rectangle={currentMode === 'weekMode'} 
+          >
           Week
         </div>
         <div class="mika-rectangle" on:click={() => alert('Coming soon')}>
@@ -90,34 +92,44 @@
 
       <div class="flex-container blur">
         <div class="calendar-section-container">
-          <CalendarTodayView
-            scheduledTasksToday={todayScheduledTasks}
-            pixelsPerHour={isGirlfriendMode ? MIKA_PIXELS_PER_HOUR : PIXELS_PER_HOUR }
-            on:task-done={(e) => markNodeAsDone(e.detail.id)}
-            on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
-            on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
-            on:task-click={(e) => openDetailedCard(e.detail)}
-          />
-          <div>
-            <div style="display: flex; width: 24vw;">  
-              {#if allTasks}
-                <UnscheduledTasksForToday
-                  {allTasks}
-                  on:task-dragged={(e) => changeTaskDeadline(e.detail)}
+          {#if currentMode === 'dayMode'}
+            <!-- DAY MODE TRIPLET-->
+            <CalendarTodayView
+              scheduledTasksToday={todayScheduledTasks}
+              pixelsPerHour={isGirlfriendMode ? MIKA_PIXELS_PER_HOUR : PIXELS_PER_HOUR }
+              on:task-done={(e) => markNodeAsDone(e.detail.id)}
+              on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
+              on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
+              on:task-click={(e) => openDetailedCard(e.detail)}
+            />
+            <div>
+              <div style="display: flex; width: 24vw;">  
+                {#if allTasks}
+                  <UnscheduledTasksForToday
+                    {allTasks}
+                    on:task-dragged={(e) => changeTaskDeadline(e.detail)}
+                    on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
+                    on:task-click={(e) => openDetailedCard(e.detail)}
+                  />
+                {/if}
+      
+                <div style="width: 2vw"></div>
+            
+                <FutureOverview
+                  {futureScheduledTasks}
                   on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
                   on:task-click={(e) => openDetailedCard(e.detail)}
                 />
-              {/if}
-    
-              <div style="width: 2vw"></div>
-          
-              <FutureOverview
-                {futureScheduledTasks}
-                on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
-                on:task-click={(e) => openDetailedCard(e.detail)}
-              />
+              </div>
             </div>
-          </div>
+          {:else if currentMode === 'weekMode'}
+            <WeekView
+              {thisWeekScheduledTasks}
+              on:task-click={(e) => openDetailedCard(e.detail)}
+              on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
+              on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
+            />
+          {/if}
         </div>
       </div>
     </div>
@@ -194,6 +206,7 @@
   import JournalPopup from '$lib/JournalPopup.svelte'
   import FinancePopup from '$lib/FinancePopup.svelte'
   import ExperimentalPlayground from '$lib/ExperimentalPlayground.svelte'
+  import WeekView from '$lib/WeekView.svelte'
 
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getDay
   function getDayOfWeek () {
@@ -202,9 +215,11 @@
     return new Intl.DateTimeFormat('en-US', options).format(today)
   }
 
+  let currentMode = 'dayMode' // weekMode hourMode monthMode
+
   let isFinancePopupOpen = false
 
-  let isGirlfriendMode = false
+  let isGirlfriendMode = true
 
   let unsubUserDocListener
   let userDoc = null 
@@ -233,6 +248,7 @@
   let dateOfToday = getDateOfToday()
   let todayScheduledTasks = []
   let futureScheduledTasks = [] // AF([])
+  let thisWeekScheduledTasks = [] 
 
   let newTopLevelTask = ''
   let isTypingNewRootTask = false
@@ -259,6 +275,8 @@
   $: if (allTasks) {
     collectTodayScheduledTasksToArray()
     collectFutureScheduledTasksToArray()
+    collectThisWeekScheduledTasksToArray()
+
     // TO-DO: don't include all the tasks in the future, only if it is bounded by < 7 days for the week view, and < 30 days for the month view
 
     futureScheduledTasks.sort((task1, task2) => {
@@ -473,6 +491,51 @@
       applyFunc: (task) => futureScheduledTasks = [...futureScheduledTasks, task]
     })
   }
+
+  // note due to a bug, sometimes `mm` is like 131 instead of a valid hour, 
+  // which fucks up the computation
+
+  // note it's not always dd:mm for mat
+  // I actually do the US format of 06/14
+  // which fucks it up
+  function collectThisWeekScheduledTasksToArray () {
+    thisWeekScheduledTasks = [] // reset
+    traverseAndUpdateTree({
+      fulfilsCriteria: (task) => {
+        const msPerDay = 1000 * 60 * 60 * 24
+        // if it's within 7 days of today, regardless of what time it is
+        if (!task.startDate) return false
+        let utc1
+        if (task.startDate.length === 5) { // i.e mm:dd format 
+          const yyyy = new Date().getFullYear()
+          const [mm, dd] = task.startDate.split('/') // note historically we store 'mm/dd' american format, but we will no longer do this 
+          utc1 = Date.UTC(yyyy, mm, dd)
+        } else {
+          const [dd, mm, yyyy] = task.startDate.split('/')
+          utc1 = Date.UTC(yyyy, mm, dd) 
+        }
+        const today = new Date()
+        let dayDiff
+
+        // the reason for +1 see Stackoverflow, getMonth() is zero-indexed which VERY stupid
+        // https://stackoverflow.com/a/18624336
+        let utc2 = Date.UTC(today.getFullYear(), 1 + today.getMonth(), today.getDate())
+        dayDiff = Math.floor(utc1 - utc2) / msPerDay
+
+        // FOR DEBUGGING PURPOSES
+        // const testTasks = ['Sell HP monitor', 'Dad arrives ', 'Korean League game', 'Mets practice']
+        // if (testTasks.includes(task.name)) {
+          // console.log('task.name =', task.name)
+          // console.log('daydiff =', dayDiff)
+          // if (dayDiff <= 7 && dayDiff >= 0) {
+          //   console.log("TRUE for task =", task)
+          // }
+        // }
+        return dayDiff <= 7 && dayDiff >= 0
+      }, 
+      applyFunc: (task) => thisWeekScheduledTasks = [...thisWeekScheduledTasks, task]
+    })
+  } 
   
   async function markNodeAsDone (id) {
     traverseAndUpdateTree({ 
