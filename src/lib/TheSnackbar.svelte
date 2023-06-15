@@ -1,6 +1,4 @@
 <div class="snack-wrap">
-  <!-- <input type="checkbox" class="snackclose animated" id="close"/><label class="snacklable animated" for="close"></label>   -->
-
   <!-- animated -->
   <div class="snackbar" style="display: flex; align-items: center;">
      <p>"{$mostRecentlyCompletedTaskName}" will now be hidden because it's completed</p>
@@ -10,8 +8,6 @@
      </div>
   </div>
 </div>
-
-<p>CSS Only Snackbar, uses checkbox:checked to change animation, with covering lable to set checked.</p>
 
 <script>
   import { mostRecentlyDeletedOrCompletedTaskID, mostRecentlyCompletedTaskName } from "/src/store";
@@ -78,23 +74,7 @@ a:focus {
   left:0px;
   z-index:9;
 } 
-.snackclose, label {
-  bottom:-70px;
-  position:absolute;
-  border:0;
-}
-.snackclose {
-  display:none;
-  z-index:10;
-}
-label {
-  z-index:11;
-  display:block;
-  width:100%;
-  height:100%;
-  color:rgba(255,255,255,0.8);
-  cursor:pointer;
-}
+
 /* .animated {
   animation-name: snackbar-show;
   animation-duration: 1s;

@@ -215,7 +215,7 @@
   import TheSnackbar from '$lib/TheSnackbar.svelte'
   import { mostRecentlyDeletedOrCompletedTaskID, mostRecentlyCompletedTaskName } from '/src/store';
 
-  let snackbarCountdownIntervalID = null
+  let snackbarTimeoutID = null
   let countdownRemaining = 0
 
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getDay
@@ -562,19 +562,20 @@
           mostRecentlyDeletedOrCompletedTaskID.set(task.id)
           // this code is terrible but my sanity is more important
           countdownRemaining = 10
-          snackbarCountdownIntervalID = setInterval(
+          snackbarTimeoutID = setTimeout(
             () => { 
               countdownRemaining = 0
-              snackbarCountdownIntervalID = null
+              clearTimeout(snackbarTimeoutID)
+              snackbarTimeoutID = null
             },
-            15000
+            10000
           )
         }
         else {
           task.completionCount = task.completionCount - 1 || 0 
           // TO-DO: think of consequences of not undoing `lastCompletionDate`
-          if (snackbarCountdownIntervalID) {
-            clearInterval(snackbarCountdownIntervalID)
+          if (snackbarTimeoutID) {
+            clearInterval(snackbarTimeoutID)
           }
           countdownRemaining = 0
         }
