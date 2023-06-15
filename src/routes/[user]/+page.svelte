@@ -854,8 +854,8 @@
   }
 
   .todo-container {
-    overflow-y: scroll;
-    overflow-x: scroll;
+    overflow-y: auto;
+    overflow-x: auto;
     box-sizing: border-box;
     width: 100%;
     height: 120vh;
@@ -864,7 +864,6 @@
   .todo-list {
     width: 100%; 
     display: flex; 
-    overflow-x: auto;
   }
 
   .task-container { 
@@ -879,12 +878,6 @@
   /* #radio-player-with-art {
     background-image: url('../maplestory-watercolor.jpg')
   } */
-
-  *::-webkit-scrollbar {
-    width: 0;
-    height: 0;
-    background-color: #aaa; /* or add it to the track */
-  }
 
   .plus {
     display:inline-block;
