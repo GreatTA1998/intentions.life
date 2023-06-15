@@ -844,7 +844,7 @@
     overflow-x: scroll;
     box-sizing: border-box;
     width: 100%;
-    height: 150vh;
+    height: 120vh;
   }
 
   .todo-list {
