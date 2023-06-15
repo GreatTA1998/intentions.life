@@ -27,7 +27,6 @@ import { createEventDispatcher, onMount, onDestroy, tick } from 'svelte'
 import _ from 'lodash'
 import { getDateOfToday, getRandomID, clickOutside } from '/src/helpers.js';
 import { getFunctions, httpsCallable } from "firebase/functions";
-import { getTokenForPlaidLinkUI } from '/src/plaidHelpers.js'
 
 export let isOpen = false
 

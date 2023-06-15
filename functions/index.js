@@ -7,70 +7,76 @@
  * See a full list of supported triggers at https://firebase.google.com/docs/functions
  */
 
+const {onRequest} = require("firebase-functions/v2/https");
+const logger = require("firebase-functions/logger");
 
 const functions = require("firebase-functions") 
 const { onCall } = require("firebase-functions/v2/https");
 const { Configuration, PlaidApi, PlaidEnvironments } = require('plaid')
 // const { PLAID_CLIENT_ID, PLAID_SECRET } = require('./.secrets.js')
 
+// SETUP CODE SHARED BY FUNCTIONS
 const PLAID_CLIENT_ID = '60a82f4b2dd19f0010a1abd3'
-const PLAID_SECRET = '0f281a6c787cb66c211224dcb9bc50'
+const PLAID_SECRET = 'b86a3e600550c25c233aee0c30dce9'
 
-const PLAID_PRODUCTS = 'auth,transactions,balance'
-const PLAID_COUNTRY_CODES = 'US,CA'
+console.log('PLAID_CLIENT_ID =', PLAID_CLIENT_ID)
+console.log('PLAID_SECRET =', PLAID_SECRET)
 
-const {onRequest} = require("firebase-functions/v2/https");
-const logger = require("firebase-functions/logger");
+const PLAID_PRODUCTS = ['auth'] // I think 'transactions' work as well, but not 'balance'
+const PLAID_COUNTRY_CODES = ['US','CA']
 
 const configuration = new Configuration({
-  basePath: PlaidEnvironments.sandbox,
+  basePath: PlaidEnvironments.development,
   baseOptions: {
     headers: {
       'PLAID-CLIENT-ID': PLAID_CLIENT_ID,
       'PLAID-SECRET': PLAID_SECRET,
     },
   },
-});
+})
 
-console.log('configuration =', configuration)
 const client = new PlaidApi(configuration);
-console.log('client =', client)
-
-const plaidClient = client
+// END OF SETUP CODE
 
 exports.createLinkToken = functions.https.onCall(async (request, response) => {
   console.log('calling createLinkToken()')
   const configs = {
     user: {
-      // This should correspond to a unique id for the current user.
       client_user_id: 'user-id',
     },
-    client_name: 'Plaid Quickstart',
+    client_name: 'Organize-life',
     products: PLAID_PRODUCTS,
     country_codes: PLAID_COUNTRY_CODES,
     language: 'en',
   };
   const createTokenResponse = await client.linkTokenCreate(configs)
-  console.log("createTokenResponse =", createTokenResponse)
-  createLinkToken()
+  return createTokenResponse.data 
 })
 
-exports.exchangeLinkTokenForAccessToken = functions.https.onCall(async (request, response) => {
-  console.log('exchangLinkTokenForAccessToken')
-  const PUBLIC_TOKEN = request.body.public_token
-  console.log('PUBLIC TOKEN =', PUBLIC_TOKEN)
+exports.exchangePublicTokenForAccessToken = functions.https.onCall(async (data, context) => {
+  const { publicToken } = data
+  console.log('publicToken =', publicToken)
   const tokenResponse = await client.itemPublicTokenExchange({
-    public_token: PUBLIC_TOKEN,
+    public_token: publicToken
   })
+
   const ACCESS_TOKEN = tokenResponse.data.access_token;
   const ITEM_ID = tokenResponse.data.item_id;
-  return  response.json({
-    // the 'access_token' is a private token, DO NOT pass this token to the frontend in your production environment
+  return {
     access_token: ACCESS_TOKEN,
     item_id: ITEM_ID,
-    error: null,
-  })
+    error: null
+  }
 })
+
+exports.getBalance = functions.https.onCall(async (data, context) => {
+  const ACCESS_TOKEN = data.accessToken
+  const balanceResponse = await client.accountsBalanceGet({
+    access_token: ACCESS_TOKEN,
+  })
+  return balanceResponse.data
+})
+
 
 // TO-DO
 //  - Figure out how to what part of the code is responsible for the Plaid Link UI 
