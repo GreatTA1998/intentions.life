@@ -83,7 +83,7 @@
 
       <div style="margin-left: auto; margin-right: 16px">
         <!-- class="material-icons" style="margin-left: 5px; font-size: {2.5 * (0.7 ** depth)}rem;" -->
-        <a on:click={() => dispatch('task-delete')}>
+        <a on:click={confirmDelete}>
           Delete
         </a>
 
@@ -137,6 +137,12 @@ onDestroy(() => {
 
 const throttledSaveTitle = _.throttle(saveTitle, 500)
 const throttledSaveNotes = _.throttle(saveNotes, 500)
+
+function confirmDelete () {
+  if (confirm('Are you sure you want to delete the task? This is irreversible.')) {
+    dispatch('task-delete')
+  } 
+}
 
 function handleClickOutside (e) {
   dispatch('card-close')

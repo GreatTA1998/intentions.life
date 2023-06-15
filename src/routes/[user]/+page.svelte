@@ -183,6 +183,11 @@
     </div>
   </div>
   <!-- End of flexbox -->
+  
+  <!-- UNDO COMPLETED SNACKBAR -->
+  {#if $mostRecentlyDeletedOrCompletedTaskID && countdownRemaining > 0}
+    <TheSnackbar on:task-done={(e) => markNodeAsDone(e.detail.id)}></TheSnackbar>
+  {/if}
 </div>
 
 <audio bind:this={AudioElem}></audio>
@@ -207,6 +212,11 @@
   import FinancePopup from '$lib/FinancePopup.svelte'
   import ExperimentalPlayground from '$lib/ExperimentalPlayground.svelte'
   import WeekView from '$lib/WeekView.svelte'
+  import TheSnackbar from '$lib/TheSnackbar.svelte'
+  import { mostRecentlyDeletedOrCompletedTaskID, mostRecentlyCompletedTaskName } from '/src/store';
+
+  let snackbarCountdownIntervalID = null
+  let countdownRemaining = 0
 
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getDay
   function getDayOfWeek () {
@@ -547,10 +557,26 @@
           if (task.daysBeforeRepeating) {
             task.lastCompletionDate = getDateOfToday()
           }
+
+          mostRecentlyCompletedTaskName.set(task.name)
+          mostRecentlyDeletedOrCompletedTaskID.set(task.id)
+          // this code is terrible but my sanity is more important
+          countdownRemaining = 10
+          snackbarCountdownIntervalID = setInterval(
+            () => { 
+              countdownRemaining = 0
+              snackbarCountdownIntervalID = null
+            },
+            15000
+          )
         }
         else {
           task.completionCount = task.completionCount - 1 || 0 
           // TO-DO: think of consequences of not undoing `lastCompletionDate`
+          if (snackbarCountdownIntervalID) {
+            clearInterval(snackbarCountdownIntervalID)
+          }
+          countdownRemaining = 0
         }
       }
     })
