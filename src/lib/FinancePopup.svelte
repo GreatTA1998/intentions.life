@@ -9,7 +9,7 @@
       </span>
     </div>
 
-    {#if accounts.length === 0 || transactions.length === 0}
+    {#if !accounts || !transactions}
       <FinancePopupLoadingIndicator/>
     {/if}
 
@@ -26,48 +26,52 @@
 
     <div style="margin-bottom: 30px"></div>
 
-    <div style="display: flex; margin-left: 50px;">
-      {#each accounts as account}
-        <div style="margin-right: 20px;">
-          <div style="font-family: sans-serif; font-size: 2rem;">
-            {account.balances.available}
+    {#if accounts}
+      <div style="display: flex; margin-left: 50px;">
+        {#each accounts as account}
+          <div style="margin-right: 20px;">
+            <div style="font-family: sans-serif; font-size: 2rem;">
+              {account.balances.available}
+            </div>
+            <div style="font-family: sans-serif;">
+              {account.name}
+            </div>
           </div>
-          <div style="font-family: sans-serif;">
-            {account.name}
-          </div>
-        </div>
-      {/each}
-    </div>
-
-    <div style="margin-left: 50px; margin-top: 50px; overflow-y: auto;">
-      <div style="font-family: sans-serif; font-size: 2rem; color: grey;">
-        Recent transactions
+        {/each}
       </div>
-      {#each transactions as transaction}
-        <div style="display: flex; flex-wrap: nowrap;">
-          {#if transaction.amount > 0}
-            <div 
-            style="font-size: {0.5 + (0.012 * transaction.amount)}rem; font-family: sans-serif;
-              color: red;
-              white-space: nowrap;
-            "
-            >
-             -{transaction.amount}: {transaction.merchant_name ? transaction.merchant_name : transaction.name}, {transaction.date}
-            </div>
-          {:else}
-            <div 
-            style="font-size: {0.5 + (-1 * 0.012 * transaction.amount)}rem; font-family: sans-serif;
-              color: green;
-              white-space: nowrap;
-            "
-            >
-              <!-- remove negative sign -->
-             +{-1 * transaction.amount}: {transaction.merchant_name ? transaction.merchant_name : transaction.name}, {transaction.date}
-            </div>
-          {/if}
+    {/if}
+
+    {#if transactions}
+      <div style="margin-left: 50px; margin-top: 50px; overflow-y: auto;">
+        <div style="font-family: sans-serif; font-size: 2rem; color: grey;">
+          Recent transactions
         </div>
-      {/each}
-    </div>
+        {#each transactions as transaction}
+          <div style="display: flex; flex-wrap: nowrap;">
+            {#if transaction.amount > 0}
+              <div 
+              style="font-size: {0.5 + (0.012 * transaction.amount)}rem; font-family: sans-serif;
+                color: red;
+                white-space: nowrap;
+              "
+              >
+              -{transaction.amount}: {transaction.merchant_name ? transaction.merchant_name : transaction.name}, {transaction.date}
+              </div>
+            {:else}
+              <div 
+              style="font-size: {0.5 + (-1 * 0.012 * transaction.amount)}rem; font-family: sans-serif;
+                color: green;
+                white-space: nowrap;
+              "
+              >
+                <!-- remove negative sign -->
+              +{-1 * transaction.amount}: {transaction.merchant_name ? transaction.merchant_name : transaction.name}, {transaction.date}
+              </div>
+            {/if}
+          </div>
+        {/each}
+      </div>
+    {/if}
   </div>
 {/if}
 
@@ -96,11 +100,11 @@ const dispatch = createEventDispatcher()
 // the browser, which are always considered as compromised
 
 let totalMoneyLeft = null
-let accounts = [] 
-let transactions = [] 
+let accounts = null
+let transactions = null
 // let ACCESS_TOKEN =  'access-development-d8846a38-5ee5-478f-b597-afc6bf3586b0'
 
-$: if (accounts.length > 0) {
+$: if (accounts) {
   totalMoneyLeft = 0
   for (const account of accounts) {
     totalMoneyLeft += account.balances.available
