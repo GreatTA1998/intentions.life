@@ -9,16 +9,79 @@
       </span>
     </div>
 
-    <!-- PLAID LINK --> 
-    {#if openPlaidLinkUI}
-      <button on:click={() => openPlaidLinkUI()}>Open Plaid Link</button>
 
-      <button on:click={() => checkHowMuchMoneyLeft(ACCESS_TOKEN)}>Get balance</button>
+    <div style="margin-left: 50px;">
+    <!-- PLAID LINK --> 
+      {#if openPlaidLinkUI}
+        <button on:click={() => openPlaidLinkUI()}>Open Plaid Link</button>
+      {/if}
+
+      {#if ACCESS_TOKEN}
+        <button on:click={() => checkHowMuchMoneyLeft(ACCESS_TOKEN)}>
+          Refresh balance
+        </button>
+
+        <button on:click={() => checkRecentTransactions(ACCESS_TOKEN)}>
+          Refresh transactions
+        </button>
+      {/if}
+    </div>
+
+    {#if totalMoneyLeft !== null}
+      <div style="margin-left: 50px; margin-top: 20px;">
+        <div style="font-family: sans-serif; font-size: 5rem;">
+          {totalMoneyLeft}
+        </div>
+        <div style="font-family: sans-serif;">
+          Total balance remaining
+        </div>
+      </div>
     {/if}
 
-    {#each accounts as account}
-      {account.name} {account.balances.available}
-    {/each}
+    <div style="margin-bottom: 30px"></div>
+
+    <div style="display: flex; margin-left: 50px;">
+      {#each accounts as account}
+        <div style="margin-right: 20px;">
+          <div style="font-family: sans-serif; font-size: 2rem;">
+            {account.balances.available}
+          </div>
+          <div style="font-family: sans-serif;">
+            {account.name}
+          </div>
+        </div>
+      {/each}
+    </div>
+
+    <div style="margin-left: 50px; margin-top: 50px; overflow-y: auto;">
+      <div style="font-family: sans-serif; font-size: 2rem; color: grey;">
+        Recent transactions
+      </div>
+      {#each transactions as transaction}
+        <div style="display: flex; flex-wrap: nowrap;">
+          {#if transaction.amount > 0}
+            <div 
+            style="font-size: {0.5 + (0.012 * transaction.amount)}rem; font-family: sans-serif;
+              color: red;
+              white-space: nowrap;
+            "
+            >
+             -{transaction.amount}: {transaction.merchant_name ? transaction.merchant_name : transaction.name}, {transaction.date}
+            </div>
+          {:else}
+            <div 
+            style="font-size: {0.5 + (-1 * 0.012 * transaction.amount)}rem; font-family: sans-serif;
+              color: green;
+              white-space: nowrap;
+            "
+            >
+              <!-- remove negative sign -->
+             +{-1 * transaction.amount}: {transaction.merchant_name ? transaction.merchant_name : transaction.name}, {transaction.date}
+            </div>
+          {/if}
+        </div>
+      {/each}
+    </div>
   </div>
 {/if}
 
@@ -43,38 +106,52 @@ const dispatch = createEventDispatcher()
 // and the fact that we use API secrets for Plaid that must not be run on 
 // the browser, which are always considered as compromised
 
+let totalMoneyLeft = null
 let openPlaidLinkUI = null
 let accounts = [] 
+let transactions = [] 
 let ACCESS_TOKEN = 'access-development-d8846a38-5ee5-478f-b597-afc6bf3586b0'
+
+$: if (accounts.length > 0) {
+  totalMoneyLeft = 0
+  for (const account of accounts) {
+    totalMoneyLeft += account.balances.available
+  }
+}
 
 onMount(async () => {
   // auto fetch account balances
   if (ACCESS_TOKEN) {
     checkHowMuchMoneyLeft(ACCESS_TOKEN)
+    checkRecentTransactions(ACCESS_TOKEN)
   }
 
-  const result = await firebaseFunctionsVersion()
+  const result = await getLinkToken()
   const link_token = result.data.link_token
-  console.log('link_token =', link_token)
+
   async function onLoginSuccessCallback (publicToken, metadata) {
-    console.log('publicToken =', publicToken)
     const exchangePublicTokenForAccessToken = httpsCallable(functions, 'exchangePublicTokenForAccessToken')
     const result = await exchangePublicTokenForAccessToken({ publicToken })
-    console.log('accessToken =', result.data.access_token)
     ACCESS_TOKEN = result.data.access_token
   }
+
   const { open } = initializePlaidUI(link_token, onLoginSuccessCallback) // `open` refers to OPENING the Plaid UI element itself to start the loginflow
   openPlaidLinkUI = open
 })
 
+async function checkRecentTransactions (accessToken) {
+  const getTransactions = httpsCallable(functions, 'getTransactions')
+  const transactionsResult = await getTransactions({ accessToken })
+  transactions = transactionsResult.data.transactions
+}
+
 async function checkHowMuchMoneyLeft (accessToken) {
   const getBalance = httpsCallable(functions, 'getBalance')
   const balanceResult = await getBalance({ accessToken })
-  console.log("balanceResult =", balanceResult)
   accounts = balanceResult.data.accounts
 }
 
-async function firebaseFunctionsVersion () {
+async function getLinkToken () {
   return new Promise(resolve => {
     // STEP 1
     const functions = getFunctions();
@@ -119,8 +196,8 @@ function initializePlaidUI (linkToken, onLoginSuccessCallback) {
 
     overflow-y: scroll;
     z-index: 5;
-    width: 60%;
-    height: 60%;
+    width: 90%;
+    height: 90%;
     min-width: 200px;
     border-radius: 10px;
     background-color: white;

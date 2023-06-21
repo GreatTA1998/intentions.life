@@ -7,6 +7,8 @@
  * See a full list of supported triggers at https://firebase.google.com/docs/functions
  */
 
+// gcloud beta functions logs read
+
 const {onRequest} = require("firebase-functions/v2/https");
 const logger = require("firebase-functions/logger");
 
@@ -19,10 +21,7 @@ const { Configuration, PlaidApi, PlaidEnvironments } = require('plaid')
 const PLAID_CLIENT_ID = '60a82f4b2dd19f0010a1abd3'
 const PLAID_SECRET = 'b86a3e600550c25c233aee0c30dce9'
 
-console.log('PLAID_CLIENT_ID =', PLAID_CLIENT_ID)
-console.log('PLAID_SECRET =', PLAID_SECRET)
-
-const PLAID_PRODUCTS = ['auth'] // I think 'transactions' work as well, but not 'balance'
+const PLAID_PRODUCTS = ['auth', 'transactions'] // I think 'transactions' work as well, but not 'balance'
 const PLAID_COUNTRY_CODES = ['US','CA']
 
 const configuration = new Configuration({
@@ -77,6 +76,33 @@ exports.getBalance = functions.https.onCall(async (data, context) => {
   return balanceResponse.data
 })
 
+exports.getTransactions = functions.https.onCall(async (data, context) => {
+  const ACCESS_TOKEN = data.accessToken
+
+  // Get today's date in YYYY-MM-DD format https://stackoverflow.com/a/29774197/7812829
+  // note it's converted to UTC time, so the date can be +- 1 day
+  const now = new Date()
+  now.setMinutes(now.getMinutes() - now.getTimezoneOffset())
+  now.toISOString().substring(0,10); // This is a cleaner alternative, since it reminds you that YYYY-MM-DD are the first ten characters of the complete iso format – 
+  const thisMonthDateInYYYYMMDD = now.toISOString().substring(0,10)
+
+  // get last month https://stackoverflow.com/a/50098236/7812829
+  now.setDate(0) // 0 will result in the last day of the previous month
+  now.setDate(1)
+  const lastMonthDateInYYYYMMDD = now.toISOString().substring(0,10)
+
+  const response = await client.transactionsGet({
+    access_token: ACCESS_TOKEN,
+    start_date: lastMonthDateInYYYYMMDD,
+    end_date: thisMonthDateInYYYYMMDD, // YYYY-MM-DD
+    // options: {
+    //   include_personal_finance_category: true
+    // }
+  });
+  let transactions = response.data.transactions;
+  const total_transactions = response.data.total_transactions;
+  return response.data
+})
 
 // TO-DO
 //  - Figure out how to what part of the code is responsible for the Plaid Link UI 
