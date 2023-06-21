@@ -9,23 +9,9 @@
       </span>
     </div>
 
-
-    <div style="margin-left: 50px;">
-    <!-- PLAID LINK --> 
-      {#if openPlaidLinkUI}
-        <button on:click={() => openPlaidLinkUI()}>Open Plaid Link</button>
-      {/if}
-
-      {#if ACCESS_TOKEN}
-        <button on:click={() => checkHowMuchMoneyLeft(ACCESS_TOKEN)}>
-          Refresh balance
-        </button>
-
-        <button on:click={() => checkRecentTransactions(ACCESS_TOKEN)}>
-          Refresh transactions
-        </button>
-      {/if}
-    </div>
+    {#if accounts.length === 0 || transactions.length === 0}
+      <FinancePopupLoadingIndicator/>
+    {/if}
 
     {#if totalMoneyLeft !== null}
       <div style="margin-left: 50px; margin-top: 20px;">
@@ -88,8 +74,11 @@
 <script>
 import { createEventDispatcher, onMount, onDestroy, tick } from 'svelte'
 import _ from 'lodash'
-import { getDateOfToday, getRandomID, clickOutside } from '/src/helpers.js';
-import { getFunctions, httpsCallable } from "firebase/functions";
+import { getDateOfToday, getRandomID, clickOutside } from '/src/helpers.js'
+import { getFunctions, httpsCallable } from "firebase/functions"
+import { updateDoc, doc, getFirestore } from 'firebase/firestore'
+import { user } from '/src/store.js'
+import FinancePopupLoadingIndicator from './FinancePopupLoadingIndicator.svelte'
 
 export let isOpen = false
 
@@ -107,10 +96,9 @@ const dispatch = createEventDispatcher()
 // the browser, which are always considered as compromised
 
 let totalMoneyLeft = null
-let openPlaidLinkUI = null
 let accounts = [] 
 let transactions = [] 
-let ACCESS_TOKEN = 'access-development-d8846a38-5ee5-478f-b597-afc6bf3586b0'
+// let ACCESS_TOKEN =  'access-development-d8846a38-5ee5-478f-b597-afc6bf3586b0'
 
 $: if (accounts.length > 0) {
   totalMoneyLeft = 0
@@ -119,25 +107,38 @@ $: if (accounts.length > 0) {
   }
 }
 
-onMount(async () => {
-  // auto fetch account balances
-  if (ACCESS_TOKEN) {
-    checkHowMuchMoneyLeft(ACCESS_TOKEN)
-    checkRecentTransactions(ACCESS_TOKEN)
-  }
+$: console.log('$user changed in finance popup =', $user)
 
+onMount(async () => {
+  if ($user.plaidAccessToken) {
+    checkHowMuchMoneyLeft($user.plaidAccessToken)
+    checkRecentTransactions($user.plaidAccessToken)
+  } else {
+    openPlaidLinkUI()
+  }
+})
+
+async function openPlaidLinkUI () {
   const result = await getLinkToken()
   const link_token = result.data.link_token
 
-  async function onLoginSuccessCallback (publicToken, metadata) {
+  const { open } = initializePlaidUI(link_token, async (publicToken, metadata) => {
     const exchangePublicTokenForAccessToken = httpsCallable(functions, 'exchangePublicTokenForAccessToken')
     const result = await exchangePublicTokenForAccessToken({ publicToken })
-    ACCESS_TOKEN = result.data.access_token
-  }
+    
+    // save access token with user
+    const userRef = doc(getFirestore(), `users/${$user.uid}`)
+    await updateDoc(userRef, {
+      plaidAccessToken: result.data.access_token
+    })
 
-  const { open } = initializePlaidUI(link_token, onLoginSuccessCallback) // `open` refers to OPENING the Plaid UI element itself to start the loginflow
-  openPlaidLinkUI = open
-})
+    checkHowMuchMoneyLeft(result.data.access_token)
+    checkRecentTransactions(result.data.access_token)
+  }) 
+  
+  // `open` refers to OPENING the Plaid UI element itself to start the loginflow
+  open()
+}
 
 async function checkRecentTransactions (accessToken) {
   const getTransactions = httpsCallable(functions, 'getTransactions')

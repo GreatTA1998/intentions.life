@@ -195,7 +195,8 @@
 
 <script>
   export let data
-  let { userID } = data; // GxBbopqXHW0qgjKEwU4z
+  // RENAME THIS TO USER_UID
+  let { userID } = data; // GxBbopqXHW0qgjKEwU4z 
   $: ({ userID } = data); // so it stays in sync when `data` changes
 
   import UnscheduledTasksForToday from '$lib/UnscheduledTasksForToday.svelte'
@@ -214,7 +215,7 @@
   import ExperimentalPlayground from '$lib/ExperimentalPlayground.svelte'
   import WeekView from '$lib/WeekView.svelte'
   import TheSnackbar from '$lib/TheSnackbar.svelte'
-  import { mostRecentlyDeletedOrCompletedTaskID, mostRecentlyCompletedTaskName } from '/src/store';
+  import { mostRecentlyDeletedOrCompletedTaskID, mostRecentlyCompletedTaskName, user } from '/src/store.js';
 
   let snackbarTimeoutID = null
   let countdownRemaining = 0
@@ -319,6 +320,9 @@
     try {
       unsubUserDocListener = onSnapshot(doc(db, userDocPath), async snapshot => {
         userDoc = snapshot.data()
+
+        user.set(userDoc)
+
         lastRanRepeatAtDate = snapshot.data().lastRanRepeatAtDate
         goalsAndPosters = snapshot.data().goalsAndPosters || ''
         // HANDLE TASKS THAT REPEAT

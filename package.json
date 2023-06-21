@@ -11,7 +11,9 @@
     "@sveltejs/adapter-auto": "next",
     "@sveltejs/adapter-vercel": "^1.0.0-next.40",
     "@sveltejs/kit": "next",
-    "svelte": "^3.44.0"
+    "sass": "^1.63.5",
+    "svelte": "^3.44.0",
+    "svelte-preprocess": "^5.0.4"
   },
   "type": "module",
   "dependencies": {
