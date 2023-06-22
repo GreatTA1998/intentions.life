@@ -42,10 +42,17 @@
   />
 {/if}
 
+{#if isBedtimePopupOpen}
+  <BedtimePopup
+    isOpen={isBedtimePopupOpen}
+    on:card-close={() => isBedtimePopupOpen = false}
+  />
+{/if}
+
 <div id="background-image-holder" style="height: 100vh;">
-  <a role="button" on:click={toggleMusic} class="float  mika-hover" style="bottom: 210px; z-index: 10;">
+  <a role="button" on:click={() => isJournalPopupOpen = !isJournalPopupOpen} class="float mika-hover" style="bottom: 50px; z-index: 10">
     <span class="material-icons my-float">
-      {isMusicPlaying ? 'music_note' : 'music_off'}
+      auto_stories
     </span>
   </a>
 
@@ -55,15 +62,21 @@
     </span>
   </a>
 
-  <a role="button" on:click={() => isJournalPopupOpen = !isJournalPopupOpen} class="float mika-hover" style="bottom: 50px; z-index: 10">
+  <a role="button" on:click={toggleMusic} class="float  mika-hover" style="bottom: 210px; z-index: 10;">
     <span class="material-icons my-float">
-      auto_stories
+      {isMusicPlaying ? 'music_note' : 'music_off'}
     </span>
   </a>
 
   <a role="button" on:click={() => isFinancePopupOpen = !isFinancePopupOpen} class="float mika-hover" style="bottom: 290px; z-index: 10">
     <span class="material-icons my-float">
       attach_money
+    </span>
+  </a>
+
+  <a role="button" on:click={() => isBedtimePopupOpen = !isBedtimePopupOpen} class="float mika-hover" style="bottom: 370px; z-index: 10">
+    <span class="material-icons my-float">
+      bedtime
     </span>
   </a>
 
@@ -212,6 +225,8 @@
   import { getRandomInt, getDateOfToday, getDateOfTomorrow, getDateInMMDD, getDateInDDMMYYYY, getRandomID } from '../../helpers.js'
   import JournalPopup from '$lib/JournalPopup.svelte'
   import FinancePopup from '$lib/FinancePopup.svelte'
+  import BedtimePopup from '$lib/BedtimePopup.svelte'
+
   import ExperimentalPlayground from '$lib/ExperimentalPlayground.svelte'
   import WeekView from '$lib/WeekView.svelte'
   import TheSnackbar from '$lib/TheSnackbar.svelte'
@@ -230,6 +245,7 @@
   let currentMode = 'dayMode' // weekMode hourMode monthMode
 
   let isFinancePopupOpen = false
+  let isBedtimePopupOpen = false
 
   let isGirlfriendMode = true
 
