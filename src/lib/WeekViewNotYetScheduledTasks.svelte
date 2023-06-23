@@ -22,13 +22,14 @@
 </div>
 
 <script>
-  import { computeDayDifference, convertDDMMYYYYToDateClassObject } from '/src/helpers.js'
+  import { computeDayDifference, convertDDMMYYYYToDateClassObject, getDateInDDMMYYYY } from '/src/helpers.js'
   import { createEventDispatcher } from 'svelte'
   import TaskElement from '/src/TaskElement.svelte'
 
   export let allTasks
   export let pixelsPerDay
 
+  const dispatch = createEventDispatcher()
   let tasksDueThisWeek = [] 
 
   $: if (allTasks) {
@@ -65,7 +66,24 @@
     }
   }
 
-  function drop_handler () {}
+  function drop_handler (e) {
+    e.preventDefault()
 
-  function dragover_handler () {}
+    // https://stackoverflow.com/a/1025712/7812829
+    const d = new Date()  
+    const endOfWeek = new Date(d.getTime() + 6 * 24 * 60 * 60 * 1000)
+    const ddmmyyyy = getDateInDDMMYYYY(endOfWeek)
+
+    dispatch('task-dragged', {
+      id: e.dataTransfer.getData('text/plain'),
+      timeOfDay: '', // reset `startTime` if dragged from calendar
+      deadlineTime: '23:59', // 
+      deadlineDate: ddmmyyyy
+    })
+  }
+
+  function dragover_handler (e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  }
 </script>

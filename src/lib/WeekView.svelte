@@ -12,6 +12,7 @@
 <WeekViewNotYetScheduledTasks
   on:task-click
   on:task-duration-adjusted
+  on:task-dragged
   {allTasks}
   {pixelsPerDay}
 />
