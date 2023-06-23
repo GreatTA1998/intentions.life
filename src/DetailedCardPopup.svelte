@@ -31,7 +31,7 @@
 
     {#if taskObject.deadlineDate}
       <div style="margin-left: 16px">
-        deadline: {taskObject.deadlineDate}
+        deadline: {taskObject.deadlineDate} {taskObject.deadlineTime}
       </div>
     {/if}
 
