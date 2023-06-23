@@ -138,6 +138,7 @@
             </div>
           {:else if currentMode === 'weekMode'}
             <WeekView
+              {allTasks}
               {thisWeekScheduledTasks}
               on:task-click={(e) => openDetailedCard(e.detail)}
               on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
@@ -355,12 +356,12 @@
           console.log('new day, resetting tasks')
           // isFirstTime = false
           const copy = [...snapshot.data().allTasks]
-          resetScheduledButMissedNonRepeatingTasks(copy) 
+          // resetScheduledButMissedNonRepeatingTasks(copy) 
 
           for (const task of copy) {
             recursivelyResetRepeatingTasks(task)
           }
-          scheduleHabitsWithoutClashing() // this will mutate tasks in `copy`
+          // scheduleHabitsWithoutClashing() // this will mutate tasks in `copy`
 
           updateDoc(doc(db, userDocPath), { 
             allTasks: copy, 

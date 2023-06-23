@@ -5,12 +5,16 @@
     on:task-duration-adjusted
     on:task-scheduled
     scheduledTasksThisWeek={thisWeekScheduledTasks}
+    {pixelsPerDay}
   />
 </div>
 
-<div style="font-family: Inter;font-size: 16px; margin-bottom: 12px;">
-  This week's tasks
-</div>
+<WeekViewNotYetScheduledTasks
+  on:task-click
+  on:task-duration-adjusted
+  {allTasks}
+  {pixelsPerDay}
+/>
 
 <div style="font-family: Inter;font-size: 16px; margin-bottom: 12px;">
   Upcoming this month
@@ -19,8 +23,11 @@
 <!-- For prototypes, it's better for code to be easy to understand and inefficient, than the other way around -->
 
 <script>
+  import WeekViewNotYetScheduledTasks from './WeekViewNotYetScheduledTasks.svelte'
   import WeekViewCalendarThisWeekView from './WeekViewCalendarThisWeekView.svelte'
 
+  export let allTasks
   export let thisWeekScheduledTasks
 
+  let pixelsPerDay = 200
 </script>

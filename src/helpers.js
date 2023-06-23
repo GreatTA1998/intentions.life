@@ -153,7 +153,6 @@ export function getRandomID () {
 // The reliable way to create date object is new Date(yyyy, mm, dd)
 // where `yyyy`, `mm` and `dd` are all integers
 
-
 // return d2 - d1
 // Based on https://stackoverflow.com/a/15289883/7812829
 // UTC computations are time-zone safe because UTC never observes Daylight Savings Time
@@ -166,4 +165,9 @@ export function computeDayDifference (dateClassObject1, dateClassObject2) {
   const utc2 = Date.UTC(d2.getFullYear(), d2.getMonth(), d2.getDate())
 
   return Math.floor((utc2 - utc1) / msPerDay)
+}
+
+export function convertDDMMYYYYToDateClassObject (ddmmyyyy) {
+  const [dd, mm, yyyy] = ddmmyyyy.split('/')
+  return new Date(yyyy, mm - 1, dd) // month is 0-indexed where as mm is 1-indexezd, so subtract 1 (Stackoverflow commmunity agrees this is stupid design)
 }
