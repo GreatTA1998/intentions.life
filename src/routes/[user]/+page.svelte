@@ -414,13 +414,21 @@
       const today = new Date()
    
       const dayDiff = computeDayDifference(d1, today)
-      if (node.name === 'Exercise') {
-        console.log('d1, d2 =', d1, today)
-        console.log('dayDiff =', dayDiff)
-      }
+
+      // USEFUL DEBUGGING LOGS
+      // if (node.name === 'Exercise') {
+        // console.log('d1, d2 =', d1, today)
+        // console.log('dayDiff =', dayDiff)
+      // }
 
       if (dayDiff >= 0) { // i.e. today is larger than the next repeating date for the habit
         node.deadlineDate = getDateInDDMMYYYY(today)
+
+        // just because it was scheduled at a particular time a few days ago
+        // does not mean you want to do it at exactly the same time today
+        node.startDate = ''
+        node.startTime = ''
+
         console.log('successfully shifted new deadline for habit =', node)
         // we leave `deadlineTime` untouched for now
       }
