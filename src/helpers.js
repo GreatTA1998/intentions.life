@@ -171,3 +171,9 @@ export function convertDDMMYYYYToDateClassObject (ddmmyyyy) {
   const [dd, mm, yyyy] = ddmmyyyy.split('/')
   return new Date(yyyy, mm - 1, dd) // month is 0-indexed where as mm is 1-indexezd, so subtract 1 (Stackoverflow commmunity agrees this is stupid design)
 }
+
+// NOT zero-indexed, just normal
+export function getMonthNameFromNumber (monthNumber) {
+  const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+  return monthNames[monthNumber]
+}

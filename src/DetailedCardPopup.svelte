@@ -53,6 +53,8 @@
             Schedule
           </a>
         {:else}
+          <ReusableDatePicker/>
+
           <input bind:value={newStartDate} placeholder={getDateOfToday()} style="width: 40px"/>
           <input bind:value={newStartTime} placeholder="13:00" style="width: 40px" on:keypress={detectEnterKey5}/>
         {/if}
@@ -131,6 +133,7 @@ import { createEventDispatcher, onMount, onDestroy, tick } from 'svelte'
 import _ from 'lodash'
 import RecursiveBulletPoint from './lib/RecursiveBulletPoint.svelte';
 import { getDateOfToday, getRandomID, clickOutside, getDateInDDMMYYYY } from './helpers.js'
+import ReusableDatePicker from '$lib/ReusableDatePicker.svelte';
 
 export let taskObject 
 

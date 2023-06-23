@@ -66,8 +66,7 @@
   import WeekViewTaskElement from './WeekViewTaskElement.svelte'
 
   export let scheduledTasksThisWeek
-
-  $: pixelsPerDay = 200
+  export let pixelsPerDay
 
   const dispatch = createEventDispatcher()
   const getDate = getDateOfToday
