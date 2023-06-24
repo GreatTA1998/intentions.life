@@ -3,7 +3,7 @@
   on:dragover={(e) => dragover_handler(e)}
 >
   <div style="font-family: Inter;font-size: 16px; margin-bottom: 12px;">
-    This week's tasks
+    This month's tasks
   </div>
 
   {#each tasksDueThisWeek as task, i}
@@ -38,11 +38,14 @@
       fulfilsCriteria: (task) => {
         if (!task.deadlineDate) return
 
+        // I thought it's d2 - d1, so the task.deadlineDate is 1 week out or 1 month out,
+        // but it's within 7 from today
         const diff = computeDayDifference(
           new Date(),
           convertDDMMYYYYToDateClassObject(task.deadlineDate)
+
         )
-        return diff <= 7 && !task.startTime && !task.isDone
+        return diff <= 30 && !task.startTime && !task.isDone
       },
       applyFunc: (task) => tasksDueThisWeek = [...tasksDueThisWeek, task]
     })

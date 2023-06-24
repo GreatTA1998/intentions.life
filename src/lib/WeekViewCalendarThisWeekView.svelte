@@ -30,7 +30,7 @@
       />
     {/each}
         
-    <!-- This offsets the fact that the timestamp needs a -6 margin to not be cut off from the top edge of the container -->
+    <!-- important: this offsets the fact that the timestamp needs a -6 margin to not be cut off from the top edge of the container -->
     <div style="margin-top: 6px;"></div>
 
     <!-- Again, because we're using absolute positioning for above elements, their positionings are independent from each other -->

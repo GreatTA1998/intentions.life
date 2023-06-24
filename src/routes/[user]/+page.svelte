@@ -84,18 +84,23 @@
     <!-- 1st flex child -->
     <div style="width: 44vw">
       <div style="margin-left: 69px; margin-top: 47px; display: flex; align-items: center;">
-        <div class="mika-rectangle" on:click={() => alert('Coming soon')}>
+        <div class="mika-rectangle" on:click={() => currentMode = 'hourMode'}
+          class:selected-rectangle={currentMode === 'hourMode'}
+        >
           Hour
         </div>
-        <div class="mika-rectangle" class:selected-rectangle={currentMode === 'dayMode'} on:click={() => currentMode = 'dayMode'}>
+        <div class="mika-rectangle" class:selected-rectangle={currentMode === 'dayMode'} 
+          on:click={() => currentMode = 'dayMode'}>
           Day
         </div>
-        <div on:click={() => currentMode = 'weekMode'} class="mika-rectangle" 
-            class:selected-rectangle={currentMode === 'weekMode'} 
-          >
+        <div class="mika-rectangle" on:click={() => currentMode = 'weekMode'}
+          class:selected-rectangle={currentMode === 'weekMode'} 
+        >
           Week
         </div>
-        <div class="mika-rectangle" on:click={() => alert('Coming soon')}>
+        <div class="mika-rectangle" on:click={() => currentMode = 'monthMode'}
+          class:selected-rectangle={currentMode === 'monthMode'}  
+        >
           Month
         </div>
       </div>
@@ -106,7 +111,11 @@
 
       <div class="flex-container blur">
         <div class="calendar-section-container">
-          {#if currentMode === 'dayMode'}
+          {#if currentMode === 'hourMode'}
+            <HourView
+              {allTasks}
+            />
+          {:else if currentMode === 'dayMode'}
             <!-- DAY MODE TRIPLET-->
             <CalendarTodayView
               scheduledTasksToday={todayScheduledTasks}
@@ -144,6 +153,10 @@
               on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
               on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
               on:task-dragged={(e) => changeTaskDeadline(e.detail)}
+            />
+          {:else if currentMode === 'monthMode'}
+            <MonthView
+              {allTasks}
             />
           {/if}
         </div>
@@ -230,7 +243,9 @@
   import BedtimePopup from '$lib/BedtimePopup.svelte'
 
   import ExperimentalPlayground from '$lib/ExperimentalPlayground.svelte'
+  import HourView from '$lib/HourView.svelte'
   import WeekView from '$lib/WeekView.svelte'
+  import MonthView from '$lib/MonthView.svelte'
   import TheSnackbar from '$lib/TheSnackbar.svelte'
   import { mostRecentlyDeletedOrCompletedTaskID, mostRecentlyCompletedTaskName, user } from '/src/store.js';
 
