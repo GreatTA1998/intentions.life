@@ -159,18 +159,36 @@ export function getRandomID () {
 // UTC computations are time-zone safe because UTC never observes Daylight Savings Time
 export function computeDayDifference (dateClassObject1, dateClassObject2) {
   const msPerDay = 1000 * 60 * 60 * 24
+  const msDiff = computeMillisecsDifference(dateClassObject1, dateClassObject2)
+  return Math.floor(msDiff / msPerDay)
+}
+
+// return d2 - d1
+// Based on https://stackoverflow.com/a/15289883/7812829
+// by shifting both dates to UTC, the DIFFERENCE calculation is "daylight-savings safe" because UTC never observes Daylight Savings Time
+export function computeMillisecsDifference (dateClassObject1, dateClassObject2) {
   const d1 = dateClassObject1
   const d2 = dateClassObject2
   
-  const utc1 = Date.UTC(d1.getFullYear(), d1.getMonth(), d1.getDate())
-  const utc2 = Date.UTC(d2.getFullYear(), d2.getMonth(), d2.getDate())
-
-  return Math.floor((utc2 - utc1) / msPerDay)
+  // monthIndex ranges from 0 to 11 
+  // hours ranges from 0 to 23
+  // minutes ranges from 0 to 69
+  const utc1 = Date.UTC(d1.getFullYear(), d1.getMonth(), d1.getDate(), d1.getHours(), d1.getMinutes())
+  const utc2 = Date.UTC(d2.getFullYear(), d2.getMonth(), d2.getDate(), d2.getHours(), d2.getMinutes())
+  return utc2 - utc1
 }
 
-export function convertDDMMYYYYToDateClassObject (ddmmyyyy) {
+// notice we purposely differentiatev`minutes` from `mm` (month) 
+export function convertDDMMYYYYToDateClassObject (ddmmyyyy, hhmm = '') {
   const [dd, mm, yyyy] = ddmmyyyy.split('/')
-  return new Date(yyyy, mm - 1, dd) // month is 0-indexed where as mm is 1-indexezd, so subtract 1 (Stackoverflow commmunity agrees this is stupid design)
+  if (!hhmm) {
+    return new Date(yyyy, mm - 1, dd)
+  } else {
+    const [hh, minutes] = hhmm.split(':')
+    const result = new Date(parseInt(yyyy), parseInt(mm) - 1, parseInt(dd), parseInt(hh), parseInt(minutes))
+    return result
+  }
+   // month is 0-indexed where as mm is 1-indexed, so subtract 1 (Stackoverflow commmunity agrees this is stupid design)
 }
 
 // NOT zero-indexed, just normal
