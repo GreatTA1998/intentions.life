@@ -7,7 +7,8 @@
  * See a full list of supported triggers at https://firebase.google.com/docs/functions
  */
 
-// gcloud beta functions logs read
+
+// gcloud beta functions logs read getBalance --limit 50
 
 const {onRequest} = require("firebase-functions/v2/https");
 const logger = require("firebase-functions/logger");
@@ -76,6 +77,12 @@ exports.getBalance = functions.https.onCall(async (data, context) => {
   return balanceResponse.data
 })
 
+
+
+// https://plaid.com/docs/errors/item/#product_not_ready
+// might need to wait for the "event" / "webhook" 
+//   - we did initialize with 'transactions' product
+//   - might listen to the 'INITIAL_UPDATE webhook
 exports.getTransactions = functions.https.onCall(async (data, context) => {
   const ACCESS_TOKEN = data.accessToken
 

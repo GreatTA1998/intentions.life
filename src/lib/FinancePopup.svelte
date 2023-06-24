@@ -71,6 +71,10 @@
           </div>
         {/each}
       </div>
+    {:else if $user.plaidAccessToken && $user.plaidItemID}
+      <button on:click={() => checkRecentTransactions($user.plaidAccessToken)}>
+        Fetch transactions
+      </button>
     {/if}
   </div>
 {/if}
@@ -103,6 +107,7 @@ let totalMoneyLeft = null
 let accounts = null
 let transactions = null
 // let ACCESS_TOKEN =  'access-development-d8846a38-5ee5-478f-b597-afc6bf3586b0'
+// newest accessToken = access-development-8e92602f-a1ac-4ec6-aa78-ba4bd266360b
 
 $: if (accounts) {
   totalMoneyLeft = 0
@@ -114,7 +119,7 @@ $: if (accounts) {
 $: console.log('$user changed in finance popup =', $user)
 
 onMount(async () => {
-  if ($user.plaidAccessToken) {
+  if ($user.plaidAccessToken && $user.plaidItemID) {
     checkHowMuchMoneyLeft($user.plaidAccessToken)
     checkRecentTransactions($user.plaidAccessToken)
   } else {
@@ -133,7 +138,8 @@ async function openPlaidLinkUI () {
     // save access token with user
     const userRef = doc(getFirestore(), `users/${$user.uid}`)
     await updateDoc(userRef, {
-      plaidAccessToken: result.data.access_token
+      plaidAccessToken: result.data.access_token,
+      plaidItemID: result.data.item_id
     })
 
     checkHowMuchMoneyLeft(result.data.access_token)
