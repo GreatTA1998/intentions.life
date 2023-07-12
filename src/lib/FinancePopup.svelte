@@ -9,6 +9,15 @@
       </span>
     </div>
 
+    {#if openPlaidLinkUI}
+      <!-- Don't use implicit arguments, or you'll get silent effects
+        Make everything explicit
+      -->
+      <button on:click={() => openPlaidLinkUI()}>
+        Link additional card
+      </button>
+    {/if}
+
     {#if !accounts || !transactions}
       <FinancePopupLoadingIndicator/>
     {/if}
@@ -92,6 +101,7 @@ export let isOpen = false
 
 const functions = getFunctions();
 const dispatch = createEventDispatcher()
+let openPlaidLinkUI = null 
 
 // TO-DO:
 //   1. createLinkToken () (you need the API keys, which is why they recommend using a server)
@@ -102,6 +112,12 @@ const dispatch = createEventDispatcher()
 // of security restrictions from Plaid not allowing client requests,
 // and the fact that we use API secrets for Plaid that must not be run on 
 // the browser, which are always considered as compromised
+
+
+// TO-DO
+// differentiate between whether you're logging into a Credit card account or Debit card account
+// let the user add an arbitrary number of account
+
 
 let totalMoneyLeft = null
 let accounts = null
@@ -120,34 +136,47 @@ $: console.log('$user changed in finance popup =', $user)
 
 onMount(async () => {
   if ($user.plaidAccessToken && $user.plaidItemID) {
-    checkHowMuchMoneyLeft($user.plaidAccessToken)
-    checkRecentTransactions($user.plaidAccessToken)
-  } else {
+    // checkHowMuchMoneyLeft($user.plaidAccessToken)
+    // checkRecentTransactions($user.plaidAccessToken)
+    // checkAccountData($user.plaidAccessToken)
+  } 
+  await preparePlaidLinkUI()
+  if (!$user.plaidAccessToken && !$user.plaidItemID) {
     openPlaidLinkUI()
   }
 })
 
-async function openPlaidLinkUI () {
-  const result = await getLinkToken()
-  const link_token = result.data.link_token
+async function preparePlaidLinkUI () {
+  return new Promise(async (resolve) => {
+    const result = await getLinkToken()
+    const link_token = result.data.link_token
 
-  const { open } = initializePlaidUI(link_token, async (publicToken, metadata) => {
-    const exchangePublicTokenForAccessToken = httpsCallable(functions, 'exchangePublicTokenForAccessToken')
-    const result = await exchangePublicTokenForAccessToken({ publicToken })
+    const { open } = initializePlaidUI(link_token, async (publicToken, metadata) => {
+      const exchangePublicTokenForAccessToken = httpsCallable(functions, 'exchangePublicTokenForAccessToken')
+      const result = await exchangePublicTokenForAccessToken({ publicToken })
+      
+      // save access token with user
+      const userRef = doc(getFirestore(), `users/${$user.uid}`)
+      await updateDoc(userRef, {
+        plaidAccessToken: result.data.access_token,
+        plaidItemID: result.data.item_id
+      })
+
+      checkHowMuchMoneyLeft(result.data.access_token)
+      checkRecentTransactions(result.data.access_token)
+    }) 
     
-    // save access token with user
-    const userRef = doc(getFirestore(), `users/${$user.uid}`)
-    await updateDoc(userRef, {
-      plaidAccessToken: result.data.access_token,
-      plaidItemID: result.data.item_id
-    })
+    // `open` refers to OPENING the Plaid UI element itself to start the loginflow
+    openPlaidLinkUI = open
+    resolve()
+  })
+}
 
-    checkHowMuchMoneyLeft(result.data.access_token)
-    checkRecentTransactions(result.data.access_token)
-  }) 
-  
-  // `open` refers to OPENING the Plaid UI element itself to start the loginflow
-  open()
+async function checkAccountData (accessToken) {
+  const fetchAccountData = httpsCallable(functions, 'fetchAccountData')
+  const accountResult = await fetchAccountData({ accessToken })
+  console.log("accountResult =", accountResult)
+  console.log("account.data =", accountResult.data)
 }
 
 async function checkRecentTransactions (accessToken) {
