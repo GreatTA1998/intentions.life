@@ -9,23 +9,67 @@
       </span>
     </div>
 
-    {#if openPlaidLinkUI}
-      <!-- Don't use implicit arguments, or you'll get silent effects
-        Make everything explicit
-      -->
-      <button on:click={() => openPlaidLinkUI()}>
-        Link additional card
-      </button>
-    {/if}
+    <div style="display: flex">
+      {#if openPlaidLinkUI}
+        <!-- Don't use implicit arguments, or you'll get silent effects
+          Make everything explicit
+        -->
+        <button on:click={() => openPlaidLinkUI()}>
+          Link additional card
+        </button>
+      {/if}
+
+      <button on:click={getTrueBalance}>Fetch overall balance</button>
+
+      {#if openPlaidLinkUIUpdateMode}
+        <button on:click={() => openPlaidLinkUIUpdateMode()}>
+          Quickly refresh login
+        </button>
+      {/if}
+    </div>
+
+
+    <div>
+      <h2>
+        Card accounts
+      </h2>
+      {#each $user.cardAccounts as cardAccount}
+        <div>
+          {cardAccount.creditOrDebit} {cardAccount.account_id}
+        </div>
+        {#if cardAccount.creditOrDebit === 'credit'}
+        <div>
+          credit balance: {creditBalance}
+        </div>
+        {:else if cardAccount.creditOrDebit === 'depository' && debitBalance}
+          debit balance: ${debitBalance}
+        {/if}      
+
+        <button on:click={() => fetchCreditOrDebitTransactions({ 
+          access_token: cardAccount.access_token, 
+          account_id: cardAccount.account_id,
+          creditOrDebit: cardAccount.creditOrDebit
+        })}
+        >
+          Get transactions for this card
+        </button>
+
+        {#if debitCardTransactions && cardAccount.creditOrDebit === 'depository'}
+          {#each debitCardTransactions as transaction}
+            <div>-{transaction.amount}: {transaction.merchant_name ? transaction.merchant_name : transaction.name}, {transaction.date}</div>
+          {/each}
+        {/if}
+      {/each}
+    </div>
 
     {#if !accounts || !transactions}
       <FinancePopupLoadingIndicator/>
     {/if}
 
-    {#if totalMoneyLeft !== null}
+    {#if trueBalance !== null}
       <div style="margin-left: 50px; margin-top: 20px;">
         <div style="font-family: sans-serif; font-size: 5rem;">
-          {totalMoneyLeft}
+          {trueBalance}
         </div>
         <div style="font-family: sans-serif;">
           Total balance remaining
@@ -93,7 +137,7 @@ import { createEventDispatcher, onMount, onDestroy, tick } from 'svelte'
 import _ from 'lodash'
 import { getDateOfToday, getRandomID, clickOutside } from '/src/helpers.js'
 import { getFunctions, httpsCallable } from "firebase/functions"
-import { updateDoc, doc, getFirestore } from 'firebase/firestore'
+import { updateDoc, doc, getFirestore, arrayUnion } from 'firebase/firestore'
 import { user } from '/src/store.js'
 import FinancePopupLoadingIndicator from './FinancePopupLoadingIndicator.svelte'
 
@@ -102,28 +146,11 @@ export let isOpen = false
 const functions = getFunctions();
 const dispatch = createEventDispatcher()
 let openPlaidLinkUI = null 
-
-// TO-DO:
-//   1. createLinkToken () (you need the API keys, which is why they recommend using a server)
-//   2. initialize the Link UI (call Plaid.create({})), see https://plaid.com/docs/link/web/
-//   3. exchange the resulting public token from the user flow, and get a permanent access token (just copy the code from the quickstart)
-
-// The actual calls to Plaid are from Cloud Functions, because 
-// of security restrictions from Plaid not allowing client requests,
-// and the fact that we use API secrets for Plaid that must not be run on 
-// the browser, which are always considered as compromised
-
-
-// TO-DO
-// differentiate between whether you're logging into a Credit card account or Debit card account
-// let the user add an arbitrary number of account
-
+let openPlaidLinkUIUpdateMode = null 
 
 let totalMoneyLeft = null
 let accounts = null
 let transactions = null
-// let ACCESS_TOKEN =  'access-development-d8846a38-5ee5-478f-b597-afc6bf3586b0'
-// newest accessToken = access-development-8e92602f-a1ac-4ec6-aa78-ba4bd266360b
 
 $: if (accounts) {
   totalMoneyLeft = 0
@@ -136,9 +163,7 @@ $: console.log('$user changed in finance popup =', $user)
 
 onMount(async () => {
   if ($user.plaidAccessToken && $user.plaidItemID) {
-    // checkHowMuchMoneyLeft($user.plaidAccessToken)
-    // checkRecentTransactions($user.plaidAccessToken)
-    // checkAccountData($user.plaidAccessToken)
+
   } 
   await preparePlaidLinkUI()
   if (!$user.plaidAccessToken && !$user.plaidItemID) {
@@ -146,24 +171,86 @@ onMount(async () => {
   }
 })
 
+const backendURL = 'http://localhost:8000' // 'https://koa-test-1-ef0d40104d58.herokuapp.com'
+
+async function getInitialPlaidLinkToken () {
+  return new Promise(async (resolve) => {
+    try {
+      const response = await fetch(backendURL + '/link/token/create') 
+      if (response.ok) {
+        const responseData = await response.json();
+        resolve(responseData.link_token)      // EXAMPLE DATA: 
+                                              // responseData := {
+                                              //   "expiration": "2023-07-15T02:31:12Z",
+                                              //   "link_token": "link-development-7805a359-c980-4a6c-ad87-e032d624b797",
+                                              //   "request_id": "7VvHW4KL08w4YCE"
+                                              // }
+      } else {
+        throw new Error('Request failed with status ' + response.status);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  })
+}
+
+async function getPermanentAccessToken (publicToken) {
+  return new Promise(async (resolve) => {
+    const response = await fetch(backendURL + '/item/public_token/exchange', {
+      method: 'POST',
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ publicToken })
+    })
+    if (response.ok) {
+      const responseData = await response.json()
+      resolve(responseData) // := {access_token: 'access-development-44835b3c-ae2a-4e7f-845e-b69ede333128', item_id: 'yKnMq5Nzw4fRRXK0YZaRIbepZYNbXJHOML7Y4'}
+    }
+  })
+}
+
+async function fetchAllAccountsWithBank (access_token) {
+  return new Promise(async resolve => {
+    const response = await fetch(backendURL + '/accounts/get', {
+      method: 'POST',
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ access_token })
+    })
+    if (response.ok) {
+      const responseData = await response.json() 
+      resolve(responseData)
+    }
+  })
+}
+
 async function preparePlaidLinkUI () {
   return new Promise(async (resolve) => {
-    const result = await getLinkToken()
-    const link_token = result.data.link_token
+    const link_token = await getInitialPlaidLinkToken()
 
     const { open } = initializePlaidUI(link_token, async (publicToken, metadata) => {
-      const exchangePublicTokenForAccessToken = httpsCallable(functions, 'exchangePublicTokenForAccessToken')
-      const result = await exchangePublicTokenForAccessToken({ publicToken })
+      const { access_token } = await getPermanentAccessToken(publicToken)
+      const accounts = await fetchAllAccountsWithBank(access_token)
       
-      // save access token with user
-      const userRef = doc(getFirestore(), `users/${$user.uid}`)
-      await updateDoc(userRef, {
-        plaidAccessToken: result.data.access_token,
-        plaidItemID: result.data.item_id
-      })
+      // [{ type: , account_id } ...]
+      // should see credit, debit, account_id, and store it with access token
 
-      checkHowMuchMoneyLeft(result.data.access_token)
-      checkRecentTransactions(result.data.access_token)
+      const userRef = doc(getFirestore(), '/users/' + $user.uid)
+
+      for (const account of accounts) {
+        await updateDoc(userRef, {
+          cardAccounts: arrayUnion({ 
+            account_id: account.account_id,
+            creditOrDebit: account.type,
+            access_token: access_token
+          })
+        })
+      }
+
+      // this function will mutate "global" variables within this file
+      getTrueBalance()
     }) 
     
     // `open` refers to OPENING the Plaid UI element itself to start the loginflow
@@ -172,23 +259,151 @@ async function preparePlaidLinkUI () {
   })
 }
 
+function getBalance ({ access_token, account_id }) {
+  return new Promise(async resolve => {
+    const response = await fetch(backendURL + '/accounts/balance/get', {
+      method: 'POST',
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ access_token, account_id })
+    })
+    if (response.ok) {
+      const responseData = await response.json() 
+      console.log('getBalance response =', responseData)
+      // then fix the frontend so it resolves the balance AMOUNT
+      resolve(responseData.account)
+    } else {
+      console.log("should throw an error")
+      updateModePlaidLinkForCreditCard(access_token)
+      throw new Error('Login probably expired')
+    }
+  })
+}
+
+async function fetchCreditOrDebitTransactions ({ access_token, account_id, creditOrDebit }) {
+  if (creditOrDebit === 'depository') {
+    debitCardTransactions = await getTransactions({ access_token, account_id })
+  } else if (creditOrDebit === 'credit') {
+    creditCardTransactions = await getTransactions({ access_token, account_id })
+  }
+}
+
+// helper function
+function getTransactions ({ access_token, account_id }) {
+  return new Promise(async resolve => {
+    const response = await fetch(backendURL + '/accounts/transactions/sync', {
+      method: 'POST',
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ access_token, account_id })
+    })
+    if (response.ok) {
+      const responseData = await response.json() 
+      console.log('get transactions response =', responseData)
+      // this will return ALL accounts associated with this bank (remember accessToken maps 1 on 1 to bank)
+      
+      // EXAMPLE OF WHAT IT LOOKS LIKE
+      // { accounts: Array(2), total_transactions: 178, transactions: Arrray(100) }
+      const cardSpecificTransactions = responseData.transactions.filter(
+        transaction => transaction.account_id === account_id
+      )
+      resolve(cardSpecificTransactions)
+    }
+  })
+}
+
+// EXPERIMENT CODE TO FIGURE OUT HOW TO GET PLAID LINK UI TO WORK
+// PROBABLY NEED A TRY CATCH BLOCK ON THE SERVER SO IT DOESN'T FREEZE
+// WHEN THERE IS AN ERROR
+
+
+// specifying the `access_token` in the config of plaid Link UI 
+// is precisely how you tell it to be in update mode
+async function updateModePlaidLinkForCreditCard (access_token) {
+  const link_token = await getInitialPlaidLinkToken4(access_token)
+
+  const { open } = initializePlaidUI(link_token, async (publicToken, metadata) => { 
+    console.log("update mode flow finished and succeeded")
+  })
+  openPlaidLinkUIUpdateMode = open
+}
+
+async function getInitialPlaidLinkToken4 (access_token) {
+  return new Promise(async (resolve) => {
+    try {
+      const response = await fetch(backendURL + '/link/token/create', { 
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ access_token })
+      }) 
+      if (response.ok) {
+        const responseData = await response.json();
+        resolve(responseData.link_token)      // EXAMPLE DATA: 
+                                              // responseData := {
+                                              //   "expiration": "2023-07-15T02:31:12Z",
+                                              //   "link_token": "link-development-7805a359-c980-4a6c-ad87-e032d624b797",
+                                              //   "request_id": "7VvHW4KL08w4YCE"
+                                              // }
+      } else {
+        throw new Error('Request failed with status ' + response.status);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  })
+}
+
+
+function getTrueBalance () {
+  console.log("getTrueBalace()")
+  return new Promise(async (resolve) => {
+    for (const cardAccount of $user.cardAccounts) {
+      console.log("account =", cardAccount)
+      // assumes there's one debit and one credit, for now
+      if (cardAccount.creditOrDebit === 'depository') {
+        const result = await getBalance({ access_token: cardAccount.access_token, account_id: cardAccount.account_id })
+        console.log("debitResult =", result)
+        debitBalance = result.balances.current
+        console.log('debitBalance =', debitBalance)
+      } else if (cardAccount.creditOrDebit === 'credit') {
+        try {
+          const result = await getBalance({ access_token: cardAccount.access_token, account_id: cardAccount.account_id })
+          creditBalance = result.balances.current
+          console.log("creditBalance =", creditBalance)
+        } catch (error) {
+          console.log("credit card login probably timed out")
+          updateModePlaidLinkForCreditCard()
+        }
+
+      }
+    } 
+    resolve()
+    // `trueBalance` will automatically update because it's $ reactive
+  })
+}
+
+let trueBalance = null
+let debitBalance = null
+let creditBalance = null
+
+let creditCardTransactions = [] 
+let debitCardTransactions = [] 
+
+$: {
+  if (debitBalance !== null && creditBalance !== null) {
+    trueBalance = debitBalance - creditBalance
+  } 
+}
+
 async function checkAccountData (accessToken) {
   const fetchAccountData = httpsCallable(functions, 'fetchAccountData')
   const accountResult = await fetchAccountData({ accessToken })
   console.log("accountResult =", accountResult)
   console.log("account.data =", accountResult.data)
-}
-
-async function checkRecentTransactions (accessToken) {
-  const getTransactions = httpsCallable(functions, 'getTransactions')
-  const transactionsResult = await getTransactions({ accessToken })
-  transactions = transactionsResult.data.transactions
-}
-
-async function checkHowMuchMoneyLeft (accessToken) {
-  const getBalance = httpsCallable(functions, 'getBalance')
-  const balanceResult = await getBalance({ accessToken })
-  accounts = balanceResult.data.accounts
 }
 
 async function getLinkToken () {
@@ -205,6 +420,7 @@ async function getLinkToken () {
   })
 }
 
+// `Plaid` is imported as a CDN on index.html
 function initializePlaidUI (linkToken, onLoginSuccessCallback) {
   const handler = Plaid.create({
     token: linkToken,

@@ -5,6 +5,9 @@
  * const {onDocumentWritten} = require("firebase-functions/v2/firestore");
  *
  * See a full list of supported triggers at https://firebase.google.com/docs/functions
+ * 
+ * https://cloud.google.com/functions/docs/monitoring/error-reporting
+ * 
  */
 
 
@@ -37,6 +40,11 @@ const configuration = new Configuration({
 
 const client = new PlaidApi(configuration);
 // END OF SETUP CODE
+
+
+// FOR UPDATE MODE, YOU NEED
+
+// OAUTH MODE
 
 exports.createLinkToken = functions.https.onCall(async (request, response) => {
   console.log('calling createLinkToken()')
