@@ -289,7 +289,6 @@
   // I once tried `allTasks = []`, it wiped my entire task tree because it synced the empty [] (which it thinks is fully fetched) with the database.task
   // AF(null) --> unfetched 
   // AF([]) --> fresh new todo-list
-  let lastRanRepeatAtDate = ''
   let dateOfToday = getDateOfToday()
   let todayScheduledTasks = []
   let futureScheduledTasks = [] // AF([])
@@ -352,11 +351,17 @@
   async function listenToTasks () { 
     try {
       unsubUserDocListener = onSnapshot(doc(db, userDocPath), async snapshot => {
+        // don't know why it would fix it
+        // const source = snapshot.metadata.hasPendingWrites ? 'Local' : 'Server'
+        // if (source === 'Local') {
+        //   return
+        // }
+
         userDoc = snapshot.data()
 
         user.set(userDoc)
 
-        lastRanRepeatAtDate = snapshot.data().lastRanRepeatAtDate
+        const { lastRanRepeatAtDate } = snapshot.data()
         goalsAndPosters = snapshot.data().goalsAndPosters || ''
         // HANDLE TASKS THAT REPEAT
         // can't use `return` in reactive expression https://github.com/sveltejs/svelte/issues/2828
@@ -366,22 +371,23 @@
 
         // this is the base case condition, otherwise infinite recursion will happen
         // as we are inside a snapshot listener
-        if (lastRanRepeatAtDate !== dateOfToday || testRunOnce) {
+        console.log('lastRanRepeatDate =', lastRanRepeatAtDate)
+        console.log('dateOfToday =', dateOfToday)
+        console.log("testRunOnce =", testRunOnce)
+
+        if ((lastRanRepeatAtDate !== dateOfToday) || testRunOnce) {
           testRunOnce = false
-        // if (isFirstTime) {
           console.log('new day, resetting tasks')
-          // isFirstTime = false
           const copy = [...snapshot.data().allTasks]
-          // resetScheduledButMissedNonRepeatingTasks(copy) 
 
           for (const task of copy) {
             recursivelyResetRepeatingTasks(task)
           }
-          // scheduleHabitsWithoutClashing() // this will mutate tasks in `copy`
 
+          console.log("dateOfToday =", dateOfToday)
           updateDoc(doc(db, userDocPath), { 
             allTasks: copy, 
-            lastRanRepeatAtDate: dateOfToday 
+            lastRanRepeatAtDate: dateOfToday // dateOfToday
           })
         }
         allTasks = [...snapshot.data().allTasks]

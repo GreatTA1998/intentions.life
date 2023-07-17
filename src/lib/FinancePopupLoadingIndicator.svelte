@@ -1,11 +1,13 @@
 <!-- <div class="loading-overlay"> -->
   <!-- <div class="loading-container"> -->
-  <div style="
-    width: 350px;   
+  <div style="   
     position: relative;
     display: flex;
     flex-direction: row-reverse;
-    padding: 0 50px;"
+    padding: 0 50px;
+    
+    --my-color: {color}
+    "
   >
     <div class="loading-dot"></div>
     <div class="loading-dot"></div>
@@ -13,6 +15,10 @@
   </div>
   <!-- </div> -->
 <!-- </div> -->
+
+<script>
+  export let color = 'grey'
+</script>
 
 <!-- scss not supported for now -->
 <style lang="scss">
@@ -64,7 +70,7 @@ body {
   position: relative;
   width: $dotsize;
   height: $dotsize;
-  background: grey;
+  background: var(--my-color);
   border-radius: 50%;
   margin-right: $dotsize;
   animation: dot 1.5s cubic-bezier(.17, .67, .83, .67) infinite;

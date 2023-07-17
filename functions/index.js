@@ -5,6 +5,9 @@
  * const {onDocumentWritten} = require("firebase-functions/v2/firestore");
  *
  * See a full list of supported triggers at https://firebase.google.com/docs/functions
+ * 
+ * https://cloud.google.com/functions/docs/monitoring/error-reporting
+ * 
  */
 
 
@@ -22,7 +25,7 @@ const { Configuration, PlaidApi, PlaidEnvironments } = require('plaid')
 const PLAID_CLIENT_ID = '60a82f4b2dd19f0010a1abd3'
 const PLAID_SECRET = 'b86a3e600550c25c233aee0c30dce9'
 
-const PLAID_PRODUCTS = ['auth', 'transactions'] // I think 'transactions' work as well, but not 'balance'
+const PLAID_PRODUCTS = ['transactions'] // I think 'transactions' work as well, but not 'balance'
 const PLAID_COUNTRY_CODES = ['US','CA']
 
 const configuration = new Configuration({
@@ -38,6 +41,11 @@ const configuration = new Configuration({
 const client = new PlaidApi(configuration);
 // END OF SETUP CODE
 
+
+// FOR UPDATE MODE, YOU NEED
+
+// OAUTH MODE
+
 exports.createLinkToken = functions.https.onCall(async (request, response) => {
   console.log('calling createLinkToken()')
   const configs = {
@@ -48,6 +56,11 @@ exports.createLinkToken = functions.https.onCall(async (request, response) => {
     products: PLAID_PRODUCTS,
     country_codes: PLAID_COUNTRY_CODES,
     language: 'en',
+
+    // testing if user can add multiple acccounts
+    update: {
+      account_selection_enabled: true
+    }
   };
   const createTokenResponse = await client.linkTokenCreate(configs)
   return createTokenResponse.data 
@@ -69,6 +82,15 @@ exports.exchangePublicTokenForAccessToken = functions.https.onCall(async (data, 
   }
 })
 
+exports.fetchAccountData = functions.https.onCall(async (data, context) => {
+  const ACCESS_TOKEN = data.accessToken
+  const accountsResponse = await plaidClient.getAccounts({
+    accessToken: ACCESS_TOKEN
+  });
+  return accountsResponse.data
+})
+
+
 exports.getBalance = functions.https.onCall(async (data, context) => {
   const ACCESS_TOKEN = data.accessToken
   const balanceResponse = await client.accountsBalanceGet({
@@ -76,7 +98,6 @@ exports.getBalance = functions.https.onCall(async (data, context) => {
   })
   return balanceResponse.data
 })
-
 
 
 // https://plaid.com/docs/errors/item/#product_not_ready
