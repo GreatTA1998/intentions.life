@@ -1,7 +1,4 @@
-<div style="margin-left: 50px; margin-top: 50px; overflow-y: auto;">
-  <div style="font-family: sans-serif; font-size: 2rem; color: grey;">
-    Recent transactions
-  </div>
+<div style="margin-top: 20px; overflow-y: auto; width: 100%;">
   {#each transactions as transaction}
     <div style="display: flex; flex-wrap: nowrap;">
       {#if transaction.amount > 0}

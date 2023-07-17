@@ -1,53 +1,48 @@
 {#if isOpen}
-  <div class="my-popup-window" use:clickOutside on:click_outside={() => dispatch('card-close')}>
+  <div 
+    class="my-popup-window" 
+    use:clickOutside on:click_outside={() => dispatch('card-close')}
+    style="padding-left: 12px;"
+  >
     <div style="display: flex;">
-      <h3 class="google-calendar-event-title"  style="margin-left: 50px; color: #323232;">
-        My finance dashboard
-      </h3>
       <span on:click={() => dispatch('card-close')} class="material-icons" style="margin-left: auto; margin-right: 10px; margin-top: 10px; color: #323232;">
         close
       </span>
     </div>
 
-    {#if trueBalance !== null}
-      <div style="margin-left: 50px; margin-top: 20px;">
-        <div style="font-family: sans-serif; font-size: 5rem;">
-          ${trueBalance}
-        </div>
-        <div style="font-family: sans-serif;">
-          Overall balance
-        </div>
-      </div>
-    {/if}
+    <div style="display: flex; flex-wrap: wrap;">
 
-    <div>
-      <div style="display: flex; align-items: center;">
-        <h2 style="font-family: sans-serif;">
-          Card accounts
-        </h2>
-       
-        <button on:click={() => preparePlaidLinkUI()} style="margin-left: 24px;">
-          Add new card
-        </button>
-
-        <button on:click={getTrueBalance}>Fetch overall balance</button>
-
-        {#if openPlaidLinkUIUpdateMode}
-          <button on:click={() => openPlaidLinkUIUpdateMode()}>
-            Quickly refresh login
-          </button>
+      <div class="dashboard-new-container">
+        {#if trueBalance === null}
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;">
+          <FinancePopupLoadingIndicator color={'white'}/>
+          </div>
+        {:else}
+          <div style="font-size: 5rem; margin-left: 50px;">
+            ${trueBalance}
+          </div>
+          
+          <div style="margin-left: 50px;">
+            Overall balance
+          </div>
         {/if}
       </div>
 
-  
-      <div style="display: flex">
-        {#each $user.cardAccounts as cardAccount}
-          <div>
+      <!-- It looks like a Debit card, physically! -->
+      {#each $user.cardAccounts as cardAccount}
+        <!-- coral color: #ff7f50  goes well with Turqoise: https://artincontext.org/what-colors-go-with-turquoise/ -->
+        <div class="dashboard-new-container" style="background-color: black">
             <div>
               {cardAccount.creditOrDebit === 'depository' ? 'Debit' : 'Credit'} card
               <!-- {cardAccount.account_id} -->
             </div>
-          
+
+            {#if expired_access_token === cardAccount.access_token}
+              <button on:click={() => preparePlaidLinkUI(expired_access_token)}>
+                Re-login required
+              </button>
+            {:else}
+            
             {#if cardAccount.creditOrDebit === 'credit'}
               <div>
                 Credit usage: {creditBalance || 'Fetching credit balance...'}
@@ -58,58 +53,24 @@
               </div>
             {/if}      
 
-            <button on:click={() => fetchCreditOrDebitTransactions({ 
-              access_token: cardAccount.access_token, 
-              account_id: cardAccount.account_id,
-              creditOrDebit: cardAccount.creditOrDebit
-            })}
-            >
-              Transaction history
-            </button>
-
             {#if debitCardTransactions && cardAccount.creditOrDebit === 'depository'}
-              <div style="max-width: 500px">
                 <FinancePopupTransactionsUI transactions={debitCardTransactions}/>
-              </div>
-            {/if}
-
-            
-            {#if creditCardTransactions && cardAccount.creditOrDebit === 'credit'}
-              <div style="max-width: 500px">
+            {:else if creditCardTransactions && cardAccount.creditOrDebit === 'credit'}
                 <FinancePopupTransactionsUI transactions={creditCardTransactions}/>
-              </div>
             {/if}
-          </div>
-        {/each}
-      </div>
+          {/if}
+        </div>
+      {/each}
+
+
+      <button on:click={() => preparePlaidLinkUI()} style="margin-left: 24px;">
+        Add new card
+      </button>
     </div>
-
-    <!-- {#if !accounts || !transactions}
-      <FinancePopupLoadingIndicator/>
-    {/if} -->
-
-    <div style="margin-bottom: 30px"></div>
-
-    {#if accounts}
-      <div style="display: flex; margin-left: 50px;">
-        {#each accounts as account}
-          <div style="margin-right: 20px;">
-            <div style="font-family: sans-serif; font-size: 2rem;">
-              {account.balances.available}
-            </div>
-            <div style="font-family: sans-serif;">
-              {account.name}
-            </div>
-          </div>
-        {/each}
-      </div>
-    {/if}
-
-    {#if transactions}
-      <FinancePopupTransactionsUI transactions/>
-    {/if}
+    <!-- End of flexbox -->
   </div>
 {/if}
+
 
 <script>
 import { createEventDispatcher, onMount, onDestroy, tick } from 'svelte'
@@ -120,6 +81,7 @@ import { updateDoc, doc, getFirestore, arrayUnion } from 'firebase/firestore'
 import { user } from '/src/store.js'
 import FinancePopupLoadingIndicator from './FinancePopupLoadingIndicator.svelte'
 import FinancePopupTransactionsUI from './FinancePopupTransactionsUI.svelte'
+import { dev } from '$app/environment';
 
 export let isOpen = false
 
@@ -132,6 +94,8 @@ let totalMoneyLeft = null
 let accounts = null
 let transactions = null
 
+let expired_access_token = ''
+
 $: if (accounts) {
   totalMoneyLeft = 0
   for (const account of accounts) {
@@ -142,10 +106,15 @@ $: if (accounts) {
 $: console.log('$user changed in finance popup =', $user)
 
 onMount(async () => {
-  getTrueBalance()
+  getTrueBalance() // this will fetch balances from all cards
+
+  for (const account of $user.cardAccounts) {
+    const { access_token, account_id, creditOrDebit } = account
+    fetchCreditOrDebitTransactions({ access_token, account_id, creditOrDebit })
+  }
 })
 
-const backendURL = 'http://localhost:8000' // 'https://koa-test-1-ef0d40104d58.herokuapp.com'
+const backendURL = dev ? 'http://localhost:8000' : 'https://koa-test-1-ef0d40104d58.herokuapp.com'
 
 async function getInitialPlaidLinkToken () {
   return new Promise(async (resolve) => {
@@ -230,7 +199,15 @@ async function preparePlaidLinkUI (access_token = '') {
             continue
           }
         }
+        
+        let cardAccountsCopy = [...$user.cardAccounts] 
+        // get rid of all credit card pointers (they're expired and need to be garbage collected)
+        const nonexpiredAccounts = cardAccountsCopy.filter(cardAccount => cardAccount.creditOrDebit !== 'credit')
+        await updateDoc(userRef, {
+          cardAccounts: nonexpiredAccounts
+        })
 
+        // now add the newly added account (which can be credit card)
         await updateDoc(userRef, {
           cardAccounts: arrayUnion({ 
             account_id: account.account_id,
@@ -273,7 +250,11 @@ function getBalance ({ access_token, account_id }) {
       resolve(responseData.account)
     } else {
       console.log("assume it's just re-auth error")
-      preparePlaidLinkUI(access_token)
+      // preparePlaidLinkUI(access_token)
+      expired_access_token = access_token
+
+
+
       // updateModePlaidLinkForCreditCard(access_token)
       // throw new Error('Login probably expired')
     }
@@ -430,7 +411,7 @@ function initializePlaidUI (linkToken, onLoginSuccessCallback) {
 
     overflow-y: scroll;
     z-index: 5;
-    width: 90%;
+    width: 95%;
     height: 90%;
     min-width: 200px;
     border-radius: 10px;
@@ -458,11 +439,6 @@ function initializePlaidUI (linkToken, onLoginSuccessCallback) {
     color: #6D6D6D;
   }
 
-  *::-webkit-scrollbar {
-    width: 0;
-    background-color: #aaa; /* or add it to the track */
-  }
-
   .google-calendar-event-time {
     font-family: serif;
     font-size: 14px;
@@ -480,4 +456,25 @@ function initializePlaidUI (linkToken, onLoginSuccessCallback) {
     line-height: 20px;
     color: #6D6D6D;
   } 
+
+  .dashboard-new-container {
+    margin-left: 25px;
+    margin-top: 20px; 
+
+    padding-left: 24px; 
+    padding-right: 24px;
+
+    border-radius: 20px; 
+    background-color: #27b36f; 
+    width: 100%; 
+    max-width: 610px; 
+    min-width: 400px;
+    padding-top: 24px; 
+    padding-bottom: 24px; 
+    height: 250px;
+    font-family: sans-serif;
+    color: white;
+
+    overflow-y: auto;
+  }
 </style>
