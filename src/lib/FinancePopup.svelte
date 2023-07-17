@@ -9,73 +9,84 @@
       </span>
     </div>
 
-    <div style="display: flex">
-      {#if openPlaidLinkUI}
-        <!-- Don't use implicit arguments, or you'll get silent effects
-          Make everything explicit
-        -->
-        <button on:click={() => openPlaidLinkUI()}>
-          Link additional card
-        </button>
-      {/if}
-
-      <button on:click={getTrueBalance}>Fetch overall balance</button>
-
-      {#if openPlaidLinkUIUpdateMode}
-        <button on:click={() => openPlaidLinkUIUpdateMode()}>
-          Quickly refresh login
-        </button>
-      {/if}
-    </div>
-
-
-    <div>
-      <h2>
-        Card accounts
-      </h2>
-      {#each $user.cardAccounts as cardAccount}
-        <div>
-          {cardAccount.creditOrDebit} {cardAccount.account_id}
-        </div>
-        {#if cardAccount.creditOrDebit === 'credit'}
-        <div>
-          credit balance: {creditBalance}
-        </div>
-        {:else if cardAccount.creditOrDebit === 'depository' && debitBalance}
-          debit balance: ${debitBalance}
-        {/if}      
-
-        <button on:click={() => fetchCreditOrDebitTransactions({ 
-          access_token: cardAccount.access_token, 
-          account_id: cardAccount.account_id,
-          creditOrDebit: cardAccount.creditOrDebit
-        })}
-        >
-          Get transactions for this card
-        </button>
-
-        {#if debitCardTransactions && cardAccount.creditOrDebit === 'depository'}
-          {#each debitCardTransactions as transaction}
-            <div>-{transaction.amount}: {transaction.merchant_name ? transaction.merchant_name : transaction.name}, {transaction.date}</div>
-          {/each}
-        {/if}
-      {/each}
-    </div>
-
-    {#if !accounts || !transactions}
-      <FinancePopupLoadingIndicator/>
-    {/if}
-
     {#if trueBalance !== null}
       <div style="margin-left: 50px; margin-top: 20px;">
         <div style="font-family: sans-serif; font-size: 5rem;">
-          {trueBalance}
+          ${trueBalance}
         </div>
         <div style="font-family: sans-serif;">
-          Total balance remaining
+          Overall balance
         </div>
       </div>
     {/if}
+
+    <div>
+      <div style="display: flex; align-items: center;">
+        <h2 style="font-family: sans-serif;">
+          Card accounts
+        </h2>
+       
+        <button on:click={() => preparePlaidLinkUI()} style="margin-left: 24px;">
+          Add new card
+        </button>
+
+        <button on:click={getTrueBalance}>Fetch overall balance</button>
+
+        {#if openPlaidLinkUIUpdateMode}
+          <button on:click={() => openPlaidLinkUIUpdateMode()}>
+            Quickly refresh login
+          </button>
+        {/if}
+      </div>
+
+  
+      <div style="display: flex">
+        {#each $user.cardAccounts as cardAccount}
+          <div>
+            <div>
+              {cardAccount.creditOrDebit === 'depository' ? 'Debit' : 'Credit'} card
+              <!-- {cardAccount.account_id} -->
+            </div>
+          
+            {#if cardAccount.creditOrDebit === 'credit'}
+              <div>
+                Credit usage: {creditBalance || 'Fetching credit balance...'}
+              </div>
+            {:else if cardAccount.creditOrDebit === 'depository'}
+              <div>
+                Balance: {debitBalance || 'Fetching debit balance...'}
+              </div>
+            {/if}      
+
+            <button on:click={() => fetchCreditOrDebitTransactions({ 
+              access_token: cardAccount.access_token, 
+              account_id: cardAccount.account_id,
+              creditOrDebit: cardAccount.creditOrDebit
+            })}
+            >
+              Transaction history
+            </button>
+
+            {#if debitCardTransactions && cardAccount.creditOrDebit === 'depository'}
+              <div style="max-width: 500px">
+                <FinancePopupTransactionsUI transactions={debitCardTransactions}/>
+              </div>
+            {/if}
+
+            
+            {#if creditCardTransactions && cardAccount.creditOrDebit === 'credit'}
+              <div style="max-width: 500px">
+                <FinancePopupTransactionsUI transactions={creditCardTransactions}/>
+              </div>
+            {/if}
+          </div>
+        {/each}
+      </div>
+    </div>
+
+    <!-- {#if !accounts || !transactions}
+      <FinancePopupLoadingIndicator/>
+    {/if} -->
 
     <div style="margin-bottom: 30px"></div>
 
@@ -95,39 +106,7 @@
     {/if}
 
     {#if transactions}
-      <div style="margin-left: 50px; margin-top: 50px; overflow-y: auto;">
-        <div style="font-family: sans-serif; font-size: 2rem; color: grey;">
-          Recent transactions
-        </div>
-        {#each transactions as transaction}
-          <div style="display: flex; flex-wrap: nowrap;">
-            {#if transaction.amount > 0}
-              <div 
-              style="font-size: {0.5 + (0.012 * transaction.amount)}rem; font-family: sans-serif;
-                color: red;
-                white-space: nowrap;
-              "
-              >
-              -{transaction.amount}: {transaction.merchant_name ? transaction.merchant_name : transaction.name}, {transaction.date}
-              </div>
-            {:else}
-              <div 
-              style="font-size: {0.5 + (-1 * 0.012 * transaction.amount)}rem; font-family: sans-serif;
-                color: green;
-                white-space: nowrap;
-              "
-              >
-                <!-- remove negative sign -->
-              +{-1 * transaction.amount}: {transaction.merchant_name ? transaction.merchant_name : transaction.name}, {transaction.date}
-              </div>
-            {/if}
-          </div>
-        {/each}
-      </div>
-    {:else if $user.plaidAccessToken && $user.plaidItemID}
-      <button on:click={() => checkRecentTransactions($user.plaidAccessToken)}>
-        Fetch transactions
-      </button>
+      <FinancePopupTransactionsUI transactions/>
     {/if}
   </div>
 {/if}
@@ -140,6 +119,7 @@ import { getFunctions, httpsCallable } from "firebase/functions"
 import { updateDoc, doc, getFirestore, arrayUnion } from 'firebase/firestore'
 import { user } from '/src/store.js'
 import FinancePopupLoadingIndicator from './FinancePopupLoadingIndicator.svelte'
+import FinancePopupTransactionsUI from './FinancePopupTransactionsUI.svelte'
 
 export let isOpen = false
 
@@ -162,13 +142,7 @@ $: if (accounts) {
 $: console.log('$user changed in finance popup =', $user)
 
 onMount(async () => {
-  if ($user.plaidAccessToken && $user.plaidItemID) {
-
-  } 
-  await preparePlaidLinkUI()
-  if (!$user.plaidAccessToken && !$user.plaidItemID) {
-    openPlaidLinkUI()
-  }
+  getTrueBalance()
 })
 
 const backendURL = 'http://localhost:8000' // 'https://koa-test-1-ef0d40104d58.herokuapp.com'
@@ -226,10 +200,16 @@ async function fetchAllAccountsWithBank (access_token) {
   })
 }
 
-async function preparePlaidLinkUI () {
+async function preparePlaidLinkUI (access_token = '') {
   return new Promise(async (resolve) => {
-    const link_token = await getInitialPlaidLinkToken()
-
+    console.log("access_token param =", access_token)
+    let link_token 
+    if (!access_token) {
+      link_token = await getInitialPlaidLinkToken()
+    } else {
+      console.log("update mode")
+      link_token = await getInitialPlaidLinkTokenUpdateMode()
+    }
     const { open } = initializePlaidUI(link_token, async (publicToken, metadata) => {
       const { access_token } = await getPermanentAccessToken(publicToken)
       const accounts = await fetchAllAccountsWithBank(access_token)
@@ -240,6 +220,17 @@ async function preparePlaidLinkUI () {
       const userRef = doc(getFirestore(), '/users/' + $user.uid)
 
       for (const account of accounts) {
+        // skip over accounts we already saved
+
+        // PROBLEM: FOR CREDIT CARDS, EACH ACESS_TOKEN AND ACCOUNT_ID SEEM TO BE 
+        // UNIQUE EVEN THOUGH THE CARD IS THE SAME
+        if ($user.cardAccounts) {
+          const duplicates = $user.cardAccounts.filter(cardAccount => cardAccount.account_id === account.account_id)
+          if (duplicates.length > 0) {
+            continue
+          }
+        }
+
         await updateDoc(userRef, {
           cardAccounts: arrayUnion({ 
             account_id: account.account_id,
@@ -254,7 +245,9 @@ async function preparePlaidLinkUI () {
     }) 
     
     // `open` refers to OPENING the Plaid UI element itself to start the loginflow
-    openPlaidLinkUI = open
+    // openPlaidLinkUI = open
+    open()
+
     resolve()
   })
 }
@@ -268,15 +261,21 @@ function getBalance ({ access_token, account_id }) {
       },
       body: JSON.stringify({ access_token, account_id })
     })
+
+    // TO-DO: automatically open Plaid Link in update mode
+    // when a particular error (re-authentication needed) is thrown
+    // configure the server to throw the error correctly,
+
     if (response.ok) {
       const responseData = await response.json() 
       console.log('getBalance response =', responseData)
       // then fix the frontend so it resolves the balance AMOUNT
       resolve(responseData.account)
     } else {
-      console.log("should throw an error")
-      updateModePlaidLinkForCreditCard(access_token)
-      throw new Error('Login probably expired')
+      console.log("assume it's just re-auth error")
+      preparePlaidLinkUI(access_token)
+      // updateModePlaidLinkForCreditCard(access_token)
+      // throw new Error('Login probably expired')
     }
   })
 }
@@ -319,18 +318,7 @@ function getTransactions ({ access_token, account_id }) {
 // WHEN THERE IS AN ERROR
 
 
-// specifying the `access_token` in the config of plaid Link UI 
-// is precisely how you tell it to be in update mode
-async function updateModePlaidLinkForCreditCard (access_token) {
-  const link_token = await getInitialPlaidLinkToken4(access_token)
-
-  const { open } = initializePlaidUI(link_token, async (publicToken, metadata) => { 
-    console.log("update mode flow finished and succeeded")
-  })
-  openPlaidLinkUIUpdateMode = open
-}
-
-async function getInitialPlaidLinkToken4 (access_token) {
+async function getInitialPlaidLinkTokenUpdateMode (access_token) {
   return new Promise(async (resolve) => {
     try {
       const response = await fetch(backendURL + '/link/token/create', { 
@@ -357,7 +345,6 @@ async function getInitialPlaidLinkToken4 (access_token) {
   })
 }
 
-
 function getTrueBalance () {
   console.log("getTrueBalace()")
   return new Promise(async (resolve) => {
@@ -366,19 +353,10 @@ function getTrueBalance () {
       // assumes there's one debit and one credit, for now
       if (cardAccount.creditOrDebit === 'depository') {
         const result = await getBalance({ access_token: cardAccount.access_token, account_id: cardAccount.account_id })
-        console.log("debitResult =", result)
         debitBalance = result.balances.current
-        console.log('debitBalance =', debitBalance)
       } else if (cardAccount.creditOrDebit === 'credit') {
-        try {
-          const result = await getBalance({ access_token: cardAccount.access_token, account_id: cardAccount.account_id })
-          creditBalance = result.balances.current
-          console.log("creditBalance =", creditBalance)
-        } catch (error) {
-          console.log("credit card login probably timed out")
-          updateModePlaidLinkForCreditCard()
-        }
-
+        const result = await getBalance({ access_token: cardAccount.access_token, account_id: cardAccount.account_id })
+        creditBalance = result.balances.current
       }
     } 
     resolve()
