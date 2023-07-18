@@ -12,57 +12,59 @@
 
     <div style="display: flex; flex-wrap: wrap;">
 
-      <div class="dashboard-new-container">
-        {#if trueBalance === null}
-          <div style="display: flex; align-items: center; justify-content: center; height: 100%;">
-          <FinancePopupLoadingIndicator color={'white'}/>
-          </div>
-        {:else}
-          <div style="font-size: 5rem; margin-left: 50px;">
-            ${trueBalance}
-          </div>
-          
-          <div style="margin-left: 50px;">
-            Overall balance
-          </div>
-        {/if}
-      </div>
-
-      <!-- It looks like a Debit card, physically! -->
-      {#each $user.cardAccounts as cardAccount}
-        <!-- coral color: #ff7f50  goes well with Turqoise: https://artincontext.org/what-colors-go-with-turquoise/ -->
-        <div class="dashboard-new-container" style="background-color: black">
-            <div>
-              {cardAccount.creditOrDebit === 'depository' ? 'Debit' : 'Credit'} card
-              <!-- {cardAccount.account_id} -->
+      {#if $user.cardAccounts}
+        <div class="dashboard-new-container">
+          {#if trueBalance === null}
+            <div style="display: flex; align-items: center; justify-content: center; height: 100%;">
+            <FinancePopupLoadingIndicator color={'white'}/>
             </div>
-
-            {#if expired_access_token === cardAccount.access_token}
-              <button on:click={() => preparePlaidLinkUI(expired_access_token)}>
-                Re-login required
-              </button>
-            {:else}
+          {:else}
+            <div style="font-size: 5rem; margin-left: 50px;">
+              ${trueBalance}
+            </div>
             
-            {#if cardAccount.creditOrDebit === 'credit'}
-              <div>
-                Credit usage: {creditBalance || 'Fetching credit balance...'}
-              </div>
-            {:else if cardAccount.creditOrDebit === 'depository'}
-              <div>
-                Balance: {debitBalance || 'Fetching debit balance...'}
-              </div>
-            {/if}      
-
-            {#if debitCardTransactions && cardAccount.creditOrDebit === 'depository'}
-                <FinancePopupTransactionsUI transactions={debitCardTransactions}/>
-            {:else if creditCardTransactions && cardAccount.creditOrDebit === 'credit'}
-                <FinancePopupTransactionsUI transactions={creditCardTransactions}/>
-            {/if}
+            <div style="margin-left: 50px;">
+              Overall balance
+            </div>
           {/if}
         </div>
-      {/each}
 
+        <!-- It looks like a Debit card, physically! -->
+        {#each $user.cardAccounts as cardAccount}
+          <!-- coral color: #ff7f50  goes well with Turqoise: https://artincontext.org/what-colors-go-with-turquoise/ -->
+          <div class="dashboard-new-container" style="background-color: black">
+              <div>
+                {cardAccount.creditOrDebit === 'depository' ? 'Debit' : 'Credit'} card
+                <!-- {cardAccount.account_id} -->
+              </div>
 
+              {#if expired_access_token === cardAccount.access_token}
+                <button on:click={() => preparePlaidLinkUI(expired_access_token)}>
+                  Re-login required
+                </button>
+              {:else}
+              
+              {#if cardAccount.creditOrDebit === 'credit'}
+                <div>
+                  Credit usage: {creditBalance || 'Fetching credit balance...'}
+                </div>
+              {:else if cardAccount.creditOrDebit === 'depository'}
+                <div>
+                  Balance: {debitBalance || 'Fetching debit balance...'}
+                </div>
+              {/if}      
+
+              {#if debitCardTransactions && cardAccount.creditOrDebit === 'depository'}
+                  <FinancePopupTransactionsUI transactions={debitCardTransactions}/>
+              {:else if creditCardTransactions && cardAccount.creditOrDebit === 'credit'}
+                  <FinancePopupTransactionsUI transactions={creditCardTransactions}/>
+              {/if}
+            {/if}
+          </div>
+        {/each}
+      {/if}
+
+      <!-- This is always visible because it's not included in the {if} statement -->
       <button on:click={() => preparePlaidLinkUI()} style="margin-left: 24px;">
         Add new card
       </button>
@@ -106,8 +108,9 @@ $: if (accounts) {
 $: console.log('$user changed in finance popup =', $user)
 
 onMount(async () => {
-  getTrueBalance() // this will fetch balances from all cards
+  if (!$user.cardAccounts) return 
 
+  getTrueBalance() // this will fetch balances from all cards
   for (const account of $user.cardAccounts) {
     const { access_token, account_id, creditOrDebit } = account
     fetchCreditOrDebitTransactions({ access_token, account_id, creditOrDebit })
