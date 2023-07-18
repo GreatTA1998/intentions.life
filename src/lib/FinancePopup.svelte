@@ -201,15 +201,15 @@ async function preparePlaidLinkUI (access_token = '') {
           if (duplicates.length > 0) {
             continue
           }
+
+          let cardAccountsCopy = [...$user.cardAccounts] 
+        // get rid of all credit card pointers (they're expired and need to be garbage collected)
+          const nonexpiredAccounts = cardAccountsCopy.filter(cardAccount => cardAccount.creditOrDebit !== 'credit')
+          await updateDoc(userRef, {
+            cardAccounts: nonexpiredAccounts
+          })
         }
         
-        let cardAccountsCopy = [...$user.cardAccounts] 
-        // get rid of all credit card pointers (they're expired and need to be garbage collected)
-        const nonexpiredAccounts = cardAccountsCopy.filter(cardAccount => cardAccount.creditOrDebit !== 'credit')
-        await updateDoc(userRef, {
-          cardAccounts: nonexpiredAccounts
-        })
-
         // now add the newly added account (which can be credit card)
         await updateDoc(userRef, {
           cardAccounts: arrayUnion({ 
