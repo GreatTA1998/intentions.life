@@ -32,7 +32,7 @@
         <!-- It looks like a Debit card, physically! -->
         {#each $user.cardAccounts as cardAccount}
           <!-- coral color: #ff7f50  goes well with Turqoise: https://artincontext.org/what-colors-go-with-turquoise/ -->
-          <div class="dashboard-new-container" style="background-color: black">
+          <div class="dashboard-new-container" style="background-color: #F4F4F4; color: #000000;">
               <div>
                 {cardAccount.creditOrDebit === 'depository' ? 'Debit' : 'Credit'} card
                 <!-- {cardAccount.account_id} -->
@@ -414,13 +414,14 @@ function initializePlaidUI (linkToken, onLoginSuccessCallback) {
 
     overflow-y: scroll;
     z-index: 5;
-    width: 95%;
-    height: 90%;
+    width: 80%;
+    height: 80%;
     min-width: 200px;
     border-radius: 10px;
     background-color: white;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     padding: 6px;
+    border: 1px solid #000;
   }
 
   /* Refer to: https://stackoverflow.com/questions/3131072/how-to-change-input-text-box-style-to-line */
@@ -429,7 +430,6 @@ function initializePlaidUI (linkToken, onLoginSuccessCallback) {
     border: none;
     border-bottom: 1px solid #000000;
     outline: none;
-
     padding: 2px 0px;
   }
 
@@ -468,7 +468,7 @@ function initializePlaidUI (linkToken, onLoginSuccessCallback) {
     padding-right: 24px;
 
     border-radius: 20px; 
-    background-color: #27b36f; 
+    background-color: #0085FF; 
     width: 100%; 
     max-width: 610px; 
     min-width: 400px;
@@ -477,7 +477,6 @@ function initializePlaidUI (linkToken, onLoginSuccessCallback) {
     height: 250px;
     font-family: sans-serif;
     color: white;
-
     overflow-y: auto;
   }
 </style>

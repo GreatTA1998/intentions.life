@@ -1,4 +1,4 @@
-<div id="scroll-container" style="position: relative; width: 13vw">
+<div id="scroll-container" style="position: relative; width: 15vw">
   <div id="calendar-month-container" 
     style="height: {pixelsPerMinute * numOfTimestampsDisplayed}px; 
       font-family: Roboto, sans-serif; 
@@ -79,11 +79,11 @@
     background: transparent;
   }
   ::-webkit-scrollbar {
-    width: 10px;
+    width: 4px;
     height: 10px;
   }
   ::-webkit-scrollbar-thumb {
-    background: #D3D1CB;
+    background: #6D6D6D;
   }
   ::-webkit-scrollbar-track {
     background: #EDECE9;

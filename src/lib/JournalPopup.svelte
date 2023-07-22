@@ -102,6 +102,7 @@ function saveJournalPage () {
     background-color: white;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     padding: 6px;
+    border: 1px solid #000000;
   }
 
   /* Refer to: https://stackoverflow.com/questions/3131072/how-to-change-input-text-box-style-to-line */

@@ -4,8 +4,8 @@
 {#if isOpen}
   <div bind:this={PopupSurface} class="my-popup-window" use:clickOutside on:click_outside={() => dispatch('card-close')}>
     <div style="display: flex;">
-      <h3 class="google-calendar-event-title"  style="margin-left: 50px; color: #323232;">
-        My bedtime popup
+      <h3 class="google-calendar-event-title"  style="margin-left: 50px; color: #ffffff;">
+        My Bedtime Popup
       </h3>
       <span on:click={() => dispatch('card-close')} class="material-icons" style="margin-left: auto; margin-right: 10px; margin-top: 10px; color: #323232;">
         close
@@ -97,11 +97,10 @@
   left: 50%;
   transform: translate(-50%, -50%);
   width: 50%;
-
   overflow-y: scroll;
   z-index: 5;
-  width: 90%;
-  height: 90%;
+  width: 80%;
+  height: 80%;
   min-width: 200px;
   border-radius: 10px;
   background-color: white;

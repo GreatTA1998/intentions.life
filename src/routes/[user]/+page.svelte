@@ -50,31 +50,33 @@
 {/if}
 
 <div id="background-image-holder" style="height: 100vh;">
-  <a role="button" on:click={() => isJournalPopupOpen = !isJournalPopupOpen} class="float mika-hover" style="bottom: 50px; z-index: 10">
-    <span class="material-icons my-float">
-      auto_stories
-    </span>
-  </a>
 
-  <a role="button" on:click={() => isGoalsAndPostersPopupOpen = !isGoalsAndPostersPopupOpen} class="float  mika-hover" style="bottom: 130px; z-index: 10">
-    <span class="material-icons my-float">
-     flag
-    </span>
-  </a>
-
-  <a role="button" on:click={toggleMusic} class="float  mika-hover" style="bottom: 210px; z-index: 10;">
+  <a role="button" on:click={toggleMusic} class="float  mika-hover" style="right: 70px; z-index: 10;">
     <span class="material-icons my-float">
       {isMusicPlaying ? 'music_note' : 'music_off'}
     </span>
   </a>
 
-  <a role="button" on:click={() => isFinancePopupOpen = !isFinancePopupOpen} class="float mika-hover" style="bottom: 290px; z-index: 10">
+  <a role="button" on:click={() => isJournalPopupOpen = !isJournalPopupOpen} class="float mika-hover" style="right:130px; z-index: 10">
+    <span class="material-icons my-float">
+      auto_stories
+    </span>
+  </a>
+
+  <a role="button" on:click={() => isGoalsAndPostersPopupOpen = !isGoalsAndPostersPopupOpen} class="float  mika-hover" style="right: 190px; z-index: 10">
+    <span class="material-icons my-float">
+     flag
+    </span>
+  </a>
+
+
+  <a role="button" on:click={() => isFinancePopupOpen = !isFinancePopupOpen} class="float mika-hover" style="right: 250px; z-index: 10">
     <span class="material-icons my-float">
       attach_money
     </span>
   </a>
 
-  <a role="button" on:click={() => isBedtimePopupOpen = !isBedtimePopupOpen} class="float mika-hover" style="bottom: 370px; z-index: 10">
+  <a role="button" on:click={() => isBedtimePopupOpen = !isBedtimePopupOpen} class="float mika-hover" style="right: 310px; z-index: 10">
     <span class="material-icons my-float">
       bedtime
     </span>
@@ -105,7 +107,7 @@
         </div>
       </div>
 
-      <div style="font-family: Inter; font-weight: 700; font-size: 32px; margin-left: 10px; padding: 30px 0px 0px 55px; color: #6D6D6D">
+      <div style="font-family: Inter; font-weight: 700; font-size: 32px; margin-left: 20px; padding: 30px 0px 10px 55px; color: #000000">
         {getDayOfWeek()}, { getNicelyFormattedDate() }, { new Date().getFullYear() }
       </div>
 
@@ -126,7 +128,7 @@
               on:task-click={(e) => openDetailedCard(e.detail)}
             />
             <div>
-              <div style="display: flex; width: 24vw;">  
+              <div style="display: flex; width: 20vw;">  
                 {#if allTasks}
                   <UnscheduledTasksForToday
                     {allTasks}
@@ -165,7 +167,7 @@
     <!-- end of 1st flex child -->
 
     <div class="todo-container" 
-      style="box-shadow: -2px 0px 10px 1px #aaaaaa;" 
+      style="border-left: 1px solid #000000; padding-top: 160px;" 
       on:drop={(e) => unscheduleTask(e)}
       on:dragover={(e) => dragover_handler(e)}
     >
@@ -188,13 +190,13 @@
           {/each}
 
           <!-- CREATE NEW TASK (invisible but hoverable region) -->
-          <div style="height: 200px; width: 200px;"
+          <div style="height: 300px; width: 200px;"
             on:mouseenter={() => isShowingCreateButton = true}
             on:mouseleave={() => isShowingCreateButton = false}
           >
             {#if isShowingCreateButton}
               {#if !isTypingNewRootTask}
-                <div style="font-size: 1.5rem; color: grey;" on:click={() => isTypingNewRootTask = true}>
+                <div style="font-size: 2rem; color: #000000;" on:click={() => isTypingNewRootTask = true}>
                   New task 
                 </div>
               {:else}
@@ -815,16 +817,35 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 121px; 
+    width: 100px; 
     height: 40px;
-    color: #6D6D6D;
-    border: 1px solid #D9D9D9;
+    color: #0085FF;
+    border: 1px solid #F4F4F4;
+    background-color: #F4F4F4;
     vertical-align: middle;
     font-family: sans-serif;
+    border-radius: 20px;
+    margin: 0px 2px;
+  }
+
+  .mika-rectangle:hover {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100px; 
+    height: 40px;
+    color: #ffffff;
+    background-color: #0085FF;
+    border: 1px solid #F4F4F4;
+    vertical-align: middle;
+    font-family: sans-serif;
+    border-radius: 20px;
+    margin: 0px 2px;
+    transition: all 0.2s ease-out;
   }
 
   .selected-rectangle {
-    background: #6D6D6D;
+    background: #0085FF;
     color: white;
   }
 
@@ -836,8 +857,7 @@
     }
     .todo-container {
       font-family: Roboto, sans-serif;
-      background: transparent;
-      width: 50vw;
+      width: 80vw;
       height: 100vh;
       padding-top: 15px; 
       padding-left: 20px;
@@ -847,7 +867,7 @@
     }
     .calendar-section-container {
       background: transparent; 
-      width: 40vw;
+      width: 50vw;
       height: 50vh;
       border: none; 
       border-left: none;
@@ -873,11 +893,11 @@
   .calendar-section-container {
     height: 100vh;
     display: flex; 
-    margin-left: 50px;
+    margin-left: 20px;
     justify-content: space-evenly; 
     /* background-color: white;  */
     box-sizing: border-box;
-    padding-top: 30px;
+    padding-top: 40px;
   }
 
   .flex-container {
@@ -921,7 +941,7 @@
     border: 0px solid; 
     margin-bottom: 25px; 
     padding-left: 0; 
-    padding-top: 16px; 
+    padding-top: 10px; 
     padding-bottom: 10px; 
     padding-right: 0; 
     overflow: none;
@@ -934,7 +954,6 @@
     display:inline-block;
     width:35px;
     height:35px;
-    
     background:
       linear-gradient(#fff 0 0),
       linear-gradient(#fff 0 0),
@@ -955,31 +974,33 @@
 
   .float{
     position:fixed;
-    width: 55px;
-    height: 55px;
-    bottom: 40px;
-    right: 40px;
-    background-color: transparent;  
-    color: #6D6D6D;
+    width: 50px;
+    height: 50px;
+    top: 45px;
+    background-color: #F4F4F4;  
     border-radius:50px;
     text-align:center;
-    box-shadow: 0px 0px 2px 2px #6D6D6D;
+    border: 1px solid #F4F4F4;
   }
 
   .my-float{
-    margin-top: 15px;
+    margin-top: 12px;
   }
 
   .mika-hover {
-    color: #6D6D6D;
+    color: #0085FF;
+    transition: all 0.2s ease-out;
   }
 
   .mika-hover:hover{
-    color: #000;
+    color: #ffffff;
+    background-color: #0085FF;
+    border: 1px solid #0085FF;
+    transition: all 0.2s ease-out;
   }
 
-  .float:hover{
-    box-shadow: 0px 0px 2px 2px #000;
-  }
+
+
+
 
 </style>
