@@ -1,4 +1,4 @@
-<div id="scroll-container" style="position: relative; width: 13vw">
+<div id="scroll-container" style="position: relative; width: 15vw">
   <!-- This is a relative container -->
   <div id="calendar-day-container" 
     style="height: {pixelsPerDay * numOfHourBlocksDisplayed}px; 
@@ -240,11 +240,11 @@
   background: transparent;
 }
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 4px;
   height: 10px;
 }
 ::-webkit-scrollbar-thumb {
-  background: #D3D1CB;
+  background: #6D6D6D;
 }
 ::-webkit-scrollbar-track {
   background: #EDECE9;

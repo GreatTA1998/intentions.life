@@ -42,11 +42,11 @@
         on:input={handleInput}
         rows="5"
         placeholder="Type in details..."
-        style="margin-left: 10px; width: 95%; margin-right: 10px; margin-bottom: 10px; box-sizing: border-box;"
+        style="margin-left: 10px; width: 95%; margin-right: 10px; margin-bottom: 20px; box-sizing: border-box;"
       />
     </div>
 
-    <div style="display: flex; margin-left: 10px">
+    <div style="display: flex;  margin-left: 10px">
       <div>
         {#if !isSchedulingTask}
           <a on:click={() => isSchedulingTask = true}>
@@ -61,7 +61,7 @@
         <!-- Repeating tasks -->
         {#if !isTypingRepeatFrequency}
           <a on:click={() => isTypingRepeatFrequency = true} style="margin-left: 0px;">
-            Repeat task
+            Repeat
           </a>
         {:else}
           <div style="display: flex">
@@ -85,12 +85,12 @@
         {/if}
 
         <a on:click={toggleIsGoal} style="margin-left: 0px;">
-          Set as goal
+           Goal
         </a>
 
         {#if !isTypingDeadline}
           <a on:click={() => isTypingDeadline = true}>
-            Set deadline
+            Deadline
           </a>
         {:else}
           <input bind:value={newDeadlineDate} placeholder={getDateInDDMMYYYY(new Date())} style="width: 80px"/>
@@ -98,7 +98,7 @@
         {/if}
       </div>
 
-      <div style="margin-left: auto; margin-right: 16px">
+      <div style="margin-left: auto; margin-right: 35px">
         <!-- class="material-icons" style="margin-left: 5px; font-size: {2.5 * (0.7 ** depth)}rem;" -->
         <a on:click={confirmDelete}>
           Delete
@@ -112,7 +112,7 @@
     </div>
 
     <!-- This is the section where you show everything regardless of whether it is scheduled or not -->
-    <div style="font-size: 0.9rem; margin-top: 24px; margin-left: 12px; font-weight: 600; font-family: roboto, sans-serif;">
+    <div style="font-size: 1.2rem; margin-top: 24px; margin-bottom: 12px; margin-left: 12px; font-weight: 600; font-family: roboto, sans-serif;">
       Full task history:
     </div>
 
@@ -290,15 +290,14 @@ function setTaskAsHabit () {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 50%;
-
+    width: 70%;
     overflow-y: scroll;
     z-index: 5;
-    width: 40%;
-    min-width: 200px;
-    height: 60%;
+    min-width: 300px;
+    height: 70%;
     border-radius: 10px;
     background-color: white;
+    border: 1px solid #000;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     padding: 6px;
   }
@@ -309,12 +308,14 @@ function setTaskAsHabit () {
     border: none;
     border-bottom: 1px solid #000000;
     outline: none;
-    padding: 2px 0px;
+    font-size: 23px;
+    font-weight: 700;
+    padding: 10px 0px;
   }
 
   .google-calendar-event-detail {
     font-family: Roboto,Arial,sans-serif;
-    font-size: 14px;
+    font-size: 20px;
     font-weight: 400;
     letter-spacing: .2px;
     line-height: 20px;
@@ -355,17 +356,17 @@ function setTaskAsHabit () {
 a {
   font-family: Roboto,Arial,sans-serif;
   flex: 1;
-  background-color: #323232;
-  color: #fff;
-  padding-top: 5px; 
-  padding-bottom: 5px;
-  padding-left: 6px;
-  padding-right: 6px;
-  border-radius: 6px;
+  background-color: #F4F4F4;
+  color: #4E4E4E;
+  padding-top: 8px; 
+  padding-bottom: 8px;
+  padding-left: 20px;
+  padding-right: 20px;
+  border-radius: 20px;
   text-align: center;
   text-decoration: none;
   transition: all 0.2s ease-out;
-   border: 1px solid #000;
+   border: 1px solid #F4F4F4;
   font-family: sans-serif;
   font-size: 1rem;
   height: 5px;
@@ -373,8 +374,8 @@ a {
 
 a:hover,
 a:focus {
-  border: 1px solid #000;
-  background-color: #fff;
-  color: #323232;
+  border: 1px solid #0085FF;
+  background-color: #0085FF;
+  color: #fff;
 }
 </style>

@@ -1,4 +1,4 @@
-<div id="future-overview-scroll-parent" style="width: 16vw;">
+<div id="future-overview-scroll-parent" style="width: 15vw;">
   <!-- color: #6D6D6D; -->
   <div style="white-space: nowrap; 
     margin-bottom: 40px; 
@@ -7,7 +7,7 @@
     font-size: 16px;
     line-height: 19px;
   ">
-    Upcoming this week
+    Upcoming tasks
   </div>
   <div class="future-overview-scroll-container">
     {#each Object.keys(datesToTasks) as date}

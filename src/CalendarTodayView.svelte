@@ -1,4 +1,4 @@
-<div id="scroll-container" style="position: relative; width: 13vw">
+<div id="scroll-container" style="position: relative; width: 15vw">
   <!-- <div style="padding-bottom: 16px;">
     {#each tasksThatAlreadyHappened as task}
       <div style="display: flex; align-items: center; opacity: 1; margin-top: 10px;" class:green-text={task.isDone}>
@@ -67,10 +67,10 @@
       <hr 
         use:scrollToElement
       style="
-        border-top: 2px solid orange; 
+        border-top: 3px solid orange; 
         position: absolute; 
         top: {computeOffset({ startTime: currentTimeInHHMM }, PIXELS_PER_HOUR, calendarStartTime)}px;
-        left: 32px;
+        left: 35px;
         width: 11vw;  
       "
       >
@@ -262,11 +262,11 @@
   background: transparent;
 }
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 4px;
   height: 10px;
 }
 ::-webkit-scrollbar-thumb {
-  background: #D3D1CB;
+  background: #6D6D6D;
 }
 ::-webkit-scrollbar-track {
   background: #EDECE9;
@@ -329,7 +329,7 @@
   "Independence" is the best word you can ever hear in programming */
   .timestamp-number {
     top: -5px; 
-    margin-right: 4px;
+    margin-left: -6px;
     font-size: 0.7rem;
 
     /* these CSS properties are copied from `.calendar-time-block`, which used to be separate */
@@ -341,4 +341,5 @@
   .visible-line {
     border-top: 1px solid rgb(195, 195, 195);
   }
+
 </style>
