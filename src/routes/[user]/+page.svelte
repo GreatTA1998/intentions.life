@@ -51,32 +51,37 @@
 
 <div id="background-image-holder" style="height: 100vh;">
 
-  <a role="button" on:click={toggleMusic} class="float  mika-hover" style="right: 70px; z-index: 10;">
+  <a role="button" on:click={toggleMusic} class="float  mika-hover" style="right: 70px; z-index: 10;"
+  class:blue-focus={isMusicPlaying}>
     <span class="material-icons my-float">
       {isMusicPlaying ? 'music_note' : 'music_off'}
     </span>
   </a>
 
-  <a role="button" on:click={() => isJournalPopupOpen = !isJournalPopupOpen} class="float mika-hover" style="right:130px; z-index: 10">
+  <a role="button" on:click={() => isJournalPopupOpen = !isJournalPopupOpen} class="float mika-hover" style="right:130px; z-index: 10"  
+  class:blue-focus={isJournalPopupOpen}>
     <span class="material-icons my-float">
       auto_stories
     </span>
   </a>
 
-  <a role="button" on:click={() => isGoalsAndPostersPopupOpen = !isGoalsAndPostersPopupOpen} class="float  mika-hover" style="right: 190px; z-index: 10">
+  <a role="button" on:click={() => isGoalsAndPostersPopupOpen = !isGoalsAndPostersPopupOpen} class="float  mika-hover" style="right: 190px; z-index: 10"
+  class:blue-focus={isGoalsAndPostersPopupOpen}>
     <span class="material-icons my-float">
      flag
     </span>
   </a>
 
 
-  <a role="button" on:click={() => isFinancePopupOpen = !isFinancePopupOpen} class="float mika-hover" style="right: 250px; z-index: 10">
+  <a role="button" on:click={() => isFinancePopupOpen = !isFinancePopupOpen} class="float mika-hover" style="right: 250px; z-index: 10"
+  class:blue-focus={isFinancePopupOpen}>
     <span class="material-icons my-float">
       attach_money
     </span>
   </a>
 
-  <a role="button" on:click={() => isBedtimePopupOpen = !isBedtimePopupOpen} class="float mika-hover" style="right: 310px; z-index: 10">
+  <a role="button" on:click={() => isBedtimePopupOpen = !isBedtimePopupOpen} class="float mika-hover" style="right: 310px; z-index: 10"
+  class:blue-focus={isBedtimePopupOpen}>
     <span class="material-icons my-float">
       bedtime
     </span>
@@ -998,6 +1003,13 @@
     border: 1px solid #0085FF;
     transition: all 0.2s ease-out;
   }
+
+.blue-focus{
+  color: #ffffff;
+  background-color: #0085FF;
+  border: 1px solid #0085FF;
+  transition: all 0.2s ease-out;
+}
 
 
 
