@@ -978,7 +978,7 @@
   }
 
   .float{
-    position:fixed;
+    position:absolute;
     width: 50px;
     height: 50px;
     top: 45px;

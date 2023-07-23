@@ -23,10 +23,10 @@
         <textarea 
           bind:value={journal[currentlySelectedDate]}
           on:input={handleInput}
-          rows="38"
+          rows="30"
           cols="120"
           placeholder="notes"
-          style="margin-left: 10px; width: 97%; margin-right: 10px; box-sizing: border-box;"
+          style="margin-left: 20px; width: 97%; margin-right: 10px; box-sizing: border-box;"
         />
       </div>
     </div>

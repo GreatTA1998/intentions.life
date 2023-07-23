@@ -4,7 +4,7 @@
 {#if isOpen}
   <div bind:this={PopupSurface} class="my-popup-window" use:clickOutside on:click_outside={() => dispatch('card-close')}>
     <div style="display: flex;">
-      <h3 class="google-calendar-event-title"  style="margin-left: 50px; color: #ffffff;">
+      <h3 class="google-calendar-event-title"  style="margin-left: 10px; color: #ffffff;">
         My Bedtime Popup
       </h3>
       <span on:click={() => dispatch('card-close')} class="material-icons" style="margin-left: auto; margin-right: 10px; margin-top: 10px; color: #323232;">
@@ -22,7 +22,7 @@
       on:initial-volume-changed={(e) => resetCountdown()}
     />
 
-    <div>
+    <div style="font-family: Roboto, sans-serif; margin-top: 10px; font-size: 20px;">
       Timer
       <!-- which would include brightness -->
       <div style="display: flex;">
