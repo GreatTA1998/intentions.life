@@ -9,13 +9,10 @@
 
   <div style="height: 70vh">
     {#each tasksDueToday as task, i}
-      <TaskElement
+      <ReusableTaskElement
         {task}
-        disableAbsolutePosition={true}
-        offsetFromTop={95 + 30 * i}
-        height={task.duration * pixelsPerMinute}
+        {pixelsPerHour}
         fontSize={0.8}
-        offsetFromLeft={2}
         on:task-click
         on:task-duration-adjusted
       />
@@ -27,7 +24,7 @@
 <script>
   import { getDateOfToday, getDateInDDMMYYYY } from '/src/helpers.js'
   import { createEventDispatcher } from 'svelte'
-  import TaskElement from '/src/TaskElement.svelte'
+  import ReusableTaskElement from '$lib/ReusableTaskElement.svelte'
 
   export let allTasks
 

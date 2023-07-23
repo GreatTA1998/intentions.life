@@ -14,9 +14,14 @@
 
       {#if $user.cardAccounts}
         <div class="dashboard-new-container">
-          {#if trueBalance === null}
+          {#if trueBalance === null && !expired_access_token}
             <div style="display: flex; align-items: center; justify-content: center; height: 100%;">
-            <FinancePopupLoadingIndicator color={'white'}/>
+              Calculating overall balance...
+            <!-- <FinancePopupLoadingIndicator color={'white'}/> -->
+            </div>
+          {:else if expired_access_token}
+            <div style="margin-left: 50px;">
+              Overall balance unavailable because re-login is needed for some accounts
             </div>
           {:else}
             <div style="font-size: 5rem; margin-left: 50px;">
@@ -54,10 +59,12 @@
                 </div>
               {/if}      
 
-              {#if debitCardTransactions && cardAccount.creditOrDebit === 'depository'}
-                  <FinancePopupTransactionsUI transactions={debitCardTransactions}/>
-              {:else if creditCardTransactions && cardAccount.creditOrDebit === 'credit'}
-                  <FinancePopupTransactionsUI transactions={creditCardTransactions}/>
+              {#if debitCardTransactions && cardAccount.creditOrDebit === plaidAccountTypes.DEBIT}
+                <FinancePopupTransactionsUI transactions={debitCardTransactions}/>
+              {:else if creditCardTransactions && cardAccount.creditOrDebit === plaidAccountTypes.CREDIT}
+                <FinancePopupTransactionsUI transactions={creditCardTransactions}/>
+              {:else if savingsTransactions && cardAccount.creditOrDebit === plaidAccountTypes.SAVINGS}
+                <FinancePopupTransactionsUI transactions={savingsTransactions}/>
               {/if}
             {/if}
           </div>
@@ -73,8 +80,12 @@
   </div>
 {/if}
 
-
 <script>
+// SIMPLIFYING ASSUMPTIONS: exactly 1 credit, debit and savings account
+
+// TO-DO: 
+//    1. support depositories
+//    2. 
 import { createEventDispatcher, onMount, onDestroy, tick } from 'svelte'
 import _ from 'lodash'
 import { getDateOfToday, getRandomID, clickOutside } from '/src/helpers.js'
@@ -87,23 +98,21 @@ import { dev } from '$app/environment';
 
 export let isOpen = false
 
+// simulate an Enum
+const plaidAccountTypes = {
+  DEBIT: 'depository',
+  CREDIT: 'credit',
+  SAVINGS: 'investment'
+}
+
 const functions = getFunctions();
 const dispatch = createEventDispatcher()
 let openPlaidLinkUI = null 
-let openPlaidLinkUIUpdateMode = null 
 
-let totalMoneyLeft = null
 let accounts = null
 let transactions = null
 
-let expired_access_token = ''
-
-$: if (accounts) {
-  totalMoneyLeft = 0
-  for (const account of accounts) {
-    totalMoneyLeft += account.balances.available
-  }
-}
+let expired_access_token = '' // CURRENTLY ONLY CREDIT CARDS EXPIRE
 
 $: console.log('$user changed in finance popup =', $user)
 
@@ -117,7 +126,29 @@ onMount(async () => {
   }
 })
 
-const backendURL = dev ? 'http://localhost:8000' : 'https://koa-test-1-ef0d40104d58.herokuapp.com'
+let trueBalance = null
+
+let debitBalance = null
+let creditBalance = null
+let savingsBalance = null
+
+let creditCardTransactions = [] 
+let debitCardTransactions = [] 
+let savingsTransactions = [] 
+
+$: {
+  if (debitBalance !== null && creditBalance !== null && savingsBalance !== null) {
+    trueBalance = debitBalance - creditBalance + savingsBalance
+  } 
+  // quickfix 
+  else if (debitBalance !== null && creditBalance !== null) {
+    trueBalance = debitBalance - creditBalance
+  }
+}
+
+const isTestingBackend = false
+
+const backendURL = dev && isTestingBackend ? 'http://localhost:8000' : 'https://koa-test-1-ef0d40104d58.herokuapp.com'
 
 async function getInitialPlaidLinkToken () {
   return new Promise(async (resolve) => {
@@ -193,18 +224,23 @@ async function preparePlaidLinkUI (access_token = '') {
 
       for (const account of accounts) {
         // skip over accounts we already saved
-
-        // PROBLEM: FOR CREDIT CARDS, EACH ACESS_TOKEN AND ACCOUNT_ID SEEM TO BE 
+        // TURNS OUT FOR CREDIT CARDS, EACH ACESS_TOKEN AND ACCOUNT_ID SEEM TO BE 
         // UNIQUE EVEN THOUGH THE CARD IS THE SAME
         if ($user.cardAccounts) {
+                 
           const duplicates = $user.cardAccounts.filter(cardAccount => cardAccount.account_id === account.account_id)
           if (duplicates.length > 0) {
             continue
           }
 
           let cardAccountsCopy = [...$user.cardAccounts] 
-        // get rid of all credit card pointers (they're expired and need to be garbage collected)
-          const nonexpiredAccounts = cardAccountsCopy.filter(cardAccount => cardAccount.creditOrDebit !== 'credit')
+      
+          // if a debit card is uploaded, then invalidate the old debit card (they're expired and need to be garbage collected)
+          // same with credit and savings accounts 
+          // Note: `account.type`: Plaid labels it as 'depository', 'credit' and 'investment'
+          const nonexpiredAccounts = cardAccountsCopy.filter(
+            cardAccount => cardAccount.creditOrDebit !== account.type 
+          )
           await updateDoc(userRef, {
             cardAccounts: nonexpiredAccounts
           })
@@ -338,27 +374,19 @@ function getTrueBalance () {
       if (cardAccount.creditOrDebit === 'depository') {
         const result = await getBalance({ access_token: cardAccount.access_token, account_id: cardAccount.account_id })
         debitBalance = result.balances.current
-      } else if (cardAccount.creditOrDebit === 'credit') {
+      } 
+      else if (cardAccount.creditOrDebit === 'credit') {
         const result = await getBalance({ access_token: cardAccount.access_token, account_id: cardAccount.account_id })
         creditBalance = result.balances.current
+      } 
+      else if (cardAccount.creditOrDebit === 'investment') {
+        const result = await getBalance({ access_token: cardAccount.access_token, account_id: cardAccount.account_id })
+        savingsBalance = result.balances.current
       }
     } 
     resolve()
     // `trueBalance` will automatically update because it's $ reactive
   })
-}
-
-let trueBalance = null
-let debitBalance = null
-let creditBalance = null
-
-let creditCardTransactions = [] 
-let debitCardTransactions = [] 
-
-$: {
-  if (debitBalance !== null && creditBalance !== null) {
-    trueBalance = debitBalance - creditBalance
-  } 
 }
 
 async function checkAccountData (accessToken) {
