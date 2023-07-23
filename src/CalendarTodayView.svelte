@@ -33,16 +33,20 @@
       {/each}
 
       {#each scheduledTasksToday.filter(task => task.startTime >= calendarStartTime) as task, i}
-        <TaskElement
+        <CalendarAbsolutePositionWrapper
           {task}
+          pixelsPerHour={PIXELS_PER_MINUTE * 60}
           {calendarStartTime}
-          height={task.duration * PIXELS_PER_MINUTE || 30 * PIXELS_PER_MINUTE}
-          fontSize={0.8}
           offsetFromLeft={32}
-          {pixelsPerHour}
-          on:task-click
-          on:task-duration-adjusted
-        />
+        >
+          <ReusableTaskElement
+            {task}
+            pixelsPerHour={PIXELS_PER_MINUTE * 60}
+            fontSize={0.8}
+            on:task-click
+            on:task-duration-adjusted
+          />
+        </CalendarAbsolutePositionWrapper>
       {/each}
         
       <!-- This offsets the fact that the timestamp needs a -6 margin to not be cut off from the top edge of the container -->
@@ -81,7 +85,8 @@
 <script>
   import { createEventDispatcher } from 'svelte'
   import { getDateOfToday, getTrueY } from './helpers.js'
-  import TaskElement from './TaskElement.svelte'
+  import ReusableTaskElement from '$lib/ReusableTaskElement.svelte'
+  import CalendarAbsolutePositionWrapper from '$lib/CalendarAbsolutePositionWrapper.svelte';
 
   export let scheduledTasksToday
   export let pixelsPerHour 

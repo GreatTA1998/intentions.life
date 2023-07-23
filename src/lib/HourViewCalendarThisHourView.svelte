@@ -37,7 +37,6 @@
 <script>
   import { createEventDispatcher } from 'svelte'
   import { getDateInMMDD, getDateOfToday, getTrueY } from '../helpers.js'
-  import WeekViewTaskElement from './WeekViewTaskElement.svelte'
 
   export let scheduledTasksThisMonth
   export let pixelsPerMinute
