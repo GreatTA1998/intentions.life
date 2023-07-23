@@ -1,6 +1,8 @@
 <div>
-  <HourViewCalendarThisHourView
-    {pixelsPerMinute}
+  <ReusableCalendarView
+    pixelsPerHour={pixelsPerMinute * 60}
+    timeBlockDurationInMinutes={5}
+    {calendarBeginningDateClassObject}
   />
 </div>
 
@@ -20,8 +22,23 @@
   import HourViewCalendarThisHourView from './HourViewCalendarThisHourView.svelte'
   import HourViewUnscheduledTasks from './HourViewUnscheduledTasks.svelte'
 
-  export let allTasks
+  import ReusableCalendarView from './ReusableCalendarView.svelte';
+  import { convertDDMMYYYYToDateClassObject, getDateInDDMMYYYY } from '/src/helpers.js'
 
+  export let allTasks
+  const minutesPerTimeBlock = 5
   // this will be renamed, it's actually for every FIVE minutes
-  let pixelsPerMinute = 100
+  let pixelsPerMinute = 20
+
+
+  function getCalendarBeginningDateClassObject () {
+    const d = new Date()
+    return convertDDMMYYYYToDateClassObject(
+      getDateInDDMMYYYY(new Date()), // ddmmyyyy
+      `${d.getHours()}:00` // hhmm
+    )
+  }
+
+  let calendarBeginningDateClassObject = getCalendarBeginningDateClassObject()
+
 </script>

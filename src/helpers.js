@@ -178,7 +178,7 @@ export function computeMillisecsDifference (dateClassObject1, dateClassObject2) 
   return utc2 - utc1
 }
 
-// notice we purposely differentiatev`minutes` from `mm` (month) 
+// notice we purposely differentiate `minutes` from `mm` (month) 
 export function convertDDMMYYYYToDateClassObject (ddmmyyyy, hhmm = '') {
   const [dd, mm, yyyy] = ddmmyyyy.split('/')
   if (!hhmm) {
