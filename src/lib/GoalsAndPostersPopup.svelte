@@ -1,7 +1,7 @@
 {#if isOpen}
   <div class="my-popup-window" use:clickOutside on:click_outside={() => dispatch('card-close')}>
     <div style="display: flex;">
-      <h1 class="google-calendar-event-title" style="margin-left: 40px">
+      <h1 class="google-calendar-event-title" style="margin-left: 40px; margin-top: 40px; margin-bottom: 40px; color: #000;">
         Goals & Encouraging Words
       </h1>
       <span on:click={() => dispatch('card-close')} class="material-icons" style="margin-left: auto; margin-right: 10px; margin-top: 10px; color: #323232;">
@@ -14,9 +14,9 @@
       <textarea 
         bind:value={notesAboutTask}
         on:input={handleInput}
-        rows="30"
+        rows="38"
         placeholder="Type in here... "
-        style="display: block; margin: auto; width: 90%; box-sizing: border-box;"
+        style="display: block; margin: auto; width: 93%; box-sizing: border-box;"
       />
     </div>
   </div>
@@ -121,7 +121,6 @@ function setTaskAsHabit () {
     left: 50%;
     transform: translate(-50%, -50%);
     width: 50%;
-
     overflow-y: scroll;
     z-index: 5;
     width: 70%;
@@ -129,9 +128,8 @@ function setTaskAsHabit () {
     min-width: 200px;
     border-radius: 10px;
     background-color: white;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    -webkit-box-shadow:  0px 0px 0px 9999px rgba(0, 0, 0, 0.5);
     padding: 6px;
-    border: 1px solid #000;
   }
 
   /* Refer to: https://stackoverflow.com/questions/3131072/how-to-change-input-text-box-style-to-line */
@@ -140,7 +138,6 @@ function setTaskAsHabit () {
     border: none;
     border-bottom: 1px solid #000000;
     outline: none;
-
     padding: 2px 0px;
   }
 
@@ -170,7 +167,7 @@ function setTaskAsHabit () {
   .google-calendar-event-title {
     font-family: Roboto,Arial,sans-serif;
     font-size: 24px;
-    font-weight: 400;
+    font-weight: 600;
     letter-spacing: .2px;
     line-height: 20px;
     color: #3c4043;

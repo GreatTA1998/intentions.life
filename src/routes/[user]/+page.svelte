@@ -89,8 +89,8 @@
 
   <div style="display: flex"> 
     <!-- 1st flex child -->
-    <div style="width: 44vw">
-      <div style="margin-left: 69px; margin-top: 47px; display: flex; align-items: center;">
+    <div style="width: 50vw">
+      <div style="margin-left: 45px; margin-top: 47px; display: flex; align-items: center;">
         <div class="mika-rectangle" on:click={() => currentMode = 'hourMode'}
           class:selected-rectangle={currentMode === 'hourMode'}
         >
@@ -112,7 +112,7 @@
         </div>
       </div>
 
-      <div style="font-family: Inter; font-weight: 700; font-size: 32px; margin-left: 20px; padding: 30px 0px 10px 55px; color: #000000">
+      <div style="font-family: Inter; font-weight: 600; font-size: 28px; margin-left: 20px; padding: 30px 0px 10px 35px; color: #000000">
         {getDayOfWeek()}, { getNicelyFormattedDate() }, { new Date().getFullYear() }
       </div>
 
@@ -133,7 +133,7 @@
               on:task-click={(e) => openDetailedCard(e.detail)}
             />
             <div>
-              <div style="display: flex; width: 20vw;">  
+              <div style="display: flex; width: 25vw;">  
                 {#if allTasks}
                   <UnscheduledTasksForToday
                     {allTasks}
@@ -172,7 +172,7 @@
     <!-- end of 1st flex child -->
 
     <div class="todo-container" 
-      style="border-left: 1px solid #000000; padding-top: 160px;" 
+      style="background-color:#F4F4F4; padding-top: 170px;" 
       on:drop={(e) => unscheduleTask(e)}
       on:dragover={(e) => dragover_handler(e)}
     >
@@ -831,6 +831,8 @@
     font-family: sans-serif;
     border-radius: 20px;
     margin: 0px 2px;
+    padding: 0px;
+    font-size: 15px;
   }
 
   .mika-rectangle:hover {
@@ -862,7 +864,7 @@
     }
     .todo-container {
       font-family: Roboto, sans-serif;
-      width: 80vw;
+      width: 55vw;
       height: 100vh;
       padding-top: 15px; 
       padding-left: 20px;
@@ -872,7 +874,7 @@
     }
     .calendar-section-container {
       background: transparent; 
-      width: 50vw;
+      width: 45vw;
       height: 50vh;
       border: none; 
       border-left: none;
@@ -899,8 +901,8 @@
     height: 100vh;
     display: flex; 
     margin-left: 20px;
-    justify-content: space-evenly; 
-    /* background-color: white;  */
+    justify-content: space-evenly;  ; 
+    /*    background-color: white;  */
     box-sizing: border-box;
     padding-top: 40px;
   }
@@ -908,7 +910,6 @@
   .flex-container {
     height: 100vh;
     display: flex; 
-    padding-left: 0; 
     padding-top: 0px;
     background: transparent; 
   }
@@ -982,10 +983,10 @@
     width: 50px;
     height: 50px;
     top: 45px;
-    background-color: #F4F4F4;  
+    background-color: #ffffff;  
     border-radius:50px;
     text-align:center;
-    border: 1px solid #F4F4F4;
+   /* border: 1px solid #0085FF;*/
   }
 
   .my-float{
@@ -1000,14 +1001,14 @@
   .mika-hover:hover{
     color: #ffffff;
     background-color: #0085FF;
-    border: 1px solid #0085FF;
+   /* border: 1px solid #0085FF; */
     transition: all 0.2s ease-out;
   }
 
 .blue-focus{
   color: #ffffff;
   background-color: #0085FF;
-  border: 1px solid #0085FF;
+/*  border: 1px solid #0085FF;*/
   transition: all 0.2s ease-out;
 }
 

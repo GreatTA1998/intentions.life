@@ -1,11 +1,11 @@
-
-<div id="player"></div>
+<div class="iframe-container">
+<div id="player"></div></div>
 
 <input
   type="range"
   min="0"
   max="100"
-  step="1"
+  step="5"
   on:input={changeVolume}
 />
 
@@ -37,8 +37,6 @@
   function initializePlayer() {
     const videoId = 'POASGRhM3wo'
     player = new YT.Player('player', {
-      height: 50, 
-      width: 50,
       videoId: videoId,
       events: {
         onReady: onPlayerReady,
@@ -82,11 +80,27 @@
 </script>
 
 <style>
-  .player{
+.iframe-container {
+  position: relative;
+width: 60%;
+padding-bottom: 32%;
+height: 0;
+margin:auto;
+margin-top: 20px;
+}
+
+  #player{
     position: absolute;
-    top:0;
+top:0;
 left: 0;
 width: 100%;
 height: 100%;
+  }
+
+  input[type="range" i] {
+   display: block;
+   margin: auto;
+   margin-top: 20px;
+  
   }
 </style>
