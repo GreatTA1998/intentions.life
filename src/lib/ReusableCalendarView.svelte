@@ -1,7 +1,7 @@
 <div 
-  bind:this={div}
+  bind:this={ScrollContainer}
   id="scroll-container" 
-  style="position: relative; 
+  style="position: relative;
   width: 15vw"
 >
   <div id="calendar-day-container" 
@@ -67,6 +67,7 @@
     <!-- A red line that indicates the current time -->
     {#if currentTimeInHHMM}
       <hr 
+        bind:this={CurrentTimeIndicator}
         style="
         border-top: 3px solid orange; 
         position: absolute; 
@@ -84,10 +85,9 @@
 </div>
 
 <script>
-  import { createEventDispatcher } from 'svelte'
   import { getDateOfToday, getTrueY, computeMillisecsDifference, convertDDMMYYYYToDateClassObject} from '/src/helpers.js'
   import ReusableTaskElement from '$lib/ReusableTaskElement.svelte'
-  import { onMount, beforeUpdate, afterUpdate } from 'svelte'
+  import { onMount, beforeUpdate, afterUpdate, tick, createEventDispatcher, onDestroy } from 'svelte'
 
   export let pixelsPerHour 
   export let timeBlockDurationInMinutes 
@@ -101,40 +101,31 @@
     console.log(...args)    
   }
 
-  let div
-  let autoscroll
+  let ScrollContainer
+  let CurrentTimeIndicator
 
-  // RUNS BEFORE ONMOUNT
-  beforeUpdate(() => {
-    // TO-DO: explain the code
-    // `offsetHeight`: visible height (not intuitive name)
-    // `scrollHeight`: the height including the content not shown (intuitive name)
-
-    // if (div) {
-    //   p('offsetHeight =', div.offsetHeight)
-    //   p('scrollTop =', div.scrollTop)
-    //   p('scrollHeight =', div.scrollHeight)
-    // }
-		autoscroll = div && div.offsetHeight + div.scrollTop > div.scrollHeight - 20;
-	})
-
-	afterUpdate(() => {
-    // if (div) {
-    //   p('offsetHeight =', div.offsetHeight)
-    //   p('scrollTop =', div.scrollTop)
-    //   p('scrollHeight =', div.scrollHeight)
-    // }
-
-		if (autoscroll) div.scrollTo(0, div.scrollHeight);
-	})
-
-  const dispatch = createEventDispatcher()
-  
-  let pixelsPerMinute = pixelsPerHour / 60
+  // PROBLEM: our scroll container's dimension is 0, even after scheduledTask is hydrated, and we tick() / beforeUpdate / afterUpdate
+  // new strategy:
+  //   1. Notice when the Scroll container resizes
+  //   2. Then set it's scrollTop value to the currentTimeIndicator's top value (parseFloat of course)
+  const myObserver = new ResizeObserver(entries => {
+    entries.forEach(entry => { 
+      ScrollContainer.scrollTop = parseFloat(CurrentTimeIndicator.style.top) // style.top returns '136.px', `parseFloat` gets rid of the 'px' suffix
+    })
+  });
 
   onMount(() => {
-    // autoscroll
+    myObserver.observe(ScrollContainer)
   })
+
+
+  onDestroy(() => {
+    myObserver.disconnect()
+  })
+
+  const dispatch = createEventDispatcher()
+
+  let pixelsPerMinute = pixelsPerHour / 60
 
   // computes the physical offset, within origin based on d1
   function computeOffsetGeneral ({ d1, d2, pixelsPerMinute }) {
@@ -143,7 +134,6 @@
     // translate time difference to a physical distance
     const minutesDifference = millisecsDifference / (1000 * 60)
     const offset = minutesDifference * pixelsPerMinute
-    p('offset =', offset)
     return offset
   }
 

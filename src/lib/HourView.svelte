@@ -25,11 +25,9 @@
 </div>
 
 <script>
-  import HourViewCalendarThisHourView from './HourViewCalendarThisHourView.svelte'
   import HourViewUnscheduledTasks from './HourViewUnscheduledTasks.svelte'
-
   import ReusableCalendarView from './ReusableCalendarView.svelte';
-  import { convertDDMMYYYYToDateClassObject, getDateInDDMMYYYY } from '/src/helpers.js'
+  import { convertDDMMYYYYToDateClassObject, getDateInDDMMYYYY, twoDigits } from '/src/helpers.js'
 
   export let allTasks
   export let scheduledTasksToday
@@ -38,8 +36,11 @@
   let timestamps = []
 
   function generateCalendarTimestamps () {
-    for (let i = 0; i <= 60; i += 5)
-    timestamps = [...timestamps, `${i}`]
+    const d = new Date()
+    for (let i = 0; i <= 55; i += 5) {
+      const timestamp = twoDigits(d.getHours()) + ':' + twoDigits(i)
+      timestamps = [...timestamps, timestamp]
+    }
   }
   generateCalendarTimestamps()
 

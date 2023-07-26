@@ -197,3 +197,7 @@ export function getMonthNameFromNumber (monthNumber) {
   const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
   return monthNames[monthNumber]
 }
+
+export function twoDigits (number) {
+  return (number < 10 ? `0${number}` : `${number}`)
+}
