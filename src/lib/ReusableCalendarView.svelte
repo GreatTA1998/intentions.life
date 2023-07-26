@@ -1,4 +1,6 @@
-<div id="scroll-container" 
+<div 
+  bind:this={div}
+  id="scroll-container" 
   style="position: relative; 
   width: 15vw"
 >
@@ -17,7 +19,7 @@
       </div>
     {/each}
 
-    {#each scheduledTasks.filter(task => task.startTime >= calendarStartTime) as task, i}
+    {#each scheduledTasks as task, i}
       <div
         style="
           position: absolute; 
@@ -58,10 +60,14 @@
       </div>
     {/each}
 
+    <!-- https://svelte.dev/tutorial/update
+      "Scrolling is hard to achieve with purely a state-driven way"
+    -->
+
     <!-- A red line that indicates the current time -->
     {#if currentTimeInHHMM}
       <hr 
-      style="
+        style="
         border-top: 3px solid orange; 
         position: absolute; 
         top: {computeOffsetGeneral({ 
@@ -81,6 +87,7 @@
   import { createEventDispatcher } from 'svelte'
   import { getDateOfToday, getTrueY, computeMillisecsDifference, convertDDMMYYYYToDateClassObject} from '/src/helpers.js'
   import ReusableTaskElement from '$lib/ReusableTaskElement.svelte'
+  import { onMount, beforeUpdate, afterUpdate } from 'svelte'
 
   export let pixelsPerHour 
   export let timeBlockDurationInMinutes 
@@ -90,13 +97,44 @@
   export let scheduledTasks = [] 
   export let timestamps = []
 
+  function p (...args) {
+    console.log(...args)    
+  }
+
+  let div
+  let autoscroll
+
+  // RUNS BEFORE ONMOUNT
+  beforeUpdate(() => {
+    // TO-DO: explain the code
+    // `offsetHeight`: visible height (not intuitive name)
+    // `scrollHeight`: the height including the content not shown (intuitive name)
+
+    // if (div) {
+    //   p('offsetHeight =', div.offsetHeight)
+    //   p('scrollTop =', div.scrollTop)
+    //   p('scrollHeight =', div.scrollHeight)
+    // }
+		autoscroll = div && div.offsetHeight + div.scrollTop > div.scrollHeight - 20;
+	})
+
+	afterUpdate(() => {
+    // if (div) {
+    //   p('offsetHeight =', div.offsetHeight)
+    //   p('scrollTop =', div.scrollTop)
+    //   p('scrollHeight =', div.scrollHeight)
+    // }
+
+		if (autoscroll) div.scrollTo(0, div.scrollHeight);
+	})
+
   const dispatch = createEventDispatcher()
   
   let pixelsPerMinute = pixelsPerHour / 60
 
-  function p (...args) {
-    console.log(...args)
-  }
+  onMount(() => {
+    // autoscroll
+  })
 
   // computes the physical offset, within origin based on d1
   function computeOffsetGeneral ({ d1, d2, pixelsPerMinute }) {
@@ -105,6 +143,7 @@
     // translate time difference to a physical distance
     const minutesDifference = millisecsDifference / (1000 * 60)
     const offset = minutesDifference * pixelsPerMinute
+    p('offset =', offset)
     return offset
   }
 
@@ -148,39 +187,40 @@
     // TODO: in practice there is a small discrepancy between where the drop is and where the mouse is 
     // because the user aims with the image corner whereas the code reads the precise mouse pointer location
    */
+
+  // How it works:
+  //   1. Do origin + new difference to get the date object
+  //   2. use the new date object to generate `startTime` and `startDate`
   function drop_handler (e) {
     e.preventDefault()
     highlightedMinute = null
 
-    const trueY = getTrueY(e)
-    let n = trueY / pixelsPerHour
-    const decimal = n - Math.floor(n)
-    const integer = Math.trunc(n)
+    // origin
+    const calendarStartAsMs = calendarBeginningDateClassObject.getTime()
     
-    // calculate minutes i.e. `mm` 
-    let minutesOffset = decimal * 60
-    let mm 
-    if (minutesOffset < 1) {
-      mm = '00'
-    } else if (minutesOffset < 10) {
-      mm = `0${minutesOffset.toPrecision(1)}`
-    } else {
-      mm = minutesOffset.toPrecision(2)
-    }
+    // difference
+    const trueY = getTrueY(e)
+    const totalHoursDistance = trueY / pixelsPerHour
+    const totalMsDistance = totalHoursDistance * 60 * 60 * 1000
 
-    // calculate hours i.e. `hh`
+    // Add them together: https://stackoverflow.com/a/12795802/7812829
+    const resultantTimeInMs = calendarStartAsMs + totalMsDistance
+    const resultantDateClassObject = new Date(resultantTimeInMs)
 
-    const yOrigin = calendarBeginningDateClassObject.getHours()
-    let hh = yOrigin + integer
-    if (hh < 10) {
-      hh = `0${hh}`
+    // format to hh:mm format to be compatible with old API
+    p('resultantTimeInMs =', resultantDateClassObject)
+    function ensureTwoDigits (number) {
+      return (number < 10 ? `0${number}` : `${number}`)
     }
-    const scheduledTime = `${hh}:${mm}` 
+    const d = resultantDateClassObject
+    const hhmm = ensureTwoDigits(d.getHours()) + ':' + ensureTwoDigits(d.getMinutes())
+    const mmdd = ensureTwoDigits(d.getMonth() + 1) + '/' + ensureTwoDigits(d.getDate())
+
 
     dispatch('task-scheduled', {
       id: e.dataTransfer.getData('text/plain'),
-      timeOfDay: scheduledTime,
-      dateScheduled: getDate()
+      timeOfDay: hhmm,
+      dateScheduled: mmdd
     })
   }
 </script>

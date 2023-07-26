@@ -394,9 +394,11 @@
 
         // this is the base case condition, otherwise infinite recursion will happen
         // as we are inside a snapshot listener
-        console.log('lastRanRepeatDate =', lastRanRepeatAtDate)
-        console.log('and today is =', dateOfToday)
-        console.log("testRunOnce =", testRunOnce)
+
+        // FOR DEBUGGING
+        // console.log('lastRanRepeatDate =', lastRanRepeatAtDate)
+        // console.log('and today is =', dateOfToday)
+        // console.log("testRunOnce =", testRunOnce)
 
         if ((lastRanRepeatAtDate !== dateOfToday) || testRunOnce) {
           testRunOnce = false
