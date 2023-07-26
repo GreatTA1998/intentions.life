@@ -730,7 +730,6 @@
   }
 
   async function changeTaskStartTime ({ id, timeOfDay, dateScheduled }) {
-    console.log('this should be firing =', timeOfDay)
     traverseAndUpdateTree({
       fulfilsCriteria: (task) => task.id === id,
       applyFunc: (task) => {
