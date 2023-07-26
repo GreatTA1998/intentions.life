@@ -123,15 +123,15 @@
               {allTasks}
             />
           {:else if currentMode === 'dayMode'}
-            <!-- DAY MODE TRIPLET-->
-            <CalendarTodayView
+            <DayView
+              {allTasks}
               scheduledTasksToday={todayScheduledTasks}
-              pixelsPerHour={isGirlfriendMode ? MIKA_PIXELS_PER_HOUR : PIXELS_PER_HOUR }
               on:task-done={(e) => markNodeAsDone(e.detail.id)}
               on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
               on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
               on:task-click={(e) => openDetailedCard(e.detail)}
             />
+
             <div>
               <div style="display: flex; width: 20vw;">  
                 {#if allTasks}
@@ -236,10 +236,13 @@
 
   import UnscheduledTasksForToday from '$lib/UnscheduledTasksForToday.svelte'
   import RecursiveTask from '../../RecursiveTask.svelte'
+
   import CalendarTodayView from '../../CalendarTodayView.svelte'
+
+
   import FutureOverview from '../../FutureOverview.svelte'
   import DetailedCardPopup from '../../DetailedCardPopup.svelte'
-  import { MIKA_PIXELS_PER_HOUR, PIXELS_PER_HOUR, getNicelyFormattedDate, computeDayDifference } from '../../helpers.js'
+  import { MIKA_PIXELS_PER_HOUR, PIXELS_PER_HOUR, getNicelyFormattedDate, computeDayDifference, convertDDMMYYYYToDateClassObject } from '../../helpers.js'
   import GoalsAndPostersPopup from '$lib/GoalsAndPostersPopup.svelte'
   import { onMount } from 'svelte'
   import db from '../../db.js'
@@ -251,6 +254,7 @@
 
   import ExperimentalPlayground from '$lib/ExperimentalPlayground.svelte'
   import HourView from '$lib/HourView.svelte'
+  import DayView from '$lib/DayView.svelte'
   import WeekView from '$lib/WeekView.svelte'
   import MonthView from '$lib/MonthView.svelte'
   import TheSnackbar from '$lib/TheSnackbar.svelte'
@@ -681,8 +685,8 @@
     })
   }
 
-  // TO-DO: make it id-based
   async function changeTaskStartTime ({ id, timeOfDay, dateScheduled }) {
+    console.log('this should be firing =', timeOfDay)
     traverseAndUpdateTree({
       fulfilsCriteria: (task) => task.id === id,
       applyFunc: (task) => {

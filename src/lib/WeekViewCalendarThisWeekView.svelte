@@ -18,12 +18,12 @@
     {/if}
     
     {#each scheduledTasksThisWeek as task, i}
-      <CalendarAbsolutePositionWrapper
-        {task}
-        pixelsPerHour={pixelsPerDay / 24}
-        {calendarStartTime}
-        offsetFromLeft={32}
-        calculatedTopPositionFromParent={computeOffset({ startTime: task.startTime, startDate: task.startDate })}
+      <div
+        style="
+          position: absolute; 
+          top: {computeOffset({ startTime: task.startTime, startDate: task.startDate })}px;
+          left: {32}px;
+        "
       >
         <ReusableTaskElement
           {task}
@@ -32,7 +32,7 @@
           on:task-click
           on:task-duration-adjusted
         />
-      </CalendarAbsolutePositionWrapper>
+      </div>
     {/each}
         
     <!-- important: this offsets the fact that the timestamp needs a -6 margin to not be cut off from the top edge of the container -->
@@ -69,7 +69,6 @@
   import { createEventDispatcher } from 'svelte'
   import { getDateInMMDD, getDateOfToday, getTrueY } from '../helpers.js'
   import ReusableTaskElement from './ReusableTaskElement.svelte'
-  import CalendarAbsolutePositionWrapper from './CalendarAbsolutePositionWrapper.svelte';
 
   export let scheduledTasksThisWeek
   export let pixelsPerDay

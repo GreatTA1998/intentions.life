@@ -18,11 +18,19 @@
     {/each}
 
     {#each scheduledTasksToday.filter(task => task.startTime >= calendarStartTime) as task, i}
-      <CalendarAbsolutePositionWrapper
-        {task}
-        pixelsPerHour={pixelsPerMinute * 60}
-        {calendarStartTime}
-        offsetFromLeft={32}
+      <div
+        style="
+          position: absolute; 
+          top: {computeOffsetGeneral({ 
+            d1: calendarBeginningDateClassObject, 
+            d2: convertDDMMYYYYToDateClassObject(
+              task.startDate.split('/')[1] + '/' + task.startDate.split('/')[0] + '/' + (task.startYYYY ? task.startYYYY : new Date().getYears()), // notice we flip mm/dd format into dd/mm/yyyy
+              task.startTime   // hhmm
+            ),
+            pixelsPerMinute
+          })}px;
+          left: {32}px;
+        "
       >
         <ReusableTaskElement
           {task}
@@ -31,7 +39,7 @@
           on:task-click
           on:task-duration-adjusted
         />
-      </CalendarAbsolutePositionWrapper>
+      </div>
     {/each}
       
     <!-- This offsets the fact that the timestamp needs a -6 margin to not be cut off from the top edge of the container -->
@@ -40,7 +48,7 @@
     <!-- Again, because we're using absolute positioning for above elements, their positionings are independent from each other -->
     {#each {length: subdivisionsPerBlock * timestamps.length} as _, i}
       <div 
-        class:visible-line={(i % 5) === 0}
+        class:visible-line={(i % subdivisionsPerBlock) === 0}
         style="height: {pixelsPerMinute}px; box-sizing: border-box; margin-right: 0; margin-left: auto; width: 82%"
         class:highlighted-background={highlightedMinute === i}
         on:dragenter={() => highlightedMinute = i}
@@ -56,7 +64,11 @@
       style="
         border-top: 3px solid orange; 
         position: absolute; 
-        top: {computeOffsetGeneral({ calendarBeginningDateClassObject, pixelsPerMinute })}px;
+        top: {computeOffsetGeneral({ 
+          d1: calendarBeginningDateClassObject, 
+          d2: new Date(), 
+          pixelsPerMinute 
+        })}px;
         left: 35px;
         width: 11vw;  
       "
@@ -67,39 +79,28 @@
 
 <script>
   import { createEventDispatcher } from 'svelte'
-  import { getDateOfToday, getTrueY, computeMillisecsDifference } from '/src/helpers.js'
+  import { getDateOfToday, getTrueY, computeMillisecsDifference, convertDDMMYYYYToDateClassObject} from '/src/helpers.js'
   import ReusableTaskElement from '$lib/ReusableTaskElement.svelte'
   import CalendarAbsolutePositionWrapper from '$lib/CalendarAbsolutePositionWrapper.svelte';
 
   export let pixelsPerHour 
   export let timeBlockDurationInMinutes 
   export let calendarBeginningDateClassObject
+  export let subdivisionsPerBlock 
 
-  const subdivisionsPerBlock = 5
+  export let scheduledTasksToday = [] // TO-DO implement for Hour, Day, Week and Month
+  export let timestamps = []
 
-  $: pixelsPerMinute = pixelsPerHour / 60
-  // TO-DO: make it reactive
-  pixelsPerMinute = pixelsPerHour / 60
-
-  let scheduledTasksToday = []
-
-  let timestamps = []
+  const dispatch = createEventDispatcher()
+  let pixelsPerMinute = pixelsPerHour / 60
 
   function p (...args) {
     console.log(...args)
   }
 
-  function generateCalendarTimestamps () {
-    for (let i = 0; i <= 60; i += 5)
-    timestamps.push(`${i}`)
-  }
-  generateCalendarTimestamps()
-
-  p('timestamps =', timestamps)
-
-  function computeOffsetGeneral ({ calendarBeginningDateClassObject, pixelsPerMinute }) {
-    const now = new Date()
-    const millisecsDifference = computeMillisecsDifference(calendarBeginningDateClassObject, now)
+  // computes the physical offset, within origin based on d1
+  function computeOffsetGeneral ({ d1, d2, pixelsPerMinute }) {
+    const millisecsDifference = computeMillisecsDifference(d1, d2)
     
     // translate time difference to a physical distance
     const minutesDifference = millisecsDifference / (1000 * 60)
@@ -107,14 +108,11 @@
     return offset
   }
 
-  const dispatch = createEventDispatcher()
   const getDate = getDateOfToday
-
-  const numOfHourBlocksDisplayed = 18
 
   let highlightedMinute = null 
 
-  let calendarStartTime = ''
+  let calendarStartTime = '07:00'
   let currentTimeInHHMM = ''
 
   const one_sec = 1000 // milliseconds
@@ -179,11 +177,13 @@
 
     const scheduledTime = `${hh}:${mm}` 
 
+    console.log('dispatching, id, timeOfDay =', e.dataTransfer.getData('text/plain'), scheduledTime)
     dispatch('task-scheduled', {
       id: e.dataTransfer.getData('text/plain'),
       timeOfDay: scheduledTime,
       dateScheduled: getDate()
     })
+    console.log("task-scheduled")
   }
 </script>
 
