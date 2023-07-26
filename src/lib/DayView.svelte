@@ -5,9 +5,10 @@
     subdivisionsPerBlock={60}
     calendarBeginningDateClassObject={dayCalendarBeginningDateClassObject}
     timestamps={timesOfDay}
-    {scheduledTasksToday}
+    scheduledTasks={scheduledTasksToday}
     on:task-duration-adjusted
     on:task-click
+    on:task-scheduled
   />
 </div>
 
@@ -23,6 +24,7 @@
   } 
     from '/src/helpers.js'
 
+  export let allTasks
   export let scheduledTasksToday
 
   let timesOfDay = [] 

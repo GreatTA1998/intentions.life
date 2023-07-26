@@ -5,6 +5,10 @@
     subdivisionsPerBlock={5}
     {calendarBeginningDateClassObject}
     {timestamps}
+    scheduledTasks={scheduledTasksToday}
+    on:task-duration-adjusted
+    on:task-click
+    on:task-scheduled
   />
 </div>
 
@@ -28,9 +32,9 @@
   import { convertDDMMYYYYToDateClassObject, getDateInDDMMYYYY } from '/src/helpers.js'
 
   export let allTasks
-  // this will be renamed, it's actually for every FIVE minutes
+  export let scheduledTasksToday
+  
   let pixelsPerMinute = 20
-
   let timestamps = []
 
   function generateCalendarTimestamps () {

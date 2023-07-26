@@ -17,7 +17,7 @@
       </div>
     {/each}
 
-    {#each scheduledTasksToday.filter(task => task.startTime >= calendarStartTime) as task, i}
+    {#each scheduledTasks.filter(task => task.startTime >= calendarStartTime) as task, i}
       <div
         style="
           position: absolute; 
@@ -49,7 +49,7 @@
     {#each {length: subdivisionsPerBlock * timestamps.length} as _, i}
       <div 
         class:visible-line={(i % subdivisionsPerBlock) === 0}
-        style="height: {pixelsPerMinute}px; box-sizing: border-box; margin-right: 0; margin-left: auto; width: 82%"
+        style="height: { (timeBlockDurationInMinutes * pixelsPerMinute) / subdivisionsPerBlock  }px; box-sizing: border-box; margin-right: 0; margin-left: auto; width: 82%"
         class:highlighted-background={highlightedMinute === i}
         on:dragenter={() => highlightedMinute = i}
         on:dragend={() => console.log('dragend') }
@@ -81,17 +81,17 @@
   import { createEventDispatcher } from 'svelte'
   import { getDateOfToday, getTrueY, computeMillisecsDifference, convertDDMMYYYYToDateClassObject} from '/src/helpers.js'
   import ReusableTaskElement from '$lib/ReusableTaskElement.svelte'
-  import CalendarAbsolutePositionWrapper from '$lib/CalendarAbsolutePositionWrapper.svelte';
 
   export let pixelsPerHour 
   export let timeBlockDurationInMinutes 
   export let calendarBeginningDateClassObject
   export let subdivisionsPerBlock 
 
-  export let scheduledTasksToday = [] // TO-DO implement for Hour, Day, Week and Month
+  export let scheduledTasks = [] 
   export let timestamps = []
 
   const dispatch = createEventDispatcher()
+  
   let pixelsPerMinute = pixelsPerHour / 60
 
   function p (...args) {
@@ -169,21 +169,19 @@
     }
 
     // calculate hours i.e. `hh`
-    const origin = parseInt(calendarStartTime.substring(0, 2))
-    let hh = origin + integer
+
+    const yOrigin = calendarBeginningDateClassObject.getHours()
+    let hh = yOrigin + integer
     if (hh < 10) {
       hh = `0${hh}`
     }
-
     const scheduledTime = `${hh}:${mm}` 
 
-    console.log('dispatching, id, timeOfDay =', e.dataTransfer.getData('text/plain'), scheduledTime)
     dispatch('task-scheduled', {
       id: e.dataTransfer.getData('text/plain'),
       timeOfDay: scheduledTime,
       dateScheduled: getDate()
     })
-    console.log("task-scheduled")
   }
 </script>
 
