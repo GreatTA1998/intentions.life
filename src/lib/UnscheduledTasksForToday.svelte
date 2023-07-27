@@ -3,7 +3,7 @@
   on:dragover={(e) => dragover_handler(e)}
 >
   <!-- color: #6D6D6D;  -->
-  <div style="font-family: Inter;font-size: 16px; margin-bottom: 40px;">
+  <div style="font-family: Inter;font-size: 16px; margin-bottom: 40px; width: 15vw;">
     Today's to-do
   </div>
 

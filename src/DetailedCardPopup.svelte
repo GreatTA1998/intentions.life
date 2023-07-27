@@ -10,7 +10,7 @@
         style="width: 97%; margin-left: 10px; margin-right: 10px; box-sizing: border-box;"
       >
         
-      <span on:click={() => dispatch('card-close')} class="material-icons" style="margin-left: auto; margin-right: 0; margin-top: 5px; color: black;">
+      <span on:click={() => dispatch('card-close')} class="material-icons" style="margin-left: auto; margin-right: 10px; margin-top: 5px; color: black;">
         close
       </span>
     </div>
@@ -42,7 +42,7 @@
         on:input={handleInput}
         rows="5"
         placeholder="Type in details..."
-        style="margin-left: 10px; width: 95%; margin-right: 10px; margin-bottom: 20px; box-sizing: border-box;"
+        style="margin-left: 12px; width: 95%; margin-right: 10px; margin-bottom: 20px; box-sizing: border-box;"
       />
     </div>
 
@@ -298,8 +298,9 @@ function setTaskAsHabit () {
     height: 70%;
     border-radius: 10px;
     background-color: white;
-    border: 1px solid #000;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+ 
+  /*    border: 1px solid #000; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);*/
+  -webkit-box-shadow:  0px 0px 0px 9999px rgba(0, 0, 0, 0.5);
     padding: 6px;
   }
 
@@ -375,8 +376,8 @@ a {
 
 a:hover,
 a:focus {
-  border: 1px solid #0085FF;
-  background-color: #0085FF;
+  border: 1px solid orange;
+  background-color: orange;
   color: #fff;
 }
 </style>

@@ -153,5 +153,6 @@
 
   .copied-from-koa {
     font: 20px/1.7 "Lucida Grande", "Lucida Sans Unicode", Helvetica, Arial, Verdana, sans-serif
+  
   }
 </style>

@@ -4,7 +4,7 @@
 {#if isOpen}
   <div bind:this={PopupSurface} class="my-popup-window" use:clickOutside on:click_outside={() => dispatch('card-close')}>
     <div style="display: flex;">
-      <h3 class="google-calendar-event-title"  style="margin-left: 50px; color: #ffffff;">
+      <h3 class="google-calendar-event-title"  style="margin-left: 50px;  margin-top: 40px; color: #ffffff; font-weight: 600;">
         My Bedtime Popup
       </h3>
       <span on:click={() => dispatch('card-close')} class="material-icons" style="margin-left: auto; margin-right: 10px; margin-top: 10px; color: #323232;">
@@ -22,9 +22,9 @@
       on:initial-volume-changed={(e) => resetCountdown()}
     />
 
-    <div>
-      Timer
-      <!-- which would include brightness -->
+    <div  class="title">
+      <!--  Timer
+      which would include brightness -->
       <div style="display: flex;">
         <!-- <div>
           10 minutes
@@ -91,6 +91,7 @@
 </script>
 
 <style>
+  
 .my-popup-window {
   position: fixed;
   top: 50%;
@@ -99,13 +100,23 @@
   width: 50%;
   overflow-y: scroll;
   z-index: 5;
-  width: 80%;
-  height: 80%;
+  width: 70%;
+  height: 70%;
   min-width: 200px;
   border-radius: 10px;
   background-color: white;
-  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  -webkit-box-shadow:  0px 0px 0px 9999px rgba(0, 0, 0, 0.5);
   padding: 6px;
+}
+
+.title{
+  font-family: Roboto, sans-serif; 
+  padding-top: 20px; 
+  font-size: 20px; 
+  display: block; 
+  margin: auto;
+  text-align: center;
+  color: white;
 }
 
 .google-calendar-event-title {
@@ -116,4 +127,48 @@
   line-height: 20px;
   color: #6D6D6D;
 } 
+
+button{
+  display: block; 
+  margin: auto;
+  margin-top: 20px; 
+  color: #fff;
+}
+
+
+button {
+    display: block;
+    align-items: center;
+    justify-content: center;
+    width: 200px; 
+    height: 40px;
+    color: #0085FF;
+    border: 1px solid #F4F4F4;
+    background-color: #F4F4F4;
+    vertical-align: middle;
+    font-family: sans-serif;
+    border-radius: 20px;
+    margin: auto;
+    padding: 0px;
+    font-size: 15px;
+    margin-top: 10px;
+  }
+
+  button:hover, :focus {
+    display: block;
+    align-items: center;
+    justify-content: center;
+    width: 200px; 
+    height: 40px;
+    color: #ffffff;
+    background-color: #0085FF;
+    border: 1px solid #0085FF;
+    vertical-align: middle;
+    font-family: sans-serif;
+    border-radius: 20px;
+    margin: auto;
+    transition: all 0.2s ease-out;
+    margin-top: 10px;
+  }
+
 </style>

@@ -5,6 +5,9 @@
     style="padding-left: 12px;"
   >
     <div style="display: flex;">
+        <h3 class="google-calendar-event-title"  style="margin-left: 50px; margin-top: 40px; color: #000000; font-weight: 600;">
+         Goal for now "SAVE 10K :P"
+        </h3>
       <span on:click={() => dispatch('card-close')} class="material-icons" style="margin-left: auto; margin-right: 10px; margin-top: 10px; color: #323232;">
         close
       </span>
@@ -442,14 +445,13 @@ function initializePlaidUI (linkToken, onLoginSuccessCallback) {
 
     overflow-y: scroll;
     z-index: 5;
-    width: 80%;
-    height: 80%;
+    width: 70%;
+    height: 70%;
     min-width: 200px;
     border-radius: 10px;
     background-color: white;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    -webkit-box-shadow:  0px 0px 0px 9999px rgba(0, 0, 0, 0.5);
     padding: 6px;
-    border: 1px solid #000;
   }
 
   /* Refer to: https://stackoverflow.com/questions/3131072/how-to-change-input-text-box-style-to-line */
@@ -489,20 +491,18 @@ function initializePlaidUI (linkToken, onLoginSuccessCallback) {
   } 
 
   .dashboard-new-container {
-    margin-left: 25px;
+    margin-left: 45px;
     margin-top: 20px; 
-
     padding-left: 24px; 
     padding-right: 24px;
-
     border-radius: 20px; 
     background-color: #0085FF; 
     width: 100%; 
-    max-width: 610px; 
-    min-width: 400px;
+    max-width: 600px; 
+    min-width: 50px;
     padding-top: 24px; 
     padding-bottom: 24px; 
-    height: 250px;
+    height: 200px;
     font-family: sans-serif;
     color: white;
     overflow-y: auto;

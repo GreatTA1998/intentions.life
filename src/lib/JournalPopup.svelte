@@ -1,8 +1,8 @@
 {#if isOpen}
   <div class="my-popup-window" use:clickOutside on:click_outside={() => dispatch('card-close')}>
     <div style="display: flex;">
-      <h3 class="google-calendar-event-title"  style="margin-left: 50px; color: #323232;">
-        My Journal
+      <h3 class="google-calendar-event-title"  style="margin-left: 40px; margin-top: 40px; margin-bottom: 40px; color: #000;">
+        Daily Notes
       </h3>
       <span on:click={() => dispatch('card-close')} class="material-icons" style="margin-left: auto; margin-right: 10px; margin-top: 10px; color: #323232;">
         close
@@ -10,7 +10,7 @@
     </div>
 
     <div style="display: flex">
-      <div class="journal-left-navigation" style="font-family: Roboto,Arial,sans-serif; font-size:16px; color: #6D6D6D;">
+      <div class="journal-left-navigation" style="font-family: Roboto,Arial,sans-serif; font-size:16px; color: #6D6D6D; margin-left: 40px;">
         {#each Object.keys(journal) as date}
           <div on:click={() => currentlySelectedDate = date} class:blue-highlight={date === currentlySelectedDate}>
             {date}
@@ -23,10 +23,10 @@
         <textarea 
           bind:value={journal[currentlySelectedDate]}
           on:input={handleInput}
-          rows="38"
-          cols="120"
+          rows="30"
+          cols="150"
           placeholder="notes"
-          style="margin-left: 10px; width: 97%; margin-right: 10px; box-sizing: border-box;"
+          style="margin-left: 20px; width: 88%; margin-right: 10px; box-sizing: border-box;"
         />
       </div>
     </div>
@@ -81,10 +81,13 @@ function saveJournalPage () {
 <style>
   .blue-highlight {
     font-family: Roboto,Arial,sans-serif;
+    font-weight: 600;
     font-size: 16px;
     background-color: none;
     color: #0085FF;
+    margin-left: 10px;
   }
+
 
   .my-popup-window {
     position: fixed;
@@ -95,14 +98,14 @@ function saveJournalPage () {
 
     overflow-y: scroll;
     z-index: 5;
-    width: 60%;
-    height: 60%;
+    width: 70%;
+    height: 70%;
     min-width: 200px;
     border-radius: 10px;
     background-color: white;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    -webkit-box-shadow:  0px 0px 0px 9999px rgba(0, 0, 0, 0.5);
     padding: 6px;
-    border: 1px solid #000000;
+  
   }
 
   /* Refer to: https://stackoverflow.com/questions/3131072/how-to-change-input-text-box-style-to-line */
@@ -136,7 +139,7 @@ function saveJournalPage () {
   .google-calendar-event-title {
     font-family: Roboto,Arial,sans-serif;
     font-size: 24px;
-    font-weight: 400;
+    font-weight: 600;
     letter-spacing: .2px;
     line-height: 20px;
     color: #6D6D6D;

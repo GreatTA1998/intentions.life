@@ -265,7 +265,7 @@
   height: 10px;
 }
 ::-webkit-scrollbar-thumb {
-  background: #6D6D6D;
+  background: #0085FF;
 }
 ::-webkit-scrollbar-track {
   background: #EDECE9;
@@ -327,9 +327,11 @@
   /* VERDICT: absolute works
   "Independence" is the best word you can ever hear in programming */
   .timestamp-number {
-    top: -5px; 
-    margin-left: -6px;
-    font-size: 0.7rem;
+    margin-top: -3px; 
+    margin-left: 0px;
+    margin-right: 6px; 
+    font-size: 0.8em;
+    color: #6D6D6D;
 
     /* these CSS properties are copied from `.calendar-time-block`, which used to be separate */
     position: absolute;
