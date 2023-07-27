@@ -41,7 +41,7 @@
 export let futureScheduledTasks 
 
 import { createEventDispatcher } from 'svelte'
-import { getDayOfWeek } from './helpers.js'
+import { getDayOfWeek } from '/src/helpers.js'
 
 let datesToTasks = {} 
 

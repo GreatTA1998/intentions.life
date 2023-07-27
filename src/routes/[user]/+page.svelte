@@ -136,28 +136,10 @@
               on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
               on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
               on:task-click={(e) => openDetailedCard(e.detail)}
-            />
+              on:task-dragged={(e) => changeTaskDeadline(e.detail)}
 
-            <div>
-              <div style="display: flex; width: 25vw;">  
-                {#if allTasks}
-                  <UnscheduledTasksForToday
-                    {allTasks}
-                    on:task-dragged={(e) => changeTaskDeadline(e.detail)}
-                    on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
-                    on:task-click={(e) => openDetailedCard(e.detail)}
-                  />
-                {/if}
-      
-                <div style="width: 2vw"></div>
-            
-                <FutureOverview
-                  {futureScheduledTasks}
-                  on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
-                  on:task-click={(e) => openDetailedCard(e.detail)}
-                />
-              </div>
-            </div>
+              {futureScheduledTasks}
+            />
           {:else if currentMode === 'weekMode'}
             <WeekView
               {allTasks}
@@ -251,7 +233,7 @@
   import CalendarTodayView from '../../CalendarTodayView.svelte'
 
 
-  import FutureOverview from '../../FutureOverview.svelte'
+  // import FutureOverview from '../../lib/FutureOverview.svelte'
   import DetailedCardPopup from '../../DetailedCardPopup.svelte'
   import { MIKA_PIXELS_PER_HOUR, PIXELS_PER_HOUR, getNicelyFormattedDate, computeDayDifference, convertDDMMYYYYToDateClassObject } from '../../helpers.js'
   import GoalsAndPostersPopup from '$lib/GoalsAndPostersPopup.svelte'

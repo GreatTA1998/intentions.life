@@ -1,19 +1,47 @@
-<div>
-  <ReusableCalendarView
-    pixelsPerHour={MIKA_PIXELS_PER_HOUR}
-    timeBlockDurationInMinutes={60}
-    subdivisionsPerBlock={60}
-    calendarBeginningDateClassObject={dayCalendarBeginningDateClassObject}
-    timestamps={timesOfDay}
-    scheduledTasks={scheduledTasksToday}
-    on:task-duration-adjusted
-    on:task-click
-    on:task-scheduled
-  />
-</div>
+<ReusableCalendarView
+  pixelsPerHour={MIKA_PIXELS_PER_HOUR}
+  timeBlockDurationInMinutes={60}
+  subdivisionsPerBlock={60}
+  calendarBeginningDateClassObject={dayCalendarBeginningDateClassObject}
+  timestamps={timesOfDay}
+  scheduledTasks={scheduledTasksToday}
+  on:task-duration-adjusted
+  on:task-click
+  on:task-scheduled
+/>
+
+<!-- <div>
+  <div style="display: flex; width: 25vw;">   -->
+    
+    <ReusableUnscheduledTodoList
+      {allTasks}
+      title={"This week's to-do"}
+      taskCriteria={(task) => task.deadlineDate === getDateInDDMMYYYY(new Date()) && !task.startTime}
+      dropzoneInfo={{
+        deadlineDate: getDateInDDMMYYYY(new Date()),
+        deadlineTime: '23:59'
+      }}
+      on:task-click
+      on:task-duration-adjusted
+      on:task-dragged
+    />
+
+    <!-- <div style="width: 2vw"></div>
+
+    <FutureOverview
+      {futureScheduledTasks}
+      on:task-duration-adjusted
+      on:task-click
+    />
+  </div>
+</div> -->
+
 
 <script>
   import ReusableCalendarView from './ReusableCalendarView.svelte';
+  import ReusableUnscheduledTodoList from '$lib/ReusableUnscheduledTodoList.svelte';
+  import FutureOverview from '$lib/FutureOverview.svelte'
+
   import { 
     MIKA_PIXELS_PER_HOUR, 
     PIXELS_PER_HOUR, 
@@ -26,6 +54,7 @@
 
   export let allTasks
   export let scheduledTasksToday
+  export let futureScheduledTasks
 
   let timesOfDay = [] 
   let numOfHourBlocksDisplayed = 24
