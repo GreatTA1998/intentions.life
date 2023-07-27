@@ -6,6 +6,8 @@
         && (taskObject.duration * 90/60 > taskObject.children.length * 60 * 0.7 ** depth)
         && (taskObject.duration * 90/60 > 60 * (0.65 ** depth))
         ? `${taskObject.duration * 90/60}px` : ''};
+
+    height: {20 * 90/60}px;
    -->
   <div 
     draggable="true"
@@ -17,7 +19,7 @@
       margin-left: {depth === 1 ? '0' : '5'}px; 
       margin-bottom: 10px; 
       width: {350 * 0.8 ** depth}px; 
-      height: '';
+
       padding-left: {10 * 0.8 ** depth}px;
     "
     on:dragstart|self={(e) => dragstart_handler(e, taskObject.id)}

@@ -30,7 +30,6 @@
 </div> -->
 
 <script>
-  import HourViewUnscheduledTasks from './HourViewUnscheduledTasks.svelte'
   import ReusableUnscheduledTodoList from './ReusableUnscheduledTodoList.svelte'
   import ReusableCalendarView from './ReusableCalendarView.svelte';
   import { convertDDMMYYYYToDateClassObject, getDateInDDMMYYYY, twoDigits } from '/src/helpers.js'

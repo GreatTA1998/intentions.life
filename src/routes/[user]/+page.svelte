@@ -951,7 +951,7 @@
     height: 100vh;
     display: flex; 
     margin-left: 20px;
-    justify-content: space-evenly;  ; 
+    justify-content: space-evenly;  
     /*    background-color: white;  */
     box-sizing: border-box;
     padding-top: 40px;
