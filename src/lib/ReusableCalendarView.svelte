@@ -98,6 +98,8 @@
   export let scheduledTasks = [] 
   export let timestamps = []
 
+  let myObserver = null
+
   function p (...args) {
     console.log(...args)    
   }
@@ -113,7 +115,7 @@
     //   1. Notice when the Scroll container resizes
     //   2. Then set it's scrollTop value to the currentTimeIndicator's top value (parseFloat of course)
     if (browser) {
-      const myObserver = new ResizeObserver(entries => {
+      myObserver = new ResizeObserver(entries => {
         entries.forEach(entry => { 
           ScrollContainer.scrollTop = parseFloat(CurrentTimeIndicator.style.top) // style.top returns '136.px', `parseFloat` gets rid of the 'px' suffix
         })
@@ -124,7 +126,9 @@
 
 
   onDestroy(() => {
-    myObserver.disconnect()
+    if (browser) {
+      myObserver.disconnect()
+    }
   })
 
   const dispatch = createEventDispatcher()
