@@ -88,6 +88,7 @@
   import { getDateOfToday, getTrueY, computeMillisecsDifference, convertDDMMYYYYToDateClassObject} from '/src/helpers.js'
   import ReusableTaskElement from '$lib/ReusableTaskElement.svelte'
   import { onMount, beforeUpdate, afterUpdate, tick, createEventDispatcher, onDestroy } from 'svelte'
+  import { browser } from '$app/environment';
 
   export let pixelsPerHour 
   export let timeBlockDurationInMinutes 
@@ -104,18 +105,21 @@
   let ScrollContainer
   let CurrentTimeIndicator
 
-  // PROBLEM: our scroll container's dimension is 0, even after scheduledTask is hydrated, and we tick() / beforeUpdate / afterUpdate
-  // new strategy:
-  //   1. Notice when the Scroll container resizes
-  //   2. Then set it's scrollTop value to the currentTimeIndicator's top value (parseFloat of course)
-  const myObserver = new ResizeObserver(entries => {
-    entries.forEach(entry => { 
-      ScrollContainer.scrollTop = parseFloat(CurrentTimeIndicator.style.top) // style.top returns '136.px', `parseFloat` gets rid of the 'px' suffix
-    })
-  });
-
   onMount(() => {
-    myObserver.observe(ScrollContainer)
+    // NOTE: window.ResizeObserve requires `window` to be defined, so must be called in onMount()
+
+    // PROBLEM: our scroll container's dimension is 0, even after scheduledTask is hydrated, and we tick() / beforeUpdate / afterUpdate
+    // new strategy:
+    //   1. Notice when the Scroll container resizes
+    //   2. Then set it's scrollTop value to the currentTimeIndicator's top value (parseFloat of course)
+    if (browser) {
+      const myObserver = new ResizeObserver(entries => {
+        entries.forEach(entry => { 
+          ScrollContainer.scrollTop = parseFloat(CurrentTimeIndicator.style.top) // style.top returns '136.px', `parseFloat` gets rid of the 'px' suffix
+        })
+      })
+      myObserver.observe(ScrollContainer)
+    }
   })
 
 
