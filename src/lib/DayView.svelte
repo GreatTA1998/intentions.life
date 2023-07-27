@@ -10,8 +10,8 @@
   on:task-scheduled
 />
 
-<!-- <div>
-  <div style="display: flex; width: 25vw;">   -->
+<div>
+  <div style="display: flex; width: 25vw;">  
 
     <ReusableUnscheduledTodoList
       {allTasks}
@@ -26,7 +26,7 @@
       on:task-dragged
     />
 
-    <!-- <div style="width: 2vw"></div>
+    <div style="width: 2vw"></div>
 
     <FutureOverview
       {futureScheduledTasks}
@@ -34,7 +34,7 @@
       on:task-click
     />
   </div>
-</div> -->
+</div>
 
 
 <script>
