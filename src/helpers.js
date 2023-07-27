@@ -178,7 +178,13 @@ export function computeMillisecsDifference (dateClassObject1, dateClassObject2) 
   return utc2 - utc1
 }
 
-// notice we purposely differentiatev`minutes` from `mm` (month) 
+export function convertMMDDToDateClassObject (mmdd, yyyy = 2023) {
+  const [mm, dd] = mmdd.split('/')
+  return new Date(yyyy, mm - 1, dd)
+}
+
+// notice we purposely differentiate `minutes` from `mm` (month) 
+// TO-DO: use destructuring so the parameters are more readable when used by clients
 export function convertDDMMYYYYToDateClassObject (ddmmyyyy, hhmm = '') {
   const [dd, mm, yyyy] = ddmmyyyy.split('/')
   if (!hhmm) {
@@ -195,4 +201,8 @@ export function convertDDMMYYYYToDateClassObject (ddmmyyyy, hhmm = '') {
 export function getMonthNameFromNumber (monthNumber) {
   const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
   return monthNames[monthNumber]
+}
+
+export function twoDigits (number) {
+  return (number < 10 ? `0${number}` : `${number}`)
 }

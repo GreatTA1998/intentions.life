@@ -121,17 +121,23 @@
           {#if currentMode === 'hourMode'}
             <HourView
               {allTasks}
+              scheduledTasksToday={todayScheduledTasks}
+              on:task-done={(e) => markNodeAsDone(e.detail.id)}
+              on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
+              on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
+              on:task-click={(e) => openDetailedCard(e.detail)}
+              on:task-dragged={(e) => changeTaskDeadline(e.detail)}
             />
           {:else if currentMode === 'dayMode'}
-            <!-- DAY MODE TRIPLET-->
-            <CalendarTodayView
+            <DayView
+              {allTasks}
               scheduledTasksToday={todayScheduledTasks}
-              pixelsPerHour={isGirlfriendMode ? MIKA_PIXELS_PER_HOUR : PIXELS_PER_HOUR }
               on:task-done={(e) => markNodeAsDone(e.detail.id)}
               on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
               on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
               on:task-click={(e) => openDetailedCard(e.detail)}
             />
+
             <div>
               <div style="display: flex; width: 25vw;">  
                 {#if allTasks}
@@ -164,6 +170,11 @@
           {:else if currentMode === 'monthMode'}
             <MonthView
               {allTasks}
+              {thisMonthScheduledTasks}
+              on:task-click={(e) => openDetailedCard(e.detail)}
+              on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
+              on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
+              on:task-dragged={(e) => changeTaskDeadline(e.detail)}
             />
           {/if}
         </div>
@@ -236,10 +247,13 @@
 
   import UnscheduledTasksForToday from '$lib/UnscheduledTasksForToday.svelte'
   import RecursiveTask from '../../RecursiveTask.svelte'
+
   import CalendarTodayView from '../../CalendarTodayView.svelte'
+
+
   import FutureOverview from '../../FutureOverview.svelte'
   import DetailedCardPopup from '../../DetailedCardPopup.svelte'
-  import { MIKA_PIXELS_PER_HOUR, PIXELS_PER_HOUR, getNicelyFormattedDate, computeDayDifference } from '../../helpers.js'
+  import { MIKA_PIXELS_PER_HOUR, PIXELS_PER_HOUR, getNicelyFormattedDate, computeDayDifference, convertDDMMYYYYToDateClassObject } from '../../helpers.js'
   import GoalsAndPostersPopup from '$lib/GoalsAndPostersPopup.svelte'
   import { onMount } from 'svelte'
   import db from '../../db.js'
@@ -251,6 +265,7 @@
 
   import ExperimentalPlayground from '$lib/ExperimentalPlayground.svelte'
   import HourView from '$lib/HourView.svelte'
+  import DayView from '$lib/DayView.svelte'
   import WeekView from '$lib/WeekView.svelte'
   import MonthView from '$lib/MonthView.svelte'
   import TheSnackbar from '$lib/TheSnackbar.svelte'
@@ -300,6 +315,7 @@
   let todayScheduledTasks = []
   let futureScheduledTasks = [] // AF([])
   let thisWeekScheduledTasks = [] 
+  let thisMonthScheduledTasks = []
 
   let newTopLevelTask = ''
   let isTypingNewRootTask = false
@@ -327,6 +343,7 @@
     collectTodayScheduledTasksToArray()
     collectFutureScheduledTasksToArray()
     collectThisWeekScheduledTasksToArray()
+    collectThisMonthScheduledTasksToArray()
 
     // TO-DO: don't include all the tasks in the future, only if it is bounded by < 7 days for the week view, and < 30 days for the month view
 
@@ -378,9 +395,11 @@
 
         // this is the base case condition, otherwise infinite recursion will happen
         // as we are inside a snapshot listener
-        console.log('lastRanRepeatDate =', lastRanRepeatAtDate)
-        console.log('dateOfToday =', dateOfToday)
-        console.log("testRunOnce =", testRunOnce)
+
+        // FOR DEBUGGING
+        // console.log('lastRanRepeatDate =', lastRanRepeatAtDate)
+        // console.log('and today is =', dateOfToday)
+        // console.log("testRunOnce =", testRunOnce)
 
         if ((lastRanRepeatAtDate !== dateOfToday) || testRunOnce) {
           testRunOnce = false
@@ -558,6 +577,38 @@
     })
   }
 
+
+  function collectThisMonthScheduledTasksToArray () {
+    thisMonthScheduledTasks = [] // reset
+    traverseAndUpdateTree({
+      fulfilsCriteria: (task) => {
+        if (!task.startDate) return false
+        
+        // create d2 date object
+        let d2 
+        if (task.startDate.length === 5) {
+          const yyyy = new Date().getFullYear()
+          const [mm, dd] = task.startDate.split('/')
+          d2 = new Date(yyyy, mm, dd) 
+        } else {
+          const [dd, mm, yyyy] = task.startDate.split('/')
+          d2 = new Date(yyyy, mm, dd) 
+        }
+        const today = new Date()
+
+        const d1 = new Date(today.getFullYear(), 1 + today.getMonth(), today.getDate())
+        // the reason for +1 see Stackoverflow, getMonth() is zero-indexed which VERY stupid
+        // // https://stackoverflow.com/a/18624336
+
+        const dayDiff = computeDayDifference(d1, d2)
+        return dayDiff >= 0 && dayDiff <= 30
+      }, 
+      applyFunc: (task) => thisMonthScheduledTasks = [...thisMonthScheduledTasks, task]
+    })
+  } 
+
+
+
   // note due to a bug, sometimes `mm` is like 131 instead of a valid hour, 
   // which fucks up the computation
 
@@ -681,7 +732,6 @@
     })
   }
 
-  // TO-DO: make it id-based
   async function changeTaskStartTime ({ id, timeOfDay, dateScheduled }) {
     traverseAndUpdateTree({
       fulfilsCriteria: (task) => task.id === id,

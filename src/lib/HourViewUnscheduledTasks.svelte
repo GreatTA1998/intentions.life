@@ -3,7 +3,7 @@
   on:dragover={(e) => dragover_handler(e)}
 >
   <div style="font-family: Inter;font-size: 16px; margin-bottom: 12px;">
-    This hour's tasks
+    This hour's to-do
   </div>
 
   {#each tasksDueThisWeek as task, i}

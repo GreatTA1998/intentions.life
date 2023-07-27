@@ -1,6 +1,12 @@
 <!-- Recursively display a task and all its subtasks -->
 <!-- Check if parent's fixed duration is enough to practically include its children's font sizes `taskObject.duration * 90/60 > children.length * 10  -->
 {#if !taskObject.isDeleted && !taskObject.isDone && !(taskObject.startTime && taskObject.startDate)}
+  <!-- 
+    {taskObject.duration && !doChildrenHaveDuration 
+        && (taskObject.duration * 90/60 > taskObject.children.length * 60 * 0.7 ** depth)
+        && (taskObject.duration * 90/60 > 60 * (0.65 ** depth))
+        ? `${taskObject.duration * 90/60}px` : ''};
+   -->
   <div 
     draggable="true"
     class="scheduled-task"
@@ -11,10 +17,7 @@
       margin-left: {depth === 1 ? '0' : '5'}px; 
       margin-bottom: 10px; 
       width: {350 * 0.8 ** depth}px; 
-      height: {taskObject.duration && !doChildrenHaveDuration 
-        && (taskObject.duration * 90/60 > taskObject.children.length * 60 * 0.7 ** depth)
-        && (taskObject.duration * 90/60 > 60 * (0.65 ** depth))
-        ? `${taskObject.duration * 90/60}px` : ''};
+      height: '';
       padding-left: {10 * 0.8 ** depth}px;
     "
     on:dragstart|self={(e) => dragstart_handler(e, taskObject.id)}
@@ -265,9 +268,9 @@
     max-width: 800px
   }
 
-  .black-duration-line {
+  /* .black-duration-line {
     border-left: 2px solid rgb(146, 146, 146);
-  }
+  } */
 
   .orange-duration-line {
     border-left: 2px solid orange;

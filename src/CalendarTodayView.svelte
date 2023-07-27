@@ -1,20 +1,4 @@
 <div id="scroll-container" style="position: relative; width: 15vw">
-  <!-- <div style="padding-bottom: 16px;">
-    {#each tasksThatAlreadyHappened as task}
-      <div style="display: flex; align-items: center; opacity: 1; margin-top: 10px;" class:green-text={task.isDone}>
-        <input
-          style="margin-left: 0; accent-color: #0085FF"
-          type="checkbox"
-          bind:checked={task.isDone}
-          on:click={() => toggleIsDone(task)}
-        >
-        <div on:click={() => dispatch('task-click', { task })} style="font-family: sans-serif; font-size: 0.8rem;">
-          {task.name}
-        </div>
-      </div>
-    {/each}
-  </div> -->
-
   <!-- This is a relative container -->
   <div id="calendar-day-container" 
     style="height: {PIXELS_PER_HOUR * numOfHourBlocksDisplayed}px; 
@@ -33,12 +17,21 @@
       {/each}
 
       {#each scheduledTasksToday.filter(task => task.startTime >= calendarStartTime) as task, i}
-        <CalendarAbsolutePositionWrapper
+        <!-- <CalendarAbsolutePositionWrapper
           {task}
           pixelsPerHour={PIXELS_PER_MINUTE * 60}
           {calendarStartTime}
           offsetFromLeft={32}
+        > -->
+        
+        <div
+          style="
+            position: absolute; 
+            top: {computeOffset({ startTime: task.startTime, startDate: task.startDate })}px;
+            left: {32}px;
+          "
         >
+          <!-- computeOffset(task, pixelsPerHour, calendarStartTime) -->
           <ReusableTaskElement
             {task}
             pixelsPerHour={PIXELS_PER_MINUTE * 60}
@@ -46,7 +39,8 @@
             on:task-click
             on:task-duration-adjusted
           />
-        </CalendarAbsolutePositionWrapper>
+        </div>
+        <!-- </CalendarAbsolutePositionWrapper> -->
       {/each}
         
       <!-- This offsets the fact that the timestamp needs a -6 margin to not be cut off from the top edge of the container -->
@@ -198,7 +192,7 @@
   } 
   decideCalendarStartTime()
 
-  function computeOffset ({ startTime }) {
+  function computeOffset ({ startTime, startDate }) {
     // compute how many hours ahead of calendar's starting hour
     // TODO: this breaks when the scheduled time is "lower" than the calendar's startTime i.e. need to pad 24 on top of it
     const hh = startTime.slice(0, 2)

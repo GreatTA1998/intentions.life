@@ -3,8 +3,8 @@
   on:dragover={(e) => dragover_handler(e)}
 >
   <!-- color: #6D6D6D;  -->
-  <div style="font-family: Inter;font-size: 16px; margin-bottom: 40px; width: 15vw;">
-    Today's to-do
+  <div style="font-family: Inter;font-size: 16px; margin-bottom: 40px;">
+    { title }
   </div>
 
   <div style="height: 70vh">
@@ -27,6 +27,10 @@
   import ReusableTaskElement from '$lib/ReusableTaskElement.svelte'
 
   export let allTasks
+  export let title = ''
+
+  export let taskCriteria
+  export let dropzoneInfo
 
   // DEFINE THE CRITERIA FOR UNSCHEDULED TASKS:
   //   IT IS DUE BY TODAY E.G. something that is due by Sunday, counts as being due this week, but does NOT count as being due today
@@ -50,16 +54,13 @@
 
   // TO-DO: this scale needs to be consistent with the current mode, e.g. hour, day or week view.
   const pixelsPerHour = 160
-  const pixelsPerMinute = pixelsPerHour / 60
   let tasksDueToday = [] 
 
 
   $: if (allTasks) {
     tasksDueToday = []
     traverseAndUpdateTree({
-      fulfilsCriteria: (task) => { 
-        return task.deadlineDate === getDateInDDMMYYYY(new Date()) && !task.startTime // i.e. not yet scheduled
-      },
+      fulfilsCriteria: taskCriteria,
       applyFunc: (task) => tasksDueToday = [...tasksDueToday, task]
     })
   }
@@ -83,16 +84,14 @@
     }
   }
 
+  // set deadline for a week from now
   function drop_handler (e) {
     e.preventDefault()
-    const ddmmyyyy = getDateInDDMMYYYY(new Date())
 
     dispatch('task-dragged', {
       id: e.dataTransfer.getData('text/plain'),
-      timeOfDay: '',
-      dateScheduled: getDateOfToday(),
-      deadlineTime: '23:59', // 
-      deadlineDate: ddmmyyyy
+      deadlineDate: dropzoneInfo.deadlineDate,
+      deadlineTime: dropzoneInfo.deadlineTime || '23:59'
     })
 
     // if `task.isRepeating` is true, then there will be a repeating symbol besides the task 
