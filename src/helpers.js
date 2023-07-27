@@ -178,6 +178,11 @@ export function computeMillisecsDifference (dateClassObject1, dateClassObject2) 
   return utc2 - utc1
 }
 
+export function convertMMDDToDateClassObject (mmdd, yyyy = 2023) {
+  const [mm, dd] = mmdd.split('/')
+  return new Date(yyyy, mm - 1, dd)
+}
+
 // notice we purposely differentiate `minutes` from `mm` (month) 
 // TO-DO: use destructuring so the parameters are more readable when used by clients
 export function convertDDMMYYYYToDateClassObject (ddmmyyyy, hhmm = '') {

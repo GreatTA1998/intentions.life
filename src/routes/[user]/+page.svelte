@@ -126,6 +126,7 @@
               on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
               on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
               on:task-click={(e) => openDetailedCard(e.detail)}
+              on:task-dragged={(e) => changeTaskDeadline(e.detail)}
             />
           {:else if currentMode === 'dayMode'}
             <DayView

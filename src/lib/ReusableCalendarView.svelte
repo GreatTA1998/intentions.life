@@ -197,8 +197,7 @@
     const resultantTimeInMs = calendarStartAsMs + totalMsDistance
     const resultantDateClassObject = new Date(resultantTimeInMs)
 
-    // format to hh:mm format to be compatible with old API
-    p('resultantTimeInMs =', resultantDateClassObject)
+    // now format to hh:mm format to be compatible with old API
     function ensureTwoDigits (number) {
       return (number < 10 ? `0${number}` : `${number}`)
     }
