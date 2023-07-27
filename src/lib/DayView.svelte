@@ -12,10 +12,10 @@
 
 <!-- <div>
   <div style="display: flex; width: 25vw;">   -->
-    
+
     <ReusableUnscheduledTodoList
       {allTasks}
-      title={"This week's to-do"}
+      title={"Today's to-do"}
       taskCriteria={(task) => task.deadlineDate === getDateInDDMMYYYY(new Date()) && !task.startTime}
       dropzoneInfo={{
         deadlineDate: getDateInDDMMYYYY(new Date()),
@@ -57,7 +57,7 @@
   export let futureScheduledTasks
 
   let timesOfDay = [] 
-  let numOfHourBlocksDisplayed = 24
+  let numOfHourBlocksDisplayed = 17
 
   function getDayCalendarBeginningDateClassObject () {
     const d = new Date()
