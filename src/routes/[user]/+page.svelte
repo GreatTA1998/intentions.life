@@ -234,7 +234,7 @@
 
 
   // import FutureOverview from '../../lib/FutureOverview.svelte'
-  import DetailedCardPopup from '../../DetailedCardPopup.svelte'
+  import DetailedCardPopup from '$lib/DetailedCardPopup.svelte'
   import { MIKA_PIXELS_PER_HOUR, PIXELS_PER_HOUR, getNicelyFormattedDate, computeDayDifference, convertDDMMYYYYToDateClassObject } from '../../helpers.js'
   import GoalsAndPostersPopup from '$lib/GoalsAndPostersPopup.svelte'
   import { onMount } from 'svelte'
@@ -245,7 +245,6 @@
   import FinancePopup from '$lib/FinancePopup.svelte'
   import BedtimePopup from '$lib/BedtimePopup.svelte'
 
-  import ExperimentalPlayground from '$lib/ExperimentalPlayground.svelte'
   import HourView from '$lib/HourView.svelte'
   import DayView from '$lib/DayView.svelte'
   import WeekView from '$lib/WeekView.svelte'

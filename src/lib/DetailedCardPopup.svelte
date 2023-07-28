@@ -131,8 +131,8 @@
 <script>
 import { createEventDispatcher, onMount, onDestroy, tick } from 'svelte'
 import _ from 'lodash'
-import RecursiveBulletPoint from './lib/RecursiveBulletPoint.svelte';
-import { getDateOfToday, getRandomID, clickOutside, getDateInDDMMYYYY } from './helpers.js'
+import RecursiveBulletPoint from '$lib/RecursiveBulletPoint.svelte';
+import { getDateOfToday, getRandomID, clickOutside, getDateInDDMMYYYY } from '/src/helpers.js'
 import ReusableDatePicker from '$lib/ReusableDatePicker.svelte';
 
 export let taskObject 

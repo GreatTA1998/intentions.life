@@ -15,6 +15,7 @@
 
 <ReusableUnscheduledTodoList
   {allTasks}
+  pixelsPerHour={pixelsPerDay / 24}
   title={"This week's to-do"}
   taskCriteria={criteriaForThisWeek}
   dropzoneInfo={{
@@ -38,6 +39,8 @@
 
   export let allTasks
   export let thisWeekScheduledTasks
+
+  
 
   function criteriaForThisWeek (task) {
     if (!task.deadlineDate) return false
