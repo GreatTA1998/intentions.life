@@ -17,19 +17,12 @@
   {/if}
 {/key}
 
-{#if isGoalsAndPostersPopupOpen}
-  <GoalsAndPostersPopup
-    isOpen={isGoalsAndPostersPopupOpen}
-    {goalsAndPosters}
-    on:card-close={() => isGoalsAndPostersPopupOpen = false}
-    on:goals-and-posters-update={(e) => changeGoalsAndPosters(e.detail)}
-  />
-{/if}
-
 {#if isJournalPopupOpen}
   <JournalPopup
+    {goalsAndPosters}
     isOpen={isJournalPopupOpen}
     journal={userDoc.journal}
+    {userID}
     on:card-close={() => isJournalPopupOpen = false}
     on:journal-update={(e) => changeJournal(e.detail)}
   />
@@ -50,37 +43,21 @@
 {/if}
 
 <div id="background-image-holder" style="height: 100vh;">
-
-  <a role="button" on:click={toggleMusic} class="float  mika-hover" style="right: 70px; z-index: 10;"
-  class:blue-focus={isMusicPlaying}>
-    <span class="material-icons my-float">
-      {isMusicPlaying ? 'music_note' : 'music_off'}
-    </span>
-  </a>
-
-  <a role="button" on:click={() => isJournalPopupOpen = !isJournalPopupOpen} class="float mika-hover" style="right:130px; z-index: 10"  
+  <a role="button" on:click={() => isJournalPopupOpen = !isJournalPopupOpen} class="float mika-hover" style="right: 250px; z-index: 10"  
   class:blue-focus={isJournalPopupOpen}>
     <span class="material-icons my-float">
       auto_stories
     </span>
   </a>
 
-  <a role="button" on:click={() => isGoalsAndPostersPopupOpen = !isGoalsAndPostersPopupOpen} class="float  mika-hover" style="right: 190px; z-index: 10"
-  class:blue-focus={isGoalsAndPostersPopupOpen}>
-    <span class="material-icons my-float">
-     flag
-    </span>
-  </a>
-
-
-  <a role="button" on:click={() => isFinancePopupOpen = !isFinancePopupOpen} class="float mika-hover" style="right: 250px; z-index: 10"
+  <a role="button" on:click={() => isFinancePopupOpen = !isFinancePopupOpen} class="float mika-hover" style="right: 190px; z-index: 10"
   class:blue-focus={isFinancePopupOpen}>
     <span class="material-icons my-float">
       attach_money
     </span>
   </a>
 
-  <a role="button" on:click={() => isBedtimePopupOpen = !isBedtimePopupOpen} class="float mika-hover" style="right: 310px; z-index: 10"
+  <a role="button" on:click={() => isBedtimePopupOpen = !isBedtimePopupOpen} class="float mika-hover" style="right: 130px; z-index: 10"
   class:blue-focus={isBedtimePopupOpen}>
     <span class="material-icons my-float">
       bedtime
@@ -219,8 +196,6 @@
   {/if}
 </div>
 
-<audio bind:this={AudioElem}></audio>
-
 <script>
   export let data
   // RENAME THIS TO USER_UID
@@ -264,22 +239,12 @@
   let isFinancePopupOpen = false
   let isBedtimePopupOpen = false
 
-  let isGirlfriendMode = true
-
   let unsubUserDocListener
   let userDoc = null 
   const userDocPath = `users/${userID}`
   let isTypingNewTask = false
   const habitPoolToResolveConflict = []
 
-  let AudioElem
-  let isMusicPlaying = false
-  let chosenMusicFile
-  let musicFiles = [
-    'illiyard-moor.mp3',
-    'illiyard-moor-lofi.mp3',
-    'ms-leafre-lofi.mp3'
-  ]
   let bgImageURLs = [
     'https://i.imgur.com/ShnqIpJ.jpeg' // airships 
   ]
@@ -300,7 +265,6 @@
   let isShowingCreateButton = false
 
   let isDetailedCardOpen = false
-  let isGoalsAndPostersPopupOpen = false
   let isJournalPopupOpen = false
   let clickedTask = {}
   let goalsAndPosters = ''
@@ -309,9 +273,6 @@
     chosenBgImageURL = bgImageURLs[getRandomInt(1)]
     const div = document.getElementById("background-image-holder")
     // div.style['background-image'] = `url(${chosenBgImageURL})`
-
-    chosenMusicFile = musicFiles[getRandomInt(3)]
-    AudioElem.src = chosenMusicFile
 
     listenToTasks()
   })
@@ -332,12 +293,6 @@
     })
   }
 
-  function changeGoalsAndPosters ({ newGoalsAndPosters }) {
-    updateDoc(doc(db, userDocPath), {
-      goalsAndPosters: newGoalsAndPosters
-    })
-  }
-  
   function changeJournal({ newJournal }) {
     updateDoc(doc(db, userDocPath), {
       journal: newJournal
@@ -468,18 +423,6 @@
   function openDetailedCard ({ task }) {
     clickedTask = task
     isDetailedCardOpen = true
-  }
-
-  function toggleMusic () {
-    AudioElem.volume = 0.1
-    if (AudioElem.paused) {
-      AudioElem.play()
-      isMusicPlaying = true
-    }
-    else {
-      AudioElem.pause()
-      isMusicPlaying = false
-    }
   }
 
   function traverseAndUpdateTree ({ fulfilsCriteria, applyFunc }) {
