@@ -40,14 +40,20 @@
           2 hours
         </div> -->
       </div>
+
+      <div>
+        <BedtimePopupMaplestoryMusic/>
+      </div>
     </div>
   </div>
 {/if}
 
 <script>
   import BedtimePopupYoutubePlayer from './BedtimePopupYoutubePlayer.svelte'
+  import BedtimePopupMaplestoryMusic from './BedtimePopupMaplestoryMusic.svelte'
   import { createEventDispatcher, onMount, onDestroy, tick } from 'svelte'
   import _ from 'lodash'
+
   import { getDateOfToday, getRandomID, clickOutside } from '/src/helpers.js'
   import { getFunctions, httpsCallable } from "firebase/functions"
   import { updateDoc, doc, getFirestore } from 'firebase/firestore'
@@ -128,13 +134,12 @@
   color: #6D6D6D;
 } 
 
-button{
+button {
   display: block; 
   margin: auto;
   margin-top: 20px; 
   color: #fff;
 }
-
 
 button {
     display: block;
