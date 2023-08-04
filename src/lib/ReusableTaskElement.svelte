@@ -2,20 +2,26 @@
   on:click={() => dispatch('task-click', { task })}
   on:keydown={() => {}}
   class:green={task.isDone}
+  class:scheduled-task={!isBulletPoint}
   style="
     position: relative;
     height: {height}px; 
     font-size: {fontSize}rem;
+    min-height: 12px;
   "
-  class="scheduled-task" 
 >
+  <!-- As long as this parent div is correctly sized, the duration adjusting area 
+    will be positioned correctly (it's glued to the bottom of this parent div)
+
+    `min-height` prevents the parent from being super small when it's bullet point mode
+  -->
   <div 
     class="task-name"
     draggable="true" 
     on:dragstart={(e) => dragstart_handler(e, task.id)} 
-    class:smallest-text={task.duration === 1}
+    class:smallest-text={isBulletPoint}
   >
-    {task.name} 
+    {isBulletPoint ? '-' : ''} {task.name} 
   </div>
 
   <!-- Continuation of re-scheduling zone -->
@@ -60,6 +66,7 @@
   export let fontSize = 1
 
   $: height = (pixelsPerHour / 60) * task.duration
+  $: isBulletPoint = height < 10
 
   const dispatch = createEventDispatcher()
   let startY = 0
