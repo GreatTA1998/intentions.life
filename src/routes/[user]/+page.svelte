@@ -230,9 +230,6 @@
   import UnscheduledTasksForToday from '$lib/UnscheduledTasksForToday.svelte'
   import RecursiveTask from '../../RecursiveTask.svelte'
 
-  import CalendarTodayView from '../../CalendarTodayView.svelte'
-
-
   // import FutureOverview from '../../lib/FutureOverview.svelte'
   import DetailedCardPopup from '$lib/DetailedCardPopup.svelte'
   import { MIKA_PIXELS_PER_HOUR, PIXELS_PER_HOUR, getNicelyFormattedDate, computeDayDifference, convertDDMMYYYYToDateClassObject } from '../../helpers.js'
