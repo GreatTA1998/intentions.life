@@ -1,5 +1,6 @@
 <div class="iframe-container">
-<div id="player"></div></div>
+  <div id="player"></div>
+</div>
 
 <input
   type="range"
@@ -46,8 +47,10 @@
 
   function onPlayerReady(event) {
     event.target.playVideo()
-    dispatch('initial-volume', { initialVolume: player.getVolume() })
-  }
+
+    // QUICKFIX: manually set initial volume to 30: it's way too loud right now
+    dispatch('initial-volume', { initialVolume: 30 }) // player.getVolume() 
+  } 
 
   function changeVolume(event) {
     const newVolume = parseFloat(event.target.value);
