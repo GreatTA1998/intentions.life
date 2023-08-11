@@ -13,6 +13,7 @@
       on:task-title-update={(e) => changeNameOfATask(e.detail)}
       on:task-notes-update={(e) => changeNotesOfATask(e.detail)}
       on:task-dragged={(e) => changeTaskDeadline(e.detail)}
+      on:repeating-tasks-generate={(e) => uploadGeneratedTasks(e.detail)}
     />
   {/if}
 {/key}
@@ -208,7 +209,6 @@
   // import FutureOverview from '../../lib/FutureOverview.svelte'
   import DetailedCardPopup from '$lib/DetailedCardPopup.svelte'
   import { MIKA_PIXELS_PER_HOUR, PIXELS_PER_HOUR, getNicelyFormattedDate, computeDayDifference, convertDDMMYYYYToDateClassObject } from '../../helpers.js'
-  import GoalsAndPostersPopup from '$lib/GoalsAndPostersPopup.svelte'
   import { onMount } from 'svelte'
   import db from '../../db.js'
   import { doc, getDoc, onSnapshot, updateDoc } from 'firebase/firestore'
@@ -293,12 +293,39 @@
     })
   }
 
+  async function uploadGeneratedTasks (param) {
+    const { allGeneratedTasksToUpload } = param
+    const { repeatGroupID, willRepeatOnWeekDayNumber } = allGeneratedTasksToUpload[0]
+
+    // quickfix: the generated tasks have the repeat schedule, but the original task doesn't, so add it here
+    traverseAndUpdateTree({
+      fulfilsCriteria: task => task.id === repeatGroupID,
+      applyFunc: task => {
+        task.willRepeatOnWeekDayNumber = willRepeatOnWeekDayNumber
+      }
+    })
+
+    traverseAndUpdateTree({
+      fulfilsCriteria: (task) => {
+        // `filter` according to MDN docs: empty array will be returned if no child passes the test
+        const filter = task.children.filter(child => child.id === repeatGroupID)
+        return filter.length === 1      
+      }, 
+      applyFunc: (task) => {
+        console.log('found the original task =', task)
+        task.children = [...task.children, ...allGeneratedTasksToUpload]
+      }
+    })
+    await updateDoc(doc(db, userDocPath), { 
+      allTasks 
+    })
+  }
+
   function changeJournal({ newJournal }) {
     updateDoc(doc(db, userDocPath), {
       journal: newJournal
     })
   }
-
 
   // FOR DEBUGGING PURPOSES, TURN IT ON TO TRUE TO RUN SCRIPT ONCE
   let testRunOnce = false
