@@ -10,10 +10,11 @@
         style="width: 97%; margin-left: 10px; margin-right: 10px; box-sizing: border-box;"
       >
 
-      <a style="height: 20px;">
+      <a style="height: 20px;" on:click={confirmDelete}>
         Delete
       </a>
-      <a style="height: 20px;">
+      <!-- TO-DO: completed is not working -->
+      <a style="height: 20px;" on:click={() => dispatch('task-done')}>
         Completed
       </a>
     </div>
