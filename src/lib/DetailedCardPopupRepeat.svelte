@@ -23,9 +23,8 @@
       <div 
         on:click={() => willRepeatOnWeekDayNumber[i] = !willRepeatOnWeekDayNumber[i]} 
         class="circle"
-        class:highlighted={willRepeatOnWeekDayNumber[i] && isChoosingRepeatDays}
+        class:highlighted={willRepeatOnWeekDayNumber[i]}
       >
-      <!-- `isChoosingRepeatDays` so it doesn't glow orange when the task is not scheduled and it's transparent mode -->
         {dayOfWeekSymbol[i]}
       </div>
     {/each}
@@ -39,7 +38,7 @@
 </div>
 
 <script>
-  import { twoDigits } from '/src/helpers.js'
+  import { twoDigits, getRandomID } from '/src/helpers.js'
   import { createEventDispatcher } from 'svelte'
 
   export let taskObject
@@ -47,6 +46,7 @@
   const dispatch = createEventDispatcher()
 
   let willRepeatOnWeekDayNumber = taskObject.willRepeatOnWeekDayNumber || [false, false, false, false, false, false, false]
+  
   let dayOfWeekSymbol = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
   let isChoosingRepeatDays = false
   let allGeneratedTasksToUpload = []
@@ -83,6 +83,7 @@
 
   function createRepeatedTask ({ dateClassObj, repeatGroupID }) {
     const taskObjCopy = {...taskObject}
+    taskObjCopy.id = getRandomID()
     taskObjCopy.willRepeatOnWeekDayNumber = [...willRepeatOnWeekDayNumber]
     taskObjCopy.repeatGroupID = repeatGroupID // way to label separate tasks as essentially clones of an original repeating task
 

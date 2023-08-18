@@ -301,6 +301,7 @@
     traverseAndUpdateTree({
       fulfilsCriteria: task => task.id === repeatGroupID,
       applyFunc: task => {
+        console.log('found original task =', task)
         task.willRepeatOnWeekDayNumber = willRepeatOnWeekDayNumber
       }
     })
@@ -312,7 +313,6 @@
         return filter.length === 1      
       }, 
       applyFunc: (task) => {
-        console.log('found the original task =', task)
         task.children = [...task.children, ...allGeneratedTasksToUpload]
       }
     })
