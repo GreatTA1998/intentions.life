@@ -32,7 +32,7 @@
 
     {#if isChoosingRepeatDays}
       <button on:click={generateRepeatedTasks}>
-        Save changes
+        Apply changes
       </button>
     {/if}
   </div>

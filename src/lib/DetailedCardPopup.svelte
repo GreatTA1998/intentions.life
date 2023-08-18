@@ -37,7 +37,8 @@
         <input bind:value={newStartDate} 
           style="margin-left: 8px; width: 44px;" 
           class="google-calendar-event-time" 
-          placeholder="mm/dd"
+          placeholder={getDateOfToday()}
+          autofocus
         >
       {/if}
 
@@ -51,7 +52,9 @@
       {:else}
         <input bind:value={newStartTime} 
           on:keypress={detectEnterKey5}
-          style="margin-left: 8px; width: 44px;" class="google-calendar-event-time" placeholder="hh:mm" 
+          style="margin-left: 8px; width: 44px;" class="google-calendar-event-time" 
+          placeholder={getCurrentTimeInHHMM()} 
+          autofocus
         >
       {/if}
 
@@ -59,19 +62,31 @@
         for
       </div>
 
-      {#if !isEditingDuration}
+      <!-- TO-DO: can input duration with `!isEditingDuration` -->
+      {#if true}
         <div on:click={() => isEditingDuration = true}
           style="margin-left: 8px; background-color: grey; padding: 4px; color: white;" class="google-calendar-event-time"
         >
           {Math.round(taskObject.duration) || 'n'} minutes
         </div>
       {:else}
-        <input style="margin-left: 8px; width: 18px;" class="google-calendar-event-time" placeholder="n">
+        <input style="margin-left: 8px; width: 18px;" 
+          class="google-calendar-event-time" 
+          placeholder="n"
+          autofocus
+        >
         <div class="google-calendar-event-time" style="margin-left: 4px;">
           minutes
         </div>
       {/if}
+
+      {#if isEditingStartDate || isEditingStartTime}
+        <div style="margin-left: 6px; opacity: 0.8">
+          (press ENTER to apply changes)
+        </div>
+      {/if}
     </div>
+
 
     <div class:half-invisible={!hasDeadline(taskObject)} 
       style="margin-left: 10px; margin-top: 5px; font-size: 1.2em; display: flex; align-items: center;"
@@ -82,7 +97,9 @@
           {taskObject.deadlineDate || 'dd/mm/yyyy'}
         </div>
       {:else}
-        <input bind:value={newDeadlineDate} placeholder={'dd/mm/yyyy'} style="width: 77px; margin-left: 8px;" class="google-calendar-event-time">
+        <input bind:value={newDeadlineDate} placeholder={getDateInDDMMYYYY(new Date())} style="width: 77px; margin-left: 8px;" class="google-calendar-event-time"
+          autofocus
+        >
       {/if}
       <!-- getDateInDDMMYYYY(new Date()) -->
 
@@ -92,8 +109,20 @@
           {taskObject.deadlineTime || 'hh:mm'}
         </div>
       {:else}
+        <input 
+          placeholder={getCurrentTimeInHHMM()} 
+          bind:value={newDeadlineTime} 
+          class="google-calendar-event-time" 
+          style="margin-left: 8px; width: 40px" 
+          on:keypress={dispatchNewDeadline}
+          autofocus
+        >
+      {/if}
 
-        <input placeholder="hh:mm" bind:value={newDeadlineTime} class="google-calendar-event-time" style="margin-left: 8px; width: 40px" on:keypress={dispatchNewDeadline}>
+      {#if isEditingDeadlineDate || isEditingDeadlineTime}
+        <div style="margin-left: 6px; opacity: 0.8">
+          (press ENTER to apply changes)
+        </div>
       {/if}
     </div>
 
@@ -148,7 +177,7 @@
 import { createEventDispatcher, onMount, onDestroy, tick } from 'svelte'
 import _ from 'lodash'
 import RecursiveBulletPoint from '$lib/RecursiveBulletPoint.svelte'
-import { getDateOfToday, getRandomID, clickOutside, getDateInDDMMYYYY } from '/src/helpers.js'
+import { getDateOfToday, getRandomID, clickOutside, getDateInDDMMYYYY, getCurrentTimeInHHMM } from '/src/helpers.js'
 import ReusableDatePicker from '$lib/ReusableDatePicker.svelte'
 import DetailedCardPopupRepeat from '$lib/DetailedCardPopupRepeat.svelte'
 
@@ -263,8 +292,12 @@ function detectEnterKey5 (e) {
       taskObject.startYYYY = yearNumber.toString()
     }
     dispatch('task-schedule', { id: taskObject.id, newStartDate, newStartTime })
+
+    // reset
     newStartDate = ''
     newStartTime = ''
+    isEditingStartDate = false 
+    isEditingStartTime = false
   }
 }
 
@@ -295,8 +328,11 @@ function dispatchNewDeadline (e) {
       deadlineDate: newDeadlineDate
     })
 
+    // reset
     newDeadlineDate = ''
     newDeadlineTime = ''
+    isEditingDeadlineDate = false
+    isEditingDeadlineTime = false
   }
 }
 
