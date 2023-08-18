@@ -13,23 +13,17 @@
       on:task-title-update={(e) => changeNameOfATask(e.detail)}
       on:task-notes-update={(e) => changeNotesOfATask(e.detail)}
       on:task-dragged={(e) => changeTaskDeadline(e.detail)}
+      on:repeating-tasks-generate={(e) => uploadGeneratedTasks(e.detail)}
     />
   {/if}
 {/key}
 
-{#if isGoalsAndPostersPopupOpen}
-  <GoalsAndPostersPopup
-    isOpen={isGoalsAndPostersPopupOpen}
-    {goalsAndPosters}
-    on:card-close={() => isGoalsAndPostersPopupOpen = false}
-    on:goals-and-posters-update={(e) => changeGoalsAndPosters(e.detail)}
-  />
-{/if}
-
 {#if isJournalPopupOpen}
   <JournalPopup
+    {goalsAndPosters}
     isOpen={isJournalPopupOpen}
     journal={userDoc.journal}
+    {userID}
     on:card-close={() => isJournalPopupOpen = false}
     on:journal-update={(e) => changeJournal(e.detail)}
   />
@@ -50,37 +44,21 @@
 {/if}
 
 <div id="background-image-holder" style="height: 100vh;">
-
-  <a role="button" on:click={toggleMusic} class="float  mika-hover" style="right: 70px; z-index: 10;"
-  class:blue-focus={isMusicPlaying}>
-    <span class="material-icons my-float">
-      {isMusicPlaying ? 'music_note' : 'music_off'}
-    </span>
-  </a>
-
-  <a role="button" on:click={() => isJournalPopupOpen = !isJournalPopupOpen} class="float mika-hover" style="right:130px; z-index: 10"  
+  <a role="button" on:click={() => isJournalPopupOpen = !isJournalPopupOpen} class="float mika-hover" style="right: 250px; z-index: 10"  
   class:blue-focus={isJournalPopupOpen}>
     <span class="material-icons my-float">
       auto_stories
     </span>
   </a>
 
-  <a role="button" on:click={() => isGoalsAndPostersPopupOpen = !isGoalsAndPostersPopupOpen} class="float  mika-hover" style="right: 190px; z-index: 10"
-  class:blue-focus={isGoalsAndPostersPopupOpen}>
-    <span class="material-icons my-float">
-     flag
-    </span>
-  </a>
-
-
-  <a role="button" on:click={() => isFinancePopupOpen = !isFinancePopupOpen} class="float mika-hover" style="right: 250px; z-index: 10"
+  <a role="button" on:click={() => isFinancePopupOpen = !isFinancePopupOpen} class="float mika-hover" style="right: 190px; z-index: 10"
   class:blue-focus={isFinancePopupOpen}>
     <span class="material-icons my-float">
       attach_money
     </span>
   </a>
 
-  <a role="button" on:click={() => isBedtimePopupOpen = !isBedtimePopupOpen} class="float mika-hover" style="right: 310px; z-index: 10"
+  <a role="button" on:click={() => isBedtimePopupOpen = !isBedtimePopupOpen} class="float mika-hover" style="right: 130px; z-index: 10"
   class:blue-focus={isBedtimePopupOpen}>
     <span class="material-icons my-float">
       bedtime
@@ -219,8 +197,6 @@
   {/if}
 </div>
 
-<audio bind:this={AudioElem}></audio>
-
 <script>
   export let data
   // RENAME THIS TO USER_UID
@@ -230,13 +206,9 @@
   import UnscheduledTasksForToday from '$lib/UnscheduledTasksForToday.svelte'
   import RecursiveTask from '../../RecursiveTask.svelte'
 
-  import CalendarTodayView from '../../CalendarTodayView.svelte'
-
-
   // import FutureOverview from '../../lib/FutureOverview.svelte'
-  import DetailedCardPopup from '../../DetailedCardPopup.svelte'
+  import DetailedCardPopup from '$lib/DetailedCardPopup.svelte'
   import { MIKA_PIXELS_PER_HOUR, PIXELS_PER_HOUR, getNicelyFormattedDate, computeDayDifference, convertDDMMYYYYToDateClassObject } from '../../helpers.js'
-  import GoalsAndPostersPopup from '$lib/GoalsAndPostersPopup.svelte'
   import { onMount } from 'svelte'
   import db from '../../db.js'
   import { doc, getDoc, onSnapshot, updateDoc } from 'firebase/firestore'
@@ -245,7 +217,6 @@
   import FinancePopup from '$lib/FinancePopup.svelte'
   import BedtimePopup from '$lib/BedtimePopup.svelte'
 
-  import ExperimentalPlayground from '$lib/ExperimentalPlayground.svelte'
   import HourView from '$lib/HourView.svelte'
   import DayView from '$lib/DayView.svelte'
   import WeekView from '$lib/WeekView.svelte'
@@ -268,22 +239,12 @@
   let isFinancePopupOpen = false
   let isBedtimePopupOpen = false
 
-  let isGirlfriendMode = true
-
   let unsubUserDocListener
   let userDoc = null 
   const userDocPath = `users/${userID}`
   let isTypingNewTask = false
   const habitPoolToResolveConflict = []
 
-  let AudioElem
-  let isMusicPlaying = false
-  let chosenMusicFile
-  let musicFiles = [
-    'illiyard-moor.mp3',
-    'illiyard-moor-lofi.mp3',
-    'ms-leafre-lofi.mp3'
-  ]
   let bgImageURLs = [
     'https://i.imgur.com/ShnqIpJ.jpeg' // airships 
   ]
@@ -304,7 +265,6 @@
   let isShowingCreateButton = false
 
   let isDetailedCardOpen = false
-  let isGoalsAndPostersPopupOpen = false
   let isJournalPopupOpen = false
   let clickedTask = {}
   let goalsAndPosters = ''
@@ -313,9 +273,6 @@
     chosenBgImageURL = bgImageURLs[getRandomInt(1)]
     const div = document.getElementById("background-image-holder")
     // div.style['background-image'] = `url(${chosenBgImageURL})`
-
-    chosenMusicFile = musicFiles[getRandomInt(3)]
-    AudioElem.src = chosenMusicFile
 
     listenToTasks()
   })
@@ -336,18 +293,39 @@
     })
   }
 
-  function changeGoalsAndPosters ({ newGoalsAndPosters }) {
-    updateDoc(doc(db, userDocPath), {
-      goalsAndPosters: newGoalsAndPosters
+  async function uploadGeneratedTasks (param) {
+    const { allGeneratedTasksToUpload } = param
+    const { repeatGroupID, willRepeatOnWeekDayNumber } = allGeneratedTasksToUpload[0]
+
+    // quickfix: the generated tasks have the repeat schedule, but the original task doesn't, so add it here
+    traverseAndUpdateTree({
+      fulfilsCriteria: task => task.id === repeatGroupID,
+      applyFunc: task => {
+        console.log('found original task =', task)
+        task.willRepeatOnWeekDayNumber = willRepeatOnWeekDayNumber
+      }
+    })
+
+    traverseAndUpdateTree({
+      fulfilsCriteria: (task) => {
+        // `filter` according to MDN docs: empty array will be returned if no child passes the test
+        const filter = task.children.filter(child => child.id === repeatGroupID)
+        return filter.length === 1      
+      }, 
+      applyFunc: (task) => {
+        task.children = [...task.children, ...allGeneratedTasksToUpload]
+      }
+    })
+    await updateDoc(doc(db, userDocPath), { 
+      allTasks 
     })
   }
-  
+
   function changeJournal({ newJournal }) {
     updateDoc(doc(db, userDocPath), {
       journal: newJournal
     })
   }
-
 
   // FOR DEBUGGING PURPOSES, TURN IT ON TO TRUE TO RUN SCRIPT ONCE
   let testRunOnce = false
@@ -472,18 +450,6 @@
   function openDetailedCard ({ task }) {
     clickedTask = task
     isDetailedCardOpen = true
-  }
-
-  function toggleMusic () {
-    AudioElem.volume = 0.1
-    if (AudioElem.paused) {
-      AudioElem.play()
-      isMusicPlaying = true
-    }
-    else {
-      AudioElem.pause()
-      isMusicPlaying = false
-    }
   }
 
   function traverseAndUpdateTree ({ fulfilsCriteria, applyFunc }) {

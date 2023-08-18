@@ -206,3 +206,11 @@ export function getMonthNameFromNumber (monthNumber) {
 export function twoDigits (number) {
   return (number < 10 ? `0${number}` : `${number}`)
 }
+
+// https://stackoverflow.com/a/18229149/7812829
+export function getCurrentTimeInHHMM () {
+  const d = new Date()
+  const hh = ("0" + d.getHours()).slice(-2) 
+  const mm = ("0" + d.getMinutes()).slice(-2)
+  return hh + ":" + mm
+}

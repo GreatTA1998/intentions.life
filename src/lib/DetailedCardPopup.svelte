@@ -1,6 +1,6 @@
 
   <div id="detailed-card" bind:this={elem} use:clickOutside on:click_outside={handleClickOutside}>
-    <div style="display: flex">
+    <div style="display: flex; align-items: center;">
       <input 
         type="text" 
         class="google-calendar-event-title" 
@@ -9,31 +9,141 @@
         placeholder="Untitled"
         style="width: 97%; margin-left: 10px; margin-right: 10px; box-sizing: border-box;"
       >
-        
-      <span on:click={() => dispatch('card-close')} class="material-icons" style="margin-left: auto; margin-right: 10px; margin-top: 5px; color: black;">
-        close
-      </span>
+
+      <a style="height: 20px;" on:click={confirmDelete}>
+        Delete
+      </a>
+      <!-- TO-DO: completed is not working -->
+      <a style="height: 20px;" on:click={() => dispatch('task-done')}>
+        Completed
+      </a>
     </div>
 
-    <div class="google-calendar-event-time" style="margin-top: 4px; margin-left: 10px;">
-      {#if !taskObject.isDone && taskObject.startTime && taskObject.startDate}
-        Scheduled for {taskObject.startDate + ' ' + taskObject.startTime}
+    <!-- In future, display in readable month / day form -->
+    <div
+      class:half-invisible={!isScheduled(taskObject)}
+      style="margin-left: 10px; margin-top: 5px; font-size: 1.2em; display: flex; align-items: center;"
+    >
+      Scheduled for: 
+
+      <!-- startDate -->
+      {#if !isEditingStartDate}
+        <div on:click={() => isEditingStartDate = true}
+          class="google-calendar-event-time" style="margin-left: 8px; background-color: grey; padding: 4px; color: white;"
+        >
+          {taskObject.startDate || 'mm/dd' }
+        </div>
+      {:else}
+        <input bind:value={newStartDate} 
+          style="margin-left: 8px; width: 44px;" 
+          class="google-calendar-event-time" 
+          placeholder={getDateOfToday()}
+          autofocus
+        >
+      {/if}
+
+      <!-- startTime -->
+      {#if !isEditingStartTime}
+        <div on:click={() => isEditingStartTime = true}
+          class="google-calendar-event-time" style="margin-left: 8px; background-color: grey; padding: 4px; color: white;"
+        >
+          {taskObject.startTime || 'hh:mm'}
+        </div>
+      {:else}
+        <input bind:value={newStartTime} 
+          on:keypress={detectEnterKey5}
+          style="margin-left: 8px; width: 44px;" class="google-calendar-event-time" 
+          placeholder={getCurrentTimeInHHMM()} 
+          autofocus
+        >
+      {/if}
+
+      <div style="margin-left: 8px;">
+        for
+      </div>
+
+      <!-- TO-DO: can input duration with `!isEditingDuration` -->
+      {#if true}
+        <div on:click={() => isEditingDuration = true}
+          style="margin-left: 8px; background-color: grey; padding: 4px; color: white;" class="google-calendar-event-time"
+        >
+          {Math.round(taskObject.duration) || 'n'} minutes
+        </div>
+      {:else}
+        <input style="margin-left: 8px; width: 18px;" 
+          class="google-calendar-event-time" 
+          placeholder="n"
+          autofocus
+        >
+        <div class="google-calendar-event-time" style="margin-left: 4px;">
+          minutes
+        </div>
+      {/if}
+
+      {#if isEditingStartDate || isEditingStartTime}
+        <div style="margin-left: 6px; opacity: 0.8">
+          (press ENTER to apply changes)
+        </div>
       {/if}
     </div>
 
-    <div class="google-calendar-event-detail" style="margin-top: 12px; margin-left: 16px;">
+
+    <div class:half-invisible={!hasDeadline(taskObject)} 
+      style="margin-left: 10px; margin-top: 5px; font-size: 1.2em; display: flex; align-items: center;"
+    >
+      Deadline: 
+      {#if !isEditingDeadlineDate}
+        <div on:click={() => isEditingDeadlineDate = true} class="google-calendar-event-time" style="margin-left: 8px; background-color: grey; padding: 4px; color: white;">
+          {taskObject.deadlineDate || 'dd/mm/yyyy'}
+        </div>
+      {:else}
+        <input bind:value={newDeadlineDate} placeholder={getDateInDDMMYYYY(new Date())} style="width: 77px; margin-left: 8px;" class="google-calendar-event-time"
+          autofocus
+        >
+      {/if}
+      <!-- getDateInDDMMYYYY(new Date()) -->
+
+      {#if !isEditingDeadlineTime}
+        <div on:click={() => isEditingDeadlineTime = true} 
+          class="google-calendar-event-time" style="margin-left: 8px; background-color: grey; padding: 4px; color: white;">
+          {taskObject.deadlineTime || 'hh:mm'}
+        </div>
+      {:else}
+        <input 
+          placeholder={getCurrentTimeInHHMM()} 
+          bind:value={newDeadlineTime} 
+          class="google-calendar-event-time" 
+          style="margin-left: 8px; width: 40px" 
+          on:keypress={dispatchNewDeadline}
+          autofocus
+        >
+      {/if}
+
+      {#if isEditingDeadlineDate || isEditingDeadlineTime}
+        <div style="margin-left: 6px; opacity: 0.8">
+          (press ENTER to apply changes)
+        </div>
+      {/if}
+    </div>
+
+    <div style="margin-left: 12px; margin-top: 0px;">
+      <DetailedCardPopupRepeat 
+        {taskObject}
+        on:repeating-tasks-generate
+      />
+    </div>
+
+    <!-- <div class="google-calendar-event-detail" style="margin-top: 12px; margin-left: 16px;">
       {#if taskObject.daysBeforeRepeating}
         { taskObject.repeatType || ''}  repeats every {taskObject.daysBeforeRepeating} days, 
         completed {taskObject.completionCount || 0} times, 
         missed { taskObject.missedCount || 0} times
       {/if}
-    </div>
+    </div> -->
 
-    {#if taskObject.deadlineDate}
-      <div style="margin-left: 16px">
-        deadline: {taskObject.deadlineDate} {taskObject.deadlineTime}
-      </div>
-    {/if}
+    <div style="margin-top: 20px;">
+
+    </div>
 
     <div stle="float: left; width: 80%">
       <!-- cols="48" determines width -->
@@ -46,73 +156,8 @@
       />
     </div>
 
-    <div style="display: flex;  margin-left: 10px">
-      <div>
-        {#if !isSchedulingTask}
-          <a on:click={() => isSchedulingTask = true}>
-            Schedule
-          </a>
-        {:else}
-          <ReusableDatePicker/>
-
-          <input bind:value={newStartDate} placeholder={getDateOfToday()} style="width: 40px"/>
-          <input bind:value={newStartTime} placeholder="13:00" style="width: 40px" on:keypress={detectEnterKey5}/>
-        {/if}
-        <!-- Repeating tasks -->
-        {#if !isTypingRepeatFrequency}
-          <a on:click={() => isTypingRepeatFrequency = true} style="margin-left: 0px;">
-            Repeat
-          </a>
-        {:else}
-          <div style="display: flex">
-            Repeat every 
-            <input 
-              bind:value={daysBeforeRepeating} 
-              style="width: 20px;" 
-              placeholder="0" 
-              on:keypress={detectEnterKey4}
-            > 
-            days 
-          </div>
-
-          <a on:click={setTaskAsHabit}>
-            Habit
-          </a>
-
-          <a on:click={setTaskAsEvent}>
-            Event
-          </a>
-        {/if}
-
-        <a on:click={toggleIsGoal} style="margin-left: 0px;">
-           Goal
-        </a>
-
-        {#if !isTypingDeadline}
-          <a on:click={() => isTypingDeadline = true}>
-            Deadline
-          </a>
-        {:else}
-          <input bind:value={newDeadlineDate} placeholder={getDateInDDMMYYYY(new Date())} style="width: 80px"/>
-          <input bind:value={newDeadlineTime} placeholder="15:00" style="width: 40px" on:keypress={dispatchNewDeadline}/>
-        {/if}
-      </div>
-
-      <div style="margin-left: auto; margin-right: 35px">
-        <!-- class="material-icons" style="margin-left: 5px; font-size: {2.5 * (0.7 ** depth)}rem;" -->
-        <a on:click={confirmDelete}>
-          Delete
-        </a>
-
-        <!-- I don't care this looks bad -->
-        <a on:click={() => dispatch('task-done')}>
-          Completed
-        </a>
-      </div>
-    </div>
-
     <!-- This is the section where you show everything regardless of whether it is scheduled or not -->
-    <div style="font-size: 1.2rem; margin-top: 24px; margin-bottom: 12px; margin-left: 12px; font-weight: 600; font-family: roboto, sans-serif;">
+    <div style="font-size: 1.2rem; margin-top: 0px; margin-bottom: 12px; margin-left: 12px; font-weight: 600; font-family: roboto, sans-serif;">
       Full task history:
     </div>
 
@@ -131,9 +176,10 @@
 <script>
 import { createEventDispatcher, onMount, onDestroy, tick } from 'svelte'
 import _ from 'lodash'
-import RecursiveBulletPoint from './lib/RecursiveBulletPoint.svelte';
-import { getDateOfToday, getRandomID, clickOutside, getDateInDDMMYYYY } from './helpers.js'
-import ReusableDatePicker from '$lib/ReusableDatePicker.svelte';
+import RecursiveBulletPoint from '$lib/RecursiveBulletPoint.svelte'
+import { getDateOfToday, getRandomID, clickOutside, getDateInDDMMYYYY, getCurrentTimeInHHMM } from '/src/helpers.js'
+import ReusableDatePicker from '$lib/ReusableDatePicker.svelte'
+import DetailedCardPopupRepeat from '$lib/DetailedCardPopupRepeat.svelte'
 
 export let taskObject 
 
@@ -145,9 +191,14 @@ let newStartTime
 let newDeadlineDate
 let newDeadlineTime
 
-let isSchedulingTask = false
+let isEditingStartTime = false
+let isEditingStartDate = false
+let isEditingDuration = false
+
+let isEditingDeadlineDate = false
+let isEditingDeadlineTime = false
+
 let isTypingRepeatFrequency = false
-let isTypingDeadline = false
 let daysBeforeRepeating = 7
 
 const dispatch = createEventDispatcher()
@@ -156,8 +207,20 @@ let notesAboutTask = taskObject.notes || ''
 let titleOfTask = taskObject.name || ''
 let elem
 
+function isScheduled (taskObj) {
+  return taskObj.startDate && taskObj.startTime && taskObj.startYYYY
+}
+
+function hasDeadline (taskObj) {
+  return taskObj.deadlineDate && taskObject.deadlineTime
+}
+
+onMount(() => {
+  // console.log('taskObject =', taskObject)
+})
+
 onDestroy(() => {
-  document.removeEventListener('click', (e) => onClickOutsideOrInside(e))
+  
 })
 
 const throttledSaveTitle = _.throttle(saveTitle, 500)
@@ -229,8 +292,12 @@ function detectEnterKey5 (e) {
       taskObject.startYYYY = yearNumber.toString()
     }
     dispatch('task-schedule', { id: taskObject.id, newStartDate, newStartTime })
+
+    // reset
     newStartDate = ''
     newStartTime = ''
+    isEditingStartDate = false 
+    isEditingStartTime = false
   }
 }
 
@@ -261,8 +328,11 @@ function dispatchNewDeadline (e) {
       deadlineDate: newDeadlineDate
     })
 
+    // reset
     newDeadlineDate = ''
     newDeadlineTime = ''
+    isEditingDeadlineDate = false
+    isEditingDeadlineTime = false
   }
 }
 
@@ -284,6 +354,10 @@ function setTaskAsHabit () {
 </script>
 
 <style>
+  .half-invisible {
+    opacity: 0.5;
+  }
+
   #detailed-card {
     font-family: Roboto,Arial,sans-serif;
     font-size: 14px;
@@ -292,7 +366,7 @@ function setTaskAsHabit () {
     left: 50%;
     transform: translate(-50%, -50%);
     width: 70%;
-    overflow-y: scroll;
+    overflow-y: auto;
     z-index: 5;
     min-width: 300px;
     height: 70%;

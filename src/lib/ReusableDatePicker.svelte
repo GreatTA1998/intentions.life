@@ -4,17 +4,10 @@
   <!-- you're more likely to need to change the day, rather than month,
   so DD:MM format is better than MM:DD -->
 
-  <div style="display: flex; align-items: center;">
-    <div style="height: 60px; width: fit-content; overflow-y: auto; overflow-x: hidden;">
-      {#each dayChoices as dayChoice}
-        <div class:blue-highlight={currentlySelectedDay === dayChoice} 
-          on:click={() => currentlySelectedDay = dayChoice}
-          style="font-size: 1.5rem;"
-        >
-          {dayChoice}
-        </div>
-      {/each}
-    </div>
+  <div style="display: flex; align-items: center; position: relative;">
+    <!-- <div id="colored-overlay-transparent">
+      
+    </div> -->
 
     {#each monthChoices as monthChoice}
       <div class:blue-highlight={currentlySelectedMonth === monthChoice} 
@@ -24,6 +17,19 @@
         {monthChoice}
       </div>
     {/each}
+
+    <div style="margin-left: 8px;"></div>
+
+    <div style="height: 84px; width: fit-content; overflow-y: auto; overflow-x: hidden;">
+      {#each dayChoices as dayChoice}
+        <div class:blue-highlight={currentlySelectedDay === dayChoice} 
+          on:click={() => currentlySelectedDay = dayChoice}
+          style="font-size: 1.5rem;"
+        >
+          {dayChoice}
+        </div>
+      {/each}
+    </div>
 
     <div style="margin-left: 30px;"></div>
 
@@ -113,7 +119,34 @@
 </script>
 
 <style>
+  #colored-overlay-transparent {
+    position: absolute;
+    width: 200px;
+    height: 25px;
+    top: 25px;
+    left: 2px;
+    z-index: 50;
+    background-color: orange;
+    opacity: 50%; 
+  }
+
   .blue-highlight {
     background-color: rgb(0, 255, 166);
   }
+
+  ::-webkit-scrollbar {
+    background: transparent;
+  }
+  ::-webkit-scrollbar {
+    width: 4px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-thumb {
+    /* background: #D3D1CB; */
+    background: rgb(34, 132, 97)
+  }
+  ::-webkit-scrollbar-track {
+    background: #EDECE9;
+  }
+
 </style>

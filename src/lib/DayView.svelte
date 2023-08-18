@@ -15,6 +15,7 @@
 
     <ReusableUnscheduledTodoList
       {allTasks}
+      pixelsPerHour={MIKA_PIXELS_PER_HOUR}
       title={"Today's to-do"}
       taskCriteria={(task) => task.deadlineDate === getDateInDDMMYYYY(new Date()) && !task.startTime}
       dropzoneInfo={{

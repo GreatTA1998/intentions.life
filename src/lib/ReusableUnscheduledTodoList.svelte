@@ -32,6 +32,8 @@
   export let taskCriteria
   export let dropzoneInfo
 
+  export let pixelsPerHour 
+
   // DEFINE THE CRITERIA FOR UNSCHEDULED TASKS:
   //   IT IS DUE BY TODAY E.G. something that is due by Sunday, counts as being due this week, but does NOT count as being due today
   //   That's it? 
@@ -53,7 +55,7 @@
 
 
   // TO-DO: this scale needs to be consistent with the current mode, e.g. hour, day or week view.
-  const pixelsPerHour = 160
+
   let tasksDueToday = [] 
 
 

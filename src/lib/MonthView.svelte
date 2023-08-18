@@ -14,6 +14,7 @@
 
 <ReusableUnscheduledTodoList
   {allTasks}
+  pixelsPerHour={pixelsPerWeek / (7 * 24)}
   title={"This month's to-do"}
   taskCriteria={criteriaForThisMonth}
   dropzoneInfo={{

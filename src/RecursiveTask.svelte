@@ -38,7 +38,10 @@
       >
         {#if !isEditingTaskName}
           <!-- on:pointerenter={showOptions} -->
-          <div style="display: flex; align-items: center;">
+          <div style="display: flex; align-items: center;"
+            on:mouseenter={() => isMouseHoveringOnTaskName = true}
+            on:mouseleave={() => isMouseHoveringOnTaskName = false}
+          >
             <div 
               on:click={() => dispatch('task-click', { task: taskObject })} 
               class="truncate"
@@ -48,9 +51,12 @@
             >
               {taskObject.name}
             </div>
-            <span class="material-icons" on:click={() => isTypingNewTask = true} style="font-size: 1rem;">
-              add
-            </span>
+
+            {#if isMouseHoveringOnTaskName}
+              <span class="material-icons" on:click={() => isTypingNewTask = true} style="font-size: 1rem;">
+                add
+              </span>
+            {/if}
           </div>     
         {:else} 
           <!-- TO-DO: newTaskName refers to EDIT, not a new sub-task -->
@@ -102,21 +108,14 @@
 
   const dispatch = createEventDispatcher()
 
+  let isMouseHoveringOnTaskName = false
+
   let isEditingTaskName = false
   let newTaskName = ''
 
-  let isShowingOptions = false
   let isTypingNewTask = false 
   let newTask = ''
 
-  let isSchedulingTask = false
-  let scheduledDate = ''
-  let scheduledTime = ''
-
-  let isRepeatingTask = false
-  let daysBeforeRepeating = 0
-
-  let isDeletingTask = false
 
   let newSubtaskInput
 
@@ -156,10 +155,6 @@
     sendUpNewChildrenPayload(childrenCopy)
   }
 
-  function startEditTaskName () {
-    isEditingTaskName = true
-    newTaskName = taskObject.name
-  }
 
   function detectEnterKey (e) {
     if (e.charCode === 13) {
@@ -174,23 +169,6 @@
     }
   }
 
-  function detectEnterKey2 (e) {
-    if (e.charCode === 13) {
-      // do some basic checks, although this is not correct for all cases
-      if (scheduledDate.length !== 5 || scheduledTime.length !== 5) {
-        alert("Formats must be exact - date is mm:dd and time is hh:mm, resetting")
-        taskObject.startDate = ''
-        taskObject.scheduledTime = ''
-      } 
-      else {
-        taskObject.startDate = scheduledDate
-        taskObject.startTime = scheduledTime
-      }
-      // TODO: rename to `treeUpdated` or something 
-      dispatch('task-done', {})
-      isSchedulingTask = false
-    }
-  }
 
   function detectEnterKey3 (e) {
     if (e.charCode === 13) {
@@ -215,49 +193,6 @@
     dispatch('task-create', {
       updatedChildren: payload
     })
-  }
-
-
-  function markAsDone () {
-    taskObject.isDone = !taskObject.isDone
-    if (taskObject.isRepeating) {
-      if (!taskObject.isDone) {
-        taskObject.completionCount = taskObject.completionCount - 1 || 0 
-        taskObject.lastCompletionDate = ''
-      } 
-      else {
-        taskObject.completionCount = taskObject.completionCount + 1 || 1
-        taskObject.lastCompletionDate = getDateOfToday()
-      }
-    }
-    dispatch('task-done', {
-      // no need to create a payload, you just want to force the parent to manually run `allTasks = [...allTasks]`
-    })
-  }
-
-  function toggleRepeating () {
-    taskObject.isRepeating = !taskObject.isRepeating
-    dispatch('task-repeating', {
-
-    })
-  }
-
-
-  function deleteTask () {
-    taskObject.isDeleted = !taskObject.isDeleted
-    console.log('taskObject.deleted =', taskObject.isDeleted)
-    dispatch('task-delete', {
-
-    })
-  }
-
-  function focusOnMount (node) {
-    console.log('action found!')
-    node.focus()
-    // need an "action object"
-    return {
-
-    }
   }
 
 </script>

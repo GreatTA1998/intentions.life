@@ -9,8 +9,21 @@
       </span>
     </div>
 
+    {#if isGoalsAndPostersPopupOpen}
+      <JournalPopupGoalsAndPosters
+        isOpen={isGoalsAndPostersPopupOpen}
+        {goalsAndPosters}
+        on:card-close={() => isGoalsAndPostersPopupOpen = false}
+        on:goals-and-posters-update={(e) => changeGoalsAndPosters(e.detail)}
+      />
+    {/if}
+
     <div style="display: flex">
-      <div class="journal-left-navigation" style="font-family: Roboto,Arial,sans-serif; font-size:16px; color: #6D6D6D; margin-left: 40px;">
+      <div class="journal-left-navigation" style="font-family: Roboto,Arial,sans-serif; font-size:16px; color: #6D6D6D; margin-left: 40px;">        
+        <div on:click={() => isGoalsAndPostersPopupOpen = true} class:blue-highlight={isGoalsAndPostersPopupOpen}>
+          Goals
+        </div>
+
         {#each Object.keys(journal) as date}
           <div on:click={() => currentlySelectedDate = date} class:blue-highlight={date === currentlySelectedDate}>
             {date}
@@ -36,18 +49,35 @@
 <script>
 import { createEventDispatcher, onMount, onDestroy, tick } from 'svelte'
 import _ from 'lodash'
-import { getDateOfToday, getRandomID, clickOutside } from '/src/helpers.js';
+import { getDateOfToday, getRandomID, clickOutside } from '/src/helpers.js'
+import JournalPopupGoalsAndPosters from './JournalPopupGoalsAndPosters.svelte';
+import db from '/src/db.js'
+import { doc, updateDoc } from 'firebase/firestore'
 
 export let journal
 export let isOpen = false
+
+// props needed for <GoalsAndPostersPopup/>
+export let userID
+export let goalsAndPosters
 
 const dispatch = createEventDispatcher()
 const todayDateMMDD = getDateOfToday()
 
 const throttledSaveJournalPage = _.throttle(saveJournalPage, 500)
 
+let isGoalsAndPostersPopupOpen = true
+
 createTodayJournal() // won't do anything if it already exists, I know this is bad because it isn't atomic
 let currentlySelectedDate = todayDateMMDD
+
+const userDocPath = `users/${userID}`
+
+function changeGoalsAndPosters ({ newGoalsAndPosters }) {
+  updateDoc(doc(db, userDocPath), {
+    goalsAndPosters: newGoalsAndPosters
+  })
+}
 
 function createTodayJournal () {
   if (!journal) { // backwards compatibility
