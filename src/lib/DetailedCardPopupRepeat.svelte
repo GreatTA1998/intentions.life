@@ -91,12 +91,14 @@
     const mm = twoDigits(dateClassObj.getMonth() + 1) // month is 0-indexed
     const dd = twoDigits(dateClassObj.getDate())
 
+    // CASE 1: DEADLINE
     // deadline takes priority: a deadlined task that repeats but is scheduled, will STILL be treated like a deadline
     if (taskObjCopy.deadlineDate && taskObjCopy.deadlineTime) {
       // set new `deadlineDate` to the dd/mm/yyyy format of `dateClassObj` (but keep the deadline time the same)
       taskObjCopy.deadlineDate = `${dd}/${mm}/${yyyy}`
     }
-    else if (taskObjCopy.startYYYY && taskObjCopy.startDate && taskObjCopy.startTime) {
+    // CASE 2: SCHEDULED 
+    if (taskObjCopy.startYYYY && taskObjCopy.startDate && taskObjCopy.startTime) {
       taskObjCopy.startYYYY = yyyy
       taskObjCopy.startDate = `${mm}/${dd}` 
     }
