@@ -1,11 +1,11 @@
 <div 
   on:keydown={() => {}}
-  class:green={task.isDone}
   class:scheduled-task={!isBulletPoint}
   style="
     position: relative;
     height: {height}px; 
     font-size: {fontSize}rem;
+    border-left: {isBulletPoint ? 0 : 2}px solid {task.isDone ? '#0085FF' : 'grey'};
     min-height: 12px;
   "
 >
@@ -15,6 +15,16 @@
     `min-height` prevents the parent from being super small when it's bullet point mode
   -->
   <div style="display: flex;">
+    {#if isBulletPoint}
+      <div 
+        style="margin-left: 1px; margin-top: 1px; margin-right: 2px;"
+        class:normal-text={!isBulletPoint}
+        class:smallest-text={isBulletPoint}
+      >
+        -
+      </div>
+    {/if}
+
     {#if hasCheckbox}
       <div>
         <!-- `checked` hydrates the initial value 
@@ -22,7 +32,7 @@
           but in case we ever need the new value, it's `e.target.checked`
         -->
         <input type="checkbox" 
-          style="zoom: 0.95;"
+          style="zoom: {isBulletPoint ? 0.8 : 0.95};"
           checked={task.isDone}
           on:change={(e) => dispatch('task-checkbox-change', {
             isDone: e.target.checked,
@@ -30,6 +40,10 @@
           })}
         >
       </div>
+    {/if}
+
+    {#if isBulletPoint}
+      <div style="margin-right: 3px"></div>
     {/if}
 
     <div 
@@ -40,7 +54,7 @@
       on:dragstart={(e) => dragstart_handler(e, task.id)} 
       class:smallest-text={isBulletPoint}
     >
-      {isBulletPoint ? '-' : ''} {task.name} 
+      {task.name} 
     </div>
   </div>
 
@@ -68,8 +82,8 @@
         left: -3px; 
         bottom: {0}px;
         height: {height/8}px; 
-        min-height: 6px;
-        width: 1vw; 
+        min-height: 4px;
+        width: 0.5vw; 
       "
     >
   </div>
@@ -123,7 +137,7 @@
 <style>
   .scheduled-task {
     margin-left: 2px;
-    border-left: 2px solid grey;
+    /* border-left: 2px solid grey; */
     padding-left: 2px;
     width: 100%;
 
@@ -142,7 +156,14 @@
 
   .task-name {
     font-family: Roboto, sans-serif; 
-    width: 11vw; cursor: pointer; font-family: sans-serif; color: #6D6D6D;
+    width: 11vw; 
+    cursor: pointer; 
+    font-family: sans-serif; color: #6D6D6D;
+  }
+
+  .normal-text {
+    font-family: Roboto, sans-serif; 
+    font-family: sans-serif; color: #6D6D6D;
   }
 
   /* Small Devices, Tablets and bigger devices */
