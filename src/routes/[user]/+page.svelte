@@ -6,7 +6,7 @@
       taskObject={clickedTask}
       on:task-click={(e) => openDetailedCard(e.detail)}
       on:card-close={() => isDetailedCardOpen = false}
-      on:task-done={() => markNodeAsDone(clickedTask.id)}
+      on:task-done={() => toggleTaskCompleted(clickedTask.id)}
       on:task-delete={() => deleteSubtree(clickedTask.id)}
       on:task-repeat={updateEntireTaskTree}
       on:task-schedule={(e) => scheduleATask(e.detail)}
@@ -100,22 +100,23 @@
             <HourView
               {allTasks}
               scheduledTasksToday={todayScheduledTasks}
-              on:task-done={(e) => markNodeAsDone(e.detail.id)}
+              on:task-done={(e) => toggleTaskCompleted(e.detail.id)}
               on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
               on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
               on:task-click={(e) => openDetailedCard(e.detail)}
               on:task-dragged={(e) => changeTaskDeadline(e.detail)}
+              on:task-checkbox-change={(e) => toggleTaskCompleted(e.detail.id)}
             />
           {:else if currentMode === 'dayMode'}
             <DayView
               {allTasks}
               scheduledTasksToday={todayScheduledTasks}
-              on:task-done={(e) => markNodeAsDone(e.detail.id)}
+              on:task-done={(e) => toggleTaskCompleted(e.detail.id)}
               on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
               on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
               on:task-click={(e) => openDetailedCard(e.detail)}
               on:task-dragged={(e) => changeTaskDeadline(e.detail)}
-
+              on:task-checkbox-change={(e) => toggleTaskCompleted(e.detail.id)}
               {futureScheduledTasks}
             />
           {:else if currentMode === 'weekMode'}
@@ -126,6 +127,7 @@
               on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
               on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
               on:task-dragged={(e) => changeTaskDeadline(e.detail)}
+              on:task-checkbox-change={(e) => toggleTaskCompleted(e.detail.id)}
             />
           {:else if currentMode === 'monthMode'}
             <MonthView
@@ -135,6 +137,7 @@
               on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
               on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
               on:task-dragged={(e) => changeTaskDeadline(e.detail)}
+              on:task-checkbox-change={(e) => toggleTaskCompleted(e.detail.id)}
             />
           {/if}
         </div>
@@ -193,7 +196,7 @@
   
   <!-- UNDO COMPLETED SNACKBAR -->
   {#if $mostRecentlyDeletedOrCompletedTaskID && countdownRemaining > 0}
-    <TheSnackbar on:task-done={(e) => markNodeAsDone(e.detail.id)}></TheSnackbar>
+    <TheSnackbar on:task-done={(e) => toggleTaskCompleted(e.detail.id)}></TheSnackbar>
   {/if}
 </div>
 
@@ -592,7 +595,7 @@
     })
   } 
   
-  async function markNodeAsDone (id) {
+  async function toggleTaskCompleted (id) {
     traverseAndUpdateTree({ 
       fulfilsCriteria: (task) => task.id === id,
       applyFunc: (task) => { 

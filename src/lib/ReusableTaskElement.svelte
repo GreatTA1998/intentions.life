@@ -1,5 +1,4 @@
 <div 
-  on:click={() => dispatch('task-click', { task })}
   on:keydown={() => {}}
   class:green={task.isDone}
   class:scheduled-task={!isBulletPoint}
@@ -15,13 +14,34 @@
 
     `min-height` prevents the parent from being super small when it's bullet point mode
   -->
-  <div 
-    class="task-name"
-    draggable="true" 
-    on:dragstart={(e) => dragstart_handler(e, task.id)} 
-    class:smallest-text={isBulletPoint}
-  >
-    {isBulletPoint ? '-' : ''} {task.name} 
+  <div style="display: flex;">
+    {#if hasCheckbox}
+      <div>
+        <!-- `checked` hydrates the initial value 
+          `task-checkbox-change` event will just toggle the checkbox, 
+          but in case we ever need the new value, it's `e.target.checked`
+        -->
+        <input type="checkbox" 
+          style="zoom: 0.95;"
+          checked={task.isDone}
+          on:change={(e) => dispatch('task-checkbox-change', {
+            isDone: e.target.checked,
+            id: task.id
+          })}
+        >
+      </div>
+    {/if}
+
+    <div 
+      style="margin-top: 2px;"
+      class="task-name"
+      draggable="true" 
+      on:click={() => dispatch('task-click', { task })}
+      on:dragstart={(e) => dragstart_handler(e, task.id)} 
+      class:smallest-text={isBulletPoint}
+    >
+      {isBulletPoint ? '-' : ''} {task.name} 
+    </div>
   </div>
 
   <!-- Continuation of re-scheduling zone -->
@@ -62,6 +82,7 @@
 
   export let task = null
   export let pixelsPerHour = null
+  export let hasCheckbox = false
 
   export let fontSize = 1
 

@@ -8,6 +8,7 @@
   on:task-duration-adjusted
   on:task-click
   on:task-scheduled
+  on:task-checkbox-change
 />
 
 <div>

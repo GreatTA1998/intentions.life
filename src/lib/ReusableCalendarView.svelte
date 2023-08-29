@@ -38,8 +38,10 @@
           {task}
           pixelsPerHour={pixelsPerMinute * 60}
           fontSize={0.8}
+          hasCheckbox
           on:task-click
           on:task-duration-adjusted
+          on:task-checkbox-change
         />
       </div>
     {/each}
