@@ -17,9 +17,9 @@
   <div style="display: flex;">
     {#if isBulletPoint}
       <div 
-        style="margin-left: 1px; margin-top: 1px; margin-right: 2px;"
         class:normal-text={!isBulletPoint}
         class:smallest-text={isBulletPoint}
+        style="color: {task.isDone ? '#0085FF' : ''}; margin-left: 1px; margin-top: 1px; margin-right: 2px;"
       >
         -
       </div>
