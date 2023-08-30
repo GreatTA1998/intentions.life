@@ -1,3 +1,9 @@
+<!-- 
+  mika blue color: '#0085FF'
+  experimental green: '#509c13'
+  Note, the HTML checkbox tick color literally cannot be changed, but it will be automatically white if it "decides" that our chosen background color is dark enough, 
+  or vice versa
+ -->
 <div 
   on:keydown={() => {}}
   class:scheduled-task={!isBulletPoint}
@@ -5,7 +11,7 @@
     position: relative;
     height: {height}px; 
     font-size: {fontSize}rem;
-    border-left: {isBulletPoint ? 0 : 2}px solid {task.isDone ? '#0085FF' : 'grey'};
+    border-left: {isBulletPoint ? 0 : 2}px solid {task.isDone ? '#509c13' : 'grey'};
     min-height: 12px;
   "
 >
@@ -19,7 +25,7 @@
       <div 
         class:normal-text={!isBulletPoint}
         class:smallest-text={isBulletPoint}
-        style="color: {task.isDone ? '#0085FF' : ''}; margin-left: 1px; margin-top: 1px; margin-right: 2px;"
+        style="color: {task.isDone ? '#509c13' : ''}; margin-left: 1px; margin-top: 1px; margin-right: 2px;"
       >
         -
       </div>
@@ -32,7 +38,10 @@
           but in case we ever need the new value, it's `e.target.checked`
         -->
         <input type="checkbox" 
-          style="zoom: {isBulletPoint ? 0.8 : 0.95};"
+          style="
+            zoom: {isBulletPoint ? 0.8 : 0.95};
+            accent-color: {task.isDone ? '#509c13' : ''}
+          "
           checked={task.isDone}
           on:change={(e) => dispatch('task-checkbox-change', {
             isDone: e.target.checked,
