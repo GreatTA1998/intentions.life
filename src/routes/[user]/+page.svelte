@@ -369,9 +369,12 @@
           console.log('new day, resetting tasks')
           const copy = [...snapshot.data().allTasks]
 
-          for (const task of copy) {
-            recursivelyResetRepeatingTasks(task)
-          }
+          // maintainOneWeekPreviewWindowForRepeatingTasks(copy)
+
+          // OLD WAY OF REPEATING TASKS - KEEP SHIFTING THE SAME TASK
+          // for (const task of copy) {
+          //   recursivelyResetRepeatingTasks(task)
+          // }
 
           console.log("dateOfToday =", dateOfToday)
           updateDoc(doc(db, userDocPath), { 
@@ -815,6 +818,35 @@
       doc(db, userDocPath),
       { allTasks }
     )
+  }
+
+  // WORK IN PROGRESS: node.children will be undefined 
+  // because `allTasks` is implicitly passed into 
+  // `traverseAndUpdateTree`, and is not yet hydrated from database
+  // 
+  // I'm considering refactor these functions into a separate file, 
+  // and also passing explicit parameters. Might deserve an explanation video. ,
+  // as mutations, pointers are a concern with these deeply nested data structures. 
+  function maintainOneWeekPreviewWindowForRepeatingTasks () {
+    // step 1: collect repeatIDs
+    console.log('calling new func')
+    const uniqueRepeatIDs = new Set()
+    traverseAndUpdateTree({
+      fulfilsCriteria: (task) => task.repeatGroupID,
+      applyFunc: (task) => { 
+        console.log('the CHOSEN task =', task)
+        uniqueRepeatIDs.add(task.repeatGroupID)
+      }
+    })
+
+    console.log('uniqueRepeatIDs =', uniqueRepeatIDs)
+
+    // step 2
+    // check latest member, then run repeat algorithm
+    // if the !mmddyyyy.includes() add it to the PARENT of the repeating tasks
+
+    // step 3 
+    // update database
   }
 </script>
 
