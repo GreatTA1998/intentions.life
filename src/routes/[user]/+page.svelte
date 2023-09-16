@@ -67,7 +67,7 @@
 
   <div style="display: flex"> 
     <!-- 1st flex child -->
-    <div style="width: 50vw">
+    <div style="width: 70vw">
       <div style="margin-left: 45px; margin-top: 47px; display: flex; align-items: center;">
         <div class="mika-rectangle" on:click={() => currentMode = 'hourMode'}
           class:selected-rectangle={currentMode === 'hourMode'}
@@ -87,6 +87,12 @@
           class:selected-rectangle={currentMode === 'monthMode'}  
         >
           Month
+        </div>
+
+        <div class="mika-rectangle" on:click={() => currentMode = 'playgroundMode'}
+          class:selected-rectangle={currentMode === 'playgroundMode'}  
+        >
+          Playground
         </div>
       </div>
 
@@ -133,6 +139,15 @@
             <MonthView
               {allTasks}
               {thisMonthScheduledTasks}
+              on:task-click={(e) => openDetailedCard(e.detail)}
+              on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
+              on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
+              on:task-dragged={(e) => changeTaskDeadline(e.detail)}
+              on:task-checkbox-change={(e) => toggleTaskCompleted(e.detail.id)}
+            />
+          {:else if currentMode === 'playgroundMode'}
+            <Playground
+              {allTasks}
               on:task-click={(e) => openDetailedCard(e.detail)}
               on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
               on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
@@ -225,7 +240,8 @@
   import WeekView from '$lib/WeekView.svelte'
   import MonthView from '$lib/MonthView.svelte'
   import TheSnackbar from '$lib/TheSnackbar.svelte'
-  import { mostRecentlyDeletedOrCompletedTaskID, mostRecentlyCompletedTaskName, user } from '/src/store.js';
+  import { mostRecentlyDeletedOrCompletedTaskID, mostRecentlyCompletedTaskName, user } from '/src/store.js'
+  import Playground from '$lib/Playground.svelte'
 
   let snackbarTimeoutID = null
   let countdownRemaining = 0
@@ -897,7 +913,7 @@
     }
     .todo-container {
       font-family: Roboto, sans-serif;
-      width: 55vw;
+      width: 30vw;
       height: 100vh;
       padding-top: 15px; 
       padding-left: 20px;
@@ -967,7 +983,7 @@
     overflow-y: auto;
     overflow-x: auto;
     box-sizing: border-box;
-    width: 100%;
+    width: 30vw;
     height: 120vh;
   }
 

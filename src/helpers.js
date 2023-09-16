@@ -69,15 +69,14 @@ export function getDayOfWeek (MMDDString) {
 }
 
 // copied from chatGPT
-export function getNicelyFormattedDate () {
-  const date = new Date(); // Get the current date
+export function getNicelyFormattedDate (dateClassObj = new Date()) {  
   const options = { 
     month: 'long',  // Display the full month name (e.g., "April")
     day: 'numeric', // Display the day of the month (e.g., "16")
     ordinal: 'numeric' // Display the ordinal suffix (e.g., "th")
   }
-  const formattedDate = date.toLocaleDateString('en-US', options)
-  const suffix = getDaySuffix(date.getDate())
+  const formattedDate = dateClassObj.toLocaleDateString('en-US', options)
+  const suffix = getDaySuffix(dateClassObj.getDate())
   return formattedDate + suffix
 }
 

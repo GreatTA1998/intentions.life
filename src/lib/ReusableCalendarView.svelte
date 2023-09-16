@@ -4,7 +4,7 @@
   style="position: relative;
   width: 15vw"
 >
-  <div id="calendar-day-container" 
+  <div class="calendar-day-container" 
     style="height: {timestamps.length * timeBlockDurationInMinutes * pixelsPerMinute}px; 
       font-family: Roboto, sans-serif; 
       margin-bottom: 1px; 
@@ -13,11 +13,13 @@
     on:drop={(e) => drop_handler(e)}
     on:dragover={(e) => dragover_handler(e)}
   >
-    {#each timestamps as timestamp, i}
-      <div class="timestamp-number" style="top: {-6 + 6 + (pixelsPerMinute * timeBlockDurationInMinutes * i)}px;">
-        {timestamp.substring(0, 5)}
-      </div>
-    {/each}
+    {#if willShowTimestamps}
+      {#each timestamps as timestamp, i}
+        <div class="timestamp-number" style="top: {-6 + 6 + (pixelsPerMinute * timeBlockDurationInMinutes * i)}px;">
+          {timestamp.substring(0, 5)}
+        </div>
+      {/each}
+    {/if}
 
     {#each scheduledTasks as task, i}
       <div
@@ -50,10 +52,11 @@
     <div style="margin-top: 6px;"></div>
 
     <!-- Again, because we're using absolute positioning for above elements, their positionings are independent from each other -->
+    <!-- old width is 82% -->
     {#each {length: subdivisionsPerBlock * timestamps.length} as _, i}
       <div 
         class:visible-line={(i % subdivisionsPerBlock) === 0}
-        style="height: { (timeBlockDurationInMinutes * pixelsPerMinute) / subdivisionsPerBlock  }px; box-sizing: border-box; margin-right: 0; margin-left: auto; width: 82%"
+        style="height: { (timeBlockDurationInMinutes * pixelsPerMinute) / subdivisionsPerBlock  }px; box-sizing: border-box; margin-right: 0; margin-left: auto; width: 100%"
         class:highlighted-background={highlightedMinute === i}
         on:dragenter={() => highlightedMinute = i}
         on:dragend={() => console.log('dragend') }
@@ -99,6 +102,7 @@
 
   export let scheduledTasks = [] 
   export let timestamps = []
+  export let willShowTimestamps = true
 
   let myObserver = null
 
@@ -230,7 +234,7 @@
   background: transparent;
 }
 ::-webkit-scrollbar {
-  width: 4px;
+  width: 1px; /** old width was 4px */
   height: 10px;
 }
 ::-webkit-scrollbar-thumb {
@@ -275,6 +279,9 @@
   }
 } 
 
+.calendar-day-container {
+  width: 100%;
+}
 
 #scroll-container {
     height: 100%; 
