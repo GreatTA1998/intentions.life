@@ -213,3 +213,23 @@ export function getCurrentTimeInHHMM () {
   const mm = ("0" + d.getMinutes()).slice(-2)
   return hh + ":" + mm
 }
+
+export function applyFuncToEveryTreeNode ({ tree, applyFunc }) {
+  const artificialRootNode = {
+    name: 'root',
+    children: tree
+  }
+  helperFunction({ node: artificialRootNode, applyFunc })
+}
+
+function helperFunction ({ node, applyFunc }) {
+  // this is a quick-fix: terminate once we find the deadlinet ask
+  if (applyFunc(node)) {
+    return
+  } 
+  else {
+    for (const child of node.children) {
+      helperFunction({ node: child, applyFunc })
+    }
+  }
+}

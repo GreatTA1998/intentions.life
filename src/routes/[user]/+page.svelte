@@ -148,6 +148,7 @@
           {:else if currentMode === 'playgroundMode'}
             <Playground
               {allTasks}
+              on:task-node-update={(e) => updateNode({ id: e.detail.id, newDeepValue: e.detail.newDeepValue })}
               on:task-click={(e) => openDetailedCard(e.detail)}
               on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
               on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
@@ -701,6 +702,30 @@
       }
     })
   }
+
+  async function updateNode ({ id, newDeepValue }) {
+    traverseAndUpdateTree({
+      fulfilsCriteria: (task) => {
+        const filter = task.children.filter(child => child.id === id)
+        return filter.length === 1  
+      },  // `filter` according to MDN docs: empty array will be returned if no child passes the test
+      applyFunc: (task) => {
+        const copyOfChildren = [...task.children]
+        for (let i = 0; i < copyOfChildren.length; i++) {
+          if (copyOfChildren[i].id === id) {
+            copyOfChildren[i] = newDeepValue
+            task.children = copyOfChildren
+            console.log("successfully modified tree")
+            return
+          }
+        }
+      }
+    })
+    await updateDoc(doc(db, userDocPath), { 
+      allTasks 
+    })
+  }
+
 
   async function changeTaskStartTime ({ id, timeOfDay, dateScheduled }) {
     traverseAndUpdateTree({

@@ -50,7 +50,8 @@
           {taskObject.startTime || 'hh:mm'}
         </div>
       {:else}
-        <input bind:value={newStartTime} 
+        <input 
+          bind:value={newStartTime} 
           on:keypress={detectEnterKey5}
           style="margin-left: 8px; width: 44px;" class="google-calendar-event-time" 
           placeholder={getCurrentTimeInHHMM()} 
@@ -286,10 +287,13 @@ function detectEnterKey5 (e) {
       alert('Need BOTH date and time')
     } 
     else {
-      taskObject.startDate = newStartDate
-      taskObject.startTime = newStartTime
-      const yearNumber = new Date().getFullYear()
-      taskObject.startYYYY = yearNumber.toString()
+      // why do we mutate it directly,
+      // but also pass these event.detail to the parent?
+      taskObject.startDate = newStartDate // this will be redundantly set to `newStartDate` at the root parent as well
+      taskObject.startTime = newStartTime // this will be redundantly set to `newStartTime` at the root parent as well
+      const yearNumber = new Date().getFullYear() 
+      // this will reach the database because it's mutated here, and allTasks will be synced to Firebase
+      taskObject.startYYYY = yearNumber.toString() 
     }
     dispatch('task-schedule', { id: taskObject.id, newStartDate, newStartTime })
 

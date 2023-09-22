@@ -27,7 +27,14 @@
         {/key}
       </div>
     {/each}
+      
+    <PlaygroundThisWeekTodo 
+      {allIncompleteTasks}
+      on:task-node-update
+      on:task-click
+    />
   </div>
+
   <!-- <CopyOfDayView
     allTasks
     scheduledTasksToday
@@ -44,9 +51,11 @@
   import ReusableCalendarView from '$lib/ReusableCalendarView.svelte'
   import { MIKA_PIXELS_PER_HOUR, getNicelyFormattedDate, getDateInMMDD } from '/src/helpers'
   import { onMount } from 'svelte'
+  import PlaygroundThisWeekTodo from '$lib/PlaygroundThisWeekTodo.svelte'
 
   export let allTasks
 
+  let allIncompleteTasks = null
   let timesOfDay = [] 
   let numOfHourBlocksDisplayed = 17
   let dateClassObjects = []
@@ -60,7 +69,23 @@
   // whenever reactivity triggers
   $: if (allTasks) {
     intForTriggeringRerender += 1
-    console.log('will trigger re-render')
+    allIncompleteTasks = filterIncompleteTasks(allTasks)
+  }
+
+  function filterIncompleteTasks (tasksArray) {
+    let output = []
+    const copy = [...tasksArray]
+    traverseAndUpdateTree({
+      tree: copy,
+      fulfilsCriteria: (task) => {
+        // make an independent copy
+        const filteredChildren = task.children.filter(t => t.isCompleted === false)
+        task.children = filteredChildren
+      },
+      applyFunc: (task) => output.push(task) // output = [...output, task]
+    })
+    output = copy
+    return output
   }
 
   function getDateClassObjects () {
@@ -84,10 +109,10 @@
     return output
   }
 
-  function traverseAndUpdateTree ({ fulfilsCriteria, applyFunc }) {
+  function traverseAndUpdateTree ({ fulfilsCriteria, applyFunc, tree = allTasks }) {
     const artificialRootNode = {
       name: 'root',
-      children: allTasks
+      children: tree
     }
     helperFunction({ node: artificialRootNode, fulfilsCriteria, applyFunc })
   }
