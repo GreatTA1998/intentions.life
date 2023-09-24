@@ -1109,7 +1109,7 @@
     overflow-y: auto;
     overflow-x: auto;
     box-sizing: border-box;
-    width: 30vw;
+    width: 50vw;
     height: 120vh;
   }
 

@@ -5,10 +5,10 @@
 // e.clientY := coordinates relative to VIEWPORT, so doesn't matter if root page is scrolled
 
 export function getTrueY (e) {
-  const ScrollContainer = document.getElementById('scroll-container')
+  const ScrollContainers = document.getElementsByClassName('scroll-container')
+  const ScrollContainer = ScrollContainers[0]
   return e.clientY + ScrollContainer.scrollTop - ScrollContainer.getBoundingClientRect().top - ScrollContainer.style.paddingTop
 }
-
 
 export const MIKA_PIXELS_PER_HOUR = 100
 export const MIKA_PIXELS_PER_MINUTE = MIKA_PIXELS_PER_HOUR / 60
