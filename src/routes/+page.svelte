@@ -13,9 +13,6 @@
         <a on:click={() => isSigningIn = true}>
           Sign in
         </a>
-        <!-- <div style="margin-left: 10px;">
-          or sign-in with phone
-        </div> -->
         {#if isSigningIn}
           <PhoneLogin canTakeInternationalNumbers/>  
         {/if}
