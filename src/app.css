@@ -12,3 +12,8 @@
 ::-webkit-scrollbar-track {
   background: #EDECE9;
 }
+
+* {
+  box-sizing: border-box;
+  font-family: sans-serif;
+}

@@ -1,14 +1,20 @@
 <div 
   bind:this={ScrollContainer}
   id="scroll-container" 
-  style="position: relative;
-  width: 15vw"
+  style="
+    position: relative;
+    width: 15vw;
+    background-color: {backgroundColor}
+    border: 2px solid red;
+    overflow: hidden;
+  "
 >
   <div class="calendar-day-container" 
     style="height: {timestamps.length * timeBlockDurationInMinutes * pixelsPerMinute}px; 
       font-family: Roboto, sans-serif; 
       margin-bottom: 1px; 
       color: #6D6D6D;
+      border: 2px solid red;
     "
     on:drop={(e) => drop_handler(e)}
     on:dragover={(e) => dragover_handler(e)}
@@ -28,7 +34,7 @@
           top: {computeOffsetGeneral({ 
             d1: calendarBeginningDateClassObject, 
             d2: convertDDMMYYYYToDateClassObject(
-              task.startDate.split('/')[1] + '/' + task.startDate.split('/')[0] + '/' + (task.startYYYY ? task.startYYYY : new Date().getYears()), // notice we flip mm/dd format into dd/mm/yyyy
+              task.startDate.split('/')[1] + '/' + task.startDate.split('/')[0] + '/' + (task.startYYYY ? task.startYYYY : new Date().getFullYear()), // notice we flip mm/dd format into dd/mm/yyyy
               task.startTime   // hhmm
             ),
             pixelsPerMinute
@@ -53,11 +59,12 @@
 
     <!-- Again, because we're using absolute positioning for above elements, their positionings are independent from each other -->
     <!-- old width is 82% -->
+    <!-- class:visible-line={(i % subdivisionsPerBlock) === 0} -->
     {#each {length: subdivisionsPerBlock * timestamps.length} as _, i}
       <div 
-        class:visible-line={(i % subdivisionsPerBlock) === 0}
         style="height: { (timeBlockDurationInMinutes * pixelsPerMinute) / subdivisionsPerBlock  }px; box-sizing: border-box; margin-right: 0; margin-left: auto; width: 100%"
         class:highlighted-background={highlightedMinute === i}
+        on:click|self={(e) => createTaskDirectly(e)}
         on:dragenter={() => highlightedMinute = i}
         on:dragend={() => console.log('dragend') }
         on:dragover={(e) => dragover_handler(e)}
@@ -94,6 +101,7 @@
   import ReusableTaskElement from '$lib/ReusableTaskElement.svelte'
   import { onMount, beforeUpdate, afterUpdate, tick, createEventDispatcher, onDestroy } from 'svelte'
   import { browser } from '$app/environment';
+  import { getDateInDDMMYYYY, getDateInMMDD, getRandomID } from '/src/helpers';
 
   export let pixelsPerHour 
   export let timeBlockDurationInMinutes 
@@ -103,8 +111,10 @@
   export let scheduledTasks = [] 
   export let timestamps = []
   export let willShowTimestamps = true
+  export let backgroundColor = 'white'
 
   let myObserver = null
+  let InputElement
 
   function p (...args) {
     console.log(...args)    
@@ -112,6 +122,9 @@
 
   let ScrollContainer
   let CurrentTimeIndicator
+  const dispatch = createEventDispatcher()
+
+  $: pixelsPerMinute = pixelsPerHour / 60
 
   onMount(() => {
     // NOTE: window.ResizeObserve requires `window` to be defined, so must be called in onMount()
@@ -120,26 +133,76 @@
     // new strategy:
     //   1. Notice when the Scroll container resizes
     //   2. Then set it's scrollTop value to the currentTimeIndicator's top value (parseFloat of course)
-    if (browser) {
-      myObserver = new ResizeObserver(entries => {
-        entries.forEach(entry => { 
-          ScrollContainer.scrollTop = parseFloat(CurrentTimeIndicator.style.top) // style.top returns '136.px', `parseFloat` gets rid of the 'px' suffix
-        })
-      })
-      myObserver.observe(ScrollContainer)
-    }
+    // if (browser) {
+    //   myObserver = new ResizeObserver(entries => {
+    //     entries.forEach(entry => { 
+    //       ScrollContainer.scrollTop = parseFloat(CurrentTimeIndicator.style.top) // style.top returns '136.px', `parseFloat` gets rid of the 'px' suffix
+    //     })
+    //   })
+    //   myObserver.observe(ScrollContainer)
+    // }
   })
 
 
   onDestroy(() => {
-    if (browser) {
-      myObserver.disconnect()
-    }
+    // if (browser) {
+    //   myObserver.disconnect()
+    // }
   })
 
-  const dispatch = createEventDispatcher()
+  async function createTaskDirectly (e) {
+    console.log("e =", e)
+    // get the y-coordinate
+    const trueY = getTrueY(e)
+    const resultantDateClassObject = getResultantDateClassObject(trueY)
+    console.log('trueY =', trueY)
+    console.log('resultantDateClassObject =', resultantDateClassObject)
 
-  let pixelsPerMinute = pixelsPerHour / 60
+    if (InputElement) {
+      // only allow 1 textbox to appear at a time
+      return
+    }
+
+    const newInput = document.createElement("input")
+    ScrollContainer.appendChild(newInput)
+    newInput.style.top = `${trueY}px`
+    newInput.style.left = '30px'
+    newInput.style.position = 'Absolute'
+    newInput.style.id = 'calendar-direct-task-input'
+
+    InputElement = newInput
+
+    await tick() 
+    newInput.focus()
+
+
+    newInput.addEventListener('keyup', (e) => {
+      if (e.key !== 'Enter') return
+
+      const newTaskName = newInput.value 
+      if (newTaskName !== '') {
+        const newTaskObj = {
+          id: getRandomID(),
+          name: newTaskName,
+          startDate: getDateInMMDD(resultantDateClassObject),
+          // deadlineDate: getDateInDDMMYYYY(resultantDateClassObject),
+          startTime: getHHMM(resultantDateClassObject),
+          startYYYY: resultantDateClassObject.getFullYear()
+        }
+        dispatch('new-root-task', newTaskObj)
+      }
+      InputElement.remove()
+      InputElement = null
+    })
+
+    // // and give it some content
+    // const newContent = document.createTextNode("Hi there and greetings!");
+
+    // add the text node to the newly created div
+    // newDiv.appendChild(newContent);
+
+    // create the task
+  } 
 
   // computes the physical offset, within origin based on d1
   function computeOffsetGeneral ({ d1, d2, pixelsPerMinute }) {
@@ -199,22 +262,13 @@
     e.preventDefault()
     highlightedMinute = null
 
+    const trueY = getTrueY(e)
+
     // origin
     const calendarStartAsMs = calendarBeginningDateClassObject.getTime()
     
     // difference
-    const trueY = getTrueY(e)
-    const totalHoursDistance = trueY / pixelsPerHour
-    const totalMsDistance = totalHoursDistance * 60 * 60 * 1000
-
-    // Add them together: https://stackoverflow.com/a/12795802/7812829
-    const resultantTimeInMs = calendarStartAsMs + totalMsDistance
-    const resultantDateClassObject = new Date(resultantTimeInMs)
-
-    // now format to hh:mm format to be compatible with old API
-    function ensureTwoDigits (number) {
-      return (number < 10 ? `0${number}` : `${number}`)
-    }
+    const resultantDateClassObject = getResultantDateClassObject(trueY)
     const d = resultantDateClassObject
     const hhmm = ensureTwoDigits(d.getHours()) + ':' + ensureTwoDigits(d.getMinutes())
     const mmdd = ensureTwoDigits(d.getMonth() + 1) + '/' + ensureTwoDigits(d.getDate())
@@ -226,6 +280,30 @@
       dateScheduled: mmdd
     })
   }
+
+  function getResultantDateClassObject (trueY) {
+    const calendarStartAsMs = calendarBeginningDateClassObject.getTime()
+
+    const totalHoursDistance = trueY / pixelsPerHour
+    const totalMsDistance = totalHoursDistance * 60 * 60 * 1000
+
+    // Add them together: https://stackoverflow.com/a/12795802/7812829
+    const resultantTimeInMs = calendarStartAsMs + totalMsDistance
+    const resultantDateClassObject = new Date(resultantTimeInMs)
+    return resultantDateClassObject
+  } 
+
+  // now format to hh:mm format to be compatible with old API
+  function ensureTwoDigits (number) {
+    return (number < 10 ? `0${number}` : `${number}`)
+  }
+
+  function getHHMM (dateClassObj) {
+    const d = dateClassObj
+    const hhmm = ensureTwoDigits(d.getHours()) + ':' + ensureTwoDigits(d.getMinutes())
+    return hhmm
+  }
+
 </script>
 
 <style>
@@ -284,11 +362,11 @@
 }
 
 #scroll-container {
-    height: 100%; 
-    overflow-y: scroll; 
+    height: fit-content;
     overflow-x: hidden; 
+    /* height: 100%;  */
+    /* overflow-y: scroll;  */
     /* padding-top: 22px;  */
-    box-sizing: border-box;
   }
 
   .green-text {

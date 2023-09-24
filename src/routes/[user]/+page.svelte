@@ -67,7 +67,7 @@
 
   <div style="display: flex"> 
     <!-- 1st flex child -->
-    <div style="width: 70vw">
+    <div style="width: 70vw; border: 3px solid blue; height: 100vh; box-sizing: border-box;">
       <div style="margin-left: 45px; margin-top: 47px; display: flex; align-items: center;">
         <div class="mika-rectangle" on:click={() => currentMode = 'hourMode'}
           class:selected-rectangle={currentMode === 'hourMode'}
@@ -96,117 +96,155 @@
         </div>
       </div>
 
-      <div style="font-family: Inter; font-weight: 600; font-size: 28px; margin-left: 20px; padding: 30px 0px 10px 35px; color: #000000">
-        {getDayOfWeek()}, { getNicelyFormattedDate() }, { new Date().getFullYear() }
+      <!-- Display today's date  -->
+      <div style="
+        display: flex; 
+        align-items: center; 
+        margin-left: 20px;
+        padding: 30px 0px 10px 35px;"
+      >
+        {#if currentMode === 'playgroundMode'}
+          <span on:click={() => incrementDateClassObj({ days: -1 })} class="material-icons" style="font-size: 4em;">
+            arrow_left
+          </span>
+        {/if}
+        <div style="font-family: Inter; font-weight: 600; font-size: 28px; color: #000000">
+          {getDayOfWeek(calStartDateClassObj)}, { getNicelyFormattedDate(calStartDateClassObj) }, { calStartDateClassObj.getFullYear() }
+        </div>
+        {#if currentMode === 'playgroundMode'}
+          <span on:click={() => incrementDateClassObj({ days: 1 })} class="material-icons" style="font-size: 4em;">
+            arrow_right
+          </span>
+        {/if}
       </div>
 
-      <div class="flex-container blur">
-        <div class="calendar-section-container">
-          {#if currentMode === 'hourMode'}
-            <HourView
-              {allTasks}
-              scheduledTasksToday={todayScheduledTasks}
-              on:task-done={(e) => toggleTaskCompleted(e.detail.id)}
-              on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
-              on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
-              on:task-click={(e) => openDetailedCard(e.detail)}
-              on:task-dragged={(e) => changeTaskDeadline(e.detail)}
-              on:task-checkbox-change={(e) => toggleTaskCompleted(e.detail.id)}
-            />
-          {:else if currentMode === 'dayMode'}
-            <DayView
-              {allTasks}
-              scheduledTasksToday={todayScheduledTasks}
-              on:task-done={(e) => toggleTaskCompleted(e.detail.id)}
-              on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
-              on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
-              on:task-click={(e) => openDetailedCard(e.detail)}
-              on:task-dragged={(e) => changeTaskDeadline(e.detail)}
-              on:task-checkbox-change={(e) => toggleTaskCompleted(e.detail.id)}
-              {futureScheduledTasks}
-            />
-          {:else if currentMode === 'weekMode'}
-            <WeekView
-              {allTasks}
-              {thisWeekScheduledTasks}
-              on:task-click={(e) => openDetailedCard(e.detail)}
-              on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
-              on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
-              on:task-dragged={(e) => changeTaskDeadline(e.detail)}
-              on:task-checkbox-change={(e) => toggleTaskCompleted(e.detail.id)}
-            />
-          {:else if currentMode === 'monthMode'}
-            <MonthView
-              {allTasks}
-              {thisMonthScheduledTasks}
-              on:task-click={(e) => openDetailedCard(e.detail)}
-              on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
-              on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
-              on:task-dragged={(e) => changeTaskDeadline(e.detail)}
-              on:task-checkbox-change={(e) => toggleTaskCompleted(e.detail.id)}
-            />
-          {:else if currentMode === 'playgroundMode'}
-            <Playground
-              {allTasks}
-              on:task-node-update={(e) => updateNode({ id: e.detail.id, newDeepValue: e.detail.newDeepValue })}
-              on:task-click={(e) => openDetailedCard(e.detail)}
-              on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
-              on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
-              on:task-dragged={(e) => changeTaskDeadline(e.detail)}
-              on:task-checkbox-change={(e) => toggleTaskCompleted(e.detail.id)}
-            />
-          {/if}
+      {#if currentMode === 'playgroundMode' && allTasks}
+        <Playground
+          {allTasks}
+          {calStartDateClassObj}
+          on:new-root-task={(e) => createNewRootTask(e.detail)}
+          on:task-node-update={(e) => updateNode({ id: e.detail.id, newDeepValue: e.detail.newDeepValue })}
+          on:task-click={(e) => openDetailedCard(e.detail)}
+          on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
+          on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
+          on:task-dragged={(e) => changeTaskDeadline(e.detail)}
+          on:task-checkbox-change={(e) => toggleTaskCompleted(e.detail.id)}
+        /> 
+      {:else if currentMode !== 'playgroundMode'}
+        <div class="flex-container blur">
+          <div class="calendar-section-container">
+            {#if currentMode === 'hourMode'}
+              <HourView
+                {allTasks}
+                scheduledTasksToday={todayScheduledTasks}
+                on:task-done={(e) => toggleTaskCompleted(e.detail.id)}
+                on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
+                on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
+                on:task-click={(e) => openDetailedCard(e.detail)}
+                on:task-dragged={(e) => changeTaskDeadline(e.detail)}
+                on:task-checkbox-change={(e) => toggleTaskCompleted(e.detail.id)}
+              />
+            {:else if currentMode === 'dayMode'}
+              <DayView
+                {allTasks}
+                scheduledTasksToday={todayScheduledTasks}
+                on:task-done={(e) => toggleTaskCompleted(e.detail.id)}
+                on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
+                on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
+                on:task-click={(e) => openDetailedCard(e.detail)}
+                on:task-dragged={(e) => changeTaskDeadline(e.detail)}
+                on:task-checkbox-change={(e) => toggleTaskCompleted(e.detail.id)}
+                {futureScheduledTasks}
+              />
+            {:else if currentMode === 'weekMode'}
+              <WeekView
+                {allTasks}
+                {thisWeekScheduledTasks}
+                on:task-click={(e) => openDetailedCard(e.detail)}
+                on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
+                on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
+                on:task-dragged={(e) => changeTaskDeadline(e.detail)}
+                on:task-checkbox-change={(e) => toggleTaskCompleted(e.detail.id)}
+              />
+            {:else if currentMode === 'monthMode'}
+              <MonthView
+                {allTasks}
+                {thisMonthScheduledTasks}
+                on:task-click={(e) => openDetailedCard(e.detail)}
+                on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
+                on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
+                on:task-dragged={(e) => changeTaskDeadline(e.detail)}
+                on:task-checkbox-change={(e) => toggleTaskCompleted(e.detail.id)}
+              />
+            {/if}
+          </div>
         </div>
-      </div>
+      {/if}
+      
     </div>
     <!-- end of 1st flex child -->
 
-    <div class="todo-container" 
-      style="background-color:#F4F4F4; padding-top: 170px;" 
-      on:drop={(e) => unscheduleTask(e)}
-      on:dragover={(e) => dragover_handler(e)}
-    >
-      <div class="todo-list">
-        {#if allTasks}
-          {#each allTasks as task}
-            {#if !task.isDeleted}
-              <div class="task-container">
-                <RecursiveTask 
-                  on:task-click={(e) => openDetailedCard(e.detail)}
-                  on:task-create={(e) => modifyTaskTree(e, task)} 
-                  on:task-done={updateEntireTaskTree}
-                  on:task-delete={updateEntireTaskTree}
-                  on:task-repeating={updateEntireTaskTree}
-                  taskObject={task}
-                  depth={1}
-                />
-              </div>
-            {/if}
-          {/each}
+    {#if currentMode === 'playgroundMode'}
+      {#if allIncompleteTasks}
+        <PlaygroundThisWeekTodo 
+          {allIncompleteTasks}
+          on:new-root-task={(e) => createNewRootTask(e.detail)}
+          on:task-unscheduled={(e) => unscheduleTask(e)}
+          on:task-node-update={(e) => updateNode({ id: e.detail.id, newDeepValue: e.detail.newDeepValue })}
+          on:task-click={(e) => openDetailedCard(e.detail)}
+        />
+      {/if}
+    {/if}
 
-          <!-- CREATE NEW TASK (invisible but hoverable region) -->
-          <div style="height: 300px; width: 200px;"
-            on:mouseenter={() => isShowingCreateButton = true}
-            on:mouseleave={() => isShowingCreateButton = false}
-          >
-            {#if isShowingCreateButton}
-              {#if !isTypingNewRootTask}
-                <div style="font-size: 2rem; color: #000000;" on:click={() => isTypingNewRootTask = true}>
-                  New task 
-                </div>
-              {:else}
-                <div style="display: flex; align-content: center; justify-items: center">
-                  <input 
-                    bind:value={newTopLevelTask} placeholder="Type task..." 
-                    on:keypress={detectEnterKey2}
-                  >
+    {#if currentMode !== 'playgroundMode'}
+      <div class="todo-container" 
+        style="background-color:#F4F4F4; padding-top: 170px;" 
+        on:drop={(e) => unscheduleTask(e)}
+        on:dragover={(e) => dragover_handler(e)}
+      >
+        <div class="todo-list">
+          {#if allTasks}
+            {#each allTasks as task}
+              {#if !task.isDeleted}
+                <div class="task-container">
+                  <RecursiveTask 
+                    on:task-click={(e) => openDetailedCard(e.detail)}
+                    on:task-create={(e) => modifyTaskTree(e, task)} 
+                    on:task-done={updateEntireTaskTree}
+                    on:task-delete={updateEntireTaskTree}
+                    on:task-repeating={updateEntireTaskTree}
+                    taskObject={task}
+                    depth={1}
+                  />
                 </div>
               {/if}
-            {/if}
-          </div>
-        {/if}
+            {/each}
+
+            <!-- CREATE NEW TASK (invisible but hoverable region) -->
+            <div style="height: 300px; width: 200px;"
+              on:mouseenter={() => isShowingCreateButton = true}
+              on:mouseleave={() => isShowingCreateButton = false}
+            >
+              {#if isShowingCreateButton}
+                {#if !isTypingNewRootTask}
+                  <div style="font-size: 2rem; color: #000000;" on:click={() => isTypingNewRootTask = true}>
+                    New task 
+                  </div>
+                {:else}
+                  <div style="display: flex; align-content: center; justify-items: center">
+                    <input 
+                      bind:value={newTopLevelTask} placeholder="Type task..." 
+                      on:keypress={detectEnterKey2}
+                    >
+                  </div>
+                {/if}
+              {/if}
+            </div>
+          {/if}
+        </div>
       </div>
-    </div>
+      <!-- End of TO-DO container -->
+    {/if}
   </div>
   <!-- End of flexbox -->
   
@@ -243,18 +281,13 @@
   import TheSnackbar from '$lib/TheSnackbar.svelte'
   import { mostRecentlyDeletedOrCompletedTaskID, mostRecentlyCompletedTaskName, user } from '/src/store.js'
   import Playground from '$lib/Playground.svelte'
+  import PlaygroundThisWeekTodo from '$lib/PlaygroundThisWeekTodo.svelte'
 
   let snackbarTimeoutID = null
   let countdownRemaining = 0
+  let calStartDateClassObj = new Date()
 
-// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getDay
-  function getDayOfWeek () {
-    const today = new Date()
-    const options = { weekday: 'long' } // can be short for Mon. instead of Monday
-    return new Intl.DateTimeFormat('en-US', options).format(today)
-  }
-
-  let currentMode = 'dayMode' // weekMode hourMode monthMode
+  let currentMode = 'playgroundMode' // weekMode hourMode monthMode
 
   let isFinancePopupOpen = false
   let isBedtimePopupOpen = false
@@ -289,6 +322,8 @@
   let clickedTask = {}
   let goalsAndPosters = ''
 
+  let allIncompleteTasks = null
+
   onMount(() => {
     chosenBgImageURL = bgImageURLs[getRandomInt(1)]
     const div = document.getElementById("background-image-holder")
@@ -299,6 +334,8 @@
 
   // TO-DO: you don't necessarily want to re-run this everytime `allTasks` changes
   $: if (allTasks) {
+    allIncompleteTasks = filterIncompleteTasks(allTasks)
+
     collectTodayScheduledTasksToArray()
     collectFutureScheduledTasksToArray()
     collectThisWeekScheduledTasksToArray()
@@ -312,6 +349,35 @@
       return d1.getTime() - d2.getTime() // most recent to the top??
     })
   }
+
+  function filterIncompleteTasks (tasksArray) {
+    let output = []
+    const copy = [...tasksArray]
+    traverseAndUpdateTree({
+      tree: copy,
+      fulfilsCriteria: (task) => {
+        // make an independent copy
+        const filteredChildren = task.children.filter(t => t.isCompleted === false)
+        task.children = filteredChildren
+      },
+      applyFunc: (task) => output.push(task) // output = [...output, task]
+    })
+    output = copy
+    return output
+  }
+
+  function incrementDateClassObj ({ days }) {
+    calStartDateClassObj.setDate(calStartDateClassObj.getDate() + days)
+    calStartDateClassObj = calStartDateClassObj // to manually trigger reactivity
+  }
+
+  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getDay
+  function getDayOfWeek (dateClassObj) {
+    // const today = new Date()
+    const options = { weekday: 'long' } // can be short for Mon. instead of Monday
+    return new Intl.DateTimeFormat('en-US', options).format(dateClassObj)
+  }
+
 
   async function uploadGeneratedTasks (param) {
     const { allGeneratedTasksToUpload } = param
@@ -797,6 +863,27 @@
     }
   }
 
+  function createNewRootTask (newTaskObj) {
+    console.log("createNewRootTask () newTaskObj =", newTaskObj)
+    const newValue = [
+      ...allTasks, 
+      { name: newTaskObj.name,
+        id: newTaskObj.id,
+        deadlineDate: newTaskObj.deadlineDate || '',
+        deadlineTime: newTaskObj.deadlineTime || '',
+        startTime: newTaskObj.startTime || '',
+        startDate: newTaskObj.startDate || '',
+        startYYYY: newTaskObj.startYYYY || '',
+        duration: 15, // minutes 
+        children: [],
+      }
+    ]
+    updateDoc(
+      doc(db, userDocPath),
+      { allTasks: newValue }
+    )
+  }
+
   function createTask () {
     if (!newTopLevelTask) {
       alert("You have to type something first")
@@ -845,14 +932,19 @@
   // unscheduling back to to-do
   function unscheduleTask (e) {
     e.preventDefault()
-    const id = e.dataTransfer.getData('text/plain')
+    // for backwards compatibility
+    let id
+    if (e.detail.id) {
+      id = e.detail.id
+    } else {
+      id = e.dataTransfer.getData('text/plain')
+    }
     traverseAndUpdateTree({
       fulfilsCriteria: (task) => task.id === id,
       applyFunc: (task) => { 
         task.startTime = ''
         task.startDate = ''
-        task.deadlineTime = '' 
-        task.deadlineDate = ''
+        task.isDone = false
       }
     })
     updateDoc(

@@ -11,40 +11,70 @@
   Hierarchy based on tags, rather than a tree with high `h`
 
   Directly add tasks to the calendar, the `allTasks` array should have length 1000 instead of 3 over the years.
+  
+  
 -->
-<div>
-  <div style="display: flex">
-    <div on:click={() => dispatch('task-click', { task: taskObj })}>{taskObj.name}</div>
-    <span class="material-icons" on:click={() => isTypingNewSubtask = true}>
-      +
-    </span>
+<!-- !(doNotShowCompletedTasks && taskObj.isDone) -->
+{#if 
+  !(doNotShowScheduledTasks && (taskObj.startDate && taskObj.startTime))
+}
+  <div 
+    style="
+      font-family: sans-serif; 
+      font-size: {depthAdjustedFontSize}em;
+      border: 1px solid pink;
+    "
+    draggable="true"
+    on:dragstart|self={(e) => dragstart_handler(e, taskObj.id)}
+
+    on:mouseenter={() => isMouseHoveringOnTaskName = true}
+    on:mouseleave={() => isMouseHoveringOnTaskName = false}
+  >
+    <div style="display: flex; align-items: center; min-height: 24px;">
+      <div on:click={() => dispatch('task-click', { task: taskObj })}>
+        {taskObj.name}
+      </div>
+      {#if isMouseHoveringOnTaskName}
+        <span 
+          style="
+            font-size: 1.2rem;
+            margin-left: 4px;
+          "
+          class="material-icons" 
+          on:click={() => isTypingNewSubtask = true}>
+          add
+        </span>
+      {/if}
+    </div>
+
+    <div style="margin-left: 20px;">
+      {#each taskObj.children as subtaskObj, i}
+        <RecursiveTaskElement 
+          taskObj={subtaskObj}
+          depth={depth+1}
+          doNotShowScheduledTasks
+          on:task-click
+          on:task-node-update
+        />
+      {/each}
+
+      <!-- on:task-create={(e) => handleGrandchildUpdate(e, i)} -->
+
+      <!-- If this task level has a deadline, creating new sub-tasks will also be 
+        initialized with the same deadline
+      -->
+      {#if isTypingNewSubtask}
+        <input 
+          bind:this={NewSubtaskInput}
+          placeholder="Type sub-task" 
+          bind:value={newSubtaskStringValue}
+          on:keypress={(e) => handleKeypress(e)} 
+          style="width: 100%; margin-left: 5px; z-index: 1"
+        />
+      {/if}
+    </div>
   </div>
-
-  <div style="margin-left: 20px;">
-    {#each taskObj.children as subtaskObj, i}
-      <RecursiveTaskElement 
-        taskObj={subtaskObj}
-        on:task-click
-        on:task-node-update
-      />
-    {/each}
-
-    <!-- on:task-create={(e) => handleGrandchildUpdate(e, i)} -->
-
-    <!-- If this task level has a deadline, creating new sub-tasks will also be 
-      initialized with the same deadline
-    -->
-    {#if isTypingNewSubtask}
-      <input 
-        bind:this={NewSubtaskInput}
-        placeholder="Type sub-task" 
-        bind:value={newSubtaskStringValue}
-        on:keypress={(e) => handleKeypress(e)} 
-        style="width: 100%; margin-left: 5px; z-index: 1"
-      />
-    {/if}
-  </div>
-</div>
+{/if}
 
 <script>
   import RecursiveTaskElement from '$lib/RecursiveTaskElement.svelte'
@@ -52,10 +82,17 @@
   import { createEventDispatcher, tick } from 'svelte'
 
   export let taskObj
+  export let depth
+  export let doNotShowScheduledTasks = false
+  export let doNotShowCompletedTasks = false
 
   let NewSubtaskInput
   let newSubtaskStringValue = ''
   let isTypingNewSubtask = false
+  let isMouseHoveringOnTaskName = false
+  
+  $: depthAdjustedFontSize = 1.8 * (0.7 ** (depth + 1))
+
   const dispatch = createEventDispatcher()
 
   $: {
@@ -68,10 +105,13 @@
     }
   }
 
+  function dragstart_handler(e, id) {
+    e.dataTransfer.setData("text/plain", id);
+  }
+
   function handleKeypress (e) {
     if (e.key === 'Enter') {
       if (newSubtaskStringValue === '') {
-        console.log('setting it back to false')
         isTypingNewSubtask = false
       }
       else {
@@ -90,6 +130,7 @@
     }
     const newSubtaskObj = {
       deadlineDate: getDateInDDMMYYYY(d),
+      deadlineTime: '07:00',
       id: getRandomID(),
       name,
       children: []

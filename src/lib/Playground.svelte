@@ -1,17 +1,27 @@
-<h1>
-  Playground
-  <!-- {#if timesOfDay.length > 0} -->
-  <div style="display: flex; margin-left: 400px;">
+<div style="border: 2px solid purple; overflow-y: auto; height: 83%">
+  <div style="display: flex; margin-left: 48px; overflow-y: hidden;">
     {#each dateClassObjects as dateClassObj, i}
       <div>
-        <!-- {getNicelyFormattedDate(dateClassObj)} -->
-        <div style="font-family: sans-serif">
-          {dateClassObj.toLocaleDateString('en-US', { weekday: 'short' })}.
+        <div 
+          style="
+            font-family: sans-serif; 
+            font-size: 1.4em;
+            background-color: {i % 2 === 1 ? '#F8F8F8' : 'white'};
+            color: #6D6D6D;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100px;
+          "
+        >
+          ({dateClassObj.toLocaleDateString('en-US', { weekday: 'short' })})
         </div>
 
-        <!-- -->
+        <hr style="margin: 0">
+
         {#key intForTriggeringRerender}
           <ReusableCalendarView
+            backgroundColor={i % 2 === 1 ? '#F8F8F8' : 'white'}
             willShowTimestamps={i === 0}
             pixelsPerHour={MIKA_PIXELS_PER_HOUR}
             timeBlockDurationInMinutes={60}
@@ -19,6 +29,7 @@
             calendarBeginningDateClassObject={dateClassObj}
             timestamps={timesOfDay}
             scheduledTasks={getScheduledTasks(dateClassObj)}
+            on:new-root-task
             on:task-duration-adjusted
             on:task-click
             on:task-scheduled
@@ -27,33 +38,16 @@
         {/key}
       </div>
     {/each}
-      
-    <PlaygroundThisWeekTodo 
-      {allIncompleteTasks}
-      on:task-node-update
-      on:task-click
-    />
   </div>
-
-  <!-- <CopyOfDayView
-    allTasks
-    scheduledTasksToday
-  /> -->
-  <!-- TO-DO: 
-    1. Multiple Day Views,
-    2. Hierarchical this week's todo
-  -->
-</h1>
+</div>
 
 <script>
-  import DayView from '$lib/DayView.svelte'
-  import CopyOfDayView from '$lib/CopyOfDayView.svelte'
   import ReusableCalendarView from '$lib/ReusableCalendarView.svelte'
   import { MIKA_PIXELS_PER_HOUR, getNicelyFormattedDate, getDateInMMDD } from '/src/helpers'
   import { onMount } from 'svelte'
-  import PlaygroundThisWeekTodo from '$lib/PlaygroundThisWeekTodo.svelte'
 
   export let allTasks
+  export let calStartDateClassObj
 
   let allIncompleteTasks = null
   let timesOfDay = [] 
@@ -61,16 +55,17 @@
   let dateClassObjects = []
   let intForTriggeringRerender = 0
 
-  onMount(() => {
-    getDateClassObjects()
-    getTimesOfDay()
-  })
+  $: getDateClassObjects(calStartDateClassObj)
 
-  // whenever reactivity triggers
   $: if (allTasks) {
     intForTriggeringRerender += 1
     allIncompleteTasks = filterIncompleteTasks(allTasks)
   }
+
+  onMount(() => {
+    // Default start date is today, if left, you shift calStartDateClassObj
+    getTimesOfDay()
+  })
 
   function filterIncompleteTasks (tasksArray) {
     let output = []
@@ -88,16 +83,18 @@
     return output
   }
 
-  function getDateClassObjects () {
-    let d = new Date()
+  function getDateClassObjects (dateClassObj) {
+    dateClassObjects = []
+    let d = dateClassObj
     // dateClassObjects.push(d)
     for (let i = 0; i < 4; i++) {
       const independentCopy = new Date()
       independentCopy.setDate(d.getDate() + i) // quickfix: for some reason we're off by 1-index, will investigate
+      // ALWAYS START FROM 7 AM
+      independentCopy.setHours(7, 0) // hours, minutes, note it's ZERO-indexed, 0-23, 0-59
       dateClassObjects.push(independentCopy)
     }
-    dateClassObjects = dateClassObjects // manually trigger reactivity
-    console.log('dateClassObjects =', dateClassObjects)
+    dateClassObjects = dateClassObjects // manually trigger reactivity)
   }
   
   function getScheduledTasks (dateClassObj) {
