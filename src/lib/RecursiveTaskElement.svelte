@@ -6,23 +6,20 @@
   But the duration visualization is a big part, so I'm guessing, YES. Assume all clients who use <RecursiveTaskElement/> will have a scale.RecursiveTaskElement.RecursiveTaskElement
   We can iterate if we change our minds. 
 
-  This task will include checkboxes an
+  This task will include checkboxes 
 
   Hierarchy based on tags, rather than a tree with high `h`
 
   Directly add tasks to the calendar, the `allTasks` array should have length 1000 instead of 3 over the years.
-  
-  
 -->
-<!-- !(doNotShowCompletedTasks && taskObj.isDone) -->
 {#if 
-  !(doNotShowScheduledTasks && (taskObj.startDate && taskObj.startTime))
+  !(doNotShowScheduledTasks && (taskObj.startDate && taskObj.startTime)) &&
+  !(doNotShowCompletedTasks && taskObj.isDone)
 }
   <div 
     style="
       font-family: sans-serif; 
       font-size: {depthAdjustedFontSize}em;
-      border: 1px solid pink;
     "
     draggable="true"
     on:dragstart|self={(e) => dragstart_handler(e, taskObj.id)}
@@ -90,8 +87,8 @@
   let newSubtaskStringValue = ''
   let isTypingNewSubtask = false
   let isMouseHoveringOnTaskName = false
-  
-  $: depthAdjustedFontSize = 1.8 * (0.7 ** (depth + 1))
+
+  $: depthAdjustedFontSize = 1.6 * (0.8 ** (depth + 1))
 
   const dispatch = createEventDispatcher()
 
@@ -122,8 +119,6 @@
   }
 
   function createSubtask (name) {
-    // add on a date here 
-    // TO-DO: make this more general
     const d = new Date()
     for (let i = 0; i < 7; i++) {
       d.setDate(d.getDate() + 1)

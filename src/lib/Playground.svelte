@@ -1,4 +1,4 @@
-<div style="border: 2px solid purple; overflow-y: auto; height: 83%">
+<div style="overflow-y: auto; height: 83%">
   <div style="display: flex; margin-left: 48px; overflow-y: hidden;">
     {#each dateClassObjects as dateClassObj, i}
       <div>
@@ -43,7 +43,7 @@
 
 <script>
   import ReusableCalendarView from '$lib/ReusableCalendarView.svelte'
-  import { MIKA_PIXELS_PER_HOUR, getNicelyFormattedDate, getDateInMMDD } from '/src/helpers'
+  import { MIKA_PIXELS_PER_HOUR, getDateInMMDD } from '/src/helpers'
   import { onMount } from 'svelte'
 
   export let allTasks

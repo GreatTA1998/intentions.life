@@ -42,7 +42,6 @@
 
 <script>
   export let allIncompleteTasks
-  export let allTasks
 
   import { 
     computeDayDifference, 
@@ -110,7 +109,6 @@
     }
     // nice side-effect of this: double-tap ENTER to be done
     else  {
-      // create new task
       createRootTaskWithDeadline(newRootTaskStringValue)
       // then reset
       newRootTaskStringValue = ''

@@ -1,11 +1,10 @@
 <div 
   bind:this={ScrollContainer}
-  id="scroll-container" 
+  class="scroll-container" 
   style="
     position: relative;
     width: 15vw;
-    background-color: {backgroundColor}
-    border: 2px solid red;
+    background-color: {backgroundColor};
     overflow: hidden;
   "
 >
@@ -14,7 +13,6 @@
       font-family: Roboto, sans-serif; 
       margin-bottom: 1px; 
       color: #6D6D6D;
-      border: 2px solid red;
     "
     on:drop={(e) => drop_handler(e)}
     on:dragover={(e) => dragover_handler(e)}
@@ -143,20 +141,21 @@
     // }
   })
 
-
   onDestroy(() => {
     // if (browser) {
     //   myObserver.disconnect()
     // }
   })
 
+  function copyGetTrueY (e) {
+    // const ScrollContainer = document.getElementById('scroll-container')
+    return e.clientY + ScrollContainer.scrollTop - ScrollContainer.getBoundingClientRect().top - ScrollContainer.style.paddingTop
+  }
+
   async function createTaskDirectly (e) {
-    console.log("e =", e)
     // get the y-coordinate
-    const trueY = getTrueY(e)
+    const trueY = copyGetTrueY(e)
     const resultantDateClassObject = getResultantDateClassObject(trueY)
-    console.log('trueY =', trueY)
-    console.log('resultantDateClassObject =', resultantDateClassObject)
 
     if (InputElement) {
       // only allow 1 textbox to appear at a time
@@ -174,7 +173,6 @@
 
     await tick() 
     newInput.focus()
-
 
     newInput.addEventListener('keyup', (e) => {
       if (e.key !== 'Enter') return
@@ -262,7 +260,7 @@
     e.preventDefault()
     highlightedMinute = null
 
-    const trueY = getTrueY(e)
+    const trueY = copyGetTrueY(e)
 
     // origin
     const calendarStartAsMs = calendarBeginningDateClassObject.getTime()
@@ -361,7 +359,7 @@
   width: 100%;
 }
 
-#scroll-container {
+.scroll-container {
     height: fit-content;
     overflow-x: hidden; 
     /* height: 100%;  */

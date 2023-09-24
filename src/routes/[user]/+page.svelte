@@ -67,10 +67,10 @@
 
   <div style="display: flex"> 
     <!-- 1st flex child -->
-    <div style="width: 70vw; border: 3px solid blue; height: 100vh; box-sizing: border-box;">
+    <div style="width: 70vw; height: 100vh; box-sizing: border-box;">
       <div style="margin-left: 45px; margin-top: 47px; display: flex; align-items: center;">
         <div class="mika-rectangle" on:click={() => currentMode = 'hourMode'}
-          class:selected-rectangle={currentMode === 'hourMode'}
+        class:selected-rectangle={currentMode === 'hourMode'}
         >
           Hour
         </div>
@@ -780,8 +780,12 @@
         for (let i = 0; i < copyOfChildren.length; i++) {
           if (copyOfChildren[i].id === id) {
             copyOfChildren[i] = newDeepValue
-            task.children = copyOfChildren
-            console.log("successfully modified tree")
+            // quick-fix: https://explanations.app/KsPz7BOExANWvkaauNKE/tx3MKBOKCUnee9kbf7dH
+            if (task.name === 'root') {
+              allTasks = copyOfChildren
+            } else {
+              task.children = copyOfChildren
+            }
             return
           }
         }
@@ -791,7 +795,6 @@
       allTasks 
     })
   }
-
 
   async function changeTaskStartTime ({ id, timeOfDay, dateScheduled }) {
     traverseAndUpdateTree({
@@ -864,7 +867,6 @@
   }
 
   function createNewRootTask (newTaskObj) {
-    console.log("createNewRootTask () newTaskObj =", newTaskObj)
     const newValue = [
       ...allTasks, 
       { name: newTaskObj.name,
@@ -939,12 +941,19 @@
     } else {
       id = e.dataTransfer.getData('text/plain')
     }
+    const d = new Date()
+    for (let i = 0; i < 7; i++) {
+      d.setDate(d.getDate() + 1)
+    }
+    const nextWeekDateClassObj = d
+
     traverseAndUpdateTree({
       fulfilsCriteria: (task) => task.id === id,
       applyFunc: (task) => { 
         task.startTime = ''
         task.startDate = ''
-        task.isDone = false
+        task.deadlineDate = getDateInDDMMYYYY(d)
+        task.deadlineTime = '07:00'
       }
     })
     updateDoc(
