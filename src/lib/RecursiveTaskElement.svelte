@@ -19,7 +19,7 @@
   <div 
     style="
       font-family: sans-serif; 
-      font-size: {depthAdjustedFontSize}em;
+      width: 100%;
     "
     draggable="true"
     on:dragstart|self={(e) => dragstart_handler(e, taskObj.id)}
@@ -27,8 +27,19 @@
     on:mouseenter={() => isMouseHoveringOnTaskName = true}
     on:mouseleave={() => isMouseHoveringOnTaskName = false}
   >
-    <div style="display: flex; align-items: center; min-height: 24px;">
-      <div on:click={() => dispatch('task-click', { task: taskObj })}>
+    <div 
+      style="
+      display: flex; 
+      align-items: center; 
+      min-height: 24px;
+    ">
+      <div 
+        on:click={() => dispatch('task-click', { task: taskObj })}
+        style="
+          font-size: {depthAdjustedFontSize}em;
+          width: calc(100% - 30px);
+        "
+      >
         {taskObj.name}
       </div>
       {#if isMouseHoveringOnTaskName}
@@ -88,7 +99,7 @@
   let isTypingNewSubtask = false
   let isMouseHoveringOnTaskName = false
 
-  $: depthAdjustedFontSize = 1.6 * (0.8 ** (depth + 1))
+  $: depthAdjustedFontSize = 1.5 * (0.8 ** (depth + 1))
 
   const dispatch = createEventDispatcher()
 
