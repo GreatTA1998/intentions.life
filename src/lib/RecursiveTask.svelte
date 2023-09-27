@@ -1,6 +1,11 @@
 <!-- Recursively display a task and all its subtasks -->
 <!-- Check if parent's fixed duration is enough to practically include its children's font sizes `taskObject.duration * 90/60 > children.length * 10  -->
-{#if !taskObject.isDeleted && !taskObject.isDone && !(taskObject.startTime && taskObject.startDate)}
+{#if 
+  !taskObject.isDeleted 
+  && !taskObject.isDone 
+  && !(taskObject.startTime && taskObject.startDate)
+  && !(taskObject.deadlineDate && taskObject.deadlineTime)
+}
   <!-- 
     {taskObject.duration && !doChildrenHaveDuration 
         && (taskObject.duration * 90/60 > taskObject.children.length * 60 * 0.7 ** depth)
@@ -99,7 +104,7 @@
 <script>
   import RecursiveTask from './RecursiveTask.svelte'
   import { createEventDispatcher, onMount, tick } from 'svelte'
-  import { getDateOfToday, getRandomID } from './helpers'
+  import { getDateOfToday, getRandomID } from '/src/helpers.js'
 
   export let taskObject
   export let depth

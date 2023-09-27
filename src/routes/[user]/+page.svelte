@@ -65,6 +65,32 @@
     </span>
   </a>
 
+  <!-- The grand tree icon -->
+  <a role="button" 
+    on:click={() => {
+      if (currentMode === 'grandTreeMode') {
+        currentMode = 'playgroundMode'
+      } else {
+        currentMode = 'grandTreeMode'
+      }
+    }} 
+    class="float"
+    style="
+      width: 75px; 
+      height: 75px; 
+      top: auto; 
+      bottom: 35px; 
+      right: 130px; 
+      z-index: 10;
+      background-color: #00AA3A;
+    "
+    class:blue-focus={currentMode === 'grandTreeMode'}
+  >
+    <span class="material-icons my-float" style="font-size: 3em;">
+      forest
+    </span>
+  </a>
+
   <div style="display: flex"> 
     <!-- 1st flex child -->
     <div style="width: 70vw; height: 100vh; box-sizing: border-box;">
@@ -130,6 +156,16 @@
           on:task-dragged={(e) => changeTaskDeadline(e.detail)}
           on:task-checkbox-change={(e) => toggleTaskCompleted(e.detail.id)}
         /> 
+      {:else if currentMode === 'grandTreeMode' && allTasks}
+        <GrandTreeTodo 
+          {allTasks}
+          on:task-click={(e) => openDetailedCard(e.detail)}
+          on:task-create={(e) => modifyTaskTree(e.detail.updatedChildren, e.detail.taskAffected)} 
+          on:task-done={updateEntireTaskTree}
+          on:task-delete={updateEntireTaskTree}
+          on:task-repeating={updateEntireTaskTree}
+          on:drop={(e) => unscheduleTask(e)}
+        />
       {:else if currentMode !== 'playgroundMode'}
         <div class="flex-container blur">
           <div class="calendar-section-container">
@@ -183,67 +219,26 @@
       
     </div>
     <!-- end of 1st flex child -->
-
-    {#if currentMode === 'playgroundMode'}
+    {#if currentMode === 'playgroundMode' || currentMode === 'grandTreeMode'}
       {#if allIncompleteTasks}
         <PlaygroundThisWeekTodo 
           {allIncompleteTasks}
           on:new-root-task={(e) => createNewRootTask(e.detail)}
-          on:task-unscheduled={(e) => unscheduleTask(e)}
+          on:task-unscheduled={(e) => putTaskToThisWeekTodo(e)}
           on:task-node-update={(e) => updateNode({ id: e.detail.id, newDeepValue: e.detail.newDeepValue })}
           on:task-click={(e) => openDetailedCard(e.detail)}
         />
       {/if}
-    {/if}
-
-    {#if currentMode !== 'playgroundMode'}
-      <div class="todo-container" 
-        style="background-color:#F4F4F4; padding-top: 170px;" 
+    {:else}
+      <GrandTreeTodo 
+        {allTasks}
+        on:task-click={(e) => openDetailedCard(e.detail)}
+        on:task-create={(e) => modifyTaskTree(e.detail.updatedChildren, e.detail.taskAffected)} 
+        on:task-done={updateEntireTaskTree}
+        on:task-delete={updateEntireTaskTree}
+        on:task-repeating={updateEntireTaskTree}
         on:drop={(e) => unscheduleTask(e)}
-        on:dragover={(e) => dragover_handler(e)}
-      >
-        <div class="todo-list">
-          {#if allTasks}
-            {#each allTasks as task}
-              {#if !task.isDeleted}
-                <div class="task-container">
-                  <RecursiveTask 
-                    on:task-click={(e) => openDetailedCard(e.detail)}
-                    on:task-create={(e) => modifyTaskTree(e, task)} 
-                    on:task-done={updateEntireTaskTree}
-                    on:task-delete={updateEntireTaskTree}
-                    on:task-repeating={updateEntireTaskTree}
-                    taskObject={task}
-                    depth={1}
-                  />
-                </div>
-              {/if}
-            {/each}
-
-            <!-- CREATE NEW TASK (invisible but hoverable region) -->
-            <div style="height: 300px; width: 200px;"
-              on:mouseenter={() => isShowingCreateButton = true}
-              on:mouseleave={() => isShowingCreateButton = false}
-            >
-              {#if isShowingCreateButton}
-                {#if !isTypingNewRootTask}
-                  <div style="font-size: 2rem; color: #000000;" on:click={() => isTypingNewRootTask = true}>
-                    New task 
-                  </div>
-                {:else}
-                  <div style="display: flex; align-content: center; justify-items: center">
-                    <input 
-                      bind:value={newTopLevelTask} placeholder="Type task..." 
-                      on:keypress={detectEnterKey2}
-                    >
-                  </div>
-                {/if}
-              {/if}
-            </div>
-          {/if}
-        </div>
-      </div>
-      <!-- End of TO-DO container -->
+      />
     {/if}
   </div>
   <!-- End of flexbox -->
@@ -259,9 +254,6 @@
   // RENAME THIS TO USER_UID
   let { userID } = data; // GxBbopqXHW0qgjKEwU4z 
   $: ({ userID } = data); // so it stays in sync when `data` changes
-
-  import UnscheduledTasksForToday from '$lib/UnscheduledTasksForToday.svelte'
-  import RecursiveTask from '../../RecursiveTask.svelte'
 
   // import FutureOverview from '../../lib/FutureOverview.svelte'
   import DetailedCardPopup from '$lib/DetailedCardPopup.svelte'
@@ -282,6 +274,7 @@
   import { mostRecentlyDeletedOrCompletedTaskID, mostRecentlyCompletedTaskName, user } from '/src/store.js'
   import Playground from '$lib/Playground.svelte'
   import PlaygroundThisWeekTodo from '$lib/PlaygroundThisWeekTodo.svelte'
+  import GrandTreeTodo from '$lib/GrandTreeTodo.svelte'
 
   let snackbarTimeoutID = null
   let countdownRemaining = 0
@@ -312,10 +305,6 @@
   let futureScheduledTasks = [] // AF([])
   let thisWeekScheduledTasks = [] 
   let thisMonthScheduledTasks = []
-
-  let newTopLevelTask = ''
-  let isTypingNewRootTask = false
-  let isShowingCreateButton = false
 
   let isDetailedCardOpen = false
   let isJournalPopupOpen = false
@@ -860,12 +849,6 @@
     }
   }
 
-  function detectEnterKey2 (e) { 
-    if (e.charCode === 13) {
-      createTask()
-    }
-  }
-
   function createNewRootTask (newTaskObj) {
     const newValue = [
       ...allTasks, 
@@ -886,31 +869,8 @@
     )
   }
 
-  function createTask () {
-    if (!newTopLevelTask) {
-      alert("You have to type something first")
-    }
-    const newValue = [
-      ...allTasks, 
-      { name: newTopLevelTask,
-        duration: 15, // minutes 
-        children: [],
-        id: getRandomID()
-      }
-    ]
-
-    updateDoc(
-      doc(db, userDocPath),
-      { allTasks: newValue }
-    )
-
-    newTopLevelTask = ''
-    isTypingNewTask = false
-  }
-
-  function modifyTaskTree (e, task) {
+  function modifyTaskTree (updatedChildren, task) {
     // change the reference
-    const { updatedChildren } = e.detail
     task.children = [...updatedChildren]
 
     updateEntireTaskTree()
@@ -927,11 +887,37 @@
     )
   }
 
-  function dragover_handler (e) {
+  // mvoe to this week's todo
+  function putTaskToThisWeekTodo (e) {
     e.preventDefault()
+    // for backwards compatibility
+    let id
+    if (e.detail.id) {
+      id = e.detail.id
+    } else {
+      id = e.dataTransfer.getData('text/plain')
+    }
+    // get next week's date class object
+    const d = new Date()
+    for (let i = 0; i < 7; i++) {
+      d.setDate(d.getDate() + 1)
+    }
+    traverseAndUpdateTree({
+      fulfilsCriteria: (task) => task.id === id,
+      applyFunc: (task) => { 
+        task.startTime = ''
+        task.startDate = ''
+        task.deadlineDate = getDateInDDMMYYYY(d)
+        task.deadlineTime = '07:00'
+      }
+    })
+    updateDoc(
+      doc(db, userDocPath),
+      { allTasks }
+    )
   }
 
-  // unscheduling back to to-do
+  // unscheduling back to grand to-do
   function unscheduleTask (e) {
     e.preventDefault()
     // for backwards compatibility
@@ -941,19 +927,14 @@
     } else {
       id = e.dataTransfer.getData('text/plain')
     }
-    const d = new Date()
-    for (let i = 0; i < 7; i++) {
-      d.setDate(d.getDate() + 1)
-    }
-    const nextWeekDateClassObj = d
-
     traverseAndUpdateTree({
       fulfilsCriteria: (task) => task.id === id,
       applyFunc: (task) => { 
         task.startTime = ''
         task.startDate = ''
-        task.deadlineDate = getDateInDDMMYYYY(d)
-        task.deadlineTime = '07:00'
+        task.deadlineDate = '' 
+        task.deadlineTime = ''
+        task.isDone = false
       }
     })
     updateDoc(
@@ -1037,16 +1018,6 @@
       height: 100vh;
       box-sizing: border-box;
     }
-    .todo-container {
-      font-family: Roboto, sans-serif;
-      width: 30vw;
-      height: 100vh;
-      padding-top: 15px; 
-      padding-left: 20px;
-      border: none; 
-      border-top: none;
-      border-right: none;
-    }
     .calendar-section-container {
       background: transparent; 
       width: 45vw;
@@ -1061,10 +1032,6 @@
   @media only screen and (max-width : 480px) {
     .flex-container {
       width: 200%
-    }
-    .todo-container {
-      width: 600px;
-      height: 100%;
     }
     .calendar-section-container {
       width: 800px;
@@ -1103,29 +1070,6 @@
   .blur {
     backdrop-filter: blur(0px);
     height: 100vh; 
-  }
-
-  .todo-container {
-    overflow-y: auto;
-    overflow-x: auto;
-    box-sizing: border-box;
-    width: 50vw;
-    height: 120vh;
-  }
-
-  .todo-list {
-    width: 100%; 
-    display: flex; 
-  }
-
-  .task-container { 
-    border: 0px solid; 
-    margin-bottom: 25px; 
-    padding-left: 0; 
-    padding-top: 10px; 
-    padding-bottom: 10px; 
-    padding-right: 0; 
-    overflow: none;
   }
   /* #radio-player-with-art {
     background-image: url('../maplestory-watercolor.jpg')
@@ -1180,15 +1124,10 @@
     transition: all 0.2s ease-out;
   }
 
-.blue-focus{
-  color: #ffffff;
-  background-color: #0085FF;
-/*  border: 1px solid #0085FF;*/
-  transition: all 0.2s ease-out;
-}
-
-
-
-
-
+  .blue-focus{
+    color: #ffffff;
+    background-color: #0085FF;
+  /*  border: 1px solid #0085FF;*/
+    transition: all 0.2s ease-out;
+  }
 </style>
