@@ -23,8 +23,8 @@
     <RecursiveTaskElement 
       {taskObj}
       depth={0}
-      doNotShowScheduledTasks
-      doNotShowCompletedTasks
+      doNotShowScheduledTasks={true}
+      doNotShowCompletedTasks={true}
       on:task-click
       on:task-node-update
     />

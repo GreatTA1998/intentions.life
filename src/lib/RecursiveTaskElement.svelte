@@ -12,9 +12,11 @@
 
   Directly add tasks to the calendar, the `allTasks` array should have length 1000 instead of 3 over the years.
 -->
+
 {#if 
-  !(doNotShowScheduledTasks && (taskObj.startDate && taskObj.startTime)) &&
-  !(doNotShowCompletedTasks && taskObj.isDone)
+  (!doNotShowScheduledTasks || (doNotShowScheduledTasks && !(taskObj.startDate && taskObj.startTime))) 
+  &&
+  (!doNotShowCompletedTasks || (doNotShowCompletedTasks && !taskObj.isDone))
 }
   <div 
     style="
@@ -38,6 +40,10 @@
         style="
           font-size: {depthAdjustedFontSize}em;
           width: calc(100% - 30px);
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          line-height: 1.5;
         "
       >
         {taskObj.name}
@@ -60,7 +66,8 @@
         <RecursiveTaskElement 
           taskObj={subtaskObj}
           depth={depth+1}
-          doNotShowScheduledTasks
+          {doNotShowScheduledTasks}
+          {doNotShowCompletedTasks}
           on:task-click
           on:task-node-update
         />
@@ -99,7 +106,7 @@
   let isTypingNewSubtask = false
   let isMouseHoveringOnTaskName = false
 
-  $: depthAdjustedFontSize = 1.5 * (0.8 ** (depth + 1))
+  $: depthAdjustedFontSize = 0.8 * (0.9 ** (depth + 1))
 
   const dispatch = createEventDispatcher()
 
