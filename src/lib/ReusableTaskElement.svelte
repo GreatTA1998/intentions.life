@@ -20,14 +20,14 @@
 
     `min-height` prevents the parent from being super small when it's bullet point mode
   -->
-  <div style="display: flex;">
+  <div style="display: flex; align-items: center;">
     {#if isBulletPoint}
       <div 
         class:normal-text={!isBulletPoint}
         class:smallest-text={isBulletPoint}
-        style="color: {task.isDone ? '#509c13' : ''}; margin-left: 1px; margin-top: 1px; margin-right: 2px;"
+        style="color: {task.isDone ? '#509c13' : 'grey'}; margin-left: 1px; margin-bottom: 5px; margin-right: 2px;"
       >
-        -
+        <span class="material-icons" style="font-size: 2px;">circle</span>
       </div>
     {/if}
 

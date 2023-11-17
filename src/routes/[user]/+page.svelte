@@ -91,9 +91,32 @@
     </span>
   </a>
 
+
   <div style="display: flex"> 
-    <!-- 1st flex child -->
-    <div style="width: 70vw; height: 100vh; box-sizing: border-box;">
+    {#if currentMode === 'playgroundMode' || currentMode === 'grandTreeMode'}
+      {#if allIncompleteTasks}
+        <PlaygroundThisWeekTodo 
+          {allIncompleteTasks}
+          on:new-root-task={(e) => createNewRootTask(e.detail)}
+          on:task-unscheduled={(e) => putTaskToThisWeekTodo(e)}
+          on:task-node-update={(e) => updateNode({ id: e.detail.id, newDeepValue: e.detail.newDeepValue })}
+          on:task-click={(e) => openDetailedCard(e.detail)}
+        />
+      {/if}
+    {:else}
+      <GrandTreeTodo 
+        {allTasks}
+        on:task-click={(e) => openDetailedCard(e.detail)}
+        on:task-create={(e) => modifyTaskTree(e.detail.updatedChildren, e.detail.taskAffected)} 
+        on:task-done={updateEntireTaskTree}
+        on:task-delete={updateEntireTaskTree}
+        on:task-repeating={updateEntireTaskTree}
+        on:drop={(e) => unscheduleTask(e)}
+      />
+    {/if}
+
+    <!-- 2nd flex child -->
+    <div style="width: 56vw; height: 100vh; box-sizing: border-box; background-color: rgb(250, 250, 250)">
       <div style="margin-left: 45px; margin-top: 47px; display: flex; align-items: center;">
         <div class="mika-rectangle" on:click={() => currentMode = 'hourMode'}
         class:selected-rectangle={currentMode === 'hourMode'}
@@ -156,6 +179,7 @@
           on:task-dragged={(e) => changeTaskDeadline(e.detail)}
           on:task-checkbox-change={(e) => toggleTaskCompleted(e.detail.id)}
         /> 
+
       {:else if currentMode === 'grandTreeMode' && allTasks}
         <GrandTreeTodo 
           {allTasks}
@@ -216,29 +240,18 @@
           </div>
         </div>
       {/if}
-      
     </div>
-    <!-- end of 1st flex child -->
-    {#if currentMode === 'playgroundMode' || currentMode === 'grandTreeMode'}
-      {#if allIncompleteTasks}
-        <PlaygroundThisWeekTodo 
-          {allIncompleteTasks}
-          on:new-root-task={(e) => createNewRootTask(e.detail)}
-          on:task-unscheduled={(e) => putTaskToThisWeekTodo(e)}
-          on:task-node-update={(e) => updateNode({ id: e.detail.id, newDeepValue: e.detail.newDeepValue })}
-          on:task-click={(e) => openDetailedCard(e.detail)}
+    <!-- end of 2nd flex child -->
+
+    <!-- optional 3rd flex child -->
+    {#if currentMode === 'playgroundMode' && allTasks}
+      <div style="padding-top: 120px; padding-left: 24px;">
+        <FutureOverview
+          {futureScheduledTasks}
+          on:task-duration-adjusted
+          on:task-click
         />
-      {/if}
-    {:else}
-      <GrandTreeTodo 
-        {allTasks}
-        on:task-click={(e) => openDetailedCard(e.detail)}
-        on:task-create={(e) => modifyTaskTree(e.detail.updatedChildren, e.detail.taskAffected)} 
-        on:task-done={updateEntireTaskTree}
-        on:task-delete={updateEntireTaskTree}
-        on:task-repeating={updateEntireTaskTree}
-        on:drop={(e) => unscheduleTask(e)}
-      />
+      </div>
     {/if}
   </div>
   <!-- End of flexbox -->
@@ -275,6 +288,7 @@
   import Playground from '$lib/Playground.svelte'
   import PlaygroundThisWeekTodo from '$lib/PlaygroundThisWeekTodo.svelte'
   import GrandTreeTodo from '$lib/GrandTreeTodo.svelte'
+  import FutureOverview from '$lib/FutureOverview.svelte'
 
   let snackbarTimeoutID = null
   let countdownRemaining = 0

@@ -35,15 +35,21 @@
       align-items: center; 
       min-height: 24px;
     ">
+      <!--  no more fixed width: width: calc(100% - 30px); 
+          min-width and height to make it easy to delete legacy tasks with no titles
+      -->
       <div 
         on:click={() => dispatch('task-click', { task: taskObj })}
         style="
+          min-width: 30px; 
+          min-height: 30px;
+          max-width: 320px;
           font-size: {depthAdjustedFontSize}em;
-          width: calc(100% - 30px);
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
           line-height: 1.5;
+          color: {taskObj.startDate && taskObj.startTime ? 'grey' : 'black'}
         "
       >
         {taskObj.name}
@@ -53,6 +59,7 @@
           style="
             font-size: 1.2rem;
             margin-left: 4px;
+            cursor: pointer;
           "
           class="material-icons" 
           on:click={() => isTypingNewSubtask = true}>
@@ -106,7 +113,7 @@
   let isTypingNewSubtask = false
   let isMouseHoveringOnTaskName = false
 
-  $: depthAdjustedFontSize = 0.8 * (0.9 ** (depth + 1))
+  $: depthAdjustedFontSize = 0.8 * (0.86 ** (depth + 1))
 
   const dispatch = createEventDispatcher()
 

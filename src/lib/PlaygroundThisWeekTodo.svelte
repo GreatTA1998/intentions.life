@@ -1,33 +1,41 @@
 <div style="
-    min-width: 495px; 
-    background-color: #ECECEC;
-    padding-left: 80px; padding-right: 80px;
+    min-width: 380px; 
+    background-color: rgb(245, 245, 245);
+    padding-left: 48px; padding-right: 24px;
     padding-top: 120px;
     font-size: 2em;
   "  
   on:drop={(e) => unscheduleTask(e)}
   on:dragover={(e) => dragover_handler(e)}
 >
-  <div style="display: flex; align-items: center">
-    <div style="font-family: Inter; color: #6D6D6D; font-weight: 600">
+  <div style="display: flex; align-items: center"
+    on:mouseenter={() => isMouseHoveringOnTaskName = true}
+    on:mouseleave={() => isMouseHoveringOnTaskName = false}
+  >
+    <div style="color: black; font-family: 'Inter'; font-weight: 600">
       This week's to-do
     </div>
 
-    <span on:click={() => isTypingNewRootTask = true} class="material-icons">
-      add
-    </span>
+    {#if isMouseHoveringOnTaskName}
+      <span on:click={() => isTypingNewRootTask = true} class="material-icons" style="margin-left: 6px; cursor: pointer;">
+        add
+      </span>
+    {/if}
   </div>
+
+  <div style="margin-bottom: 20px;"></div>
 
   <!-- TO-DO: Render all tasks with deadline of this week here -->
   {#each tasksDueThisWeek as taskObj}
     <RecursiveTaskElement 
       {taskObj}
       depth={0}
-      doNotShowScheduledTasks={true}
+      doNotShowScheduledTasks={false}
       doNotShowCompletedTasks={true}
       on:task-click
       on:task-node-update
     />
+    <div style="margin-bottom: 20px;"></div>
   {/each}
 
   {#if isTypingNewRootTask}
@@ -55,6 +63,7 @@
   import { createEventDispatcher, tick } from 'svelte'
   
 
+  let isMouseHoveringOnTaskName = false
   let tasksDueThisWeek = null
 
   let isTypingNewRootTask = false
@@ -91,7 +100,7 @@
         const dayDiff = computeDayDifference(
           d1, d2
         )
-        if (0 <= dayDiff && dayDiff <= 7) {
+        if (dayDiff <= 7) {
           output.push(task)
           return true // this will terminate further traversal down its children
         }

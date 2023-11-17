@@ -10,7 +10,7 @@
 >
   <div class="calendar-day-container" 
     style="height: {timestamps.length * timeBlockDurationInMinutes * pixelsPerMinute}px; 
-      font-family: Roboto, sans-serif; 
+      font-family: 'Inter', sans-serif; 
       margin-bottom: 1px; 
       color: #6D6D6D;
     "

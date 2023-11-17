@@ -6,7 +6,7 @@
           style="
             font-family: sans-serif; 
             font-size: 1.4em;
-            background-color: {i % 2 === 1 ? '#F8F8F8' : 'white'};
+            background-color: rgb(250, 250, 250);
             color: #6D6D6D;
             display: flex;
             justify-content: center;
@@ -14,14 +14,12 @@
             height: 100px;
           "
         >
-          ({dateClassObj.toLocaleDateString('en-US', { weekday: 'short' })})
+          {dateClassObj.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase()}
         </div>
-
-        <hr style="margin: 0">
 
         {#key intForTriggeringRerender}
           <ReusableCalendarView
-            backgroundColor={i % 2 === 1 ? '#F8F8F8' : 'white'}
+            backgroundColor='rgb(250, 250, 250)'
             willShowTimestamps={i === 0}
             pixelsPerHour={MIKA_PIXELS_PER_HOUR}
             timeBlockDurationInMinutes={60}
@@ -143,3 +141,20 @@
   }
 
 </script>
+
+<style>
+/* Notion scrollbar styles */
+::-webkit-scrollbar {
+  background: transparent;
+}
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: #D3D1CB;
+}
+::-webkit-scrollbar-track {
+  background: #EDECE9;
+}
+</style>

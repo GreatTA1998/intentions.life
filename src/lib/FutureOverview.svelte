@@ -4,7 +4,8 @@
     margin-bottom: 40px; 
     font-family: 'Inter';
     font-style: normal;
-    font-size: 16px;
+    font-size: 24px;
+    font-weight: 500;
     line-height: 19px;
   ">
     Upcoming this week
