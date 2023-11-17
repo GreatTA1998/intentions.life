@@ -8,7 +8,7 @@
     font-weight: 500;
     line-height: 19px;
   ">
-    Upcoming this week
+    Upcoming in future
   </div>
   <div class="future-overview-scroll-container">
     {#each Object.keys(datesToTasks) as date}

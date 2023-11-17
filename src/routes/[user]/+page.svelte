@@ -91,7 +91,6 @@
     </span>
   </a>
 
-
   <div style="display: flex"> 
     {#if currentMode === 'playgroundMode' || currentMode === 'grandTreeMode'}
       {#if allIncompleteTasks}
