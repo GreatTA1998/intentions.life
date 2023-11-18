@@ -1,27 +1,33 @@
-<!-- TO-DO:
-  Previously, we deprecated the duration lines for unscheduled tasks, because it violates the principle of 
-  "do not distort or misrepresent data"
+<!-- 
+  The goal is for this to be used on the calendar, todo-list...everywhere
+    1. It is hierarchical
+    2. It also has duration (NOTE: right now it doesn't)
+      (note, consider whether you want to display duration visualizations
+      for the future preview and the all-time todo list - it could be useful to turn off 
+      visualization as a prop)
 
-  However, we will now keep duration visualization units consistent, pixelsPerHour will be the same for all elements on the screen. 
-  But the duration visualization is a big part, so I'm guessing, YES. Assume all clients who use <RecursiveTaskElement/> will have a scale.RecursiveTaskElement.RecursiveTaskElement
-  We can iterate if we change our minds. 
+  Other notes: 
+    Previously, we deprecated the duration lines for the all-time todo tree, because it violates the principle of 
+    "do not distort or misrepresent data".
 
-  This task will include checkboxes 
+    However, we will now keep duration visualization units consistent, pixelsPerHour will be the same for all elements on the screen. 
+    But the duration visualization is a big part, so I'm guessing, YES. Assume all clients who use <RecursiveTaskElement/> will have a scale.R
 
-  Hierarchy based on tags, rather than a tree with high `h`
+    This task will include checkboxes 
 
-  Directly add tasks to the calendar, the `allTasks` array should have length 1000 instead of 3 over the years.
+    Hierarchy based on tags, rather than a tree with high `h`
+
+    Directly add tasks to the calendar, the `allTasks` array should have length 1000 instead of 3 over the years.
 -->
-
 {#if 
   (!doNotShowScheduledTasks || (doNotShowScheduledTasks && !(taskObj.startDate && taskObj.startTime))) 
   &&
   (!doNotShowCompletedTasks || (doNotShowCompletedTasks && !taskObj.isDone))
 }
   <div 
-    style="
-      font-family: sans-serif; 
+    style=" 
       width: 100%;
+      font-weight: 400;
     "
     draggable="true"
     on:dragstart|self={(e) => dragstart_handler(e, taskObj.id)}
@@ -62,7 +68,8 @@
             cursor: pointer;
           "
           class="material-icons" 
-          on:click={() => isTypingNewSubtask = true}>
+          on:click={() => isTypingNewSubtask = true}
+        >
           add
         </span>
       {/if}
@@ -102,6 +109,7 @@
   import RecursiveTaskElement from '$lib/RecursiveTaskElement.svelte'
   import { getDateInDDMMYYYY, getRandomID } from '/src/helpers'
   import { createEventDispatcher, tick } from 'svelte'
+  import { appModePixelsPerHour } from '/src/store'
 
   export let taskObj
   export let depth

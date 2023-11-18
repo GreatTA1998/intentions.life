@@ -6,3 +6,6 @@ export const hasLogoExited = writable(false)
 
 export const mostRecentlyDeletedOrCompletedTaskID = writable('')
 export const mostRecentlyCompletedTaskName = writable('')
+
+// 200/24 is the week view value
+export const appModePixelsPerHour = writable(200/24)

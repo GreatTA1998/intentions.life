@@ -43,22 +43,49 @@
   />
 {/if}
 
+<!-- Top Navigation Bar -->
+<div style="box-sizing: border-box; height: 60px; width: 100%; display: flex; align-items: center; padding-left: 24px; padding-right: 24px; 
+  border-bottom: 1px solid lightgrey">
+  <img src="ola-ios-size.JPG" style="width: 36px; height: 36px; margin-right: 8px;">
+  <div style="font-family: inter;">organize-life.com</div>
+
+  <div style="
+    box-sizing: border-box; 
+    margin-top: 0px;
+    display: flex; 
+    margin-left: 120px;
+    width: fit-content; 
+    justify-content: space-evenly; border-bottom: 0px solid rgb(200, 200, 200); font-family: 'Inter', sans-serif;"
+  >
+    <!-- 'Hour' and 'Month' views not yet implemented -->
+    {#each ['Day', 'Week'] as mode}
+      <div 
+        class="ux-tab-item" 
+        class:active-ux-tab={currentMode === mode} 
+        on:click={() => currentMode = mode}
+      >
+        {mode}
+      </div>
+    {/each}
+  </div>
+</div>
+
 <div id="background-image-holder" style="height: 100vh;">
-  <a role="button" on:click={() => isJournalPopupOpen = !isJournalPopupOpen} class="float mika-hover" style="right: 250px; z-index: 10"  
+  <a role="button" on:click={() => isJournalPopupOpen = !isJournalPopupOpen} class="float mika-hover" style="right: 150px; z-index: 10"  
   class:blue-focus={isJournalPopupOpen}>
     <span class="material-icons my-float">
       auto_stories
     </span>
   </a>
 
-  <a role="button" on:click={() => isFinancePopupOpen = !isFinancePopupOpen} class="float mika-hover" style="right: 190px; z-index: 10"
+  <a role="button" on:click={() => isFinancePopupOpen = !isFinancePopupOpen} class="float mika-hover" style="right: 90px; z-index: 10"
   class:blue-focus={isFinancePopupOpen}>
     <span class="material-icons my-float">
       attach_money
     </span>
   </a>
 
-  <a role="button" on:click={() => isBedtimePopupOpen = !isBedtimePopupOpen} class="float mika-hover" style="right: 130px; z-index: 10"
+  <a role="button" on:click={() => isBedtimePopupOpen = !isBedtimePopupOpen} class="float mika-hover" style="right: 30px; z-index: 10"
   class:blue-focus={isBedtimePopupOpen}>
     <span class="material-icons my-float">
       bedtime
@@ -69,7 +96,7 @@
   <a role="button" 
     on:click={() => {
       if (currentMode === 'grandTreeMode') {
-        currentMode = 'playgroundMode'
+        currentMode = 'Playground'
       } else {
         currentMode = 'grandTreeMode'
       }
@@ -80,7 +107,8 @@
       height: 75px; 
       top: auto; 
       bottom: 35px; 
-      right: 130px; 
+      left: 48px; 
+      right: auto;
       z-index: 10;
       background-color: #00AA3A;
     "
@@ -92,7 +120,7 @@
   </a>
 
   <div style="display: flex"> 
-    {#if currentMode === 'playgroundMode' || currentMode === 'grandTreeMode'}
+    {#if currentMode === 'Week' || currentMode === 'grandTreeMode'}
       {#if allIncompleteTasks}
         <PlaygroundThisWeekTodo 
           {allIncompleteTasks}
@@ -115,58 +143,30 @@
     {/if}
 
     <!-- 2nd flex child -->
-    <div style="width: 56vw; height: 100vh; box-sizing: border-box; background-color: rgb(250, 250, 250)">
-      <div style="margin-left: 45px; margin-top: 47px; display: flex; align-items: center;">
-        <div class="mika-rectangle" on:click={() => currentMode = 'hourMode'}
-        class:selected-rectangle={currentMode === 'hourMode'}
-        >
-          Hour
-        </div>
-        <div class="mika-rectangle" class:selected-rectangle={currentMode === 'dayMode'} 
-          on:click={() => currentMode = 'dayMode'}>
-          Day
-        </div>
-        <div class="mika-rectangle" on:click={() => currentMode = 'weekMode'}
-          class:selected-rectangle={currentMode === 'weekMode'} 
-        >
-          Week
-        </div>
-        <div class="mika-rectangle" on:click={() => currentMode = 'monthMode'}
-          class:selected-rectangle={currentMode === 'monthMode'}  
-        >
-          Month
-        </div>
-
-        <div class="mika-rectangle" on:click={() => currentMode = 'playgroundMode'}
-          class:selected-rectangle={currentMode === 'playgroundMode'}  
-        >
-          Playground
-        </div>
-      </div>
-
+    <div style="width: 58vw; height: 100vh; box-sizing: border-box; background-color: rgb(250, 250, 250)">
       <!-- Display today's date  -->
       <div style="
         display: flex; 
         align-items: center; 
         margin-left: 20px;
-        padding: 30px 0px 10px 35px;"
+        padding: 60px 0px 10px 35px;"
       >
-        {#if currentMode === 'playgroundMode'}
+        <!-- {#if currentMode === 'Playground'}
           <span on:click={() => incrementDateClassObj({ days: -1 })} class="material-icons" style="font-size: 4em;">
             arrow_left
           </span>
-        {/if}
-        <div style="font-family: Inter; font-weight: 600; font-size: 28px; color: #000000">
+        {/if} -->
+        <div style="font-weight: 500; font-size: 28px; color: #000000;">
           {getDayOfWeek(calStartDateClassObj)}, { getNicelyFormattedDate(calStartDateClassObj) }, { calStartDateClassObj.getFullYear() }
         </div>
-        {#if currentMode === 'playgroundMode'}
+        <!-- {#if currentMode === 'Playground'}
           <span on:click={() => incrementDateClassObj({ days: 1 })} class="material-icons" style="font-size: 4em;">
             arrow_right
           </span>
-        {/if}
+        {/if} -->
       </div>
 
-      {#if currentMode === 'playgroundMode' && allTasks}
+      {#if currentMode === 'Week' && allTasks}
         <Playground
           {allTasks}
           {calStartDateClassObj}
@@ -189,7 +189,7 @@
           on:task-repeating={updateEntireTaskTree}
           on:drop={(e) => unscheduleTask(e)}
         />
-      {:else if currentMode !== 'playgroundMode'}
+      {:else if currentMode !== 'Week'}
         <div class="flex-container blur">
           <div class="calendar-section-container">
             {#if currentMode === 'hourMode'}
@@ -215,7 +215,8 @@
                 on:task-checkbox-change={(e) => toggleTaskCompleted(e.detail.id)}
                 {futureScheduledTasks}
               />
-            {:else if currentMode === 'weekMode'}
+              <!-- DEPRECATED lEGACY WEEK VIEW -->
+              <!-- {:else if currentMode === 'Week'}
               <WeekView
                 {allTasks}
                 {thisWeekScheduledTasks}
@@ -224,7 +225,8 @@
                 on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
                 on:task-dragged={(e) => changeTaskDeadline(e.detail)}
                 on:task-checkbox-change={(e) => toggleTaskCompleted(e.detail.id)}
-              />
+              /> -->
+
             {:else if currentMode === 'monthMode'}
               <MonthView
                 {allTasks}
@@ -243,8 +245,8 @@
     <!-- end of 2nd flex child -->
 
     <!-- optional 3rd flex child -->
-    {#if currentMode === 'playgroundMode' && allTasks}
-      <div style="padding-top: 120px; padding-left: 24px;">
+    {#if currentMode === 'Week' && allTasks}
+      <div style="padding-top: 60px; padding-left: 40px;">
         <FutureOverview
           {futureScheduledTasks}
           on:task-duration-adjusted
@@ -293,7 +295,7 @@
   let countdownRemaining = 0
   let calStartDateClassObj = new Date()
 
-  let currentMode = 'playgroundMode' // weekMode hourMode monthMode
+  let currentMode = 'Week' // weekMode hourMode monthMode
 
   let isFinancePopupOpen = false
   let isBedtimePopupOpen = false
@@ -1013,6 +1015,22 @@
 </script>
 
 <style>
+  .ux-tab-item {
+    box-sizing: border-box;
+    height: 60px;
+    width: 100px;
+    display: flex; 
+    align-items: center;
+    justify-content: center;
+    border-bottom: 2px solid transparent;
+  }
+
+  .active-ux-tab {
+    border-bottom: 2px solid #0085FF;
+    color: #0085FF;
+    font-weight: 500;
+  }
+
   .mika-rectangle {
     display: flex;
     align-items: center;
@@ -1023,7 +1041,6 @@
     border: 1px solid #F4F4F4;
     background-color: #F4F4F4;
     vertical-align: middle;
-    font-family: sans-serif;
     border-radius: 20px;
     margin: 0px 2px;
     padding: 0px;
@@ -1040,7 +1057,6 @@
     background-color: #0085FF;
     border: 1px solid #F4F4F4;
     vertical-align: middle;
-    font-family: sans-serif;
     border-radius: 20px;
     margin: 0px 2px;
     transition: all 0.2s ease-out;
@@ -1140,7 +1156,7 @@
     position:absolute;
     width: 50px;
     height: 50px;
-    top: 45px;
+    top: 6px;
     background-color: #ffffff;  
     border-radius:50px;
     text-align:center;

@@ -2,11 +2,8 @@
   <!-- color: #6D6D6D; -->
   <div style="white-space: nowrap; 
     margin-bottom: 40px; 
-    font-family: 'Inter';
-    font-style: normal;
-    font-size: 24px;
+    font-size: 28px;
     font-weight: 500;
-    line-height: 19px;
   ">
     Upcoming in future
   </div>

@@ -19,6 +19,7 @@
 </div>
 
 <script>
+  import "/src/app.css";
   import db from '../db.js'
   import { page } from '$app/stores'
   import { hasFetchedUser, user, hasLogoExited } from '../store.js'

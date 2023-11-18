@@ -1,3 +1,9 @@
+
+* {
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
+}
+
 /* Notion scrollbar styles */
 ::-webkit-scrollbar {
   background: transparent;
@@ -11,9 +17,4 @@
 }
 ::-webkit-scrollbar-track {
   background: #EDECE9;
-}
-
-* {
-  box-sizing: border-box;
-  font-family: 'Inter', sans-serif;
 }

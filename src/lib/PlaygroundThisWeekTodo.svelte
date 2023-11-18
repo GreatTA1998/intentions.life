@@ -1,8 +1,8 @@
 <div style="
     min-width: 380px; 
-    background-color: rgb(245, 245, 245);
+    background-color: rgb(248, 248, 248);
     padding-left: 48px; padding-right: 24px;
-    padding-top: 120px;
+    padding-top: 60px;
     font-size: 2em;
   "  
   on:drop={(e) => unscheduleTask(e)}
@@ -12,7 +12,7 @@
     on:mouseenter={() => isMouseHoveringOnTaskName = true}
     on:mouseleave={() => isMouseHoveringOnTaskName = false}
   >
-    <div style="color: black; font-family: 'Inter'; font-weight: 600">
+    <div style="color: black; font-family: 'Inter'; font-weight: 500; font-size: 28px;">
       This week's to-do
     </div>
 
