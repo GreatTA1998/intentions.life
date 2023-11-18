@@ -12,8 +12,13 @@
     on:mouseenter={() => isMouseHoveringOnTaskName = true}
     on:mouseleave={() => isMouseHoveringOnTaskName = false}
   >
-    <div style="color: black; font-family: 'Inter'; font-weight: 500; font-size: 28px;">
-      This week's to-do
+    <div style="color: black; font-weight: 500; font-size: 28px; align-items: center; display: flex;">
+      This week's 
+      <div style="font-weight: 600; margin-left: 12px;">to-do</div>
+
+      <span class="material-symbols-outlined" style="font-size: 34px; color: black; margin-left: 4px; margin-top: 4px;">
+        list
+      </span>
     </div>
 
     {#if isMouseHoveringOnTaskName}

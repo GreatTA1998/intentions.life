@@ -4,8 +4,13 @@
     margin-bottom: 40px; 
     font-size: 28px;
     font-weight: 500;
+    display: flex; 
+    align-items: center;
   ">
-    Upcoming in future
+    Upcoming 
+    <span class="material-symbols-outlined" style="font-size: 32px; margin-left: 4px;">
+      event
+    </span> 
   </div>
   <div class="future-overview-scroll-container">
     {#each Object.keys(datesToTasks) as date}

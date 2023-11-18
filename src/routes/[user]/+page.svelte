@@ -1037,7 +1037,8 @@
     justify-content: center;
     width: 100px; 
     height: 40px;
-    color: #0085FF;
+    color: black;
+    /* color: #0085FF; */
     border: 1px solid #F4F4F4;
     background-color: #F4F4F4;
     vertical-align: middle;
@@ -1168,7 +1169,7 @@
   }
 
   .mika-hover {
-    color: #0085FF;
+    /* color: #0085FF; */
     transition: all 0.2s ease-out;
   }
 
