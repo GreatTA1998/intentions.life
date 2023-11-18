@@ -149,21 +149,21 @@
         display: flex; 
         align-items: center; 
         margin-left: 20px;
-        padding: 60px 0px 10px 35px;"
+        padding: 64px 0px 10px 35px;"
       >
-        <!-- {#if currentMode === 'Playground'}
-          <span on:click={() => incrementDateClassObj({ days: -1 })} class="material-icons" style="font-size: 4em;">
+        {#if currentMode === 'Week'}
+          <span on:click={() => incrementDateClassObj({ days: -1 })} class="material-icons" style="font-size: 4em; cursor: pointer;">
             arrow_left
           </span>
-        {/if} -->
+        {/if}
         <div style="font-weight: 500; font-size: 28px; color: #000000;">
           {getDayOfWeek(calStartDateClassObj)}, { getNicelyFormattedDate(calStartDateClassObj) }, { calStartDateClassObj.getFullYear() }
         </div>
-        <!-- {#if currentMode === 'Playground'}
-          <span on:click={() => incrementDateClassObj({ days: 1 })} class="material-icons" style="font-size: 4em;">
+        {#if currentMode === 'Week'}
+          <span on:click={() => incrementDateClassObj({ days: 1 })} class="material-icons" style="font-size: 4em; cursor: pointer;">
             arrow_right
           </span>
-        {/if} -->
+        {/if}
       </div>
 
       {#if currentMode === 'Week' && allTasks}
@@ -246,7 +246,7 @@
 
     <!-- optional 3rd flex child -->
     {#if currentMode === 'Week' && allTasks}
-      <div style="padding-top: 60px; padding-left: 40px;">
+      <div style="padding-top: 80px; padding-left: 40px;">
         <FutureOverview
           {futureScheduledTasks}
           on:task-duration-adjusted

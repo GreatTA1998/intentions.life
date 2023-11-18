@@ -2,7 +2,7 @@
     min-width: 380px; 
     background-color: rgb(248, 248, 248);
     padding-left: 48px; padding-right: 24px;
-    padding-top: 60px;
+    padding-top: 80px;
     font-size: 2em;
   "  
   on:drop={(e) => unscheduleTask(e)}
