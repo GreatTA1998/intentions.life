@@ -985,7 +985,6 @@
         uniqueRepeatIDs.add(task.repeatGroupID)
       }
     })
-    console.log('uniqueRepeatIDs =', uniqueRepeatIDs)
 
     // STEP 2: check if we need to generate more tasks
     //   check latest member, then run repeat algorithm
