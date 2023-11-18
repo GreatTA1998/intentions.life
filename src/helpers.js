@@ -233,3 +233,50 @@ function helperFunction ({ node, applyFunc }) {
     }
   }
 }
+
+
+export function generateRepeatedTasks (taskObject) {
+  const repeatGroupID = taskObject.id // the first instance of the repeated task will represent the repeatGroupID
+  const d = new Date()
+  for (let i = 0; i < 7; i++) { // as it's a new feature, try 7 day foresight window to avoid taking forever to delete everything manually
+    d.setDate(d.getDate() + 1)
+
+    // % gives the remainder, not the modulus, see https://stackoverflow.com/a/17323608/7812829
+    function mod (n, m) {
+      return ((n % m) + m) % m;
+    }
+           
+    const weekDayNumber = mod(d.getDay() - 1, 7) // for getDay(), Sunday = 0, Monday = 1
+    if (willRepeatOnWeekDayNumber[weekDayNumber]) {
+      const generatedTask = createRepeatedTask({ dateClassObj: new Date(d.getTime()), repeatGroupID }, taskObject)
+      allGeneratedTasksToUpload.push(generatedTask)
+    }
+  }
+  console.log('allGeneratedTasksToUpload =', allGeneratedTasksToUpload)
+
+  return allGeneratedTasksToUpload
+}
+
+export function createRepeatedTask ({ dateClassObj, repeatGroupID }, taskObject) {
+  const taskObjCopy = {...taskObject}
+  taskObjCopy.id = getRandomID()
+  taskObjCopy.willRepeatOnWeekDayNumber = [...willRepeatOnWeekDayNumber]
+  taskObjCopy.repeatGroupID = repeatGroupID // way to label separate tasks as essentially clones of an original repeating task
+
+  const yyyy = `${dateClassObj.getFullYear()}`
+  const mm = twoDigits(dateClassObj.getMonth() + 1) // month is 0-indexed
+  const dd = twoDigits(dateClassObj.getDate())
+
+  // CASE 1: DEADLINE
+  // deadline takes priority: a deadlined task that repeats but is scheduled, will STILL be treated like a deadline
+  if (taskObjCopy.deadlineDate && taskObjCopy.deadlineTime) {
+    // set new `deadlineDate` to the dd/mm/yyyy format of `dateClassObj` (but keep the deadline time the same)
+    taskObjCopy.deadlineDate = `${dd}/${mm}/${yyyy}`
+  }
+  // CASE 2: SCHEDULED 
+  if (taskObjCopy.startYYYY && taskObjCopy.startDate && taskObjCopy.startTime) {
+    taskObjCopy.startYYYY = yyyy
+    taskObjCopy.startDate = `${mm}/${dd}` 
+  }
+  return taskObjCopy
+}

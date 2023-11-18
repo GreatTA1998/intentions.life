@@ -273,7 +273,7 @@
   import { onMount } from 'svelte'
   import db from '../../db.js'
   import { doc, getDoc, onSnapshot, updateDoc } from 'firebase/firestore'
-  import { getRandomInt, getDateOfToday, getDateOfTomorrow, getDateInMMDD, getDateInDDMMYYYY, getRandomID } from '../../helpers.js'
+  import { getRandomInt, getDateOfToday, getDateOfTomorrow, getDateInMMDD, getDateInDDMMYYYY, getRandomID, generateRepeatedTasks } from '/src/helpers.js'
   import JournalPopup from '$lib/JournalPopup.svelte'
   import FinancePopup from '$lib/FinancePopup.svelte'
   import BedtimePopup from '$lib/BedtimePopup.svelte'
@@ -343,6 +343,9 @@
     collectThisWeekScheduledTasksToArray()
     collectThisMonthScheduledTasksToArray()
 
+    const copy = [...allTasks]
+    maintainOneWeekPreviewWindowForRepeatingTasks(copy)
+
     // TO-DO: don't include all the tasks in the future, only if it is bounded by < 7 days for the week view, and < 30 days for the month view
 
     futureScheduledTasks.sort((task1, task2) => {
@@ -389,8 +392,8 @@
     traverseAndUpdateTree({
       fulfilsCriteria: task => task.id === repeatGroupID,
       applyFunc: task => {
-        console.log('found original task =', task)
         task.willRepeatOnWeekDayNumber = willRepeatOnWeekDayNumber
+        task.lastRanRepeatAtIsoString = new Date().toISOString()
       }
     })
 
@@ -401,7 +404,15 @@
         return filter.length === 1      
       }, 
       applyFunc: (task) => {
-        task.children = [...task.children, ...allGeneratedTasksToUpload]
+        const updatedChildren = [...task.children, ...allGeneratedTasksToUpload]
+        if (task.name === 'root') {
+          // without this, `task.children' will point to an `updatedChildren`, but `allTasks` will be unaffected
+          // so we set it manually
+          // https://explanations.app/KsPz7BOExANWvkaauNKE/tx3MKBOKCUnee9kbf7dH
+          allTasks = updatedChildren
+        } else {
+          task.children = updatedChildren
+        }
       }
     })
     await updateDoc(doc(db, userDocPath), { 
@@ -416,7 +427,7 @@
   }
 
   // FOR DEBUGGING PURPOSES, TURN IT ON TO TRUE TO RUN SCRIPT ONCE
-  let testRunOnce = false
+  let testRunOnce = true
 
   // DON'T DELETE BELOW: CONVENIENT FOR DEBUGGING
   // let isFirstTime = true
@@ -449,13 +460,14 @@
         // console.log('and today is =', dateOfToday)
         // console.log("testRunOnce =", testRunOnce)
 
+
+        // DANGER: `allTasks` is undefined here, so functions relying on it will break
         if ((lastRanRepeatAtDate !== dateOfToday) || testRunOnce) {
           testRunOnce = false
           console.log('new day, resetting tasks')
           const copy = [...snapshot.data().allTasks]
 
-          // maintainOneWeekPreviewWindowForRepeatingTasks(copy)
-
+     
           // OLD WAY OF REPEATING TASKS - KEEP SHIFTING THE SAME TASK
           // for (const task of copy) {
           //   recursivelyResetRepeatingTasks(task)
@@ -782,7 +794,8 @@
         for (let i = 0; i < copyOfChildren.length; i++) {
           if (copyOfChildren[i].id === id) {
             copyOfChildren[i] = newDeepValue
-            // quick-fix: https://explanations.app/KsPz7BOExANWvkaauNKE/tx3MKBOKCUnee9kbf7dH
+            // quick-fix for root pointer not updating: 
+            // https://explanations.app/KsPz7BOExANWvkaauNKE/tx3MKBOKCUnee9kbf7dH
             if (task.name === 'root') {
               allTasks = copyOfChildren
             } else {
@@ -964,25 +977,39 @@
   // and also passing explicit parameters. Might deserve an explanation video. ,
   // as mutations, pointers are a concern with these deeply nested data structures. 
   function maintainOneWeekPreviewWindowForRepeatingTasks () {
-    // step 1: collect repeatIDs
-    console.log('calling new func')
+    // STEP 1: collect repeatIDs
     const uniqueRepeatIDs = new Set()
     traverseAndUpdateTree({
       fulfilsCriteria: (task) => task.repeatGroupID,
       applyFunc: (task) => { 
-        console.log('the CHOSEN task =', task)
         uniqueRepeatIDs.add(task.repeatGroupID)
       }
     })
-
     console.log('uniqueRepeatIDs =', uniqueRepeatIDs)
 
-    // step 2
-    // check latest member, then run repeat algorithm
-    // if the !mmddyyyy.includes() add it to the PARENT of the repeating tasks
-
-    // step 3 
-    // update database
+    // STEP 2: check if we need to generate more tasks
+    //   check latest member, then run repeat algorithm
+    //   if the !mmddyyyy.includes() add it to the PARENT of the repeating tasks
+    //   NOTE: we rely on the "origin repeating task", because it stores information about whether the task should continue
+    //   etc. see https://www.explanations.app/KsPz7BOExANWvkaauNKE/i4udjmZVtXToD9JKyMCD
+    const repeatIDsArray = [...uniqueRepeatIDs]
+    for (const repeatID of repeatIDsArray)
+    traverseAndUpdateTree({
+      fulfilsCriteria: (task) => task.id === repeatID, 
+      applyFunc: (task) => {
+        const dayDiff = computeDayDifference(
+          new Date(task.lastRanRepeatAtIsoString), 
+          new Date()
+        )
+        if (dayDiff >= 7) {
+          // STEP 3 
+          // update database
+          const allGeneratedTasksToUpload = generateRepeatedTasks(task)
+          uploadGeneratedTasks({ allGeneratedTasksToUpload }) 
+          // we put it in destructure form to conform to the function's current API, of course we can change it
+        }
+      }
+    })
   }
 </script>
 

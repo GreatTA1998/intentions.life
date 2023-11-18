@@ -85,7 +85,7 @@
     dateClassObjects = []
     let d = dateClassObj
     // dateClassObjects.push(d)
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 7; i++) {
       const independentCopy = new Date()
       independentCopy.setDate(d.getDate() + i) // quickfix: for some reason we're off by 1-index, will investigate
       // ALWAYS START FROM 7 AM

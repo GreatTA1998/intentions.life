@@ -62,7 +62,7 @@
   function generateRepeatedTasks () {
     const repeatGroupID = taskObject.id // the first instance of the repeated task will represent the repeatGroupID
     const d = new Date()
-    for (let i = 0; i < 7; i++) { // as it's a new feature, try only 7 days foresight window instead of 30 days
+    for (let i = 0; i < 7; i++) { // as it's a new feature, try 7 day foresight window to avoid taking forever to delete everything manually
       d.setDate(d.getDate() + 1)
 
       // % gives the remainder, not the modulus, see https://stackoverflow.com/a/17323608/7812829
