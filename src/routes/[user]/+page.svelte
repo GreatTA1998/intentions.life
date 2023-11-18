@@ -122,7 +122,7 @@
   <div style="display: flex"> 
     {#if currentMode === 'Week' || currentMode === 'grandTreeMode'}
       {#if allIncompleteTasks}
-        <PlaygroundThisWeekTodo 
+        <TodoThisWeek
           {allIncompleteTasks}
           on:new-root-task={(e) => createNewRootTask(e.detail)}
           on:task-unscheduled={(e) => putTaskToThisWeekTodo(e)}
@@ -167,7 +167,7 @@
       </div>
 
       {#if currentMode === 'Week' && allTasks}
-        <Playground
+        <CalendarThisWeek
           {allTasks}
           {calStartDateClassObj}
           on:new-root-task={(e) => createNewRootTask(e.detail)}
@@ -286,8 +286,8 @@
   import MonthView from '$lib/MonthView.svelte'
   import TheSnackbar from '$lib/TheSnackbar.svelte'
   import { mostRecentlyDeletedOrCompletedTaskID, mostRecentlyCompletedTaskName, user } from '/src/store.js'
-  import Playground from '$lib/Playground.svelte'
-  import PlaygroundThisWeekTodo from '$lib/PlaygroundThisWeekTodo.svelte'
+  import CalendarThisWeek from '$lib/CalendarThisWeek.svelte'
+  import TodoThisWeek from '$lib/TodoThisWeek.svelte'
   import GrandTreeTodo from '$lib/GrandTreeTodo.svelte'
   import FutureOverview from '$lib/FutureOverview.svelte'
 
