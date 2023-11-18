@@ -25,11 +25,13 @@
             style="display: flex; align-items: center; flex-wrap: nowrap;"
           >
             <div 
-              style="font-family: sans-serif; font-size: 0.8rem; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"
+              style="font-family: sans-serif; font-size: 16px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"
               class:grey-text={task.daysBeforeRepeating}
               class:purple-text={!task.daysBeforeRepeating}
             >
-              <span style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">{task.name + ' '}</span>({task.startTime})
+              <span style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; font-size: 18px; color: black;">
+                {task.name + ' '}
+              </span>({task.startTime})
             </div>
           </div>
         {/each}
