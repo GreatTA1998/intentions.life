@@ -1,6 +1,7 @@
-<div id="future-overview-scroll-parent" style="width: 15vw;">
+<div id="future-overview-scroll-parent" style="width: 15vw; height: 100%;">
   <!-- color: #6D6D6D; -->
-  <div style="white-space: nowrap; 
+  <div style="
+    white-space: nowrap; 
     margin-bottom: 40px; 
     font-size: 28px;
     font-weight: 500;

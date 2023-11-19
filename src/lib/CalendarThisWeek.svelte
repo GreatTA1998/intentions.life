@@ -1,5 +1,5 @@
-<div style="overflow-y: auto; height: 83%">
-  <div style="display: flex; margin-left: 48px; overflow-y: hidden;">
+<div style="overflow-y: auto; overflow-x: auto; height: 100%; margin-left: 48px;">
+  <div style="display: flex; overflow-y: hidden; width: fit-content;">
     {#each dateClassObjects as dateClassObj, i}
       <div>
         <div 
@@ -143,18 +143,5 @@
 </script>
 
 <style>
-/* Notion scrollbar styles */
-::-webkit-scrollbar {
-  background: transparent;
-}
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-::-webkit-scrollbar-thumb {
-  background: #D3D1CB;
-}
-::-webkit-scrollbar-track {
-  background: #EDECE9;
-}
+
 </style>

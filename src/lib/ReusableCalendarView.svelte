@@ -6,6 +6,7 @@
     width: 15vw;
     background-color: {backgroundColor};
     overflow: hidden;
+    flex-grow: 1;
   "
 >
   <div class="calendar-day-container" 

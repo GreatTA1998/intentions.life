@@ -44,8 +44,15 @@
 {/if}
 
 <!-- Top Navigation Bar -->
-<div style="box-sizing: border-box; height: 60px; width: 100%; display: flex; align-items: center; padding-left: 24px; padding-right: 24px; 
-  border-bottom: 1px solid lightgrey">
+<div style="
+  height: {navbarHeight}px; 
+  width: 100%; 
+  display: flex; 
+  align-items: center; 
+  padding-left: 24px; 
+  padding-right: 24px; 
+  border-bottom: 1px solid lightgrey"
+>
   <img src="ola-ios-size.JPG" style="width: 36px; height: 36px; margin-right: 8px;">
   <div style="font-family: inter;">organize-life.com</div>
 
@@ -70,7 +77,7 @@
   </div>
 </div>
 
-<div id="background-image-holder" style="height: 100vh;">
+<div id="background-image-holder" style="height: calc(100% - {navbarHeight}px);">
   <a role="button" on:click={() => isJournalPopupOpen = !isJournalPopupOpen} class="float mika-hover" style="right: 150px; z-index: 10"  
   class:blue-focus={isJournalPopupOpen}>
     <span class="material-icons my-float">
@@ -119,7 +126,8 @@
     </span>
   </a>
 
-  <div style="display: flex"> 
+  <div style="display: flex; height: calc(100% - {navbarHeight}px);"> 
+    <!-- 1st flex child -->
     {#if currentMode === 'Week' || currentMode === 'grandTreeMode'}
       {#if allIncompleteTasks}
         <TodoThisWeek
@@ -141,10 +149,17 @@
         on:drop={(e) => unscheduleTask(e)}
       />
     {/if}
+    <!-- End of 1st flex child -->
 
     <!-- 2nd flex child -->
-    <div style="width: 58vw; height: 100vh; box-sizing: border-box; background-color: rgb(250, 250, 250)">
-      <!-- Display today's date  -->
+    <div style="
+      height: calc(100vh - {navbarHeight}px); 
+      display: flex; 
+      flex-direction: column;
+      background-color: rgb(250, 250, 250);
+      width: 58vw; 
+    "
+    >
       <div style="
         display: flex; 
         align-items: center; 
@@ -215,18 +230,6 @@
                 on:task-checkbox-change={(e) => toggleTaskCompleted(e.detail.id)}
                 {futureScheduledTasks}
               />
-              <!-- DEPRECATED lEGACY WEEK VIEW -->
-              <!-- {:else if currentMode === 'Week'}
-              <WeekView
-                {allTasks}
-                {thisWeekScheduledTasks}
-                on:task-click={(e) => openDetailedCard(e.detail)}
-                on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
-                on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
-                on:task-dragged={(e) => changeTaskDeadline(e.detail)}
-                on:task-checkbox-change={(e) => toggleTaskCompleted(e.detail.id)}
-              /> -->
-
             {:else if currentMode === 'monthMode'}
               <MonthView
                 {allTasks}
@@ -246,7 +249,9 @@
 
     <!-- optional 3rd flex child -->
     {#if currentMode === 'Week' && allTasks}
-      <div style="padding-top: 80px; padding-left: 40px;">
+      <div style="padding-top: 80px; padding-left: 40px; background-color: rgb(248, 248, 248); width: 100%; 
+        height: calc(100vh - 60px);"
+      >
         <FutureOverview
           {futureScheduledTasks}
           on:task-duration-adjusted
@@ -290,6 +295,8 @@
   import TodoThisWeek from '$lib/TodoThisWeek.svelte'
   import GrandTreeTodo from '$lib/GrandTreeTodo.svelte'
   import FutureOverview from '$lib/FutureOverview.svelte'
+
+  const navbarHeight = 60
 
   let snackbarTimeoutID = null
   let countdownRemaining = 0
@@ -429,7 +436,7 @@
   }
 
   // FOR DEBUGGING PURPOSES, TURN IT ON TO TRUE TO RUN SCRIPT ONCE
-  let testRunOnce = true
+  let testRunOnce = false
 
   // DON'T DELETE BELOW: CONVENIENT FOR DEBUGGING
   // let isFirstTime = true
