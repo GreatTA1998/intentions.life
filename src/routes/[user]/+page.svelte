@@ -103,7 +103,7 @@
   <a role="button" 
     on:click={() => {
       if (currentMode === 'grandTreeMode') {
-        currentMode = 'Playground'
+        currentMode = 'Week'
       } else {
         currentMode = 'grandTreeMode'
       }
@@ -128,25 +128,13 @@
 
   <div style="display: flex; height: calc(100% - {navbarHeight}px);"> 
     <!-- 1st flex child -->
-    {#if currentMode === 'Week' || currentMode === 'grandTreeMode'}
-      {#if allIncompleteTasks}
-        <TodoThisWeek
-          {allIncompleteTasks}
-          on:new-root-task={(e) => createNewRootTask(e.detail)}
-          on:task-unscheduled={(e) => putTaskToThisWeekTodo(e)}
-          on:task-node-update={(e) => updateNode({ id: e.detail.id, newDeepValue: e.detail.newDeepValue })}
-          on:task-click={(e) => openDetailedCard(e.detail)}
-        />
-      {/if}
-    {:else}
-      <GrandTreeTodo 
-        {allTasks}
+    {#if allIncompleteTasks}
+      <TodoThisWeek
+        {allIncompleteTasks}
+        on:new-root-task={(e) => createNewRootTask(e.detail)}
+        on:task-unscheduled={(e) => putTaskToThisWeekTodo(e)}
+        on:task-node-update={(e) => updateNode({ id: e.detail.id, newDeepValue: e.detail.newDeepValue })}
         on:task-click={(e) => openDetailedCard(e.detail)}
-        on:task-create={(e) => modifyTaskTree(e.detail.updatedChildren, e.detail.taskAffected)} 
-        on:task-done={updateEntireTaskTree}
-        on:task-delete={updateEntireTaskTree}
-        on:task-repeating={updateEntireTaskTree}
-        on:drop={(e) => unscheduleTask(e)}
       />
     {/if}
     <!-- End of 1st flex child -->
@@ -157,31 +145,31 @@
       display: flex; 
       flex-direction: column;
       background-color: rgb(250, 250, 250);
-      width: 58vw; 
+      width: {currentMode === 'Week' ? '58vw' : 'calc(100vw - 380px)'}; 
     "
-    >
-      <div style="
-        display: flex; 
-        align-items: center; 
-        margin-left: 20px;
-        padding: 64px 0px 10px 35px;"
-      >
-        {#if currentMode === 'Week'}
-          <span on:click={() => incrementDateClassObj({ days: -1 })} class="material-icons" style="font-size: 4em; cursor: pointer;">
-            arrow_left
-          </span>
-        {/if}
-        <div style="font-weight: 500; font-size: 28px; color: #000000;">
-          {getDayOfWeek(calStartDateClassObj)}, { getNicelyFormattedDate(calStartDateClassObj) }, { calStartDateClassObj.getFullYear() }
-        </div>
-        {#if currentMode === 'Week'}
-          <span on:click={() => incrementDateClassObj({ days: 1 })} class="material-icons" style="font-size: 4em; cursor: pointer;">
-            arrow_right
-          </span>
-        {/if}
-      </div>
-
+    > 
       {#if currentMode === 'Week' && allTasks}
+        <div style="
+          display: flex; 
+          align-items: center; 
+          margin-left: 20px;
+          padding: 64px 0px 10px 35px;"
+        >
+          {#if currentMode === 'Week'}
+            <span on:click={() => incrementDateClassObj({ days: -1 })} class="material-icons" style="font-size: 4em; cursor: pointer;">
+              arrow_left
+            </span>
+          {/if}
+          <div style="font-weight: 500; font-size: 28px; color: #000000;">
+            {getDayOfWeek(calStartDateClassObj)}, { getNicelyFormattedDate(calStartDateClassObj) }, { calStartDateClassObj.getFullYear() }
+          </div>
+          {#if currentMode === 'Week'}
+            <span on:click={() => incrementDateClassObj({ days: 1 })} class="material-icons" style="font-size: 4em; cursor: pointer;">
+              arrow_right
+            </span>
+          {/if}
+        </div>
+
         <CalendarThisWeek
           {allTasks}
           {calStartDateClassObj}

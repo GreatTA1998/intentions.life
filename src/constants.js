@@ -1,0 +1,1 @@
+export const todoListBgColor = 'rgb(248, 248, 248)'

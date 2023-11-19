@@ -1,7 +1,7 @@
 <!-- background-color:#F4F4F4; -->
 <div 
   class="todo-container" 
-  style="padding-top: 170px;" 
+  style="padding-top: 80px; background-color: {todoListBgColor};" 
   on:drop
   on:dragover={(e) => dragover_handler(e)}
 >
@@ -54,6 +54,7 @@
   import { getRandomID } from '/src/helpers.js'
   import RecursiveTask from '$lib/RecursiveTask.svelte'
   import { createEventDispatcher } from 'svelte'
+  import { todoListBgColor } from '/src/constants.js'
 
   export let allTasks
 
