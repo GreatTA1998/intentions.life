@@ -10,9 +10,9 @@
   style="
     position: relative;
     height: {height}px; 
+    min-height: 12px;
     font-size: {fontSize}rem;
     border-left: {isBulletPoint ? 0 : 2}px solid {task.isDone ? '#509c13' : 'grey'};
-    min-height: 12px;
   "
 >
   <!-- As long as this parent div is correctly sized, the duration adjusting area 
@@ -20,16 +20,21 @@
 
     `min-height` prevents the parent from being super small when it's bullet point mode
   -->
-  <div style="display: flex; align-items: center;">
+  <div style="display: flex; align-items: start; width: 100%;">
     {#if isBulletPoint}
-      <div 
-        class:normal-text={!isBulletPoint}
-        class:smallest-text={isBulletPoint}
-        style="color: {task.isDone ? '#509c13' : 'grey'}; margin-left: 1px; margin-bottom: 5px; margin-right: 2px;"
+      <span class="material-icons" 
+        style="
+          font-size: 2px; 
+          color: {task.isDone ? '#509c13' : 'grey'}; 
+          margin-top: 6px;
+          margin-right: -1px;
+        "
       >
-        <span class="material-icons" style="font-size: 2px;">circle</span>
-      </div>
+        circle
+      </span>
     {/if}
+
+    <div style="margin-right: 2px;"></div>
 
     {#if hasCheckbox}
       <div>
@@ -39,8 +44,10 @@
         -->
         <input type="checkbox" 
           style="
-            zoom: {isBulletPoint ? 0.8 : 0.95};
-            accent-color: {task.isDone ? '#509c13' : ''}
+            zoom: {isBulletPoint ? 1 : 1};
+            accent-color: {task.isDone ? '#509c13' : ''};
+            margin: 0; 
+            margin-left: 2px;
           "
           checked={task.isDone}
           on:change={(e) => dispatch('task-checkbox-change', {
@@ -51,17 +58,12 @@
       </div>
     {/if}
 
-    {#if isBulletPoint}
-      <div style="margin-right: 3px"></div>
-    {/if}
-
     <div 
-      style="margin-top: 2px;"
+      style="margin-top: -1px; margin-left: 3px; font-size: 12px;"
       class="task-name"
       draggable="true" 
       on:click={() => dispatch('task-click', { task })}
       on:dragstart={(e) => dragstart_handler(e, task.id)} 
-      class:smallest-text={isBulletPoint}
     >
       {task.name} 
     </div>
@@ -145,9 +147,6 @@
 
 <style>
   .scheduled-task {
-    margin-left: 2px;
-    /* border-left: 2px solid grey; */
-    padding-left: 2px;
     width: 100%;
 
     /* font-size: 0.8rem; */
@@ -164,10 +163,9 @@
   }
 
   .task-name {
-    font-family: Roboto, sans-serif; 
     width: 11vw; 
     cursor: pointer; 
-    font-family: sans-serif; color: #6D6D6D;
+    font-family: sans-serif; color: #000000;
   }
 
   .normal-text {
@@ -195,7 +193,7 @@
   }
 
   .smallest-text {
-    font-size: 0.6rem;
+    font-size: 12px;
     color: black;
   }
 </style>

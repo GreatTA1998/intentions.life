@@ -1,6 +1,6 @@
 <div style="
     height: calc(100vh - 60px);
-    min-width: 380px; 
+    min-width: 400px; 
     background-color: {todoListBgColor};
     padding-left: 48px; padding-right: 24px;
     padding-top: 80px;

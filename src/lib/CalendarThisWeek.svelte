@@ -1,19 +1,8 @@
 <div style="overflow-y: auto; overflow-x: auto; height: 100%; margin-left: 48px;">
-  <div style="display: flex; overflow-y: hidden; width: fit-content;">
+  <div style="display: flex; width: fit-content;">
     {#each dateClassObjects as dateClassObj, i}
       <div>
-        <div 
-          style="
-            font-family: sans-serif; 
-            font-size: 1.4em;
-            background-color: rgb(250, 250, 250);
-            color: #6D6D6D;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100px;
-          "
-        >
+        <div class="sticky-day-of-week-abbreviation">
           {dateClassObj.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase()}
         </div>
 
@@ -143,5 +132,17 @@
 </script>
 
 <style>
-
+.sticky-day-of-week-abbreviation {
+  font-size: 1.4em;
+  background-color: rgb(250, 250, 250);
+  color: #6D6D6D;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100px;
+  
+  position: sticky; 
+  top: 0;
+  z-index: 10;
+}
 </style>

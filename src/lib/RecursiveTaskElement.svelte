@@ -55,7 +55,7 @@
           overflow: hidden;
           text-overflow: ellipsis;
           line-height: 1.5;
-          color: {taskObj.startDate && taskObj.startTime ? 'rgb(200, 200, 200)' : 'black'}
+          color: {taskObj.startDate && taskObj.startTime ? 'rgb(220, 220, 220)' : 'black'}
         "
       >
         {taskObj.name}

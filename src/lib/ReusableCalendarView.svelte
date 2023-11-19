@@ -1,29 +1,38 @@
 <div 
   bind:this={ScrollContainer}
-  class="scroll-container" 
   style="
     position: relative;
     width: 15vw;
     background-color: {backgroundColor};
-    overflow: hidden;
     flex-grow: 1;
   "
 >
-  <div class="calendar-day-container" 
+  <!-- NOTE: this is a tall rectangular container that only encompasses the timestamps -->
+  <div 
+    class="calendar-day-container" 
     style="height: {timestamps.length * timeBlockDurationInMinutes * pixelsPerMinute}px; 
-      font-family: 'Inter', sans-serif; 
       margin-bottom: 1px; 
       color: #6D6D6D;
+      width: 30px;
     "
     on:drop={(e) => drop_handler(e)}
     on:dragover={(e) => dragover_handler(e)}
   >
     {#if willShowTimestamps}
       {#each timestamps as timestamp, i}
-        <div class="timestamp-number" style="top: {-6 + 6 + (pixelsPerMinute * timeBlockDurationInMinutes * i)}px;">
-          {timestamp.substring(0, 5)}
+        <div 
+          class="timestamp-number" 
+          style="
+            top: {-6 + 6 + (pixelsPerMinute * timeBlockDurationInMinutes * i)}px; 
+          "
+        >
+          <!-- TO-DO: this is a Tree Sentinel issue..run away and come back later
+          <div style="position: sticky; left: 0px;"> -->
+            {timestamp.substring(0, 5)}
+          <!-- </div> -->
         </div>
       {/each}
+      <!-- </div> -->
     {/if}
 
     {#each scheduledTasks as task, i}
@@ -39,6 +48,7 @@
             pixelsPerMinute
           })}px;
           left: {32}px;
+          width: calc(15vw - 48px);
         "
       >
         <ReusableTaskElement
@@ -306,25 +316,6 @@
 </script>
 
 <style>
-/* Notion scrollbar styles */
-::-webkit-scrollbar {
-  background: transparent;
-}
-::-webkit-scrollbar {
-  width: 1px; /** old width was 4px */
-  height: 10px;
-}
-::-webkit-scrollbar-thumb {
-  background: #6D6D6D;
-}
-::-webkit-scrollbar-track {
-  background: #EDECE9;
-}
-
-* {
-  box-sizing: border-box;
-}
-
 
 .highlighted-background {
   background: rgb(82, 180, 251);
@@ -338,6 +329,12 @@
 
   without border-box, the padding on top will add ON TOP OF 100% height  
 */
+
+.calendar-day-container {
+  width: 100%;
+}
+
+
 @media only screen and (max-width : 480px) {
   #scroll-container {
     width: 200px;
@@ -355,18 +352,6 @@
     width: 12vw;
   }
 } 
-
-.calendar-day-container {
-  width: 100%;
-}
-
-.scroll-container {
-    height: fit-content;
-    overflow-x: hidden; 
-    /* height: 100%;  */
-    /* overflow-y: scroll;  */
-    /* padding-top: 22px;  */
-  }
 
   .green-text {
     color: #0085FF;
