@@ -255,7 +255,7 @@
         <FutureOverview
           {futureScheduledTasks}
           on:task-duration-adjusted
-          on:task-click
+          on:task-click={(e) => openDetailedCard(e.detail)}
         />
       </div>
     {/if}

@@ -17,8 +17,8 @@
     {#each Object.keys(datesToTasks) as date}
       <div style="margin-top: 20px; margin-bottom: 20px;">
         <div>
-          <div style="font-family:Roboto, sans-serif; ; font-size: 1rem; margin-bottom: 2px; color:#6D6D6D">
-            {date} {getDayOfWeek(date)}.
+          <div style="font-family:Roboto, sans-serif; ; font-size: 1rem; margin-bottom: 2px; color:#6D6D6D">    
+            {convertMMDDToReadableMonthDayForm(date)} 
           </div>
         </div>
 
@@ -28,13 +28,13 @@
             style="display: flex; align-items: center; flex-wrap: nowrap;"
           >
             <div 
-              style="font-family: sans-serif; font-size: 16px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"
+              style="font-family: sans-serif; font-size: 18px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"
               class:grey-text={task.daysBeforeRepeating}
               class:purple-text={!task.daysBeforeRepeating}
             >
-              <span style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; font-size: 18px; color: black;">
+              <span style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;">
                 {task.name + ' '}
-              </span>({task.startTime})
+              </span>({getDayOfWeek(date).toUpperCase() + ' '} {task.startTime})
             </div>
           </div>
         {/each}
@@ -61,6 +61,7 @@ $: if (futureScheduledTasks) {
     }
   })
 
+  // Nov 13 
   const temp = {} 
   for (const task of futureScheduledTasks) {
     if (!temp[task.startDate]) {
@@ -70,6 +71,12 @@ $: if (futureScheduledTasks) {
     }
   }
   datesToTasks = {...temp}
+}
+
+function convertMMDDToReadableMonthDayForm (mmdd) {
+  const dateStr = new Date(mmdd).toDateString() //  'Fri Apr 10 2020'
+  const splitArr = dateStr.split(' ' )// ['Fri', 'Apr', '10', '2020']
+  return splitArr[1] + ' ' + splitArr[2] 
 }
 
 function convertToPureMinutes (hhmm) {
