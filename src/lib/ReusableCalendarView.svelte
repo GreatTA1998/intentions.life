@@ -48,7 +48,7 @@
             ),
             pixelsPerMinute
           })}px;
-          left: {32}px;
+          left: {36}px;
           width: calc(15vw - 48px);
         "
       >
