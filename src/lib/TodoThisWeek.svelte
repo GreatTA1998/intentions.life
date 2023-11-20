@@ -29,7 +29,7 @@
     {/if}
   </div>
 
-  <div style="margin-bottom: 20px;"></div>
+  <div style="margin-bottom: 36px;"></div>
 
   <!-- TO-DO: Render all tasks with deadline of this week here -->
   {#each tasksDueThisWeek as taskObj}
@@ -41,7 +41,7 @@
       on:task-click
       on:task-node-update
     />
-    <div style="margin-bottom: 20px;"></div>
+    <div style="margin-bottom: 24px;"></div>
   {/each}
 
   {#if isTypingNewRootTask}
