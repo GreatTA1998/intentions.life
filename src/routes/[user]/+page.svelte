@@ -51,7 +51,9 @@
   align-items: center; 
   padding-left: 24px; 
   padding-right: 24px; 
-  border-bottom: 1px solid lightgrey"
+  border-bottom: 1px solid lightgrey;
+  background-color: rgb(250, 250, 250);
+"
 >
   <img src="ola-ios-size.JPG" style="width: 36px; height: 36px; margin-right: 8px;">
   <div style="font-family: inter;">organize-life.com</div>
@@ -129,7 +131,7 @@
 
   <div style="display: flex; height: calc(100% - {navbarHeight}px);"> 
     <!-- 1st flex child -->
-    {#if currentMode === 'Week' && allIncompleteTasks}
+    {#if (currentMode === 'Week' || currentMode === 'grandTreeMode') && allIncompleteTasks}
       <TodoThisWeek
         {allIncompleteTasks}
         on:new-root-task={(e) => createNewRootTask(e.detail)}
@@ -139,20 +141,22 @@
       />
     {:else if currentMode === 'Day'}
       <div style="position: relative;">
-        <!-- <img src="https://i.imgur.com/ShnqIpJ.jpeg" style="height: calc(100vh - 60px)"> -->
-        <img src="https://i.ytimg.com/vi/Dh0jhjs2z7c/maxresdefault.jpg" style="height: calc(100vh - 60px); width: 100vw; object-fit: cover;">
-        <!-- <video src="/rain-video-blurred.mp4" loop="true" autoplay="true" style="height: calc(100vh - 60px); width: 100vw; object-fit: cover;"></video> -->
+        <BackgroundRainScene/>
+
         <div 
-          style="border-radius: 20px; background-color: white; width: 480px; height: 700px; position: absolute; top: 140px; left: 240px; 
+          class="glow-card-hover-effect"
+          style="border-radius: 20px; background-color: white; width: 440px; height: 640px; position: absolute; top: 200px; left: 340px; 
             padding: 48px;
-            box-shadow: 0 0 100px 15px grey;  
           "
         >
-        <!-- #48abe0; -->
-          <ZenJournal/>
+          <ZenJournal
+            journal={userDoc.journal}
+            on:journal-update={(e) => changeJournal(e.detail)}
+          />
         </div>
-        <div style="border-radius: 20px; background-color: white; width: 640px; height: 700px; position: absolute; top: 140px; left: 1000px; padding: 48px;
-        box-shadow: 0 0 100px 15px grey;  
+        <div 
+          class="glow-card-hover-effect"
+          style="border-radius: 20px; background-color: white; width: 640px; height: 640px; position: absolute; top: 200px; left: 828px; padding-top: 48px; padding-left: 48px;; 
         ">
           <DayView
             {allTasks}
@@ -318,6 +322,7 @@
   import GrandTreeTodo from '$lib/GrandTreeTodo.svelte'
   import FutureOverview from '$lib/FutureOverview.svelte'
   import ZenJournal from '$lib/ZenJournal.svelte'
+  import BackgroundRainScene from '$lib/BackgroundRainScene.svelte'
 
   const navbarHeight = 60
 
@@ -1045,6 +1050,11 @@
 </script>
 
 <style>
+  .glow-card-hover-effect {
+    /* #48abe0; was the original glow box shadow color */
+    box-shadow: 0 0 48px 15px #3b3b3b;  
+  }
+
   .ux-tab-item {
     box-sizing: border-box;
     height: 60px;

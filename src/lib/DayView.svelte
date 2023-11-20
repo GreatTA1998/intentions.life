@@ -1,6 +1,9 @@
-<div style="display: flex;">
+<!-- Do not remove 100%, flex boxes will stretch according to children elements 
+  unless you specify that you want it to be 100% of its containing block.
+-->
+<div style="display: flex; height: 100%;">
   <div>
-    <div style="display: flex; width: 12vw;">  
+    <div style="display: flex; width: 13vw;">  
 
       <ReusableUnscheduledTodoList
         {allTasks}
@@ -26,7 +29,9 @@
     </div>
   </div>
 
-  <div style="overflow-y: auto; height: 740px;">
+  <div style="margin-left: 48px;"></div>
+
+  <div style="overflow-y: auto; height: 100%;">
     <ReusableCalendarView
       pixelsPerHour={MIKA_PIXELS_PER_HOUR}
       timeBlockDurationInMinutes={60}

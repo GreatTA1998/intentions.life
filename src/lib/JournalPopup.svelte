@@ -91,7 +91,7 @@ function createTodayJournal () {
     }
 
   }
-  journal[todayDateMMDD] = '- Happenings\n\n\n- Grateful for\n\n\n- Findings\n\n\n- Intentions'
+  journal[todayDateMMDD] = ''
   dispatch('journal-update', journal)
 }
 
