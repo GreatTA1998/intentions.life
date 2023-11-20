@@ -1,5 +1,7 @@
+<!-- TO-DO: rename to calendar container, as each calendar individually does not handle scrolling (it's handled by the parents) -->
 <div 
   bind:this={ScrollContainer}
+  class="scroll-container"
   style="
     position: relative;
     width: 15vw;
@@ -13,7 +15,6 @@
     style="height: {timestamps.length * timeBlockDurationInMinutes * pixelsPerMinute}px; 
       margin-bottom: 1px; 
       color: #6D6D6D;
-      width: 30px;
     "
     on:drop={(e) => drop_handler(e)}
     on:dragover={(e) => dragover_handler(e)}
@@ -316,6 +317,11 @@
 </script>
 
 <style>
+/* DO NOT REMOVE, BREAKS DRAG-AND-DROP AND DURATION ADJUSTMENT */
+.scroll-container {
+  height: fit-content;
+  overflow-x: hidden; 
+}
 
 .highlighted-background {
   background: rgb(82, 180, 251);
