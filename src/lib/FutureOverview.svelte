@@ -47,7 +47,7 @@
 export let futureScheduledTasks 
 
 import { createEventDispatcher } from 'svelte'
-import { getDayOfWeek } from '/src/helpers.js'
+import { getDayOfWeek, convertMMDDToReadableMonthDayForm } from '/src/helpers.js'
 
 let datesToTasks = {} 
 
@@ -71,12 +71,6 @@ $: if (futureScheduledTasks) {
     }
   }
   datesToTasks = {...temp}
-}
-
-function convertMMDDToReadableMonthDayForm (mmdd) {
-  const dateStr = new Date(mmdd).toDateString() //  'Fri Apr 10 2020'
-  const splitArr = dateStr.split(' ' )// ['Fri', 'Apr', '10', '2020']
-  return splitArr[1] + ' ' + splitArr[2] 
 }
 
 function convertToPureMinutes (hhmm) {

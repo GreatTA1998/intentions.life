@@ -280,3 +280,9 @@ export function createRepeatedTask ({ dateClassObj, repeatGroupID }, taskObject)
   }
   return taskObjCopy
 }
+
+export function convertMMDDToReadableMonthDayForm (mmdd) {
+  const dateStr = new Date(mmdd).toDateString() //  'Fri Apr 10 2020'
+  const splitArr = dateStr.split(' ' )// ['Fri', 'Apr', '10', '2020']
+  return splitArr[1] + ' ' + splitArr[2] 
+}

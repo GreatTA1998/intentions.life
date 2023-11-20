@@ -3,7 +3,17 @@
     {#each dateClassObjects as dateClassObj, i}
       <div>
         <div class="sticky-day-of-week-abbreviation">
-          {dateClassObj.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase()}
+          <div>
+            <div class="center-flex" style="font-size: 16px;">
+              {dateClassObj.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase()}
+            </div>
+
+            <div style="margin-bottom: 4px;"></div>
+
+            <div class="center-flex" style="font-size: 40px;">
+              {dateClassObj.getDate()}
+            </div>
+          </div>
         </div>
 
         {#key intForTriggeringRerender}
@@ -132,13 +142,16 @@
 </script>
 
 <style>
+  .center-flex {
+    display: flex; 
+    justify-content: center;
+    align-items: center;
+  }
+
 .sticky-day-of-week-abbreviation {
   font-size: 1.4em;
   background-color: rgb(250, 250, 250);
   color: #6D6D6D;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   height: 100px;
   
   position: sticky; 

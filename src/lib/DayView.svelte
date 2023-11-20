@@ -1,43 +1,46 @@
-<ReusableCalendarView
-  pixelsPerHour={MIKA_PIXELS_PER_HOUR}
-  timeBlockDurationInMinutes={60}
-  subdivisionsPerBlock={60}
-  calendarBeginningDateClassObject={dayCalendarBeginningDateClassObject}
-  timestamps={timesOfDay}
-  scheduledTasks={scheduledTasksToday}
-  on:task-duration-adjusted
-  on:task-click
-  on:task-scheduled
-  on:task-checkbox-change
-/>
+<div style="display: flex;">
+  <div>
+    <div style="display: flex; width: 12vw;">  
 
-<div>
-  <div style="display: flex; width: 25vw;">  
+      <ReusableUnscheduledTodoList
+        {allTasks}
+        pixelsPerHour={MIKA_PIXELS_PER_HOUR}
+        title={"Today's to-do"}
+        taskCriteria={(task) => task.deadlineDate === getDateInDDMMYYYY(new Date()) && !task.startTime}
+        dropzoneInfo={{
+          deadlineDate: getDateInDDMMYYYY(new Date()),
+          deadlineTime: '23:59'
+        }}
+        on:task-click
+        on:task-duration-adjusted
+        on:task-dragged
+      />
 
-    <ReusableUnscheduledTodoList
-      {allTasks}
+      <div style="width: 2vw"></div>
+
+      <!-- <FutureOverview
+        {futureScheduledTasks}
+        on:task-duration-adjusted
+        on:task-click
+      /> -->
+    </div>
+  </div>
+
+  <div style="overflow-y: auto; height: 740px;">
+    <ReusableCalendarView
       pixelsPerHour={MIKA_PIXELS_PER_HOUR}
-      title={"Today's to-do"}
-      taskCriteria={(task) => task.deadlineDate === getDateInDDMMYYYY(new Date()) && !task.startTime}
-      dropzoneInfo={{
-        deadlineDate: getDateInDDMMYYYY(new Date()),
-        deadlineTime: '23:59'
-      }}
-      on:task-click
-      on:task-duration-adjusted
-      on:task-dragged
-    />
-
-    <div style="width: 2vw"></div>
-
-    <FutureOverview
-      {futureScheduledTasks}
+      timeBlockDurationInMinutes={60}
+      subdivisionsPerBlock={60}
+      calendarBeginningDateClassObject={dayCalendarBeginningDateClassObject}
+      timestamps={timesOfDay}
+      scheduledTasks={scheduledTasksToday}
       on:task-duration-adjusted
       on:task-click
+      on:task-scheduled
+      on:task-checkbox-change
     />
   </div>
 </div>
-
 
 <script>
   import ReusableCalendarView from './ReusableCalendarView.svelte';

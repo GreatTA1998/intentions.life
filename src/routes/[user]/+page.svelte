@@ -125,10 +125,11 @@
       forest
     </span>
   </a>
+  <!-- End of absolute positioning items -->
 
   <div style="display: flex; height: calc(100% - {navbarHeight}px);"> 
     <!-- 1st flex child -->
-    {#if allIncompleteTasks}
+    {#if currentMode === 'Week' && allIncompleteTasks}
       <TodoThisWeek
         {allIncompleteTasks}
         on:new-root-task={(e) => createNewRootTask(e.detail)}
@@ -136,6 +137,36 @@
         on:task-node-update={(e) => updateNode({ id: e.detail.id, newDeepValue: e.detail.newDeepValue })}
         on:task-click={(e) => openDetailedCard(e.detail)}
       />
+    {:else if currentMode === 'Day'}
+      <div style="position: relative;">
+        <!-- <img src="https://i.imgur.com/ShnqIpJ.jpeg" style="height: calc(100vh - 60px)"> -->
+        <img src="https://i.ytimg.com/vi/Dh0jhjs2z7c/maxresdefault.jpg" style="height: calc(100vh - 60px); width: 100vw; object-fit: cover;">
+        <!-- <video src="/rain-video-blurred.mp4" loop="true" autoplay="true" style="height: calc(100vh - 60px); width: 100vw; object-fit: cover;"></video> -->
+        <div 
+          style="border-radius: 20px; background-color: white; width: 480px; height: 700px; position: absolute; top: 140px; left: 240px; 
+            padding: 48px;
+            box-shadow: 0 0 100px 15px grey;  
+          "
+        >
+        <!-- #48abe0; -->
+          <ZenJournal/>
+        </div>
+        <div style="border-radius: 20px; background-color: white; width: 640px; height: 700px; position: absolute; top: 140px; left: 1000px; padding: 48px;
+        box-shadow: 0 0 100px 15px grey;  
+        ">
+          <DayView
+            {allTasks}
+            scheduledTasksToday={todayScheduledTasks}
+            on:task-done={(e) => toggleTaskCompleted(e.detail.id)}
+            on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
+            on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
+            on:task-click={(e) => openDetailedCard(e.detail)}
+            on:task-dragged={(e) => changeTaskDeadline(e.detail)}
+            on:task-checkbox-change={(e) => toggleTaskCompleted(e.detail.id)}
+            {futureScheduledTasks}
+          />
+        </div>
+      </div>
     {/if}
     <!-- End of 1st flex child -->
 
@@ -153,7 +184,7 @@
           display: flex; 
           align-items: center; 
           margin-left: 20px;
-          padding: 64px 0px 10px 35px;"
+          padding: 66px 0px 10px 35px;"
         >
           {#if currentMode === 'Week'}
             <span on:click={() => incrementDateClassObj({ days: -1 })} class="material-icons" style="font-size: 4em; cursor: pointer;">
@@ -161,7 +192,8 @@
             </span>
           {/if}
           <div style="font-weight: 500; font-size: 28px; color: #000000;">
-            {getDayOfWeek(calStartDateClassObj)}, { getNicelyFormattedDate(calStartDateClassObj) }, { calStartDateClassObj.getFullYear() }
+            { getNicelyFormattedDate(calStartDateClassObj) } calendar
+            <!-- {getDayOfWeek(calStartDateClassObj)}, { getNicelyFormattedDate(calStartDateClassObj) }, { calStartDateClassObj.getFullYear() } -->
           </div>
           {#if currentMode === 'Week'}
             <span on:click={() => incrementDateClassObj({ days: 1 })} class="material-icons" style="font-size: 4em; cursor: pointer;">
@@ -169,6 +201,8 @@
             </span>
           {/if}
         </div>
+
+        <div style="margin-bottom: 24px;"></div>
 
         <CalendarThisWeek
           {allTasks}
@@ -283,6 +317,7 @@
   import TodoThisWeek from '$lib/TodoThisWeek.svelte'
   import GrandTreeTodo from '$lib/GrandTreeTodo.svelte'
   import FutureOverview from '$lib/FutureOverview.svelte'
+  import ZenJournal from '$lib/ZenJournal.svelte'
 
   const navbarHeight = 60
 
