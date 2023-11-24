@@ -15,7 +15,7 @@
   >
     <div style="color: black; font-weight: 500; font-size: 28px; align-items: center; display: flex;">
       This week's 
-      <div style="font-weight: 600; margin-left: 12px;">to-do</div>
+      <div style="font-weight: 500; margin-left: 12px;">to-do</div>
 
       <span class="material-symbols-outlined" style="font-size: 34px; color: black; margin-left: 4px; margin-top: 4px;">
         list

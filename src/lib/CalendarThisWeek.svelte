@@ -4,14 +4,23 @@
       <div>
         <div class="sticky-day-of-week-abbreviation">
           <div>
-            <div class="center-flex" style="font-size: 16px;">
+            <div 
+              class="center-flex" 
+              style="font-size: 12px;" 
+              class:orange-highlight={getDateInDDMMYYYY(dateClassObj) === getDateInDDMMYYYY(new Date())}
+            >
               {dateClassObj.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase()}
             </div>
 
             <div style="margin-bottom: 4px;"></div>
 
-            <div class="center-flex" style="font-size: 40px;">
-              {dateClassObj.getDate()}
+            <div 
+              class="center-flex" 
+              style="font-size: 28px;" 
+            >
+              <div style="padding: 8px;" class:highlighted-circle={getDateInDDMMYYYY(dateClassObj) === getDateInDDMMYYYY(new Date())}>
+                {dateClassObj.getDate()}
+              </div>
             </div>
           </div>
         </div>
@@ -40,7 +49,7 @@
 
 <script>
   import ReusableCalendarView from '$lib/ReusableCalendarView.svelte'
-  import { MIKA_PIXELS_PER_HOUR, getDateInMMDD } from '/src/helpers'
+  import { MIKA_PIXELS_PER_HOUR, getDateInMMDD, getDateInDDMMYYYY } from '/src/helpers'
   import { onMount } from 'svelte'
 
   export let allTasks
@@ -142,20 +151,30 @@
 </script>
 
 <style>
+  .orange-highlight {
+    color: orange;
+  }
+
+  .highlighted-circle {
+    background-color: orange;
+    color: white;
+    border-radius: 50px;
+  }
+
   .center-flex {
     display: flex; 
     justify-content: center;
     align-items: center;
   }
 
-.sticky-day-of-week-abbreviation {
-  font-size: 1.4em;
-  background-color: rgb(250, 250, 250);
-  color: #6D6D6D;
-  height: 100px;
-  
-  position: sticky; 
-  top: 0;
-  z-index: 1;
-}
+  .sticky-day-of-week-abbreviation {
+    font-size: 1.4em;
+    background-color: rgb(250, 250, 250);
+    color: #6D6D6D;
+    height: 100px;
+    
+    position: sticky; 
+    top: 0;
+    z-index: 1;
+  }
 </style>

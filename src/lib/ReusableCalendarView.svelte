@@ -74,13 +74,36 @@
       <div 
         style="height: { (timeBlockDurationInMinutes * pixelsPerMinute) / subdivisionsPerBlock  }px; box-sizing: border-box; margin-right: 0; margin-left: auto; width: 100%"
         class:highlighted-background={highlightedMinute === i}
-        on:click|self={(e) => createTaskDirectly(e)}
+        on:click|self={(e) => {
+          isDirectlyCreatingTask = true
+          yPosition = copyGetTrueY(e)
+        }}
         on:dragenter={() => highlightedMinute = i}
         on:dragend={() => console.log('dragend') }
         on:dragover={(e) => dragover_handler(e)}
       >
       </div>
     {/each}
+
+    {#if isDirectlyCreatingTask}
+      <div 
+        id="calendar-direct-task-div"  
+        style="
+          top: {yPosition - formFieldTopPadding}px;
+          left: 30px;
+          position: absolute;
+          width: 80%; 
+          padding-left: 6px; 
+          padding-right: 6px;
+        "
+      >
+        <UXFormField
+          fieldLabel="Task Name"
+          inputText={newTaskName}
+          on:task-entered={(e) => createTaskDirectly(e)}
+        />
+      </div> 
+    {/if}
 
     <!-- https://svelte.dev/tutorial/update
       "Scrolling is hard to achieve with purely a state-driven way"
@@ -112,6 +135,7 @@
   import { onMount, beforeUpdate, afterUpdate, tick, createEventDispatcher, onDestroy } from 'svelte'
   import { browser } from '$app/environment';
   import { getDateInDDMMYYYY, getDateInMMDD, getRandomID } from '/src/helpers';
+  import UXFormField from '$lib/UXFormField.svelte'
 
   export let pixelsPerHour 
   export let timeBlockDurationInMinutes 
@@ -133,6 +157,12 @@
   let ScrollContainer
   let CurrentTimeIndicator
   const dispatch = createEventDispatcher()
+  
+  let isDirectlyCreatingTask = false
+  let formFieldTopPadding = 40
+  let yPosition
+  $: resultantDateClassObject = getResultantDateClassObject(yPosition)
+  let newTaskName = ''
 
   $: pixelsPerMinute = pixelsPerHour / 60
 
@@ -165,54 +195,20 @@
   }
 
   async function createTaskDirectly (e) {
-    // get the y-coordinate
-    const trueY = copyGetTrueY(e)
-    const resultantDateClassObject = getResultantDateClassObject(trueY)
-
-    if (InputElement) {
-      // only allow 1 textbox to appear at a time
-      return
-    }
-
-    const newInput = document.createElement("input")
-    ScrollContainer.appendChild(newInput)
-    newInput.style.top = `${trueY}px`
-    newInput.style.left = '30px'
-    newInput.style.position = 'Absolute'
-    newInput.style.id = 'calendar-direct-task-input'
-
-    InputElement = newInput
-
-    await tick() 
-    newInput.focus()
-
-    newInput.addEventListener('keyup', (e) => {
-      if (e.key !== 'Enter') return
-
-      const newTaskName = newInput.value 
-      if (newTaskName !== '') {
-        const newTaskObj = {
-          id: getRandomID(),
-          name: newTaskName,
-          startDate: getDateInMMDD(resultantDateClassObject),
-          // deadlineDate: getDateInDDMMYYYY(resultantDateClassObject),
-          startTime: getHHMM(resultantDateClassObject),
-          startYYYY: resultantDateClassObject.getFullYear()
-        }
-        dispatch('new-root-task', newTaskObj)
+    const newTaskName = e.detail.taskName
+    if (newTaskName !== '') {
+      const newTaskObj = {
+        id: getRandomID(),
+        name: newTaskName,
+        startDate: getDateInMMDD(resultantDateClassObject),
+        // deadlineDate: getDateInDDMMYYYY(resultantDateClassObject),
+        startTime: getHHMM(resultantDateClassObject),
+        startYYYY: resultantDateClassObject.getFullYear()
       }
-      InputElement.remove()
-      InputElement = null
-    })
-
-    // // and give it some content
-    // const newContent = document.createTextNode("Hi there and greetings!");
-
-    // add the text node to the newly created div
-    // newDiv.appendChild(newContent);
-
-    // create the task
-  } 
+      dispatch('new-root-task', newTaskObj)
+    }
+    isDirectlyCreatingTask = false
+  }
 
   // computes the physical offset, within origin based on d1
   function computeOffsetGeneral ({ d1, d2, pixelsPerMinute }) {
