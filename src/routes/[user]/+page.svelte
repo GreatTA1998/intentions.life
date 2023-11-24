@@ -55,14 +55,14 @@
   background-color: rgb(250, 250, 250);
 "
 >
-  <img src="ola-ios-size.JPG" style="width: 36px; height: 36px; margin-right: 8px;">
+  <img src="hand-drawn-twig-no-bg-cropped.png" style="width: 26px; height: 36px; margin-left: 24px; margin-right: 6px;">
   <div style="font-family: inter;">organize-life.com</div>
 
   <div style="
     box-sizing: border-box; 
     margin-top: 0px;
     display: flex; 
-    margin-left: 120px;
+    margin-left: 80px;
     width: fit-content; 
     justify-content: space-evenly; border-bottom: 0px solid rgb(200, 200, 200); font-family: 'Inter', sans-serif;"
   >
@@ -119,7 +119,7 @@
       left: 48px; 
       right: auto;
       z-index: 10;
-      background-color: #00AA3A;
+      background-color: white;
     "
     class:blue-focus={currentMode === 'grandTreeMode'}
   >
@@ -1221,8 +1221,10 @@
   }
 
   .blue-focus{
-    color: #ffffff;
-    background-color: #0085FF;
+    /* color: #ffffff; */
+    color: darkgreen;
+    backgrond-color: brown !important;
+    /* background-color: #0085FF; */
   /*  border: 1px solid #0085FF;*/
     transition: all 0.2s ease-out;
   }
