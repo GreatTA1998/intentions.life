@@ -18,7 +18,7 @@
       <div style="margin-top: 20px; margin-bottom: 20px;">
         <div>
           <div style="font-family:Roboto, sans-serif; ; font-size: 1rem; margin-bottom: 2px; color:#6D6D6D">    
-            {convertMMDDToReadableMonthDayForm(date)} 
+            {convertMMDDToReadableMonthDayForm(date)} {getDayOfWeek(date).toUpperCase()}
           </div>
         </div>
 
@@ -34,7 +34,7 @@
             >
               <span style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;">
                 {task.name + ' '}
-              </span>({getDayOfWeek(date).toUpperCase() + ' '} {task.startTime})
+              </span>({task.startTime})
             </div>
           </div>
         {/each}

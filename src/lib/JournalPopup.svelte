@@ -2,7 +2,7 @@
   <div class="my-popup-window" use:clickOutside on:click_outside={() => dispatch('card-close')}>
     <div style="display: flex;">
       <h3 class="google-calendar-event-title"  style="margin-left: 40px; margin-top: 40px; margin-bottom: 40px; color: #000;">
-        Daily Notes
+        Journal
       </h3>
       <span on:click={() => dispatch('card-close')} class="material-icons" style="margin-left: auto; margin-right: 10px; margin-top: 10px; color: #323232;">
         close
@@ -19,27 +19,31 @@
     {/if}
 
     <div style="display: flex">
-      <div class="journal-left-navigation" style="font-family: Roboto,Arial,sans-serif; font-size:16px; color: #6D6D6D; margin-left: 40px;">        
+      <div class="journal-left-navigation" style="font-size:16px; color: #6D6D6D; margin-left: 40px;">        
         <div on:click={() => isGoalsAndPostersPopupOpen = true} class:blue-highlight={isGoalsAndPostersPopupOpen}>
           Goals
         </div>
 
-        {#each Object.keys(journal) as date}
-          <div on:click={() => currentlySelectedDate = date} class:blue-highlight={date === currentlySelectedDate}>
-            {date}
+        <div style="margin-bottom: 10px;"></div>
+
+        {#each sortedJournalDates as date}
+          <div on:click={() => currentlySelectedDate = date} style="width: 80px; font-size: 16px; padding: 6px;" class:blue-highlight={date === currentlySelectedDate}>
+            {convertMMDDToReadableMonthDayForm(date)}
           </div>
+          <div style="margin-bottom: 6px;"></div>
         {/each}
       </div>
 
-      <div stle="float: left; width: 80%">
+      <div stle="float: left; width: 80%; padding: 24px;">
         <!-- cols="48" determines width -->
         <textarea 
+          class="reset-textarea" 
           bind:value={journal[currentlySelectedDate]}
           on:input={handleInput}
           rows="30"
           cols="150"
           placeholder="notes"
-          style="margin-left: 20px; width: 88%; margin-right: 10px; box-sizing: border-box;"
+          style="margin-left: 20px; width: 88%; margin-right: 10px; box-sizing: border-box; font-size: 16px;"
         />
       </div>
     </div>
@@ -49,7 +53,7 @@
 <script>
 import { createEventDispatcher, onMount, onDestroy, tick } from 'svelte'
 import _ from 'lodash'
-import { getDateOfToday, getRandomID, clickOutside } from '/src/helpers.js'
+import { getDateOfToday, getRandomID, clickOutside, convertMMDDToReadableMonthDayForm } from '/src/helpers.js'
 import JournalPopupGoalsAndPosters from './JournalPopupGoalsAndPosters.svelte';
 import db from '/src/db.js'
 import { doc, updateDoc } from 'firebase/firestore'
@@ -64,14 +68,17 @@ export let goalsAndPosters
 const dispatch = createEventDispatcher()
 const todayDateMMDD = getDateOfToday()
 
-const throttledSaveJournalPage = _.throttle(saveJournalPage, 500)
+const debouncedSaveJournalPage = _.debounce(saveJournalPage, 500)
 
-let isGoalsAndPostersPopupOpen = true
+
+let isGoalsAndPostersPopupOpen = false
 
 createTodayJournal() // won't do anything if it already exists, I know this is bad because it isn't atomic
 let currentlySelectedDate = todayDateMMDD
 
 const userDocPath = `users/${userID}`
+
+$: sortedJournalDates = [...Object.keys(journal)].sort()
 
 function changeGoalsAndPosters ({ newGoalsAndPosters }) {
   updateDoc(doc(db, userDocPath), {
@@ -98,7 +105,7 @@ function createTodayJournal () {
 
 function handleInput (e) {
   journal[currentlySelectedDate] = e.target.value
-  throttledSaveJournalPage()
+  debouncedSaveJournalPage()
 }
 
 function saveJournalPage () {
@@ -110,12 +117,10 @@ function saveJournalPage () {
 
 <style>
   .blue-highlight {
-    font-family: Roboto,Arial,sans-serif;
     font-weight: 600;
     font-size: 16px;
     background-color: none;
     color: #0085FF;
-    margin-left: 10px;
   }
 
 
@@ -167,7 +172,7 @@ function saveJournalPage () {
   }
 
   .google-calendar-event-title {
-    font-family: Roboto,Arial,sans-serif;
+    /* font-family: Roboto,Arial,sans-serif; */
     font-size: 24px;
     font-weight: 600;
     letter-spacing: .2px;

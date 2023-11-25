@@ -152,11 +152,13 @@
 
 <style>
   .orange-highlight {
-    color: orange;
+    color: #0085FF;
+    /* color: orange; */
   }
 
   .highlighted-circle {
-    background-color: orange;
+    /* background-color: orange;  */
+    background-color: #0085FF;
     color: white;
     border-radius: 50px;
   }

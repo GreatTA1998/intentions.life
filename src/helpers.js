@@ -236,6 +236,7 @@ function helperFunction ({ node, applyFunc }) {
 
 
 export function generateRepeatedTasks (taskObject) {
+  const allGeneratedTasksToUpload = []
   const repeatGroupID = taskObject.id // the first instance of the repeated task will represent the repeatGroupID
   const d = new Date()
   for (let i = 0; i < 7; i++) { // as it's a new feature, try 7 day foresight window to avoid taking forever to delete everything manually
@@ -247,20 +248,19 @@ export function generateRepeatedTasks (taskObject) {
     }
            
     const weekDayNumber = mod(d.getDay() - 1, 7) // for getDay(), Sunday = 0, Monday = 1
-    if (willRepeatOnWeekDayNumber[weekDayNumber]) {
+    if (taskObject.willRepeatOnWeekDayNumber[weekDayNumber]) {
       const generatedTask = createRepeatedTask({ dateClassObj: new Date(d.getTime()), repeatGroupID }, taskObject)
       allGeneratedTasksToUpload.push(generatedTask)
     }
   }
-  console.log('allGeneratedTasksToUpload =', allGeneratedTasksToUpload)
-
+  
   return allGeneratedTasksToUpload
 }
 
 export function createRepeatedTask ({ dateClassObj, repeatGroupID }, taskObject) {
   const taskObjCopy = {...taskObject}
   taskObjCopy.id = getRandomID()
-  taskObjCopy.willRepeatOnWeekDayNumber = [...willRepeatOnWeekDayNumber]
+  taskObjCopy.willRepeatOnWeekDayNumber = [...taskObject.willRepeatOnWeekDayNumber]
   taskObjCopy.repeatGroupID = repeatGroupID // way to label separate tasks as essentially clones of an original repeating task
 
   const yyyy = `${dateClassObj.getFullYear()}`

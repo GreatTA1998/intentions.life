@@ -1024,28 +1024,28 @@
     })
 
     // STEP 2: check if we need to generate more tasks
-    //   check latest member, then run repeat algorithm
-    //   if the !mmddyyyy.includes() add it to the PARENT of the repeating tasks
-    //   NOTE: we rely on the "origin repeating task", because it stores information about whether the task should continue
-    //   etc. see https://www.explanations.app/KsPz7BOExANWvkaauNKE/i4udjmZVtXToD9JKyMCD
+    //   - Find the original member of each repeat group (as it contains the key info)
+    //   - if the !mmddyyyy.includes() add it to the PARENT of the repeating tasks
+    //   - NOTE: we rely on the "origin repeating task", because it stores information about whether the task should continue
+    //   - etc. see https://www.explanations.app/KsPz7BOExANWvkaauNKE/i4udjmZVtXToD9JKyMCD
     const repeatIDsArray = [...uniqueRepeatIDs]
-    for (const repeatID of repeatIDsArray)
-    traverseAndUpdateTree({
-      fulfilsCriteria: (task) => task.id === repeatID, 
-      applyFunc: (task) => {
-        const dayDiff = computeDayDifference(
-          new Date(task.lastRanRepeatAtIsoString), 
-          new Date()
-        )
-        if (dayDiff >= 7) {
-          // STEP 3 
-          // update database
-          const allGeneratedTasksToUpload = generateRepeatedTasks(task)
-          uploadGeneratedTasks({ allGeneratedTasksToUpload }) 
-          // we put it in destructure form to conform to the function's current API, of course we can change it
+    for (const repeatID of repeatIDsArray) {
+      traverseAndUpdateTree({
+        fulfilsCriteria: (task) => task.id === repeatID, 
+        applyFunc: (task) => {
+          const dayDiff = computeDayDifference(
+            new Date(task.lastRanRepeatAtIsoString), 
+            new Date()
+          )
+          if (dayDiff >= 7) {
+            // STEP 3: update database
+            const allGeneratedTasksToUpload = generateRepeatedTasks(task)
+            uploadGeneratedTasks({ allGeneratedTasksToUpload }) 
+            // we put it in destructure form to conform to the function's current API, we can change it later
+          }
         }
-      }
-    })
+      })
+    }
   }
 </script>
 
@@ -1193,7 +1193,7 @@
     background-repeat:no-repeat;
   }
 
-  .float{
+  .float {
     position:absolute;
     width: 50px;
     height: 50px;
@@ -1220,12 +1220,11 @@
     transition: all 0.2s ease-out;
   }
 
-  .blue-focus{
+  .blue-focus {
     /* color: #ffffff; */
     color: darkgreen;
-    backgrond-color: brown !important;
     /* background-color: #0085FF; */
-  /*  border: 1px solid #0085FF;*/
+    /*  border: 1px solid #0085FF;*/
     transition: all 0.2s ease-out;
   }
 </style>
