@@ -145,7 +145,7 @@
   export let scheduledTasks = [] 
   export let timestamps = []
   export let willShowTimestamps = true
-  export let backgroundColor = 'white'
+  export let backgroundColor = 'transparent'
 
   let myObserver = null
   let InputElement

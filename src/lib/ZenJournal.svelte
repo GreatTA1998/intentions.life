@@ -9,7 +9,7 @@
   on:input={handleInput}
   class="reset-textarea" 
   name="hide" placeholder="Write anything..." 
-  style="width: 100%; height: 90%; font-size: 16px; color: rgb(36, 33, 33)"
+  style="background-color: transparent; width: 100%; height: 90%; font-size: 16px; color: rgb(36, 33, 33)"
 />
 
 <script>

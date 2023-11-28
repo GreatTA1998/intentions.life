@@ -145,7 +145,7 @@
 
         <div 
           class="glow-card-hover-effect"
-          style="border-radius: 20px; background-color: white; width: 440px; height: 640px; position: absolute; top: 200px; left: 340px; 
+          style="border-radius: 20px; width: 440px; height: 640px; position: absolute; top: 200px; left: 340px; 
             padding: 48px;
           "
         >
@@ -156,7 +156,7 @@
         </div>
         <div 
           class="glow-card-hover-effect"
-          style="border-radius: 20px; background-color: white; width: 640px; height: 640px; position: absolute; top: 200px; left: 828px; padding-top: 48px; padding-left: 48px;; 
+          style="border-radius: 20px; width: 640px; height: 640px; position: absolute; top: 200px; left: 828px; padding-top: 48px; padding-left: 48px;; 
         ">
           <DayView
             {allTasks}
@@ -1053,7 +1053,11 @@
   .glow-card-hover-effect {
     /* #48abe0; was the original glow box shadow color */
     box-shadow: 0 0 48px 15px #3b3b3b;  
-  }
+
+    /* Additional ways to blend the cards to the background suggested by Claude AI */
+    /* 90% opacity without affecting children */
+    background-color: rgba(255, 255, 255, 0.95)
+  } 
 
   .ux-tab-item {
     box-sizing: border-box;
