@@ -9,14 +9,6 @@
         placeholder="Untitled"
         style="width: 97%; margin-left: 10px; margin-right: 10px; box-sizing: border-box;"
       >
-
-      <a style="height: 20px;" on:click={confirmDelete}>
-        Delete
-      </a>
-      <!-- TO-DO: completed is not working -->
-      <a style="height: 20px;" on:click={() => dispatch('task-done')}>
-        Completed
-      </a>
     </div>
 
     <!-- In future, display in readable month / day form -->
@@ -157,9 +149,23 @@
       />
     </div>
 
+    <div style="margin-bottom: 24px; margin-left: 12px;">
+      <a style="height: 20px;" on:click={() => dispatch('task-done')}>
+        Completed
+      </a>
+
+      <a style="height: 20px;" on:click={() => dispatch('task-reusable')}>
+        Set as reusable task
+      </a>
+
+      <a style="height: 20px;" on:click={confirmDelete}>
+        Delete
+      </a>
+    </div>
+
     <!-- This is the section where you show everything regardless of whether it is scheduled or not -->
     <div style="font-size: 1.2rem; margin-top: 0px; margin-bottom: 12px; margin-left: 12px; font-weight: 600; font-family: roboto, sans-serif;">
-      Full task history:
+      Full task history
     </div>
 
     {#each taskObject.children as child}

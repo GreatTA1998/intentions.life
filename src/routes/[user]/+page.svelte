@@ -7,6 +7,7 @@
       on:task-click={(e) => openDetailedCard(e.detail)}
       on:card-close={() => isDetailedCardOpen = false}
       on:task-done={() => toggleTaskCompleted(clickedTask.id)}
+      on:task-reusable={() => createReusableTaskTemplate(clickedTask.id)}
       on:task-delete={() => deleteSubtree(clickedTask.id)}
       on:task-repeat={updateEntireTaskTree}
       on:task-schedule={(e) => scheduleATask(e.detail)}
@@ -64,10 +65,10 @@
     display: flex; 
     margin-left: 80px;
     width: fit-content; 
-    justify-content: space-evenly; border-bottom: 0px solid rgb(200, 200, 200); font-family: 'Inter', sans-serif;"
+    justify-content: space-evenly; border-bottom: 0px solid rgb(200, 200, 200);"
   >
     <!-- 'Hour' and 'Month' views not yet implemented -->
-    {#each ['Day', 'Week'] as mode}
+    {#each ['Day', 'Week', 'Dashboard'] as mode}
       <div 
         class="ux-tab-item" 
         class:active-ux-tab={currentMode === mode} 
@@ -130,6 +131,10 @@
   <!-- End of absolute positioning items -->
 
   <div style="display: flex; height: calc(100% - {navbarHeight}px);"> 
+    {#if currentMode === 'Dashboard'}
+      <LifeDashboard/>  
+    {/if}  
+
     <!-- 1st flex child -->
     {#if (currentMode === 'Week' || currentMode === 'grandTreeMode') && allIncompleteTasks}
       <TodoThisWeek
@@ -286,8 +291,9 @@
       </div>
     {/if}
   </div>
+
   <!-- End of flexbox -->
-  
+
   <!-- UNDO COMPLETED SNACKBAR -->
   {#if $mostRecentlyDeletedOrCompletedTaskID && countdownRemaining > 0}
     <TheSnackbar on:task-done={(e) => toggleTaskCompleted(e.detail.id)}></TheSnackbar>
@@ -305,7 +311,7 @@
   import { MIKA_PIXELS_PER_HOUR, PIXELS_PER_HOUR, getNicelyFormattedDate, computeDayDifference, convertDDMMYYYYToDateClassObject } from '../../helpers.js'
   import { onMount } from 'svelte'
   import db from '../../db.js'
-  import { doc, getDoc, onSnapshot, updateDoc } from 'firebase/firestore'
+  import { doc, getDoc, onSnapshot, updateDoc, arrayUnion } from 'firebase/firestore'
   import { getRandomInt, getDateOfToday, getDateOfTomorrow, getDateInMMDD, getDateInDDMMYYYY, getRandomID, generateRepeatedTasks } from '/src/helpers.js'
   import JournalPopup from '$lib/JournalPopup.svelte'
   import FinancePopup from '$lib/FinancePopup.svelte'
@@ -323,6 +329,7 @@
   import FutureOverview from '$lib/FutureOverview.svelte'
   import ZenJournal from '$lib/ZenJournal.svelte'
   import BackgroundRainScene from '$lib/BackgroundRainScene.svelte'
+  import LifeDashboard from '$lib/LifeDashboard.svelte'
 
   const navbarHeight = 60
 
@@ -732,6 +739,18 @@
     })
   } 
   
+  async function createReusableTaskTemplate (id) {
+    traverseAndUpdateTree({
+      fulfilsCriteria: (task) => task.id === id, 
+      applyFunc: async (task) => {
+        const userRef = doc(db, userDocPath)
+        await updateDoc(userRef, {
+          reusableTaskTemplates: arrayUnion(task)
+        })
+      }
+    })
+  }
+
   async function toggleTaskCompleted (id) {
     traverseAndUpdateTree({ 
       fulfilsCriteria: (task) => task.id === id,
@@ -1062,7 +1081,7 @@
   .ux-tab-item {
     box-sizing: border-box;
     height: 60px;
-    width: 100px;
+    width: 140px;
     display: flex; 
     align-items: center;
     justify-content: center;

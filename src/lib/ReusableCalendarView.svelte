@@ -102,6 +102,22 @@
           inputText={newTaskName}
           on:task-entered={(e) => createTaskDirectly(e)}
         />
+
+        <!-- Display reusable task templates here -->
+        {#if $user}
+          <div style="background-color: white; padding: 12px;">
+            <div style="font-size: 12px;">
+              REUSABLE TASK TEMPALTES
+            </div>
+    
+            {#each $user.reusableTaskTemplates as taskTemplate}
+              <div style="padding: 12px; border: 2px solid grey;">
+                {taskTemplate.name}
+              </div>
+           
+            {/each}
+          </div>
+        {/if}
       </div> 
     {/if}
 
@@ -134,6 +150,7 @@
   import ReusableTaskElement from '$lib/ReusableTaskElement.svelte'
   import { onMount, beforeUpdate, afterUpdate, tick, createEventDispatcher, onDestroy } from 'svelte'
   import { browser } from '$app/environment';
+  import { user } from '/src/store.js'
   import { getDateInDDMMYYYY, getDateInMMDD, getRandomID } from '/src/helpers';
   import UXFormField from '$lib/UXFormField.svelte'
 
