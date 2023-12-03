@@ -3,15 +3,16 @@
   <div style="
     white-space: nowrap; 
     margin-bottom: 40px; 
-    font-size: 28px;
+    font-size: 16px;
+    color: rgb(90, 90, 90);
     font-weight: 500;
     display: flex; 
     align-items: center;
   ">
-    Upcoming 
-    <span class="material-symbols-outlined" style="font-size: 32px; margin-left: 4px;">
+    UPCOMING EVENTS
+    <!-- <span class="material-symbols-outlined" style="font-size: 32px; margin-left: 4px;">
       event
-    </span> 
+    </span>  -->
   </div>
   <div class="future-overview-scroll-container">
     {#each Object.keys(datesToTasks) as date}

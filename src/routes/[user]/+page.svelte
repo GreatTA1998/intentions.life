@@ -59,16 +59,20 @@
   <img src="hand-drawn-twig-no-bg-cropped.png" style="width: 26px; height: 36px; margin-left: 24px; margin-right: 6px;">
   <div style="font-family: inter;">organize-life.com</div>
 
+  <div style="margin-left: 236px; font-size: 24px;">
+    {new Date().toLocaleString('en-US', { month: 'short', year: 'numeric'})}
+  </div>
+
   <div style="
     box-sizing: border-box; 
     margin-top: 0px;
     display: flex; 
-    margin-left: 80px;
+    margin-left: 40px;
     width: fit-content; 
     justify-content: space-evenly; border-bottom: 0px solid rgb(200, 200, 200);"
   >
     <!-- 'Hour' and 'Month' views not yet implemented -->
-    {#each ['Day', 'Week', 'Dashboard'] as mode}
+    {#each ['Day', 'Week'] as mode}
       <div 
         class="ux-tab-item" 
         class:active-ux-tab={currentMode === mode} 
@@ -189,33 +193,13 @@
     "
     > 
       {#if currentMode === 'Week' && allTasks}
-        <div style="
-          display: flex; 
-          align-items: center; 
-          margin-left: 20px;
-          padding: 66px 0px 10px 35px;"
-        >
-          {#if currentMode === 'Week'}
-            <span on:click={() => incrementDateClassObj({ days: -1 })} class="material-icons" style="font-size: 4em; cursor: pointer;">
-              arrow_left
-            </span>
-          {/if}
-          <div style="font-weight: 500; font-size: 28px; color: #000000;">
-            { getNicelyFormattedDate(calStartDateClassObj) } calendar
-            <!-- {getDayOfWeek(calStartDateClassObj)}, { getNicelyFormattedDate(calStartDateClassObj) }, { calStartDateClassObj.getFullYear() } -->
-          </div>
-          {#if currentMode === 'Week'}
-            <span on:click={() => incrementDateClassObj({ days: 1 })} class="material-icons" style="font-size: 4em; cursor: pointer;">
-              arrow_right
-            </span>
-          {/if}
-        </div>
 
         <div style="margin-bottom: 24px;"></div>
 
         <CalendarThisWeek
           {allTasks}
           {calStartDateClassObj}
+          on:calendar-shifted={(e) => incrementDateClassObj({ days: e.detail.days})}
           on:new-root-task={(e) => createNewRootTask(e.detail)}
           on:task-node-update={(e) => updateNode({ id: e.detail.id, newDeepValue: e.detail.newDeepValue })}
           on:task-click={(e) => openDetailedCard(e.detail)}
@@ -280,7 +264,7 @@
 
     <!-- optional 3rd flex child -->
     {#if currentMode === 'Week' && allTasks}
-      <div style="padding-top: 80px; padding-left: 40px; background-color: rgb(248, 248, 248); width: 100%; 
+      <div style="padding-top: {36}px; padding-left: 40px; background-color: rgb(248, 248, 248); width: 100%; 
         height: calc(100vh - 60px);"
       >
         <FutureOverview
@@ -383,7 +367,7 @@
     allIncompleteTasks = filterIncompleteTasks(allTasks)
 
     collectTodayScheduledTasksToArray()
-    collectFutureScheduledTasksToArray()
+    collectFutureScheduledTasksToArray() // NOTE: this will not include REPEATING tasks
     collectThisWeekScheduledTasksToArray()
     collectThisMonthScheduledTasksToArray()
 
@@ -665,8 +649,9 @@
     traverseAndUpdateTree({
       fulfilsCriteria: (task) => { 
         return (task.startDate && task.startDate !== 'NaN/NaN') && 
-                 (task.startTime && task.startDate > getDateOfToday()) &&
-                   (task.startYYYY === yearNumber.toString())
+                (!task.willRepeatOnWeekDayNumber) &&
+                  (task.startTime && task.startDate > getDateOfToday()) &&
+                    (task.startYYYY === yearNumber.toString())
       }, // 'NaN' quick-fix bug
       applyFunc: (task) => futureScheduledTasks = [...futureScheduledTasks, task]
     })
@@ -1081,7 +1066,7 @@
   .ux-tab-item {
     box-sizing: border-box;
     height: 60px;
-    width: 140px;
+    width: 120px;
     display: flex; 
     align-items: center;
     justify-content: center;
@@ -1089,7 +1074,7 @@
   }
 
   .active-ux-tab {
-    border-bottom: 2px solid #0085FF;
+    border-bottom: 1px solid #0085FF;
     color: #0085FF;
     font-weight: 500;
   }
