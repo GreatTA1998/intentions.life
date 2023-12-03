@@ -235,6 +235,7 @@
     copy.reusableTemplateID = taskObj.id
     copy.isDone = false
     copy.startDate = getDateInMMDD(resultantDateClassObject)
+    copy.startTime = getHHMM(resultantDateClassObject)
     copy.startYYYY = resultantDateClassObject.getFullYear()
     dispatch('new-root-task', copy)
     isDirectlyCreatingTask = false
