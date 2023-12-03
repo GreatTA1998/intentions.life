@@ -56,17 +56,59 @@
 </div>
 
 <script>
+  import { onMount } from 'svelte'
+  import { user } from '/src/store.js'
+  import { applyFuncToEveryTreeNode, round } from '/src/helpers.js'
+
+  export let allTasks 
+
   let myGoal1 = 'Hit $100 monthly revenue'
   let myGoal1Description = 'By launching a compelling product to universities and the internet'
 
   let myGoal2 = 'An intimidating girlfriend'
   let myGoal2Description = 'Pretty, articulate, emotionally mature with compatible fun hobbies. I will achieve this by becoming fluent in 3 languages, cultivating good male friendships and becoming a dangerous person.'
 
-  let templatedTasksThisWeek = [
-    { name: 'Twitch', hourDuration: 3, frequency: 4},
-    { name: 'Life Organizer', hourDuration: 2, frequency: 3},
-    { name: 'Meditate', hourDuration: 0.5, frequency: 7}
-  ]
+  let templatedTasksThisWeek = []
+
+  onMount(() => {
+    summarizeReusedTasks()
+  })
+
+  // write a function that loops through each reusableTaskTemplate
+  function summarizeReusedTasks () {
+    for (const taskTemplate of $user.reusableTaskTemplates) {
+      // you need a way to traverse through the entire tree
+      const taskInstances = collectTaskInstances({ reusableTemplateID: taskTemplate.id })
+      const totalMinutesDuration = taskInstances.reduce((accum, currObj) => accum + currObj.duration, 0)
+      const hourDuration = totalMinutesDuration / 60
+      const stats = {
+        name: taskTemplate.name,
+        hourDuration: round(hourDuration, 1),
+        frequency: taskInstances.length
+      }
+      templatedTasksThisWeek = [...templatedTasksThisWeek, stats]
+    }
+    templatedTasksThisWeek.sort((task1, task2) => {
+      return task2.hourDuration - task1.hourDuration
+    })
+  }
+
+  function collectTaskInstances ({ reusableTemplateID }) {
+    const id = reusableTemplateID
+    const allTasksCopy = [...allTasks]
+    const output = [] 
+    applyFuncToEveryTreeNode({ 
+      tree: allTasksCopy,
+      applyFunc: (node) => {
+        if (node.reusableTemplateID === id || node.id === id) {
+          if (node.isDone) {
+            output.push(node)
+          }
+        }
+      }
+    })
+    return output
+  }
 
   // write a general debounce function that lets you update a particular user property to a new value
   // call it debouncedUpdateUserDoc ({ propertyName, newValue })

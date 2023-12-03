@@ -99,25 +99,26 @@
       >
         <UXFormField
           fieldLabel="Task Name"
-          inputText={newTaskName}
+          value={newTaskName}
+          on:input={(e) => {
+            newTaskName = e.detail.value;
+            searchTaskTemplates();
+          }}
           on:task-entered={(e) => createTaskDirectly(e)}
         />
 
         <!-- Display reusable task templates here -->
-        {#if $user}
-          <div style="background-color: white; padding: 12px;">
-            <div style="font-size: 12px;">
-              REUSABLE TASK TEMPALTES
+        {#key taskTemplateSearchResults}
+          {#if $user && newTaskName.length >= 2}
+            <div class="core-shadow cast-shadow" style="background-color: white; padding: 6px; border-radius: 12px">   
+              {#each taskTemplateSearchResults as taskTemplate}
+                <div class="autocomplete-option" on:click={() => createNewInstanceOfReusableTask(taskTemplate)}>
+                  {taskTemplate.name}
+                </div>
+              {/each}
             </div>
-    
-            {#each $user.reusableTaskTemplates as taskTemplate}
-              <div style="padding: 12px; border: 2px solid grey;">
-                {taskTemplate.name}
-              </div>
-           
-            {/each}
-          </div>
-        {/if}
+          {/if}
+        {/key}
       </div> 
     {/if}
 
@@ -183,6 +184,8 @@
 
   $: pixelsPerMinute = pixelsPerHour / 60
 
+  let taskTemplateSearchResults = []
+
   onMount(() => {
     // NOTE: window.ResizeObserve requires `window` to be defined, so must be called in onMount()
 
@@ -206,9 +209,35 @@
     // }
   })
 
+  function searchTaskTemplates () {
+    const uniqueSet = new Set()
+    const searchQuery = newTaskName
+    for (const searchTerm of searchQuery.split(' ')) {
+      for (const taskTemplate of $user.reusableTaskTemplates) {
+        if (taskTemplate.name.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1) {
+          uniqueSet.add(taskTemplate)
+        }
+      }
+    }
+    const result = [...uniqueSet]
+    taskTemplateSearchResults = result
+    return result
+  }
+
   function copyGetTrueY (e) {
     // const ScrollContainer = document.getElementById('scroll-container')
     return e.clientY + ScrollContainer.scrollTop - ScrollContainer.getBoundingClientRect().top - ScrollContainer.style.paddingTop
+  }
+
+  async function createNewInstanceOfReusableTask (taskObj) {
+    const copy = {...taskObj}
+    copy.id = getRandomID()
+    copy.reusableTemplateID = taskObj.id
+    copy.isDone = false
+    copy.startDate = getDateInMMDD(resultantDateClassObject)
+    copy.startYYYY = resultantDateClassObject.getFullYear()
+    dispatch('new-root-task', copy)
+    isDirectlyCreatingTask = false
   }
 
   async function createTaskDirectly (e) {
@@ -330,6 +359,14 @@
 </script>
 
 <style>
+.autocomplete-option {
+  padding-top: 12px; padding-bottom: 12px; padding-left: 12px; padding-right: 12px; font-size: 16px; border-radius: 12px;
+}
+
+.autocomplete-option:hover {
+  background-color: rgb(240, 240, 240);
+}
+
 /* DO NOT REMOVE, BREAKS DRAG-AND-DROP AND DURATION ADJUSTMENT */
 .scroll-container {
   height: fit-content;

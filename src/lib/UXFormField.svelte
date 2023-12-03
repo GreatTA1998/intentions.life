@@ -9,14 +9,16 @@
   </div>
 
   <input 
-    class="ux-input-text" 
-    bind:this={InputElem} 
-    bind:value={modelValue}
+
+    value={value}
+    on:input={(e) => dispatch('input', { value: e.target.value })}
     on:keyup={(e) => {
       if (e.key === 'Enter') {
-        dispatch('task-entered', { taskName: modelValue })
+        dispatch('task-entered', { taskName: value })
       }
     }}
+    bind:this={InputElem} 
+    class="ux-input-text" 
   >
 </div>
 
@@ -24,11 +26,10 @@
   import { onMount, createEventDispatcher } from 'svelte'
 
   export let fieldLabel = 'Field Label'
-  export let inputText = ''
+  export let value = ''
 
   const dispatch = createEventDispatcher()
 
-  let modelValue = inputText
   let InputElem
 
   onMount(() => {

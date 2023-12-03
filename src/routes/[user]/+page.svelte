@@ -85,27 +85,6 @@
 </div>
 
 <div id="background-image-holder" style="height: calc(100% - {navbarHeight}px);">
-  <a role="button" on:click={() => isJournalPopupOpen = !isJournalPopupOpen} class="float mika-hover" style="right: 150px; z-index: 10"  
-  class:blue-focus={isJournalPopupOpen}>
-    <span class="material-icons my-float">
-      auto_stories
-    </span>
-  </a>
-
-  <a role="button" on:click={() => isFinancePopupOpen = !isFinancePopupOpen} class="float mika-hover" style="right: 90px; z-index: 10"
-  class:blue-focus={isFinancePopupOpen}>
-    <span class="material-icons my-float">
-      attach_money
-    </span>
-  </a>
-
-  <a role="button" on:click={() => isBedtimePopupOpen = !isBedtimePopupOpen} class="float mika-hover" style="right: 30px; z-index: 10"
-  class:blue-focus={isBedtimePopupOpen}>
-    <span class="material-icons my-float">
-      bedtime
-    </span>
-  </a>
-
   <!-- The grand tree icon -->
   <a role="button" 
     on:click={() => {
@@ -115,28 +94,47 @@
         currentMode = 'grandTreeMode'
       }
     }} 
-    class="float"
-    style="
-      width: 75px; 
-      height: 75px; 
-      top: auto; 
-      bottom: 35px; 
-      left: 48px; 
-      right: auto;
-      z-index: 10;
-      background-color: white;
-    "
+    class="float mika-hover"
     class:blue-focus={currentMode === 'grandTreeMode'}
+    style="right: 270px; z-index: 10"
   >
-    <span class="material-icons my-float" style="font-size: 3em;">
+    <span class="material-symbols-outlined my-float" style="">
       forest
+    </span>
+  </a>
+
+  <a role="button" on:click={() => currentMode === 'Dashboard' ? currentMode = 'Week' : currentMode = 'Dashboard'} class="float mika-hover" style="right: 210px; z-index: 10"  
+    class:blue-focus={isJournalPopupOpen}>
+    <span class="material-symbols-outlined my-float">
+      dashboard
+      </span>
+  </a>
+
+  <a role="button" on:click={() => isJournalPopupOpen = !isJournalPopupOpen} class="float mika-hover" style="right: 150px; z-index: 10"  
+  class:blue-focus={isJournalPopupOpen}>
+    <span class="material-symbols-outlined my-float">
+      auto_stories
+    </span>
+  </a>
+
+  <a role="button" on:click={() => isFinancePopupOpen = !isFinancePopupOpen} class="float mika-hover" style="right: 90px; z-index: 10"
+  class:blue-focus={isFinancePopupOpen}>
+    <span class="material-symbols-outlined my-float">
+      attach_money
+    </span>
+  </a>
+
+  <a role="button" on:click={() => isBedtimePopupOpen = !isBedtimePopupOpen} class="float mika-hover" style="right: 30px; z-index: 10"
+  class:blue-focus={isBedtimePopupOpen}>
+    <span class="material-symbols-outlined my-float">
+      bedtime
     </span>
   </a>
   <!-- End of absolute positioning items -->
 
   <div style="display: flex; height: calc(100% - {navbarHeight}px);"> 
     {#if currentMode === 'Dashboard'}
-      <LifeDashboard/>  
+      <LifeDashboard {allTasks}/>  
     {/if}  
 
     <!-- 1st flex child -->
@@ -916,19 +914,29 @@
     }
   }
 
+  function checkTaskObjSchema (task) {
+    const output = {...task}
+    if (!task.startYYYY) output.startYYYY = ''
+    if (!task.duration) output.duration = 15 
+    if (!task.children) output.children = [] 
+      // { name: newTaskObj.name,
+      //   id: newTaskObj.id,
+      //   deadlineDate: newTaskObj.deadlineDate || '',
+      //   deadlineTime: newTaskObj.deadlineTime || '',
+      //   startTime: newTaskObj.startTime || '',
+      //   startDate: newTaskObj.startDate || '',
+      //   startYYYY: newTaskObj.startYYYY || '',
+      //   duration: 15, // minutes 
+      //   children: [],
+      // }
+    return output
+  }
+
   function createNewRootTask (newTaskObj) {
+    const correctSchemaTaskObj = checkTaskObjSchema(newTaskObj)
     const newValue = [
       ...allTasks, 
-      { name: newTaskObj.name,
-        id: newTaskObj.id,
-        deadlineDate: newTaskObj.deadlineDate || '',
-        deadlineTime: newTaskObj.deadlineTime || '',
-        startTime: newTaskObj.startTime || '',
-        startDate: newTaskObj.startDate || '',
-        startYYYY: newTaskObj.startYYYY || '',
-        duration: 15, // minutes 
-        children: [],
-      }
+      correctSchemaTaskObj
     ]
     updateDoc(
       doc(db, userDocPath),
@@ -1206,7 +1214,7 @@
     width: 50px;
     height: 50px;
     top: 6px;
-    background-color: #ffffff;  
+    background-color: transparent;  
     border-radius:50px;
     text-align:center;
    /* border: 1px solid #0085FF;*/
