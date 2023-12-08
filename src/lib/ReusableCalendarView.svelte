@@ -127,7 +127,8 @@
     -->
 
     <!-- A red line that indicates the current time -->
-    {#if currentTimeInHHMM}
+    <!-- `willShowTimestamps` is a quick-fix to identify today's calendar -->
+    {#if currentTimeInHHMM && willShowTimestamps}
       <hr 
         bind:this={CurrentTimeIndicator}
         style="
@@ -201,6 +202,14 @@
     //   })
     //   myObserver.observe(ScrollContainer)
     // }
+  })
+
+  afterUpdate(() => {
+    // NOTE: for week view, every calendar will run this logic, but the time indicator only 
+    // exists for 1 of the days
+    if (CurrentTimeIndicator) {
+      CurrentTimeIndicator.scrollIntoView()
+    }
   })
 
   onDestroy(() => {
