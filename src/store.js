@@ -9,3 +9,5 @@ export const mostRecentlyCompletedTaskName = writable('')
 
 // 200/24 is the week view value
 export const appModePixelsPerHour = writable(200/24)
+
+export const hasInitialScrolled = writable(false)

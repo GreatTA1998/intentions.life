@@ -152,7 +152,7 @@
   import ReusableTaskElement from '$lib/ReusableTaskElement.svelte'
   import { onMount, beforeUpdate, afterUpdate, tick, createEventDispatcher, onDestroy } from 'svelte'
   import { browser } from '$app/environment';
-  import { user } from '/src/store.js'
+  import { user, hasInitialScrolled } from '/src/store.js'
   import { getDateInDDMMYYYY, getDateInMMDD, getRandomID } from '/src/helpers';
   import UXFormField from '$lib/UXFormField.svelte'
 
@@ -207,8 +207,10 @@
   afterUpdate(() => {
     // NOTE: for week view, every calendar will run this logic, but the time indicator only 
     // exists for 1 of the days
-    if (CurrentTimeIndicator) {
+    if (CurrentTimeIndicator && !$hasInitialScrolled) {
+      console.log('triggering scroll')
       CurrentTimeIndicator.scrollIntoView()
+      hasInitialScrolled.set(true)
     }
   })
 
