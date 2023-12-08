@@ -66,8 +66,9 @@
   export let calStartDateClassObj
 
   let allIncompleteTasks = null
+  // NOTE: timesOfDay should start from 00:00, so dateClassObjects also need to start from 00:00 military time
   let timesOfDay = [] 
-  let numOfHourBlocksDisplayed = 17
+  let numOfHourBlocksDisplayed = 24
   let dateClassObjects = []
   let intForTriggeringRerender = 0
 
@@ -108,8 +109,8 @@
     for (let i = 0; i < 7; i++) {
       const independentCopy = new Date()
       independentCopy.setDate(d.getDate() + i) // quickfix: for some reason we're off by 1-index, will investigate
-      // ALWAYS START FROM 7 AM
-      independentCopy.setHours(7, 0) // hours, minutes, note it's ZERO-indexed, 0-23, 0-59
+      // no longer start from 7 am, or else there will be missing hours
+      independentCopy.setHours(0, 0) // hours, minutes, note it's ZERO-indexed, 0-23, 0-59
       dateClassObjects.push(independentCopy)
     }
     dateClassObjects = dateClassObjects // manually trigger reactivity)
@@ -143,7 +144,7 @@
   }
 
   function getTimesOfDay () {
-    let currentHour = 7 // today.getHours() // get the integer i.e. 0 to 23
+    let currentHour = 0 // today.getHours() // get the integer i.e. 0 to 23
     // now generate 16 hours of time (so it covers, for example, 8 am - midnight)
     for (let i = 0; i < numOfHourBlocksDisplayed; i++) {
       if (currentHour === 24) {

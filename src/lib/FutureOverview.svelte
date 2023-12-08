@@ -4,12 +4,15 @@
     white-space: nowrap; 
     margin-bottom: 40px; 
     font-size: 16px;
-    color: rgb(90, 90, 90);
-    font-weight: 500;
     display: flex; 
     align-items: center;
   ">
-    UPCOMING EVENTS
+    <div style="font-weight: 500; color: rgb(10, 10, 10)">
+      UPCOMING
+    </div>
+    <div style="color: rgb(80, 80, 80); margin-left: 6px; font-weight: 300;">
+      EVENTS
+    </div>
     <!-- <span class="material-symbols-outlined" style="font-size: 32px; margin-left: 4px;">
       event
     </span>  -->

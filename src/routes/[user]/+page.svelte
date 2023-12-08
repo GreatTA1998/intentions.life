@@ -59,8 +59,25 @@
   <img src="hand-drawn-twig-no-bg-cropped.png" style="width: 26px; height: 36px; margin-left: 24px; margin-right: 6px;">
   <div style="font-family: inter;">organize-life.com</div>
 
-  <div style="margin-left: 236px; font-size: 24px;">
-    {new Date().toLocaleString('en-US', { month: 'short', year: 'numeric'})}
+  <div style="margin-left: 236px; font-size: 24px; display: flex;">
+    <div>
+      {new Date().toLocaleString('en-US', { month: 'short'})}
+    </div>
+    <div style="margin-left: 8px; font-weight: 300; color: rgb(80, 80, 80)">
+      {new Date().toLocaleString('en-US', { year: 'numeric'})}
+    </div>
+  </div>
+
+  <div style="margin-left: 8px; margin-top: 2px;">
+    <span on:click={() => incrementDateClassObj({ days: -1})} class="material-icons shift-calendar-arrow">
+      navigate_before
+    </span>
+  </div>
+
+  <div style="margin-top: 2px;">
+    <span on:click={() => incrementDateClassObj({ days: 1})} class="material-icons shift-calendar-arrow">
+      keyboard_arrow_right
+    </span>
   </div>
 
   <div style="
@@ -1074,7 +1091,7 @@
   .ux-tab-item {
     box-sizing: border-box;
     height: 60px;
-    width: 120px;
+    width: 72px;
     display: flex; 
     align-items: center;
     justify-content: center;

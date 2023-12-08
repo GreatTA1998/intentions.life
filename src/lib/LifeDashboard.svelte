@@ -1,15 +1,4 @@
 <div style="background-color: transparent; width: 100%; display: flex; justify-content: space-between; padding: 24px;">
-  <!-- 
-    You want to preserve all the tasks created with the template. 
-    Then choose to only display tasks that had a startDate that was before the first week.
-
-    HOW TO CODE: 
-      - Goals are editable rather than hard-coded
-      - How do you create templates? Create template button (based on an existing task for now)
-      - Display the data on time spent
-      - Done.
-  -->
-
   <!-- specifically articulated vision with deadline and how-to-achieve, but no need to keep track of progress for now -->
   <div class="rounded-card">
     <div style="text-transform: uppercase; color: rgb(40, 40, 40);">
@@ -18,20 +7,32 @@
 
     <div style="margin-bottom: 24px;"></div>
     
-    <input class="section-title" bind:value={myGoal1}>
-  
-    <div style="margin-top: 6px;"></div>
-    <textarea class="reset-textarea section-description" style="font-weight: 400; width: 100%; height: 100px;" bind:value={myGoal1Description}/>
+    <input class="section-title" 
+      value={$user.myGoal1}
+      on:input={(e) => debouncedUpdateUserDoc({ propertyName: 'myGoal1', newValue: e.target.value})}
+    >
+
+    <textarea class="reset-textarea section-description" style="font-weight: 400; width: 100%; height: 100px; margin-top: 6px;" 
+      value={$user.myGoal1Description}
+      on:input={(e) => debouncedUpdateUserDoc({ propertyName: 'myGoal1Description', newValue: e.target.value})}
+    />
 
     <div style="margin-bottom: 24px;"></div>
 
-    <input class="section-title" bind:value={myGoal2}>
+    <input class="section-title"
+      value={$user.myGoal2}
+      on:input={(e) => debouncedUpdateUserDoc({ propertyName: 'myGoal2', newValue: e.target.value})}
+    >
 
-    <div style="margin-top: 6px;"></div>
-    <textarea class="reset-textarea section-description" style="font-weight: 400; width: 100%; height: 100px;" bind:value={myGoal2Description}/>
+    <textarea 
+      class="reset-textarea section-description" 
+      style="font-weight: 400; width: 100%; height: 100px; margin-top: 6px;" 
+      value={$user.myGoal2Description}
+      on:input={(e) => debouncedUpdateUserDoc({ propertyName: 'myGoal2Description', newValue: e.target.value})}
+    />
   </div>
 
-  <div class="rounded-card">
+  <div class="rounded-card" style="margin-left: 24px;">
     <div style="display: flex; align-items: center;">
     <div style="text-transform: uppercase; color: rgb(40, 40, 40);">
       TIME SPENT
@@ -44,13 +45,18 @@
     <div style="margin-top: 24px;"></div>
 
     {#each templatedTasksThisWeek as templateTask}
-      <div style="font-weight: 600; font-size: 24px;">
-        {templateTask.hourDuration} hr
-      </div>
-      <div style="font-weight: 400;">
+      <div style="font-weight: 500; font-size: 16px;">
         {templateTask.name}
       </div>
-      <div style="background: green; border-radius: 4px; width: {templateTask.hourDuration * 48}px; height: 8px; margin-top: 4px; margin-bottom: 24px;"></div>
+      <div style="display: flex; align-items: center; margin-top: 2px; margin-bottom: 24px;">
+        {#each {length: templateTask.frequency} as _, i}
+          <div style="background: green; border-radius: 4px; width: {(templateTask.hourDuration/templateTask.frequency) * 48}px; height: 4px; margin-right: 2px;"></div>
+        {/each}
+        
+        <div style="font-weight: 400; font-size: 14px; margin-left: 4px;">
+          {templateTask.hourDuration} hr
+        </div>
+      </div>      
     {/each}
   </div>
 </div>
@@ -59,20 +65,25 @@
   import { onMount } from 'svelte'
   import { user } from '/src/store.js'
   import { applyFuncToEveryTreeNode, round } from '/src/helpers.js'
+  import _ from 'lodash'
+  import { updateFirestoreDoc } from '/src/crud.js'
 
   export let allTasks 
 
-  let myGoal1 = 'Hit $100 monthly revenue'
-  let myGoal1Description = 'By launching a compelling product to universities and the internet'
-
-  let myGoal2 = 'An intimidating girlfriend'
-  let myGoal2Description = 'Pretty, articulate, emotionally mature with compatible fun hobbies. I will achieve this by becoming fluent in 3 languages, cultivating good male friendships and becoming a dangerous person.'
-
   let templatedTasksThisWeek = []
+  // create a video explaining how debounced functions work
+  const debouncedUpdateUserDoc = _.debounce(updateUserDoc, 500)
 
   onMount(() => {
     summarizeReusedTasks()
   })
+
+  function updateUserDoc ({ propertyName, newValue }) {
+    const updateObj = {}
+    updateObj[propertyName] = newValue
+    console.log("updateObj =", updateObj)
+    updateFirestoreDoc(`users/${$user.uid}`, updateObj)
+  }
 
   // write a function that loops through each reusableTaskTemplate
   function summarizeReusedTasks () {
@@ -118,7 +129,7 @@
   .rounded-card {
     border-radius: 40px; 
     width: 460px; 
-    height: 640px; 
+    height: 100%;
     padding: 24px;
     border: 2px solid grey;
   }
