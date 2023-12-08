@@ -7,6 +7,7 @@
       on:task-click={(e) => openDetailedCard(e.detail)}
       on:card-close={() => isDetailedCardOpen = false}
       on:task-done={() => toggleTaskCompleted(clickedTask.id)}
+      on:task-reusable={() => createReusableTaskTemplate(clickedTask.id)}
       on:task-delete={() => deleteSubtree(clickedTask.id)}
       on:task-repeat={updateEntireTaskTree}
       on:task-schedule={(e) => scheduleATask(e.detail)}
@@ -58,13 +59,34 @@
   <img src="hand-drawn-twig-no-bg-cropped.png" style="width: 26px; height: 36px; margin-left: 24px; margin-right: 6px;">
   <div style="font-family: inter;">organize-life.com</div>
 
+  <div style="margin-left: 236px; font-size: 24px; display: flex;">
+    <div>
+      {new Date().toLocaleString('en-US', { month: 'short'})}
+    </div>
+    <div style="margin-left: 8px; font-weight: 300; color: rgb(80, 80, 80)">
+      {new Date().toLocaleString('en-US', { year: 'numeric'})}
+    </div>
+  </div>
+
+  <div style="margin-left: 8px; margin-top: 2px;">
+    <span on:click={() => incrementDateClassObj({ days: -1})} class="material-icons shift-calendar-arrow">
+      navigate_before
+    </span>
+  </div>
+
+  <div style="margin-top: 2px;">
+    <span on:click={() => incrementDateClassObj({ days: 1})} class="material-icons shift-calendar-arrow">
+      keyboard_arrow_right
+    </span>
+  </div>
+
   <div style="
     box-sizing: border-box; 
     margin-top: 0px;
     display: flex; 
-    margin-left: 80px;
+    margin-left: 40px;
     width: fit-content; 
-    justify-content: space-evenly; border-bottom: 0px solid rgb(200, 200, 200); font-family: 'Inter', sans-serif;"
+    justify-content: space-evenly; border-bottom: 0px solid rgb(200, 200, 200);"
   >
     <!-- 'Hour' and 'Month' views not yet implemented -->
     {#each ['Day', 'Week'] as mode}
@@ -80,27 +102,6 @@
 </div>
 
 <div id="background-image-holder" style="height: calc(100% - {navbarHeight}px);">
-  <a role="button" on:click={() => isJournalPopupOpen = !isJournalPopupOpen} class="float mika-hover" style="right: 150px; z-index: 10"  
-  class:blue-focus={isJournalPopupOpen}>
-    <span class="material-icons my-float">
-      auto_stories
-    </span>
-  </a>
-
-  <a role="button" on:click={() => isFinancePopupOpen = !isFinancePopupOpen} class="float mika-hover" style="right: 90px; z-index: 10"
-  class:blue-focus={isFinancePopupOpen}>
-    <span class="material-icons my-float">
-      attach_money
-    </span>
-  </a>
-
-  <a role="button" on:click={() => isBedtimePopupOpen = !isBedtimePopupOpen} class="float mika-hover" style="right: 30px; z-index: 10"
-  class:blue-focus={isBedtimePopupOpen}>
-    <span class="material-icons my-float">
-      bedtime
-    </span>
-  </a>
-
   <!-- The grand tree icon -->
   <a role="button" 
     on:click={() => {
@@ -110,26 +111,49 @@
         currentMode = 'grandTreeMode'
       }
     }} 
-    class="float"
-    style="
-      width: 75px; 
-      height: 75px; 
-      top: auto; 
-      bottom: 35px; 
-      left: 48px; 
-      right: auto;
-      z-index: 10;
-      background-color: white;
-    "
+    class="float mika-hover"
     class:blue-focus={currentMode === 'grandTreeMode'}
+    style="right: 270px; z-index: 10"
   >
-    <span class="material-icons my-float" style="font-size: 3em;">
+    <span class="material-symbols-outlined my-float" style="">
       forest
+    </span>
+  </a>
+
+  <a role="button" on:click={() => currentMode === 'Dashboard' ? currentMode = 'Week' : currentMode = 'Dashboard'} class="float mika-hover" style="right: 210px; z-index: 10"  
+    class:blue-focus={isJournalPopupOpen}>
+    <span class="material-symbols-outlined my-float">
+      dashboard
+      </span>
+  </a>
+
+  <a role="button" on:click={() => isJournalPopupOpen = !isJournalPopupOpen} class="float mika-hover" style="right: 150px; z-index: 10"  
+  class:blue-focus={isJournalPopupOpen}>
+    <span class="material-symbols-outlined my-float">
+      auto_stories
+    </span>
+  </a>
+
+  <a role="button" on:click={() => isFinancePopupOpen = !isFinancePopupOpen} class="float mika-hover" style="right: 90px; z-index: 10"
+  class:blue-focus={isFinancePopupOpen}>
+    <span class="material-symbols-outlined my-float">
+      attach_money
+    </span>
+  </a>
+
+  <a role="button" on:click={() => isBedtimePopupOpen = !isBedtimePopupOpen} class="float mika-hover" style="right: 30px; z-index: 10"
+  class:blue-focus={isBedtimePopupOpen}>
+    <span class="material-symbols-outlined my-float">
+      bedtime
     </span>
   </a>
   <!-- End of absolute positioning items -->
 
   <div style="display: flex; height: calc(100% - {navbarHeight}px);"> 
+    {#if currentMode === 'Dashboard'}
+      <LifeDashboard {allTasks}/>  
+    {/if}  
+
     <!-- 1st flex child -->
     {#if (currentMode === 'Week' || currentMode === 'grandTreeMode') && allIncompleteTasks}
       <TodoThisWeek
@@ -184,33 +208,13 @@
     "
     > 
       {#if currentMode === 'Week' && allTasks}
-        <div style="
-          display: flex; 
-          align-items: center; 
-          margin-left: 20px;
-          padding: 66px 0px 10px 35px;"
-        >
-          {#if currentMode === 'Week'}
-            <span on:click={() => incrementDateClassObj({ days: -1 })} class="material-icons" style="font-size: 4em; cursor: pointer;">
-              arrow_left
-            </span>
-          {/if}
-          <div style="font-weight: 500; font-size: 28px; color: #000000;">
-            { getNicelyFormattedDate(calStartDateClassObj) } calendar
-            <!-- {getDayOfWeek(calStartDateClassObj)}, { getNicelyFormattedDate(calStartDateClassObj) }, { calStartDateClassObj.getFullYear() } -->
-          </div>
-          {#if currentMode === 'Week'}
-            <span on:click={() => incrementDateClassObj({ days: 1 })} class="material-icons" style="font-size: 4em; cursor: pointer;">
-              arrow_right
-            </span>
-          {/if}
-        </div>
 
         <div style="margin-bottom: 24px;"></div>
 
         <CalendarThisWeek
           {allTasks}
           {calStartDateClassObj}
+          on:calendar-shifted={(e) => incrementDateClassObj({ days: e.detail.days})}
           on:new-root-task={(e) => createNewRootTask(e.detail)}
           on:task-node-update={(e) => updateNode({ id: e.detail.id, newDeepValue: e.detail.newDeepValue })}
           on:task-click={(e) => openDetailedCard(e.detail)}
@@ -275,7 +279,7 @@
 
     <!-- optional 3rd flex child -->
     {#if currentMode === 'Week' && allTasks}
-      <div style="padding-top: 80px; padding-left: 40px; background-color: rgb(248, 248, 248); width: 100%; 
+      <div style="padding-top: {36}px; padding-left: 40px; background-color: rgb(248, 248, 248); width: 100%; 
         height: calc(100vh - 60px);"
       >
         <FutureOverview
@@ -286,8 +290,9 @@
       </div>
     {/if}
   </div>
+
   <!-- End of flexbox -->
-  
+
   <!-- UNDO COMPLETED SNACKBAR -->
   {#if $mostRecentlyDeletedOrCompletedTaskID && countdownRemaining > 0}
     <TheSnackbar on:task-done={(e) => toggleTaskCompleted(e.detail.id)}></TheSnackbar>
@@ -305,7 +310,7 @@
   import { MIKA_PIXELS_PER_HOUR, PIXELS_PER_HOUR, getNicelyFormattedDate, computeDayDifference, convertDDMMYYYYToDateClassObject } from '../../helpers.js'
   import { onMount } from 'svelte'
   import db from '../../db.js'
-  import { doc, getDoc, onSnapshot, updateDoc } from 'firebase/firestore'
+  import { doc, getDoc, onSnapshot, updateDoc, arrayUnion } from 'firebase/firestore'
   import { getRandomInt, getDateOfToday, getDateOfTomorrow, getDateInMMDD, getDateInDDMMYYYY, getRandomID, generateRepeatedTasks } from '/src/helpers.js'
   import JournalPopup from '$lib/JournalPopup.svelte'
   import FinancePopup from '$lib/FinancePopup.svelte'
@@ -323,6 +328,7 @@
   import FutureOverview from '$lib/FutureOverview.svelte'
   import ZenJournal from '$lib/ZenJournal.svelte'
   import BackgroundRainScene from '$lib/BackgroundRainScene.svelte'
+  import LifeDashboard from '$lib/LifeDashboard.svelte'
 
   const navbarHeight = 60
 
@@ -376,7 +382,7 @@
     allIncompleteTasks = filterIncompleteTasks(allTasks)
 
     collectTodayScheduledTasksToArray()
-    collectFutureScheduledTasksToArray()
+    collectFutureScheduledTasksToArray() // NOTE: this will not include REPEATING tasks
     collectThisWeekScheduledTasksToArray()
     collectThisMonthScheduledTasksToArray()
 
@@ -658,8 +664,9 @@
     traverseAndUpdateTree({
       fulfilsCriteria: (task) => { 
         return (task.startDate && task.startDate !== 'NaN/NaN') && 
-                 (task.startTime && task.startDate > getDateOfToday()) &&
-                   (task.startYYYY === yearNumber.toString())
+                (!task.willRepeatOnWeekDayNumber) &&
+                  (task.startTime && task.startDate > getDateOfToday()) &&
+                    (task.startYYYY === yearNumber.toString())
       }, // 'NaN' quick-fix bug
       applyFunc: (task) => futureScheduledTasks = [...futureScheduledTasks, task]
     })
@@ -732,6 +739,18 @@
     })
   } 
   
+  async function createReusableTaskTemplate (id) {
+    traverseAndUpdateTree({
+      fulfilsCriteria: (task) => task.id === id, 
+      applyFunc: async (task) => {
+        const userRef = doc(db, userDocPath)
+        await updateDoc(userRef, {
+          reusableTaskTemplates: arrayUnion(task)
+        })
+      }
+    })
+  }
+
   async function toggleTaskCompleted (id) {
     traverseAndUpdateTree({ 
       fulfilsCriteria: (task) => task.id === id,
@@ -912,19 +931,29 @@
     }
   }
 
+  function checkTaskObjSchema (task) {
+    const output = {...task}
+    if (!task.startYYYY) output.startYYYY = ''
+    if (!task.duration) output.duration = 15 
+    if (!task.children) output.children = [] 
+      // { name: newTaskObj.name,
+      //   id: newTaskObj.id,
+      //   deadlineDate: newTaskObj.deadlineDate || '',
+      //   deadlineTime: newTaskObj.deadlineTime || '',
+      //   startTime: newTaskObj.startTime || '',
+      //   startDate: newTaskObj.startDate || '',
+      //   startYYYY: newTaskObj.startYYYY || '',
+      //   duration: 15, // minutes 
+      //   children: [],
+      // }
+    return output
+  }
+
   function createNewRootTask (newTaskObj) {
+    const correctSchemaTaskObj = checkTaskObjSchema(newTaskObj)
     const newValue = [
       ...allTasks, 
-      { name: newTaskObj.name,
-        id: newTaskObj.id,
-        deadlineDate: newTaskObj.deadlineDate || '',
-        deadlineTime: newTaskObj.deadlineTime || '',
-        startTime: newTaskObj.startTime || '',
-        startDate: newTaskObj.startDate || '',
-        startYYYY: newTaskObj.startYYYY || '',
-        duration: 15, // minutes 
-        children: [],
-      }
+      correctSchemaTaskObj
     ]
     updateDoc(
       doc(db, userDocPath),
@@ -1062,7 +1091,7 @@
   .ux-tab-item {
     box-sizing: border-box;
     height: 60px;
-    width: 100px;
+    width: 72px;
     display: flex; 
     align-items: center;
     justify-content: center;
@@ -1070,7 +1099,7 @@
   }
 
   .active-ux-tab {
-    border-bottom: 2px solid #0085FF;
+    border-bottom: 1px solid #0085FF;
     color: #0085FF;
     font-weight: 500;
   }
@@ -1202,7 +1231,7 @@
     width: 50px;
     height: 50px;
     top: 6px;
-    background-color: #ffffff;  
+    background-color: transparent;  
     border-radius:50px;
     text-align:center;
    /* border: 1px solid #0085FF;*/

@@ -1,24 +1,34 @@
 <div style="overflow-y: auto; overflow-x: auto; height: 100%; margin-left: 48px;">
   <div style="display: flex; width: fit-content;">
+    <!-- <div>
+      <span on:click={() => dispatch('calendar-shifted', { days: -1 })} class="material-icons shift-calendar-arrow">
+        navigate_before
+      </span>
+    </div>
+
+    <div>
+      <span on:click={() => dispatch('calendar-shifted', { days: 1 })} class="material-icons shift-calendar-arrow">
+        keyboard_arrow_right
+      </span>
+    </div> -->
+
     {#each dateClassObjects as dateClassObj, i}
       <div>
         <div class="sticky-day-of-week-abbreviation">
           <div>
             <div 
               class="center-flex" 
-              style="font-size: 12px;" 
+              style="font-size: 12px; margin-bottom: 4px;" 
               class:orange-highlight={getDateInDDMMYYYY(dateClassObj) === getDateInDDMMYYYY(new Date())}
             >
               {dateClassObj.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase()}
             </div>
 
-            <div style="margin-bottom: 4px;"></div>
-
             <div 
               class="center-flex" 
               style="font-size: 28px;" 
             >
-              <div style="padding: 8px;" class:highlighted-circle={getDateInDDMMYYYY(dateClassObj) === getDateInDDMMYYYY(new Date())}>
+              <div class="center-flex" style="padding: 8px; width: 48px; height: 48px;" class:highlighted-circle={getDateInDDMMYYYY(dateClassObj) === getDateInDDMMYYYY(new Date())}>
                 {dateClassObj.getDate()}
               </div>
             </div>
@@ -50,16 +60,19 @@
 <script>
   import ReusableCalendarView from '$lib/ReusableCalendarView.svelte'
   import { MIKA_PIXELS_PER_HOUR, getDateInMMDD, getDateInDDMMYYYY } from '/src/helpers'
-  import { onMount } from 'svelte'
+  import { onMount, createEventDispatcher } from 'svelte'
 
   export let allTasks
   export let calStartDateClassObj
 
   let allIncompleteTasks = null
+  // NOTE: timesOfDay should start from 00:00, so dateClassObjects also need to start from 00:00 military time
   let timesOfDay = [] 
-  let numOfHourBlocksDisplayed = 17
+  let numOfHourBlocksDisplayed = 24
   let dateClassObjects = []
   let intForTriggeringRerender = 0
+
+  const dispatch = createEventDispatcher()
 
   $: getDateClassObjects(calStartDateClassObj)
 
@@ -96,8 +109,8 @@
     for (let i = 0; i < 7; i++) {
       const independentCopy = new Date()
       independentCopy.setDate(d.getDate() + i) // quickfix: for some reason we're off by 1-index, will investigate
-      // ALWAYS START FROM 7 AM
-      independentCopy.setHours(7, 0) // hours, minutes, note it's ZERO-indexed, 0-23, 0-59
+      // no longer start from 7 am, or else there will be missing hours
+      independentCopy.setHours(0, 0) // hours, minutes, note it's ZERO-indexed, 0-23, 0-59
       dateClassObjects.push(independentCopy)
     }
     dateClassObjects = dateClassObjects // manually trigger reactivity)
@@ -131,7 +144,7 @@
   }
 
   function getTimesOfDay () {
-    let currentHour = 7 // today.getHours() // get the integer i.e. 0 to 23
+    let currentHour = 0 // today.getHours() // get the integer i.e. 0 to 23
     // now generate 16 hours of time (so it covers, for example, 8 am - midnight)
     for (let i = 0; i < numOfHourBlocksDisplayed; i++) {
       if (currentHour === 24) {
@@ -151,16 +164,28 @@
 </script>
 
 <style>
+  .shift-calendar-arrow {
+    font-size: 36px; 
+    cursor: pointer; 
+    height: 40px; 
+
+    position: sticky; 
+    top: 0;
+    z-index: 1;
+
+    padding-top: 24px;
+  }
+
   .orange-highlight {
     color: #0085FF;
-    /* color: orange; */
+    font-weight: 500;
   }
 
   .highlighted-circle {
     /* background-color: orange;  */
     background-color: #0085FF;
     color: white;
-    border-radius: 50px;
+    border-radius: 25px;
   }
 
   .center-flex {

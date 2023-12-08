@@ -2,9 +2,11 @@
     height: calc(100vh - 60px);
     min-width: 400px; 
     background-color: {todoListBgColor};
-    padding-left: 48px; padding-right: 24px;
-    padding-top: 80px;
+    padding-left: 48px; 
+    padding-right: 24px;
+    padding-top: 36px;
     font-size: 2em;
+    overflow-y: auto;
   "  
   on:drop={(e) => unscheduleTask(e)}
   on:dragover={(e) => dragover_handler(e)}
@@ -13,13 +15,12 @@
     on:mouseenter={() => isMouseHoveringOnTaskName = true}
     on:mouseleave={() => isMouseHoveringOnTaskName = false}
   >
-    <div style="color: black; font-weight: 500; font-size: 28px; align-items: center; display: flex;">
-      This week's 
-      <div style="font-weight: 500; margin-left: 12px;">to-do</div>
-
-      <span class="material-symbols-outlined" style="font-size: 34px; color: black; margin-left: 4px; margin-top: 4px;">
+    <div style="height: 24px; font-size: 16px; align-items: center; display: flex;">
+      <div style="color: rgb(90, 90, 90); font-weight: 300">THIS WEEK'S </div> 
+      <div style="color: rgb(10, 10, 10); font-weight: 500; margin-left: 6px;">TO-DO</div>
+      <!-- <span class="material-symbols-outlined" style="font-size: 34px; color: black; margin-left: 4px; margin-top: 4px;">
         list
-      </span>
+      </span> -->
     </div>
 
     {#if isMouseHoveringOnTaskName}
@@ -29,7 +30,7 @@
     {/if}
   </div>
 
-  <div style="margin-bottom: 36px;"></div>
+  <div style="margin-bottom: 8px;"></div>
 
   <!-- TO-DO: Render all tasks with deadline of this week here -->
   {#each tasksDueThisWeek as taskObj}
@@ -41,7 +42,7 @@
       on:task-click
       on:task-node-update
     />
-    <div style="margin-bottom: 24px;"></div>
+    <div style="margin-bottom: 12px;"></div>
   {/each}
 
   {#if isTypingNewRootTask}
