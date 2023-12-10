@@ -113,33 +113,33 @@
     }} 
     class="float mika-hover"
     class:blue-focus={currentMode === 'grandTreeMode'}
-    style="right: 270px; z-index: 10"
+    style="right: 210px; z-index: 10"
   >
     <span class="material-symbols-outlined my-float" style="">
       forest
     </span>
   </a>
 
-  <a role="button" on:click={() => currentMode === 'Dashboard' ? currentMode = 'Week' : currentMode = 'Dashboard'} class="float mika-hover" style="right: 210px; z-index: 10"  
+  <a role="button" on:click={() => currentMode === 'Dashboard' ? currentMode = 'Week' : currentMode = 'Dashboard'} class="float mika-hover" style="right: 150px; z-index: 10"  
     class:blue-focus={isJournalPopupOpen}>
     <span class="material-symbols-outlined my-float">
       dashboard
       </span>
   </a>
 
-  <a role="button" on:click={() => isJournalPopupOpen = !isJournalPopupOpen} class="float mika-hover" style="right: 150px; z-index: 10"  
+  <a role="button" on:click={() => isJournalPopupOpen = !isJournalPopupOpen} class="float mika-hover" style="right: 90px; z-index: 10"  
   class:blue-focus={isJournalPopupOpen}>
     <span class="material-symbols-outlined my-float">
       auto_stories
     </span>
   </a>
 
-  <a role="button" on:click={() => isFinancePopupOpen = !isFinancePopupOpen} class="float mika-hover" style="right: 90px; z-index: 10"
+  <!-- <a role="button" on:click={() => isFinancePopupOpen = !isFinancePopupOpen} class="float mika-hover" style="right: 90px; z-index: 10"
   class:blue-focus={isFinancePopupOpen}>
     <span class="material-symbols-outlined my-float">
       attach_money
     </span>
-  </a>
+  </a> -->
 
   <a role="button" on:click={() => isBedtimePopupOpen = !isBedtimePopupOpen} class="float mika-hover" style="right: 30px; z-index: 10"
   class:blue-focus={isBedtimePopupOpen}>
