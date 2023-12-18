@@ -16,11 +16,14 @@
     on:mouseleave={() => isMouseHoveringOnTaskName = false}
   >
     <div style="height: 24px; font-size: 16px; align-items: center; display: flex;">
-      <div style="color: rgb(90, 90, 90); font-weight: 300">THIS WEEK'S </div> 
+      <GrandTreeTodoPopup let:setIsPopupOpen={setIsPopupOpen}>
+        <span on:click={() => setIsPopupOpen({ newVal: true })} class="material-symbols-outlined my-float" style="font-size: 42px; color: rgb(20, 20, 20); cursor: pointer; margin-left: -4px;">
+          summarize
+        </span>
+      </GrandTreeTodoPopup>
+
+      <div style="margin-left: 8px; color: rgb(10, 10, 10); font-weight: 500">THIS WEEK'S </div> 
       <div style="color: rgb(10, 10, 10); font-weight: 500; margin-left: 6px;">TO-DO</div>
-      <!-- <span class="material-symbols-outlined" style="font-size: 34px; color: black; margin-left: 4px; margin-top: 4px;">
-        list
-      </span> -->
     </div>
 
     {#if isMouseHoveringOnTaskName}
@@ -30,7 +33,7 @@
     {/if}
   </div>
 
-  <div style="margin-bottom: 8px;"></div>
+  <div style="margin-bottom: 36px;"></div>
 
   <!-- TO-DO: Render all tasks with deadline of this week here -->
   {#each tasksDueThisWeek as taskObj}
@@ -42,7 +45,7 @@
       on:task-click
       on:task-node-update
     />
-    <div style="margin-bottom: 12px;"></div>
+    <div style="margin-bottom: 24px;"></div>
   {/each}
 
   {#if isTypingNewRootTask}
@@ -69,6 +72,7 @@
   import RecursiveTaskElement from '$lib/RecursiveTaskElement.svelte'
   import { createEventDispatcher, tick } from 'svelte'
   import { todoListBgColor } from '/src/constants.js'
+  import GrandTreeTodoPopup from '$lib/GrandTreeTodoPopup.svelte'
 
   let isMouseHoveringOnTaskName = false
   let tasksDueThisWeek = null

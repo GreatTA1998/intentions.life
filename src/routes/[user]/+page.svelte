@@ -57,9 +57,8 @@
 "
 >
   <img src="hand-drawn-twig-no-bg-cropped.png" style="width: 26px; height: 36px; margin-left: 24px; margin-right: 6px;">
-  <div style="font-family: inter;">organize-life.com</div>
 
-  <div style="margin-left: 236px; font-size: 24px; display: flex;">
+  <div style="margin-left: 224px; font-size: 24px; display: flex;">
     <div>
       {new Date().toLocaleString('en-US', { month: 'short'})}
     </div>
@@ -102,24 +101,6 @@
 </div>
 
 <div id="background-image-holder" style="height: calc(100% - {navbarHeight}px);">
-  <!-- The grand tree icon -->
-  <a role="button" 
-    on:click={() => {
-      if (currentMode === 'grandTreeMode') {
-        currentMode = 'Week'
-      } else {
-        currentMode = 'grandTreeMode'
-      }
-    }} 
-    class="float mika-hover"
-    class:blue-focus={currentMode === 'grandTreeMode'}
-    style="right: 210px; z-index: 10"
-  >
-    <span class="material-symbols-outlined my-float" style="">
-      forest
-    </span>
-  </a>
-
   <a role="button" on:click={() => currentMode === 'Dashboard' ? currentMode = 'Week' : currentMode = 'Dashboard'} class="float mika-hover" style="right: 150px; z-index: 10"  
     class:blue-focus={isJournalPopupOpen}>
     <span class="material-symbols-outlined my-float">
