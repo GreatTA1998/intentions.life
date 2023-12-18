@@ -3,10 +3,8 @@
 </span>
 
 {#if isPopupOpen}
-  <div class="my-popup" style="" bind:this={elem} use:clickOutside on:click_outside={handleClickOutside}>    
-    <div style="display: flex; justify-content: space-around; align-items: start;">
-
-      <div>
+  <div class="my-popup" style="display: flex; justify-content: space-around; align-items: start; width: 100%" bind:this={elem} use:clickOutside on:click_outside={handleClickOutside}>    
+      <!-- <div>
         <GrandTreeTodoReusableList
           listTitle="TODAY"
           {allIncompleteTasks}
@@ -17,7 +15,7 @@
           on:task-click
           on:task-dragged
         />  
-      </div>
+      </div> -->
 
       <div>
         <GrandTreeTodoReusableList
@@ -45,12 +43,12 @@
         />  
       </div>
 
-      <div style="max-width: 40vw; min-width: 400px; overflow-x: auto;">
+      <div style="min-width: 38vw; overflow-x: auto;">
         <slot>
           <!-- GrandTreeTodo will be injected via the parent,, so no interface will need to be changed -->
         </slot>
       </div>
-    </div>
+    <!-- </div> -->
   </div>
 {/if}
 
@@ -108,6 +106,5 @@ onDestroy(() => {
 
 /*    border: 1px solid #000; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);*/
   -webkit-box-shadow:  0px 0px 0px 9999px rgba(0, 0, 0, 0.5);
-  padding: 6px;
 }
 </style>
