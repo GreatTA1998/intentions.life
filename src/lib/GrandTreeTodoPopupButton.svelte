@@ -3,17 +3,18 @@
 </span>
 
 {#if isPopupOpen}
-  <div id="detailed-card" style="padding: 24px; padding-top: 0px;" bind:this={elem} use:clickOutside on:click_outside={handleClickOutside}>    
-    <div style="display: flex; justify-content: space-around; align-items: start; margin-left: 56%;">
-      <span class="material-symbols-outlined my-float" style="font-size: 42px; color: rgb(20, 20, 20); cursor: pointer; margin-left: -4px;">
-        summarize
-      </span>
+  <div class="my-popup" style="" bind:this={elem} use:clickOutside on:click_outside={handleClickOutside}>    
+    <div style="display: flex; justify-content: space-around; align-items: start;">
 
       <div>
         <GrandTreeTodoReusableList
           listTitle="TODAY"
           {allIncompleteTasks}
           dueInHowManyDays={1}
+          on:new-root-task
+          on:task-unscheduled
+          on:task-node-update
+          on:task-click
           on:task-dragged
         />  
       </div>
@@ -23,6 +24,10 @@
           listTitle="THIS WEEK"
           {allIncompleteTasks}
           dueInHowManyDays={7}
+          on:new-root-task
+          on:task-unscheduled
+          on:task-node-update
+          on:task-click
           on:task-dragged
         />  
       </div>
@@ -32,11 +37,15 @@
           listTitle="THIS MONTH"
           {allIncompleteTasks}
           dueInHowManyDays={30}
+          on:new-root-task
+          on:task-unscheduled
+          on:task-node-update
+          on:task-click
           on:task-dragged
         />  
       </div>
 
-      <div>
+      <div style="max-width: 40vw; min-width: 400px; overflow-x: auto;">
         <slot>
           <!-- GrandTreeTodo will be injected via the parent,, so no interface will need to be changed -->
         </slot>
@@ -51,8 +60,6 @@ import _ from 'lodash'
 import { getDateOfToday, getRandomID, clickOutside, getDateInDDMMYYYY, getCurrentTimeInHHMM } from '/src/helpers.js'
 import GrandTreeTodoReusableList from '$lib/GrandTreeTodoReusableList.svelte'
 
-export let listTitle
-export let taskObject 
 export let allIncompleteTasks
 
 const dispatch = createEventDispatcher()
@@ -85,17 +92,17 @@ onDestroy(() => {
   font-weight: 500;
 }
 
-#detailed-card {
+.my-popup {
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   overflow-y: auto;
   overflow-x: auto;
-  z-index: 5;
+  z-index: 2;
   min-width: 300px;
   width: 96%;
-  height: 96%;
+  height: 94%;
   border-radius: 36px;
   background-color: white;
 

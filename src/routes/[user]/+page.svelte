@@ -101,14 +101,14 @@
 </div>
 
 <div id="background-image-holder" style="height: calc(100% - {navbarHeight}px);">
-  <a role="button" on:click={() => currentMode === 'Dashboard' ? currentMode = 'Week' : currentMode = 'Dashboard'} class="float mika-hover" style="right: 150px; z-index: 10"  
+  <a role="button" on:click={() => currentMode === 'Dashboard' ? currentMode = 'Week' : currentMode = 'Dashboard'} class="float mika-hover" style="right: 150px; z-index: 1"  
     class:blue-focus={isJournalPopupOpen}>
     <span class="material-symbols-outlined my-float">
       dashboard
       </span>
   </a>
 
-  <a role="button" on:click={() => isJournalPopupOpen = !isJournalPopupOpen} class="float mika-hover" style="right: 90px; z-index: 10"  
+  <a role="button" on:click={() => isJournalPopupOpen = !isJournalPopupOpen} class="float mika-hover" style="right: 90px; z-index: 1"  
   class:blue-focus={isJournalPopupOpen}>
     <span class="material-symbols-outlined my-float">
       auto_stories
@@ -122,7 +122,7 @@
     </span>
   </a> -->
 
-  <a role="button" on:click={() => isBedtimePopupOpen = !isBedtimePopupOpen} class="float mika-hover" style="right: 30px; z-index: 10"
+  <a role="button" on:click={() => isBedtimePopupOpen = !isBedtimePopupOpen} class="float mika-hover" style="right: 30px; z-index: 1"
   class:blue-focus={isBedtimePopupOpen}>
     <span class="material-symbols-outlined my-float">
       bedtime
@@ -146,6 +146,11 @@
       >
         <GrandTreeTodoPopupButton
           {allIncompleteTasks}
+          on:new-root-task={(e) => createNewRootTask(e.detail)}
+          on:task-unscheduled={(e) => putTaskToThisWeekTodo(e)}
+          on:task-node-update={(e) => updateNode({ id: e.detail.id, newDeepValue: e.detail.newDeepValue })}
+          on:task-click={(e) => openDetailedCard(e.detail)}
+          
           on:task-dragged={(e) => changeTaskDeadline(e.detail)}
         > 
           <!-- This will be injected on the 4th column, after day, week & month -->

@@ -1,5 +1,5 @@
 
-  <div id="detailed-card" bind:this={elem} use:clickOutside on:click_outside={handleClickOutside}>
+  <div class="detailed-card-popup" bind:this={elem} use:clickOutside on:click_outside={handleClickOutside}>
     <div style="display: flex; align-items: center;">
       <input 
         type="text" 
@@ -345,22 +345,6 @@ function dispatchNewDeadline (e) {
     isEditingDeadlineTime = false
   }
 }
-
-function toggleIsGoal () {
-  taskObject.isGoal = !taskObject.isGoal // !undefined or !null evaluates to true
-  dispatch('task-repeat')
-}
-
-function setTaskAsEvent () {
-  taskObject.repeatType = 'event'
-  // they all just update the Firestore anyway there is no difference
-  dispatch('task-repeat')
-} 
-
-function setTaskAsHabit () {
-  taskObject.repeatType = 'habit'
-  dispatch('task-repeat')
-}
 </script>
 
 <style>
@@ -368,8 +352,7 @@ function setTaskAsHabit () {
     opacity: 0.5;
   }
 
-  #detailed-card {
-    font-family: Roboto,Arial,sans-serif;
+  .detailed-card-popup {
     font-size: 14px;
     position: fixed;
     top: 50%;
@@ -377,7 +360,7 @@ function setTaskAsHabit () {
     transform: translate(-50%, -50%);
     width: 70%;
     overflow-y: auto;
-    z-index: 5;
+    z-index: 3;
     min-width: 300px;
     height: 70%;
     border-radius: 10px;
