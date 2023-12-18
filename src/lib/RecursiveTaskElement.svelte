@@ -28,7 +28,6 @@
     style=" 
       width: 100%;
       font-weight: {depthAdjustedFontWeight};
-      color: rgb(240, 240, 240);
     "
     draggable="true"
     on:dragstart|self={(e) => dragstart_handler(e, taskObj.id)}

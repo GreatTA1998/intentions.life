@@ -143,7 +143,23 @@
         on:task-unscheduled={(e) => putTaskToThisWeekTodo(e)}
         on:task-node-update={(e) => updateNode({ id: e.detail.id, newDeepValue: e.detail.newDeepValue })}
         on:task-click={(e) => openDetailedCard(e.detail)}
-      />
+      >
+        <GrandTreeTodoPopupButton
+          {allIncompleteTasks}
+          on:task-dragged={(e) => changeTaskDeadline(e.detail)}
+        > 
+          <!-- This will be injected on the 4th column, after day, week & month -->
+          <GrandTreeTodo 
+            {allTasks}
+            on:task-click={(e) => openDetailedCard(e.detail)}
+            on:task-create={(e) => modifyTaskTree(e.detail.updatedChildren, e.detail.taskAffected)} 
+            on:task-done={updateEntireTaskTree}
+            on:task-delete={updateEntireTaskTree}
+            on:task-repeating={updateEntireTaskTree}
+            on:drop={(e) => unscheduleTask(e)}
+          />
+        </GrandTreeTodoPopupButton>
+      </TodoThisWeek>
     {:else if currentMode === 'Day'}
       <div style="position: relative;">
         <BackgroundRainScene/>
@@ -305,11 +321,12 @@
   import { mostRecentlyDeletedOrCompletedTaskID, mostRecentlyCompletedTaskName, user } from '/src/store.js'
   import CalendarThisWeek from '$lib/CalendarThisWeek.svelte'
   import TodoThisWeek from '$lib/TodoThisWeek.svelte'
-  import GrandTreeTodo from '$lib/GrandTreeTodo.svelte'
   import FutureOverview from '$lib/FutureOverview.svelte'
   import ZenJournal from '$lib/ZenJournal.svelte'
   import BackgroundRainScene from '$lib/BackgroundRainScene.svelte'
   import LifeDashboard from '$lib/LifeDashboard.svelte'
+  import GrandTreeTodoPopupButton from '$lib/GrandTreeTodoPopupButton.svelte'
+  import GrandTreeTodo from '$lib/GrandTreeTodo.svelte'
 
   const navbarHeight = 60
 
