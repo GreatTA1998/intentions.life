@@ -1,87 +1,88 @@
-{#if isOpen}
-  <div 
-    class="my-popup-window" 
-    use:clickOutside on:click_outside={() => dispatch('card-close')}
-    style="padding-left: 12px;"
-  >
-    <div style="display: flex;">
-        <h3 class="google-calendar-event-title"  style="margin-left: 50px; margin-top: 40px; color: #000000; font-weight: 600;">
-          NET WORTH
-        </h3>
-      <span on:click={() => dispatch('card-close')} class="material-icons" style="margin-left: auto; margin-right: 10px; margin-top: 10px; color: #323232;">
-        close
-      </span>
-    </div>
 
-    <div style="display: flex; flex-wrap: wrap;">
+<div style="display: flex;">
+  <div style="color: rgb(40, 40, 40); display: flex; align-items: center">
+    <span class="material-symbols-outlined" style="margin-right: 6px">
+      savings
+    </span>
+    NET WORTH
+  </div>
+</div>
 
-      {#if $user.cardAccounts}
-        <div class="dashboard-new-container">
-          {#if trueBalance === null && !expired_access_token}
-            <div style="display: flex; align-items: center; justify-content: center; height: 100%;">
-              Calculating overall balance...
-            <!-- <FinancePopupLoadingIndicator color={'white'}/> -->
-            </div>
-          {:else if expired_access_token}
-            <div style="margin-left: 50px;">
-              Overall balance unavailable because re-login is needed for some accounts
-            </div>
-          {:else}
-            <div style="font-size: 5rem; margin-left: 50px;">
-              ${trueBalance}
-            </div>
-            
-            <div style="margin-left: 50px;">
-              Overall balance
-            </div>
-          {/if}
+<div style="display: flex; flex-wrap: wrap;">
+
+  {#if $user.cardAccounts}
+
+<!-- 
+    <div class="dashboard-new-container">
+      {#if trueBalance === null && !expired_access_token}
+        <div style="display: flex; align-items: center; justify-content: center; height: 100%;">
+          Calculating overall balance...
         </div>
+      {:else if expired_access_token}
+        <div style="margin-left: 50px;">
+          Overall balance unavailable because re-login is needed for some accounts
+        </div>
+      {:else}
+        <div style="font-size: 5rem; margin-left: 50px;">
+          ${trueBalance}
+        </div>
+        
+        <div style="margin-left: 50px;">
+          Overall balance
+        </div>
+      {/if}
+    </div> -->
 
-        <!-- It looks like a Debit card, physically! -->
-        {#each $user.cardAccounts as cardAccount}
-          <!-- coral color: #ff7f50  goes well with Turqoise: https://artincontext.org/what-colors-go-with-turquoise/ -->
-          <div class="dashboard-new-container" style="background-color: #F4F4F4; color: #000000;">
-              <div>
-                {cardAccount.creditOrDebit === 'depository' ? 'Debit' : 'Credit'} card
-                <!-- {cardAccount.account_id} -->
-              </div>
+    <!-- It looks like a Debit card, physically! -->
+    {#each $user.cardAccounts as cardAccount}
+      <!-- Quickfix don't show credit cards -->
+      {#if cardAccount.creditOrDebit !== plaidAccountTypes.CREDIT}
 
-              {#if expired_access_token === cardAccount.access_token}
-                <button on:click={() => preparePlaidLinkUI(expired_access_token)}>
-                  Re-login required
-                </button>
-              {:else}
-              
-              {#if cardAccount.creditOrDebit === 'credit'}
-                <div>
-                  Credit usage: {creditBalance || 'Fetching credit balance...'}
-                </div>
-              {:else if cardAccount.creditOrDebit === 'depository'}
-                <div>
-                  Balance: {debitBalance || 'Fetching debit balance...'}
-                </div>
-              {/if}      
-
-              {#if debitCardTransactions && cardAccount.creditOrDebit === plaidAccountTypes.DEBIT}
-                <FinancePopupTransactionsUI transactions={debitCardTransactions}/>
-              {:else if creditCardTransactions && cardAccount.creditOrDebit === plaidAccountTypes.CREDIT}
-                <FinancePopupTransactionsUI transactions={creditCardTransactions}/>
-              {:else if savingsTransactions && cardAccount.creditOrDebit === plaidAccountTypes.SAVINGS}
-                <FinancePopupTransactionsUI transactions={savingsTransactions}/>
-              {/if}
-            {/if}
+      <!-- coral color: #ff7f50  goes well with Turqoise: https://artincontext.org/what-colors-go-with-turquoise/ -->
+      <div class="dashboard-new-container" style="background-color: #F4F4F4; color: #000000;">
+          <div>
+            {cardAccount.creditOrDebit === 'depository' ? 'Debit' : 'Credit'} card
+            <!-- {cardAccount.account_id} -->
           </div>
-        {/each}
+
+          {#if expired_access_token === cardAccount.access_token}
+            <button on:click={() => preparePlaidLinkUI(expired_access_token)}>
+              Re-login required
+            </button>
+          {:else}
+          
+          {#if cardAccount.creditOrDebit === 'credit'}
+            <div>
+              Credit usage: {creditBalance || 'Fetching credit balance...'}
+            </div>
+          {:else if cardAccount.creditOrDebit === 'depository'}
+            <!-- <div>
+              Balance: {debitBalance || 'Fetching debit balance...'}
+            </div> -->
+          {/if}      
+
+          {#if debitCardTransactions && cardAccount.creditOrDebit === plaidAccountTypes.DEBIT}
+            <FinancePopupTransactionsUI transactions={debitCardTransactions}/>
+          {:else if creditCardTransactions && cardAccount.creditOrDebit === plaidAccountTypes.CREDIT}
+            <FinancePopupTransactionsUI transactions={creditCardTransactions}/>
+          {:else if savingsTransactions && cardAccount.creditOrDebit === plaidAccountTypes.SAVINGS}
+            <FinancePopupTransactionsUI transactions={savingsTransactions}/>
+          {/if}
+        {/if}
+      </div>
+
+      
       {/if}
 
-      <!-- This is always visible because it's not included in the {if} statement -->
-      <button on:click={() => preparePlaidLinkUI()} style="margin-left: 24px;">
-        Add new card
-      </button>
-    </div>
-    <!-- End of flexbox -->
-  </div>
-{/if}
+    {/each}
+  {/if}
+
+  <!-- This is always visible because it's not included in the {if} statement -->
+  <!-- <button on:click={() => preparePlaidLinkUI()} style="margin-left: 24px;">
+    Add new card
+  </button> -->
+</div>
+<!-- End of flexbox -->
 
 <script>
 // SIMPLIFYING ASSUMPTIONS: exactly 1 credit, debit and savings account
@@ -146,6 +147,8 @@ $: {
   // quickfix 
   else if (debitBalance !== null && creditBalance !== null) {
     trueBalance = debitBalance - creditBalance
+  } else if (debitBalance !== null){
+    trueBalance = debitBalance
   }
 }
 

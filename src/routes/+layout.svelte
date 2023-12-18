@@ -5,9 +5,10 @@
     class="elementToFadeInAndOut center"
   >
     <img 
-      src="/ola-full-size.JPG" 
+      src="/hand-drawn-twig-no-bg-cropped.png" 
       class="app-loading-logo center"
       alt="logo"
+      style="width: 38px; height: 48px;"
     />
   </div>
 {/if}

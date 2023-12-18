@@ -27,7 +27,7 @@
   <div 
     style=" 
       width: 100%;
-      font-weight: 400;
+      font-weight: {depthAdjustedFontWeight};
     "
     draggable="true"
     on:dragstart|self={(e) => dragstart_handler(e, taskObj.id)}
@@ -52,11 +52,21 @@
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
-          line-height: 1.5;
-          color: {taskObj.startDate && taskObj.startTime ? 'rgb(220, 220, 220)' : 'black'}
+          color: {taskObj.startDate && taskObj.startTime ? 'rgb(220, 220, 220)' : 'black'};
+          display: flex;
+          align-items: center;
         "
-      >
-        - {taskObj.name}
+      > 
+      <span class="material-icons" 
+          style="
+            font-size: {depth === 0 ? '5px' : '4px'}; 
+            color: {isTaskDueSoonOrOverdue ? 'red' : 'rgb(150, 150, 150)'};
+            margin-right: 4px;
+          "
+        >
+          circle
+        </span>
+        {taskObj.name}
       </div>
       {#if isMouseHoveringOnTaskName}
         <span 
@@ -73,8 +83,10 @@
       {/if}
     </div>
 
-    <div style="margin-left: 20px;">
+    <div style="margin-left: 32px;">
       {#each taskObj.children as subtaskObj, i}
+        <!-- little bit of spacing between each children for readability -->
+        <div style="margin-top: 3px"></div>
         <RecursiveTaskElement 
           taskObj={subtaskObj}
           depth={depth+1}
@@ -105,12 +117,12 @@
 
 <script>
   import RecursiveTaskElement from '$lib/RecursiveTaskElement.svelte'
-  import { getDateInDDMMYYYY, getRandomID } from '/src/helpers'
+  import { getDateInDDMMYYYY, convertDDMMYYYYToDateClassObject, computeDayDifference, getRandomID } from '/src/helpers'
   import { createEventDispatcher, tick } from 'svelte'
   import { appModePixelsPerHour } from '/src/store'
 
   export let taskObj
-  export let depth
+  export let depth 
   export let doNotShowScheduledTasks = false
   export let doNotShowCompletedTasks = false
 
@@ -118,8 +130,25 @@
   let newSubtaskStringValue = ''
   let isTypingNewSubtask = false
   let isMouseHoveringOnTaskName = false
+  let isTaskDueSoonOrOverdue = false
 
-  $: depthAdjustedFontSize = 0.7 * (0.74 ** (depth + 1))
+  let depthAdjustedFontSize 
+
+  $: if (depth >= 0) {
+    switch (depth) {
+      case 0:
+        depthAdjustedFontSize = 0.5
+        break
+      case 1:
+        depthAdjustedFontSize = 0.4
+        break
+      case 2:
+        depthAdjustedFontSize = 0.4
+    }
+  }
+  
+  // depthAdjustedFontSize = 1 * (0.6 ** (depth)
+  $: depthAdjustedFontWeight = 400 - (depth * 0) + (200 * Math.max(1 - depth, 0))
 
   const dispatch = createEventDispatcher()
 
@@ -130,6 +159,17 @@
           NewSubtaskInput.focus()
         }
       })
+    }
+  }
+
+  // calculate if a task is 1 day before the deadline / overdue
+  $: {
+    const d1 = new Date()
+    const d2 = convertDDMMYYYYToDateClassObject(taskObj.deadlineDate, taskObj.deadlineTime)
+
+    const dayDiff = computeDayDifference(d1, d2)
+    if (dayDiff <= 1) {
+      isTaskDueSoonOrOverdue = true
     }
   }
 

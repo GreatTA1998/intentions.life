@@ -57,9 +57,8 @@
 "
 >
   <img src="hand-drawn-twig-no-bg-cropped.png" style="width: 26px; height: 36px; margin-left: 24px; margin-right: 6px;">
-  <div style="font-family: inter;">organize-life.com</div>
 
-  <div style="margin-left: 236px; font-size: 24px; display: flex;">
+  <div style="margin-left: 224px; font-size: 24px; display: flex;">
     <div>
       {new Date().toLocaleString('en-US', { month: 'short'})}
     </div>
@@ -102,46 +101,28 @@
 </div>
 
 <div id="background-image-holder" style="height: calc(100% - {navbarHeight}px);">
-  <!-- The grand tree icon -->
-  <a role="button" 
-    on:click={() => {
-      if (currentMode === 'grandTreeMode') {
-        currentMode = 'Week'
-      } else {
-        currentMode = 'grandTreeMode'
-      }
-    }} 
-    class="float mika-hover"
-    class:blue-focus={currentMode === 'grandTreeMode'}
-    style="right: 270px; z-index: 10"
-  >
-    <span class="material-symbols-outlined my-float" style="">
-      forest
-    </span>
-  </a>
-
-  <a role="button" on:click={() => currentMode === 'Dashboard' ? currentMode = 'Week' : currentMode = 'Dashboard'} class="float mika-hover" style="right: 210px; z-index: 10"  
+  <a role="button" on:click={() => currentMode === 'Dashboard' ? currentMode = 'Week' : currentMode = 'Dashboard'} class="float mika-hover" style="right: 150px; z-index: 1"  
     class:blue-focus={isJournalPopupOpen}>
     <span class="material-symbols-outlined my-float">
       dashboard
       </span>
   </a>
 
-  <a role="button" on:click={() => isJournalPopupOpen = !isJournalPopupOpen} class="float mika-hover" style="right: 150px; z-index: 10"  
+  <a role="button" on:click={() => isJournalPopupOpen = !isJournalPopupOpen} class="float mika-hover" style="right: 90px; z-index: 1"  
   class:blue-focus={isJournalPopupOpen}>
     <span class="material-symbols-outlined my-float">
       auto_stories
     </span>
   </a>
 
-  <a role="button" on:click={() => isFinancePopupOpen = !isFinancePopupOpen} class="float mika-hover" style="right: 90px; z-index: 10"
+  <!-- <a role="button" on:click={() => isFinancePopupOpen = !isFinancePopupOpen} class="float mika-hover" style="right: 90px; z-index: 10"
   class:blue-focus={isFinancePopupOpen}>
     <span class="material-symbols-outlined my-float">
       attach_money
     </span>
-  </a>
+  </a> -->
 
-  <a role="button" on:click={() => isBedtimePopupOpen = !isBedtimePopupOpen} class="float mika-hover" style="right: 30px; z-index: 10"
+  <a role="button" on:click={() => isBedtimePopupOpen = !isBedtimePopupOpen} class="float mika-hover" style="right: 30px; z-index: 1"
   class:blue-focus={isBedtimePopupOpen}>
     <span class="material-symbols-outlined my-float">
       bedtime
@@ -162,7 +143,28 @@
         on:task-unscheduled={(e) => putTaskToThisWeekTodo(e)}
         on:task-node-update={(e) => updateNode({ id: e.detail.id, newDeepValue: e.detail.newDeepValue })}
         on:task-click={(e) => openDetailedCard(e.detail)}
-      />
+      >
+        <GrandTreeTodoPopupButton
+          {allIncompleteTasks}
+          on:new-root-task={(e) => createNewRootTask(e.detail)}
+          on:task-unscheduled={(e) => putTaskToThisWeekTodo(e)}
+          on:task-node-update={(e) => updateNode({ id: e.detail.id, newDeepValue: e.detail.newDeepValue })}
+          on:task-click={(e) => openDetailedCard(e.detail)}
+          
+          on:task-dragged={(e) => changeTaskDeadline(e.detail)}
+        > 
+          <!-- This will be injected on the 4th column, after day, week & month -->
+          <GrandTreeTodo 
+            {allTasks}
+            on:task-click={(e) => openDetailedCard(e.detail)}
+            on:task-create={(e) => modifyTaskTree(e.detail.updatedChildren, e.detail.taskAffected)} 
+            on:task-done={updateEntireTaskTree}
+            on:task-delete={updateEntireTaskTree}
+            on:task-repeating={updateEntireTaskTree}
+            on:drop={(e) => unscheduleTask(e)}
+          />
+        </GrandTreeTodoPopupButton>
+      </TodoThisWeek>
     {:else if currentMode === 'Day'}
       <div style="position: relative;">
         <BackgroundRainScene/>
@@ -324,11 +326,12 @@
   import { mostRecentlyDeletedOrCompletedTaskID, mostRecentlyCompletedTaskName, user } from '/src/store.js'
   import CalendarThisWeek from '$lib/CalendarThisWeek.svelte'
   import TodoThisWeek from '$lib/TodoThisWeek.svelte'
-  import GrandTreeTodo from '$lib/GrandTreeTodo.svelte'
   import FutureOverview from '$lib/FutureOverview.svelte'
   import ZenJournal from '$lib/ZenJournal.svelte'
   import BackgroundRainScene from '$lib/BackgroundRainScene.svelte'
   import LifeDashboard from '$lib/LifeDashboard.svelte'
+  import GrandTreeTodoPopupButton from '$lib/GrandTreeTodoPopupButton.svelte'
+  import GrandTreeTodo from '$lib/GrandTreeTodo.svelte'
 
   const navbarHeight = 60
 
