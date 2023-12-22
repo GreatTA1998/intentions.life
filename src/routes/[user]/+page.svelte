@@ -103,8 +103,9 @@
 <div id="background-image-holder" style="height: calc(100% - {navbarHeight}px);">
   <a role="button" on:click={() => currentMode === 'Dashboard' ? currentMode = 'Week' : currentMode = 'Dashboard'} class="float mika-hover" style="right: 150px; z-index: 1"  
     class:blue-focus={isJournalPopupOpen}>
-    <span class="material-symbols-outlined my-float">
-      dashboard
+
+    <span class="material-symbols-outlined my-float" style="font-size: 26px;">
+      signal_cellular_alt
       </span>
   </a>
 

@@ -12,7 +12,7 @@
     height: {height}px; 
     min-height: 12px;
     font-size: {fontSize}rem;
-    border-left: {isBulletPoint ? 0 : 3}px solid {task.isDone ? '#509c13' : 'grey'};
+    border-left: {isBulletPoint ? 0 : 3}px solid {task.isDone ? 'grey' : 'grey'};
   "
 >
   <!-- As long as this parent div is correctly sized, the duration adjusting area 
@@ -55,6 +55,10 @@
             id: task.id
           })}
         >
+
+        <!-- <CustomRoundCheckbox></CustomRoundCheckbox> -->
+
+
       </div>
     {/if}
 
@@ -104,6 +108,7 @@
   // Assumes `task` is hydrated
   import { createEventDispatcher } from 'svelte'
   import { getTrueY } from '/src/helpers.js'
+  import CustomRoundCheckbox from '$lib/CustomRoundCheckbox.svelte';
 
   export let task = null
   export let pixelsPerHour = null

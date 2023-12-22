@@ -1,6 +1,8 @@
-<div style="display: flex; align-items: center;">
-  <div style="font-size: 1.2em; margin-top: 8px;" class:half-transparent={!taskObject.willRepeatOnWeekDayNumber}>
-    Repeats every 1 week:
+<div style="display: flex; align-items: center; margin-top: 12px;">
+  <div class:half-transparent={!taskObject.willRepeatOnWeekDayNumber}>
+    <span class="material-symbols-outlined" style="font-size: 28px; margin-top: 4px;">
+      repeat
+    </span>
   </div>
 
   <!-- Don't allow non-scheduled / non-deadline tasks to repeat -->
@@ -11,7 +13,7 @@
   <!-- doesn't repeat, setting it to repeat -->
   <div 
     class:half-transparent={!taskObject.willRepeatOnWeekDayNumber && !isChoosingRepeatDays}
-    style="display: flex; margin-top: 9px; padding-left: 12px;" on:click={() => {
+    style="display: flex; padding-left: 12px;" on:click={() => {
       if (isScheduled(taskObject) || hasDeadline(taskObject)) {
         isChoosingRepeatDays = true
       } else {

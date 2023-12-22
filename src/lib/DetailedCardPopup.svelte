@@ -7,19 +7,36 @@
         bind:value={titleOfTask} 
         on:input={handleInput2}
         placeholder="Untitled"
-        style="width: 97%; margin-left: 10px; margin-right: 10px; box-sizing: border-box;"
+        style="width: 100%; box-sizing: border-box;"
       >
     </div>
 
     <!-- In future, display in readable month / day form -->
     <div
       class:half-invisible={!isScheduled(taskObject)}
-      style="margin-left: 10px; margin-top: 5px; font-size: 1.2em; display: flex; align-items: center;"
+      style="margin-top: 12px; font-size: 1.2em; display: flex; align-items: center;"
     >
-      Scheduled for: 
+      <div style="width: 134px;">
+        <UXFormField
+          fieldLabel="Start"
+          value={taskObject.startDate + ' ' + taskObject.startTime}
+          placeholder="MM/DD hh:mm"
+        />
+      </div>
+
+      <div style="margin-left: 6px; margin-right: 6px;">
+        
+      </div>
+
+      <div style="width: 134px;">
+        <UXFormField
+          fieldLabel="End"
+          value={taskObject.startDate + ' ' + taskObject.startTime}
+        />
+      </div>
 
       <!-- startDate -->
-      {#if !isEditingStartDate}
+      <!-- {#if !isEditingStartDate}
         <div on:click={() => isEditingStartDate = true}
           class="google-calendar-event-time" style="margin-left: 8px; background-color: grey; padding: 4px; color: white;"
         >
@@ -32,10 +49,10 @@
           placeholder={getDateOfToday()}
           autofocus
         >
-      {/if}
+      {/if} -->
 
       <!-- startTime -->
-      {#if !isEditingStartTime}
+      <!-- {#if !isEditingStartTime}
         <div on:click={() => isEditingStartTime = true}
           class="google-calendar-event-time" style="margin-left: 8px; background-color: grey; padding: 4px; color: white;"
         >
@@ -49,14 +66,14 @@
           placeholder={getCurrentTimeInHHMM()} 
           autofocus
         >
-      {/if}
+      {/if} -->
 
-      <div style="margin-left: 8px;">
+      <!-- <div style="margin-left: 8px;">
         for
-      </div>
+      </div> -->
 
       <!-- TO-DO: can input duration with `!isEditingDuration` -->
-      {#if true}
+      <!-- {#if true}
         <div on:click={() => isEditingDuration = true}
           style="margin-left: 8px; background-color: grey; padding: 4px; color: white;" class="google-calendar-event-time"
         >
@@ -71,7 +88,7 @@
         <div class="google-calendar-event-time" style="margin-left: 4px;">
           minutes
         </div>
-      {/if}
+      {/if} -->
 
       {#if isEditingStartDate || isEditingStartTime}
         <div style="margin-left: 6px; opacity: 0.8">
@@ -82,8 +99,19 @@
 
 
     <div class:half-invisible={!hasDeadline(taskObject)} 
-      style="margin-left: 10px; margin-top: 5px; font-size: 1.2em; display: flex; align-items: center;"
+      style="margin-top: 12px; font-size: 1.2em; display: flex; align-items: center;"
     >
+      <UXFormField
+        fieldLabel="Deadline"
+        value={(taskObject.deadlineDate || '') + (taskObject.deadlineTime || '')}
+        placeholder="dd/mm/yyyy hh:mm"
+      >
+        <span slot="icon" class="material-symbols-outlined" style="margin-right: 4px; font-size: 18px;">
+          alarm
+        </span>
+      </UXFormField>
+
+<!-- 
       Deadline: 
       {#if !isEditingDeadlineDate}
         <div on:click={() => isEditingDeadlineDate = true} class="google-calendar-event-time" style="margin-left: 8px; background-color: grey; padding: 4px; color: white;">
@@ -93,10 +121,10 @@
         <input bind:value={newDeadlineDate} placeholder={getDateInDDMMYYYY(new Date())} style="width: 77px; margin-left: 8px;" class="google-calendar-event-time"
           autofocus
         >
-      {/if}
+      {/if} -->
       <!-- getDateInDDMMYYYY(new Date()) -->
 
-      {#if !isEditingDeadlineTime}
+      <!-- {#if !isEditingDeadlineTime}
         <div on:click={() => isEditingDeadlineTime = true} 
           class="google-calendar-event-time" style="margin-left: 8px; background-color: grey; padding: 4px; color: white;">
           {taskObject.deadlineTime || 'hh:mm'}
@@ -110,20 +138,13 @@
           on:keypress={dispatchNewDeadline}
           autofocus
         >
-      {/if}
+      {/if} -->
 
       {#if isEditingDeadlineDate || isEditingDeadlineTime}
         <div style="margin-left: 6px; opacity: 0.8">
           (press ENTER to apply changes)
         </div>
       {/if}
-    </div>
-
-    <div style="margin-left: 12px; margin-top: 0px;">
-      <DetailedCardPopupRepeat 
-        {taskObject}
-        on:repeating-tasks-generate
-      />
     </div>
 
     <!-- <div class="google-calendar-event-detail" style="margin-top: 12px; margin-left: 16px;">
@@ -138,18 +159,27 @@
 
     </div>
 
-    <div stle="float: left; width: 80%">
+    <div stle="width: 100%; margin-bottom: 24px;">
+      <UXFormField fieldLabel="Details"/>
+
       <!-- cols="48" determines width -->
-      <textarea 
+      <!-- <textarea 
         bind:value={notesAboutTask}
         on:input={handleInput}
         rows="5"
         placeholder="Type in details..."
-        style="margin-left: 12px; width: 95%; margin-right: 10px; margin-bottom: 20px; box-sizing: border-box;"
+        style="width: 100%; margin-bottom: 20px; box-sizing: border-box;"
+      /> -->
+    </div>
+
+    <div style="margin-left: 12px; margin-top: 0px;">
+      <DetailedCardPopupRepeat 
+        {taskObject}
+        on:repeating-tasks-generate
       />
     </div>
 
-    <div style="margin-bottom: 24px; margin-left: 12px;">
+    <div style="margin-top: 24px; margin-bottom: 24px; margin-left: 12px;">
       <a style="height: 20px;" on:click={() => dispatch('task-done')}>
         Completed
       </a>
@@ -187,6 +217,7 @@ import RecursiveBulletPoint from '$lib/RecursiveBulletPoint.svelte'
 import { getDateOfToday, getRandomID, clickOutside, getDateInDDMMYYYY, getCurrentTimeInHHMM } from '/src/helpers.js'
 import ReusableDatePicker from '$lib/ReusableDatePicker.svelte'
 import DetailedCardPopupRepeat from '$lib/DetailedCardPopupRepeat.svelte'
+import UXFormField from '$lib/UXFormField.svelte'
 
 export let taskObject 
 
@@ -358,17 +389,18 @@ function dispatchNewDeadline (e) {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 70%;
+    width: 60%;
     overflow-y: auto;
     z-index: 3;
     min-width: 300px;
     height: 70%;
-    border-radius: 10px;
+
+    padding: 24px;
+    border-radius: 24px;
     background-color: white;
  
   /*    border: 1px solid #000; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);*/
     -webkit-box-shadow:  0px 0px 0px 9999px rgba(0, 0, 0, 0.5);
-    padding: 6px;
   }
 
   /* Refer to: https://stackoverflow.com/questions/3131072/how-to-change-input-text-box-style-to-line */
@@ -379,7 +411,8 @@ function dispatchNewDeadline (e) {
     outline: none;
     font-size: 23px;
     font-weight: 700;
-    padding: 10px 0px;
+    /* padding: 10px 0px; */
+    padding-bottom: 10px;
   }
 
   .google-calendar-event-detail {
@@ -401,7 +434,6 @@ function dispatchNewDeadline (e) {
   }
 
   .google-calendar-event-title {
-    font-family: Roboto,Arial,sans-serif;
     font-size: 24px;
     font-weight: 400;
     letter-spacing: .2px;
@@ -423,7 +455,6 @@ function dispatchNewDeadline (e) {
 }
 
 a {
-  font-family: Roboto,Arial,sans-serif;
   flex: 1;
   background-color: #F4F4F4;
   color: #4E4E4E;

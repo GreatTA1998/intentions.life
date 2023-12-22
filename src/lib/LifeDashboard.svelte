@@ -1,7 +1,7 @@
 <div style="width: 100vw;">
   <!-- Top section, spans horizontally -->
-  <div style="display: flex; padding: 24px;">
-    <div class="rounded-card" style="margin-right: 24px; width: 50vw; height: 440px;">
+  <div style="display: flex; padding: 24px; width: 100vw;">
+    <!-- <div class="rounded-card" style="margin-right: 24px; width: 50vw; height: 440px;">
       <div style="color: rgb(40, 40, 40); display: flex; align-items: center">
         <span class="material-symbols-outlined" style="margin-right: 6px">
           work
@@ -19,49 +19,50 @@
 
         <MRRLineGraph/>
       </div>
-    </div>
+    </div> -->
 
     <div style="width: 40vw;" class="rounded-card">
       <FinancePopupNoPopup/>
     </div>
+
+    <div style="background-color: transparent; width: 100%; display: flex; justify-content: left; padding: 24px;">
+      <!-- Loved Ones Dashboard in future updates -->
+
+      <div class="rounded-card" style="margin-left: 24px; width: 100%;">
+        <div style="display: flex; align-items: center;">
+        <div style="text-transform: uppercase; color: rgb(40, 40, 40); display: flex; align-items: center;">
+          <span class="material-symbols-outlined" style="margin-right: 6px;">
+            timer
+          </span>
+
+          TIME SPENT
+        </div>
+          <div style="font-size: 14px; margin-left: 8px;">
+            this week
+          </div>
+        </div>
+
+        <div style="margin-top: 24px;"></div>
+
+        {#each templatedTasksThisWeek as templateTask}
+          <div style="font-weight: 500; font-size: 16px;">
+            {templateTask.name}
+          </div>
+          <div style="display: flex; align-items: center; margin-top: 2px; margin-bottom: 24px;">
+            {#each {length: templateTask.frequency} as _, i}
+              <div style="background: green; border-radius: 4px; width: {(templateTask.hourDuration/templateTask.frequency) * 48}px; height: 4px; margin-right: 2px;"></div>
+            {/each}
+            
+            <div style="font-weight: 400; font-size: 14px; margin-left: 4px;">
+              {templateTask.hourDuration} hr
+            </div>
+          </div>      
+        {/each}
+      </div>
+    </div>
+
   </div>
   <!-- End of top section flexbox -->
-
-  <div style="background-color: transparent; width: 100%; display: flex; justify-content: left; padding: 24px;">
-    <!-- Loved Ones Dashboard in future updates -->
-
-    <div class="rounded-card" style="margin-left: 24px;">
-      <div style="display: flex; align-items: center;">
-      <div style="text-transform: uppercase; color: rgb(40, 40, 40); display: flex; align-items: center;">
-        <span class="material-symbols-outlined" style="margin-right: 6px;">
-          timer
-        </span>
-
-        TIME SPENT
-      </div>
-        <div style="font-size: 14px; margin-left: 8px;">
-          this week
-        </div>
-      </div>
-
-      <div style="margin-top: 24px;"></div>
-
-      {#each templatedTasksThisWeek as templateTask}
-        <div style="font-weight: 500; font-size: 16px;">
-          {templateTask.name}
-        </div>
-        <div style="display: flex; align-items: center; margin-top: 2px; margin-bottom: 24px;">
-          {#each {length: templateTask.frequency} as _, i}
-            <div style="background: green; border-radius: 4px; width: {(templateTask.hourDuration/templateTask.frequency) * 48}px; height: 4px; margin-right: 2px;"></div>
-          {/each}
-          
-          <div style="font-weight: 400; font-size: 14px; margin-left: 4px;">
-            {templateTask.hourDuration} hr
-          </div>
-        </div>      
-      {/each}
-    </div>
-  </div>
 
 </div>
 
