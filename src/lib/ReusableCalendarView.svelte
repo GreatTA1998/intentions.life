@@ -193,7 +193,10 @@
 
   onMount(async () => {
     setTimeout(() => {
-      CurrentTimeIndicator.scrollIntoView({ behavior: 'smooth', block: 'center'})
+      if (CurrentTimeIndicator && !$hasInitialScrolled) {
+        CurrentTimeIndicator.scrollIntoView({ behavior: 'smooth', block: 'center'})
+        hasInitialScrolled.set(true)
+      }
     }, 0)
   })
 
