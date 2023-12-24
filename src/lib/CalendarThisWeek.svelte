@@ -1,4 +1,4 @@
-<div style="overflow-y: auto; overflow-x: auto; height: 100%; margin-left: 48px;">
+<div style="overflow-y: auto; overflow-x: auto; height: 100%; margin-left: 24px;">
   <div style="display: flex; width: fit-content;">
     <!-- <div>
       <span on:click={() => dispatch('calendar-shifted', { days: -1 })} class="material-icons shift-calendar-arrow">
@@ -36,21 +36,23 @@
         </div>
 
         {#key intForTriggeringRerender}
-          <ReusableCalendarView
-            backgroundColor='rgb(250, 250, 250)'
-            willShowTimestamps={i === 0}
-            pixelsPerHour={MIKA_PIXELS_PER_HOUR}
-            timeBlockDurationInMinutes={60}
-            subdivisionsPerBlock={60}
-            calendarBeginningDateClassObject={dateClassObj}
-            timestamps={timesOfDay}
-            scheduledTasks={getScheduledTasks(dateClassObj)}
-            on:new-root-task
-            on:task-duration-adjusted
-            on:task-click
-            on:task-scheduled
-            on:task-checkbox-change
-          />
+          {#if timesOfDay.length !== 0}
+            <ReusableCalendarView
+              calendarBeginningDateClassObject={dateClassObj}
+              scheduledTasks={getScheduledTasks(dateClassObj)}
+              timestamps={timesOfDay}
+              backgroundColor='rgb(250, 250, 250)'
+              willShowTimestamps={i === 0}
+              pixelsPerHour={MIKA_PIXELS_PER_HOUR}
+              timeBlockDurationInMinutes={60}
+              subdivisionsPerBlock={60}
+              on:new-root-task
+              on:task-duration-adjusted
+              on:task-click
+              on:task-scheduled
+              on:task-checkbox-change
+            />
+          {/if}
         {/key}
       </div>
     {/each}

@@ -1,1 +1,1 @@
-export const todoListBgColor = 'rgb(248, 248, 248)'
+export const todoListBgColor = 'rgb(245, 245, 245)'

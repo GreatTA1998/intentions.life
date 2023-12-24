@@ -131,7 +131,7 @@
   </a>
   <!-- End of absolute positioning items -->
 
-  <div style="display: flex; height: calc(100% - {navbarHeight}px);"> 
+  <div style="display: flex; height: calc(100% - {navbarHeight}px); width: 100vw;"> 
     {#if currentMode === 'Dashboard'}
       <LifeDashboard {allTasks}/>  
     {/if}  
@@ -201,13 +201,16 @@
     {/if}
     <!-- End of 1st flex child -->
 
+    <!-- width: {currentMode === 'Week' ? '58vw' : 'calc(100vw - 380px)'};  -->
+
     <!-- 2nd flex child -->
     <div style="
       height: calc(100vh - {navbarHeight}px); 
+      overflow-x: auto;
+      flex-grow: 1;
       display: flex; 
       flex-direction: column;
       background-color: rgb(250, 250, 250);
-      width: {currentMode === 'Week' ? '58vw' : 'calc(100vw - 380px)'}; 
     "
     > 
       {#if currentMode === 'Week' && allTasks}
@@ -282,7 +285,7 @@
 
     <!-- optional 3rd flex child -->
     {#if currentMode === 'Week' && allTasks}
-      <div style="padding-top: {36}px; padding-left: 40px; background-color: rgb(248, 248, 248); width: 100%; 
+      <div style="padding-top: {36}px; padding-left: 36px; padding-right: 36px; background-color: rgb(248, 248, 248); width: 14vw; min-width: 332px; 
         height: calc(100vh - 60px);"
       >
         <FutureOverview

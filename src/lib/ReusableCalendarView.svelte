@@ -1,12 +1,15 @@
-<!-- TO-DO: rename to calendar container, as each calendar individually does not handle scrolling (it's handled by the parents) -->
+<!-- TO-DO: rename to "overall-container", as each calendar individually does not handle scrolling (it's handled by the parents) -->
+<!-- https://github.com/sveltejs/svelte/issues/6016 -->
 <div 
   bind:this={ScrollContainer}
+  bind:clientHeight={overallContainerHeight}
   class="scroll-container"
   style="
     position: relative;
     width: 15vw;
     background-color: {backgroundColor};
     flex-grow: 1;
+    border: 0px solid red;
   "
 >
   <!-- NOTE: this is a tall rectangular container that only encompasses the timestamps -->
@@ -156,68 +159,46 @@
   import { getDateInDDMMYYYY, getDateInMMDD, getRandomID } from '/src/helpers';
   import UXFormField from '$lib/UXFormField.svelte'
 
+  export let scheduledTasks = [] 
+  export let timestamps = []
+
   export let pixelsPerHour 
   export let timeBlockDurationInMinutes 
   export let calendarBeginningDateClassObject
   export let subdivisionsPerBlock 
 
-  export let scheduledTasks = [] 
-  export let timestamps = []
   export let willShowTimestamps = true
   export let backgroundColor = 'transparent'
 
-  let myObserver = null
-  let InputElement
+  let overallContainerHeight 
+
+  let ScrollContainer
+  let CurrentTimeIndicator
 
   function p (...args) {
     console.log(...args)    
   }
 
-  let ScrollContainer
-  let CurrentTimeIndicator
   const dispatch = createEventDispatcher()
   
   let isDirectlyCreatingTask = false
   let formFieldTopPadding = 40
   let yPosition
-  $: resultantDateClassObject = getResultantDateClassObject(yPosition)
   let newTaskName = ''
-
-  $: pixelsPerMinute = pixelsPerHour / 60
 
   let taskTemplateSearchResults = []
 
-  onMount(() => {
-    // NOTE: window.ResizeObserve requires `window` to be defined, so must be called in onMount()
+  $: pixelsPerMinute = pixelsPerHour / 60
+  $: resultantDateClassObject = getResultantDateClassObject(yPosition)
 
-    // PROBLEM: our scroll container's dimension is 0, even after scheduledTask is hydrated, and we tick() / beforeUpdate / afterUpdate
-    // new strategy:
-    //   1. Notice when the Scroll container resizes
-    //   2. Then set it's scrollTop value to the currentTimeIndicator's top value (parseFloat of course)
-    // if (browser) {
-    //   myObserver = new ResizeObserver(entries => {
-    //     entries.forEach(entry => { 
-    //       ScrollContainer.scrollTop = parseFloat(CurrentTimeIndicator.style.top) // style.top returns '136.px', `parseFloat` gets rid of the 'px' suffix
-    //     })
-    //   })
-    //   myObserver.observe(ScrollContainer)
-    // }
-  })
-
-  afterUpdate(() => {
-    // NOTE: for week view, every calendar will run this logic, but the time indicator only 
-    // exists for 1 of the days
-    if (CurrentTimeIndicator && !$hasInitialScrolled) {
-      console.log('triggering scroll')
-      CurrentTimeIndicator.scrollIntoView()
-      hasInitialScrolled.set(true)
-    }
+  onMount(async () => {
+    setTimeout(() => {
+      CurrentTimeIndicator.scrollIntoView({ behavior: 'smooth', block: 'center'})
+    }, 0)
   })
 
   onDestroy(() => {
-    // if (browser) {
-    //   myObserver.disconnect()
-    // }
+
   })
 
   function searchTaskTemplates () {
