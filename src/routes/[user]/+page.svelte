@@ -101,19 +101,12 @@
 </div>
 
 <div id="background-image-holder" style="height: calc(100% - {navbarHeight}px);">
-  <a role="button" on:click={() => currentMode === 'Dashboard' ? currentMode = 'Week' : currentMode = 'Dashboard'} class="float mika-hover" style="right: 150px; z-index: 1"  
+  <a role="button" on:click={() => currentMode === 'Dashboard' ? currentMode = 'Week' : currentMode = 'Dashboard'} class="float mika-hover" style="right: 90px; z-index: 1"  
     class:blue-focus={isJournalPopupOpen}>
 
     <span class="material-symbols-outlined my-float" style="font-size: 26px;">
       signal_cellular_alt
       </span>
-  </a>
-
-  <a role="button" on:click={() => isJournalPopupOpen = !isJournalPopupOpen} class="float mika-hover" style="right: 90px; z-index: 1"  
-  class:blue-focus={isJournalPopupOpen}>
-    <span class="material-symbols-outlined my-float">
-      auto_stories
-    </span>
   </a>
 
   <!-- <a role="button" on:click={() => isFinancePopupOpen = !isFinancePopupOpen} class="float mika-hover" style="right: 90px; z-index: 10"
@@ -176,10 +169,12 @@
             padding: 48px;
           "
         >
-          <ZenJournal
-            journal={userDoc.journal}
-            on:journal-update={(e) => changeJournal(e.detail)}
-          />
+          {#key userDoc.journal}
+            <ZenJournal
+              journal={userDoc.journal}
+              on:journal-update={(e) => changeJournal(e.detail)}
+            />
+          {/key}
         </div>
         <div 
           class="glow-card-hover-effect"

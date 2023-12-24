@@ -1,3 +1,10 @@
+<a role="button" on:click={() => isJournalPopupOpen = !isJournalPopupOpen} class="float mika-hover" style="right: 90px; z-index: 1"  
+  class:blue-focus={isJournalPopupOpen}>
+    <span class="material-symbols-outlined my-float">
+      auto_stories
+    </span>
+  </a>
+
 <div style="font-size: 28px; font-weight: 500; color: #091346">
   {convertMMDDToReadableMonthDayForm(todayMMDD)}
 </div>
@@ -19,6 +26,8 @@
   import { createEventDispatcher } from 'svelte'
 
   export let journal
+
+  let isJournalPopupOpen = false
 
   const dispatch = createEventDispatcher()
   const todayMMDD = getDateInMMDD(new Date())

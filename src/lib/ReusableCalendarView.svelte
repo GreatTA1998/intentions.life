@@ -9,7 +9,6 @@
     width: 15vw;
     background-color: {backgroundColor};
     flex-grow: 1;
-    border: 0px solid red;
   "
 >
   <!-- NOTE: this is a tall rectangular container that only encompasses the timestamps -->

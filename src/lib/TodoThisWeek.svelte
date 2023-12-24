@@ -30,32 +30,32 @@
 
   <div style="margin-bottom: 36px;"></div>
 
-  <div 
+  <div style="height: calc(100% - 24px - 36px);"
     on:drop={(e) => unscheduleTask(e)}
     on:dragover={(e) => dragover_handler(e)}
   >
 
-  <!-- TO-DO: Render all tasks with deadline of this week here -->
-  {#each tasksDueThisWeek as taskObj}
-    <RecursiveTaskElement 
-      {taskObj}
-      depth={0}
-      doNotShowScheduledTasks={false}
-      doNotShowCompletedTasks={true}
-      on:task-click
-      on:task-node-update
-    />
-    <div style="margin-bottom: 24px;"></div>
-  {/each}
+    <!-- TO-DO: Render all tasks with deadline of this week here -->
+    {#each tasksDueThisWeek as taskObj}
+      <RecursiveTaskElement 
+        {taskObj}
+        depth={0}
+        doNotShowScheduledTasks={false}
+        doNotShowCompletedTasks={true}
+        on:task-click
+        on:task-node-update
+      />
+      <div style="margin-bottom: 24px;"></div>
+    {/each}
 
-  {#if isTypingNewRootTask}
-    <input 
-      bind:this={NewRootTaskInput}
-      bind:value={newRootTaskStringValue} 
-      on:keydown={(e) => handleKeyDown(e)}
-      placeholder="Type task here..."
-    >
-  {/if}
+    {#if isTypingNewRootTask}
+      <input 
+        bind:this={NewRootTaskInput}
+        bind:value={newRootTaskStringValue} 
+        on:keydown={(e) => handleKeyDown(e)}
+        placeholder="Type task here..."
+      >
+    {/if}
   </div>
 </div>
 

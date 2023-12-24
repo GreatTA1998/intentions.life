@@ -112,7 +112,7 @@
       const independentCopy = new Date()
       independentCopy.setDate(d.getDate() + i) // quickfix: for some reason we're off by 1-index, will investigate
       // no longer start from 7 am, or else there will be missing hours
-      independentCopy.setHours(0, 0) // hours, minutes, note it's ZERO-indexed, 0-23, 0-59
+      independentCopy.setHours(0, 0, 0) // hours, minutes, seconds, note it's ZERO-indexed, 0-23, 0-59
       dateClassObjects.push(independentCopy)
     }
     dateClassObjects = dateClassObjects // manually trigger reactivity)
