@@ -1,16 +1,30 @@
-<div style="overflow-y: auto; overflow-x: auto; height: 100%; margin-left: 24px;">
+<div style="height: 100%; padding-left: 24px;">
   <div style="display: flex; width: fit-content;">
-    <!-- <div>
-      <span on:click={() => dispatch('calendar-shifted', { days: -1 })} class="material-icons shift-calendar-arrow">
-        navigate_before
-      </span>
-    </div>
+    <div style="position: relative;">
+      <div style="margin-left: 0px; margin-top: 12px; font-size: 18px; display: flex;">
+        <div>
+          {new Date().toLocaleString('en-US', { month: 'short'})}
+        </div>
+        <div style="margin-left: 8px; font-weight: 300; color: rgb(80, 80, 80)">
+          {new Date().toLocaleString('en-US', { year: 'numeric'})}
+        </div>
 
-    <div>
-      <span on:click={() => dispatch('calendar-shifted', { days: 1 })} class="material-icons shift-calendar-arrow">
-        keyboard_arrow_right
-      </span>
-    </div> -->
+        <div style="display: flex; margin-left: 6px;">
+          <div>
+              <span on:click={() => dispatch('calendar-shifted', { days: -1 })} class="material-icons shift-calendar-arrow">
+                navigate_before
+              </span>
+            </div>
+    
+            <div>
+              <span on:click={() => dispatch('calendar-shifted', { days: 1 })} class="material-icons shift-calendar-arrow">
+                keyboard_arrow_right
+              </span>
+            </div>
+          </div>
+      </div>
+    </div>
+  
 
     {#each dateClassObjects as dateClassObj, i}
       <div>
@@ -18,7 +32,7 @@
           <div>
             <div 
               class="center-flex" 
-              style="font-size: 12px; margin-bottom: 4px;" 
+              style="font-size: 16px; margin-bottom: 0px; font-weight: 500" 
               class:orange-highlight={getDateInDDMMYYYY(dateClassObj) === getDateInDDMMYYYY(new Date())}
             >
               {dateClassObj.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase()}
@@ -26,14 +40,20 @@
 
             <div 
               class="center-flex" 
-              style="font-size: 28px;" 
+              style="font-size: 16px; font-weight: 300" 
             >
-              <div class="center-flex" style="padding: 8px; width: 48px; height: 48px;" class:highlighted-circle={getDateInDDMMYYYY(dateClassObj) === getDateInDDMMYYYY(new Date())}>
+              <div class="center-flex" 
+                style="padding: 8px; width: 48px; height: 48px;" 
+                class:orange-highlight={getDateInDDMMYYYY(dateClassObj) === getDateInDDMMYYYY(new Date())}
+                class:highlighted-circle={getDateInDDMMYYYY(dateClassObj) === getDateInDDMMYYYY(new Date())}
+              >
                 {dateClassObj.getDate()}
               </div>
             </div>
           </div>
         </div>
+
+        
 
         {#key intForTriggeringRerender}
           {#if timesOfDay.length !== 0}
@@ -167,7 +187,7 @@
 
 <style>
   .shift-calendar-arrow {
-    font-size: 36px; 
+    font-size: 18px; 
     cursor: pointer; 
     height: 40px; 
 
@@ -175,18 +195,14 @@
     top: 0;
     z-index: 1;
 
-    padding-top: 24px;
+    padding-top: 0px;
   }
 
   .orange-highlight {
-    color: #0085FF;
-    font-weight: 500;
+    color: black;
   }
 
   .highlighted-circle {
-    /* background-color: orange;  */
-    background-color: #0085FF;
-    color: white;
     border-radius: 25px;
   }
 

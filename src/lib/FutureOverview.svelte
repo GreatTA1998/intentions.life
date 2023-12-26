@@ -21,7 +21,7 @@
     {#each Object.keys(datesToTasks) as date}
       <div style="margin-top: 20px; margin-bottom: 20px;">
         <div>
-          <div style="font-family:Roboto, sans-serif; ; font-size: 1rem; margin-bottom: 2px; color:#6D6D6D">    
+          <div style="font-size: 14px; margin-bottom: 2px; color:#6D6D6D">    
             {convertMMDDToReadableMonthDayForm(date)} {getDayOfWeek(date).toUpperCase()}
           </div>
         </div>
@@ -32,11 +32,11 @@
             style="display: flex; align-items: center; flex-wrap: nowrap;"
           >
             <div 
-              style="font-family: sans-serif; font-size: 18px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"
+              style="font-size: 16px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"
               class:grey-text={task.daysBeforeRepeating}
               class:purple-text={!task.daysBeforeRepeating}
             >
-              <span style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;">
+              <span style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: rgb(10, 10, 10); font-weight: 500;">
                 {task.name + ' '}
               </span>({task.startTime})
             </div>

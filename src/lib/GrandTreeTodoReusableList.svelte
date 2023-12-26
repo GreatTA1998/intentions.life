@@ -1,7 +1,7 @@
 <div style="
-    height: calc(100vh - 60px);
+    height: 100%;
     min-width: 400px; 
-    background-color: {todoListBgColor};
+    background-color: var(--todo-list-bg-color);
     padding-left: 48px; 
     padding-right: 24px;
     padding-top: 36px;
@@ -62,7 +62,6 @@
   } from '/src/helpers.js'
   import RecursiveTaskElement from '$lib/RecursiveTaskElement.svelte'
   import { createEventDispatcher, tick } from 'svelte'
-  import { todoListBgColor } from '/src/constants.js'
 
   export let allIncompleteTasks
   export let dueInHowManyDays

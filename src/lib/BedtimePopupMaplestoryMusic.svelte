@@ -1,12 +1,19 @@
-<button on:click={toggleMusic}>
-  Lofi Maplestory
-</button>
+<img
+  src={maplestoryAirshipsBackgroundURL}
+  style="height: calc(100vh - 60px); width: 100vw; object-fit: cover; position: absolute;"
+>
 
-<audio bind:this={AudioElem}></audio>
+<audio 
+  bind:this={AudioElem} 
+  autoplay="true" 
+  loop="true">
+</audio>
 
 <script>
   import { getRandomInt } from '/src/helpers.js'
   import { onMount } from 'svelte'
+
+  const maplestoryAirshipsBackgroundURL =  'https://i.imgur.com/ShnqIpJ.jpeg'
 
   let AudioElem
   let isMusicPlaying = false
@@ -16,10 +23,27 @@
     'illiyard-moor-lofi.mp3',
     'ms-leafre-lofi.mp3'
   ]
-  chosenMusicFile = musicFiles[getRandomInt(3)]
+
+  const d = new Date()
+
+  // most energetic music is the illiyard-moor none-lofi
+  if (d.getHours() < 12 - 1) {
+    chosenMusicFile = musicFiles[0]
+  }
+
+  else if  (d.getHours() >= 12 - 1) {
+    chosenMusicFile = musicFiles[1]
+  }
+
+  else if (d.getHours() >= 17 - 1) {
+    chosenMusicFile = musicFiles[2]
+  }
+
+  // chosenMusicFile = musicFiles[getRandomInt(3)]
 
   onMount(() => {
     AudioElem.src = chosenMusicFile
+    AudioElem.volume = 0.1
   })
 
   function toggleMusic () {

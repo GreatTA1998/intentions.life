@@ -1,4 +1,4 @@
-<div style="position: relative; height: 100vh; border: none; solid black; width: 12vw"
+<div style="position: relative; width: 12vw"
   on:drop={(e) => drop_handler(e)}
   on:dragover={(e) => dragover_handler(e)}
 >
@@ -7,7 +7,7 @@
     { title }
   </div>
 
-  <div style="height: 70vh">
+  <div style="height: 100%;">
     {#each tasksDueToday as task, i}
       <ReusableTaskElement
         {task}

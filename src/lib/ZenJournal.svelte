@@ -53,7 +53,7 @@
 
     }
     journal[todayMMDD] = ''
-    dispatch('journal-update', journal)
+    saveJournalPage()
   }
 
   function saveJournalPage () {

@@ -63,8 +63,8 @@
     {/if}
 
     <div 
-      style="margin-top: -1px; margin-left: 3px; font-size: 12px;"
-      class="task-name"
+      style="margin-top: -1px; margin-left: 3px; font-size: 12px; width: 100%;"
+      class="task-name truncate-to-one-line"
       draggable="true" 
       on:click={() => dispatch('task-click', { task })}
       on:dragstart={(e) => dragstart_handler(e, task.id)} 
@@ -170,7 +170,7 @@
   .task-name {
     width: 11vw; 
     cursor: pointer; 
-    font-family: sans-serif; color: #000000;
+    color: #000000;
   }
 
   .normal-text {

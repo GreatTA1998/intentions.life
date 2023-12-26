@@ -1,7 +1,19 @@
+:root {
+  --navbar-height: 60px;
+  --todo-list-bg-color: rgb(246, 246, 246)
+}
 
 * {
   box-sizing: border-box;
   font-family: 'Inter', sans-serif;
+}
+
+/* NOTE: must have a explicitly set width */
+.truncate-to-one-line {
+  /*  width: 250px; */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Reused between some components */

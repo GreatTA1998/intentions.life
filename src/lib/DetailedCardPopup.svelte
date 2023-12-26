@@ -384,8 +384,8 @@ function dispatchNewDeadline (e) {
   }
 
   .detailed-card-popup {
-    font-size: 14px;
     position: fixed;
+    font-size: 14px;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);

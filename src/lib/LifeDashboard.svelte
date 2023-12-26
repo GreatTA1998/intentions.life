@@ -21,9 +21,9 @@
       </div>
     </div> -->
 
-    <div style="width: 40vw;" class="rounded-card">
+    <!-- <div style="width: 40vw;" class="rounded-card">
       <FinancePopupNoPopup/>
-    </div>
+    </div> -->
 
     <div style="background-color: transparent; width: 100%; display: flex; justify-content: left; padding: 24px;">
       <!-- Loved Ones Dashboard in future updates -->
