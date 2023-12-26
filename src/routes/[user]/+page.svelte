@@ -1233,7 +1233,7 @@
   .blue-focus {
     /* color: #ffffff; */
     /* color: darkgreen; */
-    border: 1px solid #0085FF;
+    /* border: 1px solid #0085FF; */
     /* background-color: #0085FF; */
     /*  border: 1px solid #0085FF;*/
     transition: all 0.2s ease-out;
