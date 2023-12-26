@@ -1216,7 +1216,7 @@
 
   .mika-hover {
     /* color: #0085FF; */
-    transition: all 0.2s ease-out;
+    transition: all 0s ease-out;
   }
 
   .mika-hover:hover{
