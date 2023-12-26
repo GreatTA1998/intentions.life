@@ -1060,6 +1060,31 @@
     margin: auto;
   }
 
+  
+  .ux-tab-item {
+    box-sizing: border-box;
+    height: 60px;
+    width: 72px;
+    display: flex; 
+    align-items: center;
+    justify-content: center;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+  }
+
+  .transparent-glow-tab {
+    color: white;
+    font-weight: 500;
+    border-bottom: 1px solid white;
+  }
+
+  .active-ux-tab {
+    border-bottom: 1px solid #0085FF;
+    color: #0085FF;
+    font-weight: 500;
+  }
+
   .top-navbar {
     height: var(--navbar-height);
     display: flex; 
@@ -1090,28 +1115,6 @@
     background-color: rgba(40, 40, 40, 0.6);
     color: white;
   } 
-
-  .ux-tab-item {
-    box-sizing: border-box;
-    height: 60px;
-    width: 72px;
-    display: flex; 
-    align-items: center;
-    justify-content: center;
-    border-bottom: 2px solid transparent;
-  }
-
-  .transparent-glow-tab {
-    color: white;
-    font-weight: 500;
-    border-bottom: 1px solid white;
-  }
-
-  .active-ux-tab {
-    border-bottom: 1px solid #0085FF;
-    color: #0085FF;
-    font-weight: 500;
-  }
 
   .mika-rectangle {
     display: flex;
