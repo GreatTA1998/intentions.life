@@ -1,22 +1,28 @@
-<a role="button" on:click={() => isJournalPopupOpen = !isJournalPopupOpen} class="float mika-hover" style="right: 90px; z-index: 1"  
-  class:blue-focus={isJournalPopupOpen}>
-    <span class="material-symbols-outlined my-float">
-      auto_stories
-    </span>
-  </a>
+<div style="display: flex; align-items: center;">
+  <span class="material-symbols-outlined my-float" 
+    style="font-size: 32px; cursor: pointer;"
+    on:click={() => isJournalPopupOpen = !isJournalPopupOpen}
+    class:blue-focus={isJournalPopupOpen}
+  >
+    auto_stories
+  </span>
 
-<div style="font-size: 28px; font-weight: 500; color: #091346">
-  {convertMMDDToReadableMonthDayForm(todayMMDD)}
+    <!-- color: #091346 -->
+  <div style="font-size: 28px; font-weight: 500; margin-left: 12px;">
+    {convertMMDDToReadableMonthDayForm(todayMMDD)}
+  </div>
 </div>
+
 
 <div style="margin-bottom: 18px;"></div>
 
+<!-- rgb(36, 33, 33) -->
 <textarea 
   bind:value={journal[todayMMDD]}
   on:input={handleInput}
   class="reset-textarea" 
   name="hide" placeholder="Write anything..." 
-  style="background-color: transparent; width: 100%; height: 90%; font-size: 16px; color: rgb(36, 33, 33)"
+  style="color: white; background-color: transparent; width: 100%; height: 90%; font-size: 16px;"
 />
 
 <script>

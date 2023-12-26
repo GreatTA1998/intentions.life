@@ -44,20 +44,25 @@
 {/if}
 
 <NavbarAndContentWrapper>
-  <div slot="navbar" class="top-navbar">
+  <div slot="navbar" class="top-navbar" class:transparent-glow-navbar={currentMode === 'Day'}>
     <img src="hand-drawn-twig-no-bg-cropped.png" 
       style="width: 26px; height: 36px; margin-left: 24px; margin-right: 6px;"
     >
 
     <div class="day-week-toggle-segment">
-      {#each ['Day', 'Week'] as mode}
-        <div on:click={() => currentMode = mode}
-          class="ux-tab-item" 
-          class:active-ux-tab={currentMode === mode} 
-        >
-          {mode}
-        </div>
-      {/each}
+      <div on:click={() => currentMode = 'Day'}
+        class="ux-tab-item" 
+        class:transparent-glow-tab={currentMode === 'Day'} 
+      >
+        Day
+      </div>
+
+      <div on:click={() => currentMode = 'Week'}
+        class="ux-tab-item" 
+        class:active-ux-tab={currentMode === 'Week'} 
+      >
+        Week
+      </div>
     </div>
 
     <a on:click={() => currentMode === 'Dashboard' ? currentMode = 'Week' : currentMode = 'Dashboard'} 
@@ -77,7 +82,7 @@
       {:else if currentMode === 'Day'}
         <!-- Note: .getHours() is 0-indexed from 0 to 23 -->
         <!-- Show daytime art from 5 am - 7 pm -->
-        {#if new Date().getHours() > 5 && new Date().getHours() < 18}
+        {#if new Date().getHours() > 5 && new Date().getHours() < 18} 
           <BedtimePopupMaplestoryMusic/>
         {:else} 
           <BackgroundRainScene/>
@@ -97,7 +102,7 @@
           <div class="glow-card-hover-effect rounded-card"
             style="margin-left: 4%; width: 60%;"
           >
-            <DayView {allTasks}
+            <!-- <DayView {allTasks}
               scheduledTasksToday={todayScheduledTasks}
               on:task-done={(e) => toggleTaskCompleted(e.detail.id)}
               on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
@@ -106,7 +111,7 @@
               on:task-dragged={(e) => changeTaskDeadline(e.detail)}
               on:task-checkbox-change={(e) => toggleTaskCompleted(e.detail.id)}
               {futureScheduledTasks}
-            />
+            /> -->
           </div>
         </div>
       
@@ -1004,8 +1009,9 @@
 
 <style>  
   .rounded-card {
-    border-radius: 36px;
-    padding: 36px;
+    /* border-radius: 36px; */
+    padding: 24px;
+    border-radius: 6px;
   }
 
   .container-for-float-cards {
@@ -1026,18 +1032,21 @@
     width: 44px;
     height: 44px;
     border-radius: 22px;
-    text-align:center;
+    text-align: center;
   }
 
   .calendar-section-flex-child {
+
     /* take up full height of parent flexbox */
-    align-self: stretch; 
+    /* align-self: stretch;  */
 
     /* take up all remaining horizontal space (after the left & right sidebars) */
     flex-grow: 1;
 
-    overflow-y: auto;
     overflow-x: auto;
+
+    /* user agent style sheet already implicitly applies overflow-y: auto, but it's clearer to be explicit */
+    overflow-y: auto;
 
     background-color: rgb(250, 250, 250);
 
@@ -1061,15 +1070,27 @@
     padding-right: 24px; 
     border-bottom: 1px solid lightgrey;
     background-color: rgb(250, 250, 250);
+
+    /* background holder has z-index 0 but somehow z-index 1 is not enough to cover it */
+    z-index: 2;
+    position: relative;
+  }
+
+  .transparent-glow-navbar {
+    background-color: rgba(150, 150, 150, 0.1);
+    border-bottom: none;
   }
 
   .glow-card-hover-effect {
+    /* BOX SHADOW */
     /* #48abe0; was the original glow box shadow color */
-    box-shadow: 0 0 48px 15px #3b3b3b;  
+    /* box-shadow: 0 0 48px 15px #3b3b3b;   */
+    box-shadow: 0 0 48px 15px #ffffff3b;  
 
     /* Additional ways to blend the cards to the background suggested by Claude AI */
     /* 90% opacity without affecting children */
-    background-color: rgba(255, 255, 255, 0.95)
+    background-color: rgba(40, 40, 40, 0.6);
+    color: white;
   } 
 
   .ux-tab-item {
@@ -1080,6 +1101,12 @@
     align-items: center;
     justify-content: center;
     border-bottom: 2px solid transparent;
+  }
+
+  .transparent-glow-tab {
+    color: white;
+    font-weight: 500;
+    border-bottom: 1px solid white;
   }
 
   .active-ux-tab {

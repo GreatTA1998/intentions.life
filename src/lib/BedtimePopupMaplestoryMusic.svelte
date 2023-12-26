@@ -1,6 +1,6 @@
 <img
   src={maplestoryAirshipsBackgroundURL}
-  style="height: calc(100vh - 60px); width: 100vw; object-fit: cover; position: absolute;"
+  style="height: 100vh; width: 100vw; object-fit: cover; position: fixed; top: 0;"
 >
 
 <audio 

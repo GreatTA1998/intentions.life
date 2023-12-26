@@ -66,7 +66,9 @@
         >
           circle
         </span>
-        {taskObj.name}
+        <div class="truncate-to-one-line">
+          {taskObj.name}
+        </div>
       </div>
       {#if isMouseHoveringOnTaskName}
         <span 

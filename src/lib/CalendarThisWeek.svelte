@@ -1,4 +1,4 @@
-<div style="height: 100%; padding-left: 24px;">
+<div style="padding-left: 24px;">
   <div style="display: flex; width: fit-content;">
     <div style="position: relative;">
       <div style="margin-left: 0px; margin-top: 12px; font-size: 18px; display: flex;">
@@ -52,8 +52,6 @@
             </div>
           </div>
         </div>
-
-        
 
         {#key intForTriggeringRerender}
           {#if timesOfDay.length !== 0}

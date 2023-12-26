@@ -1,13 +1,4 @@
-<div style="
-    height: 100%;
-    min-width: 400px; 
-    background-color: var(--todo-list-bg-color);
-    padding-left: 48px; 
-    padding-right: 24px;
-    padding-top: 36px;
-    font-size: 2em;
-    overflow-y: auto;
-  "  
+<div class="todo-list-container"  
   on:drop={(e) => handleDroppedTask(e)}
   on:dragover={(e) => dragover_handler(e)}
 >
@@ -194,3 +185,18 @@
   })
 }
 </script>
+
+<style>
+  .todo-list-container {
+    height: 100%;
+    width: 100%;
+    /* min-width: 300px;  */
+    background-color: var(--todo-list-bg-color);
+    padding-left: 12px; 
+    border-radius: 12px;
+    padding-right: 12px;
+    padding-top: 24px;
+    font-size: 2em;
+    overflow-y: auto;
+  }
+</style>
