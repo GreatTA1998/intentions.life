@@ -92,11 +92,9 @@
           <div class="glow-card-hover-effect rounded-card"
             style="width: 36%;"
           >
-            {#key userDoc.journal}
-              <ZenJournal journal={userDoc.journal}
-                on:journal-update={(e) => changeJournal(e.detail)}
-              />
-            {/key}
+            <ZenJournal journal={userDoc.journal}
+              on:journal-update={(e) => changeJournal(e.detail)}
+            />
           </div>
 
           <div class="glow-card-hover-effect rounded-card"
