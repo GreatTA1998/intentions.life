@@ -37,269 +37,191 @@
   />
 {/if}
 
-{#if isBedtimePopupOpen}
-  <BedtimePopup
-    isOpen={isBedtimePopupOpen}
-    on:card-close={() => isBedtimePopupOpen = false}
-  />
+
+<!-- UNDO COMPLETED SNACKBAR -->
+{#if $mostRecentlyDeletedOrCompletedTaskID && countdownRemaining > 0}
+  <TheSnackbar on:task-done={(e) => toggleTaskCompleted(e.detail.id)}></TheSnackbar>
 {/if}
 
-<!-- Top Navigation Bar -->
-<div style="
-  height: {navbarHeight}px; 
-  width: 100%; 
-  display: flex; 
-  align-items: center; 
-  padding-left: 24px; 
-  padding-right: 24px; 
-  border-bottom: 1px solid lightgrey;
-  background-color: rgb(250, 250, 250);
-"
->
-  <img src="hand-drawn-twig-no-bg-cropped.png" style="width: 26px; height: 36px; margin-left: 24px; margin-right: 6px;">
+<NavbarAndContentWrapper>
+  <div slot="navbar" class="top-navbar" class:transparent-glow-navbar={currentMode === 'Day'}>
+    <img src="hand-drawn-twig-no-bg-cropped.png" 
+      style="width: 26px; height: 36px; margin-left: 24px; margin-right: 6px;"
+    >
 
-  <div style="margin-left: 224px; font-size: 24px; display: flex;">
-    <div>
-      {new Date().toLocaleString('en-US', { month: 'short'})}
-    </div>
-    <div style="margin-left: 8px; font-weight: 300; color: rgb(80, 80, 80)">
-      {new Date().toLocaleString('en-US', { year: 'numeric'})}
-    </div>
-  </div>
-
-  <div style="margin-left: 8px; margin-top: 2px;">
-    <span on:click={() => incrementDateClassObj({ days: -1})} class="material-icons shift-calendar-arrow">
-      navigate_before
-    </span>
-  </div>
-
-  <div style="margin-top: 2px;">
-    <span on:click={() => incrementDateClassObj({ days: 1})} class="material-icons shift-calendar-arrow">
-      keyboard_arrow_right
-    </span>
-  </div>
-
-  <div style="
-    box-sizing: border-box; 
-    margin-top: 0px;
-    display: flex; 
-    margin-left: 40px;
-    width: fit-content; 
-    justify-content: space-evenly; border-bottom: 0px solid rgb(200, 200, 200);"
-  >
-    <!-- 'Hour' and 'Month' views not yet implemented -->
-    {#each ['Day', 'Week'] as mode}
-      <div 
+    <div class="day-week-toggle-segment">
+      <div on:click={() => currentMode = 'Day'}
         class="ux-tab-item" 
-        class:active-ux-tab={currentMode === mode} 
-        on:click={() => currentMode = mode}
+        class:transparent-glow-tab={currentMode === 'Day'} 
       >
-        {mode}
+        Day
       </div>
-    {/each}
-  </div>
-</div>
 
-<div id="background-image-holder" style="height: calc(100% - {navbarHeight}px);">
-  <a role="button" on:click={() => currentMode === 'Dashboard' ? currentMode = 'Week' : currentMode = 'Dashboard'} class="float mika-hover" style="right: 150px; z-index: 1"  
-    class:blue-focus={isJournalPopupOpen}>
-    <span class="material-symbols-outlined my-float">
-      dashboard
-      </span>
-  </a>
-
-  <a role="button" on:click={() => isJournalPopupOpen = !isJournalPopupOpen} class="float mika-hover" style="right: 90px; z-index: 1"  
-  class:blue-focus={isJournalPopupOpen}>
-    <span class="material-symbols-outlined my-float">
-      auto_stories
-    </span>
-  </a>
-
-  <!-- <a role="button" on:click={() => isFinancePopupOpen = !isFinancePopupOpen} class="float mika-hover" style="right: 90px; z-index: 10"
-  class:blue-focus={isFinancePopupOpen}>
-    <span class="material-symbols-outlined my-float">
-      attach_money
-    </span>
-  </a> -->
-
-  <a role="button" on:click={() => isBedtimePopupOpen = !isBedtimePopupOpen} class="float mika-hover" style="right: 30px; z-index: 1"
-  class:blue-focus={isBedtimePopupOpen}>
-    <span class="material-symbols-outlined my-float">
-      bedtime
-    </span>
-  </a>
-  <!-- End of absolute positioning items -->
-
-  <div style="display: flex; height: calc(100% - {navbarHeight}px);"> 
-    {#if currentMode === 'Dashboard'}
-      <LifeDashboard {allTasks}/>  
-    {/if}  
-
-    <!-- 1st flex child -->
-    {#if (currentMode === 'Week' || currentMode === 'grandTreeMode') && allIncompleteTasks}
-      <TodoThisWeek
-        {allIncompleteTasks}
-        on:new-root-task={(e) => createNewRootTask(e.detail)}
-        on:task-unscheduled={(e) => putTaskToThisWeekTodo(e)}
-        on:task-node-update={(e) => updateNode({ id: e.detail.id, newDeepValue: e.detail.newDeepValue })}
-        on:task-click={(e) => openDetailedCard(e.detail)}
+      <div on:click={() => currentMode = 'Week'}
+        class="ux-tab-item" 
+        class:active-ux-tab={currentMode === 'Week'} 
       >
-        <GrandTreeTodoPopupButton
+        Week
+      </div>
+    </div>
+
+    <a on:click={() => currentMode === 'Dashboard' ? currentMode = 'Week' : currentMode = 'Dashboard'} 
+      class="mika-hover circular-icon-button" 
+      class:blue-focus={currentMode === 'Dashboard'}
+      role="button" 
+    >
+      <span class="material-symbols-outlined mika-hover" class:blue-icon={currentMode === 'Dashboard'} style="font-size: 32px;">
+        signal_cellular_alt
+      </span>
+    </a>
+  </div>
+
+  <!-- position: relative; -->
+  <div slot="content" style="display: flex; flex-grow: 1; height: 100%; ">
+      {#if currentMode === 'Dashboard'}
+        <LifeDashboard {allTasks}/>  
+      {:else if currentMode === 'Day'}
+        <!-- Note: .getHours() is 0-indexed from 0 to 23 -->
+        <!-- Show daytime art from 5 am - 7 pm -->
+        {#if new Date().getHours() > 5 && new Date().getHours() < 18} 
+          <BedtimePopupMaplestoryMusic/>
+        {:else} 
+          <BackgroundRainScene/>
+        {/if}
+
+        <div class="container-for-float-cards">
+          <div class="glow-card-hover-effect rounded-card"
+            style="width: 36%;"
+          >
+            <ZenJournal journal={userDoc.journal}
+              on:journal-update={(e) => changeJournal(e.detail)}
+            />
+          </div>
+
+          <div class="glow-card-hover-effect rounded-card"
+            style="margin-left: 4%; width: 60%;"
+          >
+            <!-- <DayView {allTasks}
+              scheduledTasksToday={todayScheduledTasks}
+              on:task-done={(e) => toggleTaskCompleted(e.detail.id)}
+              on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
+              on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
+              on:task-click={(e) => openDetailedCard(e.detail)}
+              on:task-dragged={(e) => changeTaskDeadline(e.detail)}
+              on:task-checkbox-change={(e) => toggleTaskCompleted(e.detail.id)}
+              {futureScheduledTasks}
+            /> -->
+          </div>
+        </div>
+      
+      <!-- WEEK MODE -->
+      {:else if (currentMode === 'Week') && allIncompleteTasks}
+        <!-- 1st flex child -->
+        <TodoThisWeek
           {allIncompleteTasks}
           on:new-root-task={(e) => createNewRootTask(e.detail)}
           on:task-unscheduled={(e) => putTaskToThisWeekTodo(e)}
           on:task-node-update={(e) => updateNode({ id: e.detail.id, newDeepValue: e.detail.newDeepValue })}
           on:task-click={(e) => openDetailedCard(e.detail)}
-          
-          on:task-dragged={(e) => changeTaskDeadline(e.detail)}
-        > 
-          <!-- This will be injected on the 4th column, after day, week & month -->
-          <GrandTreeTodo 
-            {allTasks}
-            on:task-click={(e) => openDetailedCard(e.detail)}
-            on:task-create={(e) => modifyTaskTree(e.detail.updatedChildren, e.detail.taskAffected)} 
-            on:task-done={updateEntireTaskTree}
-            on:task-delete={updateEntireTaskTree}
-            on:task-repeating={updateEntireTaskTree}
-            on:drop={(e) => unscheduleTask(e)}
-          />
-        </GrandTreeTodoPopupButton>
-      </TodoThisWeek>
-    {:else if currentMode === 'Day'}
-      <div style="position: relative;">
-        <BackgroundRainScene/>
-
-        <div 
-          class="glow-card-hover-effect"
-          style="border-radius: 20px; width: 440px; height: 640px; position: absolute; top: 200px; left: 340px; 
-            padding: 48px;
-          "
         >
-          <ZenJournal
-            journal={userDoc.journal}
-            on:journal-update={(e) => changeJournal(e.detail)}
-          />
-        </div>
-        <div 
-          class="glow-card-hover-effect"
-          style="border-radius: 20px; width: 640px; height: 640px; position: absolute; top: 200px; left: 828px; padding-top: 48px; padding-left: 48px;; 
-        ">
-          <DayView
-            {allTasks}
-            scheduledTasksToday={todayScheduledTasks}
-            on:task-done={(e) => toggleTaskCompleted(e.detail.id)}
-            on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
-            on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
+          <GrandTreeTodoPopupButton
+            {allIncompleteTasks}
+            on:new-root-task={(e) => createNewRootTask(e.detail)}
+            on:task-unscheduled={(e) => putTaskToThisWeekTodo(e)}
+            on:task-node-update={(e) => updateNode({ id: e.detail.id, newDeepValue: e.detail.newDeepValue })}
             on:task-click={(e) => openDetailedCard(e.detail)}
+            
             on:task-dragged={(e) => changeTaskDeadline(e.detail)}
-            on:task-checkbox-change={(e) => toggleTaskCompleted(e.detail.id)}
-            {futureScheduledTasks}
-          />
+          > 
+            <GrandTreeTodo 
+              {allTasks}
+              on:task-click={(e) => openDetailedCard(e.detail)}
+              on:task-create={(e) => modifyTaskTree(e.detail.updatedChildren, e.detail.taskAffected)} 
+              on:task-done={updateEntireTaskTree}
+              on:task-delete={updateEntireTaskTree}
+              on:task-repeating={updateEntireTaskTree}
+              on:drop={(e) => unscheduleTask(e)}
+            />
+          </GrandTreeTodoPopupButton>
+        </TodoThisWeek>
+
+        <!-- 2nd flex child -->
+        <div class="calendar-section-flex-child"> 
+          {#if allTasks}    
+            <CalendarThisWeek
+              {allTasks}
+              {calStartDateClassObj}
+              on:calendar-shifted={(e) => incrementDateClassObj({ days: e.detail.days})}
+              on:new-root-task={(e) => createNewRootTask(e.detail)}
+              on:task-node-update={(e) => updateNode({ id: e.detail.id, newDeepValue: e.detail.newDeepValue })}
+              on:task-click={(e) => openDetailedCard(e.detail)}
+              on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
+              on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
+              on:task-dragged={(e) => changeTaskDeadline(e.detail)}
+              on:task-checkbox-change={(e) => toggleTaskCompleted(e.detail.id)}
+            /> 
+          {/if}
         </div>
-      </div>
-    {/if}
-    <!-- End of 1st flex child -->
-
-    <!-- 2nd flex child -->
-    <div style="
-      height: calc(100vh - {navbarHeight}px); 
-      display: flex; 
-      flex-direction: column;
-      background-color: rgb(250, 250, 250);
-      width: {currentMode === 'Week' ? '58vw' : 'calc(100vw - 380px)'}; 
-    "
-    > 
-      {#if currentMode === 'Week' && allTasks}
-
-        <div style="margin-bottom: 24px;"></div>
-
-        <CalendarThisWeek
-          {allTasks}
-          {calStartDateClassObj}
-          on:calendar-shifted={(e) => incrementDateClassObj({ days: e.detail.days})}
-          on:new-root-task={(e) => createNewRootTask(e.detail)}
-          on:task-node-update={(e) => updateNode({ id: e.detail.id, newDeepValue: e.detail.newDeepValue })}
-          on:task-click={(e) => openDetailedCard(e.detail)}
-          on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
-          on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
-          on:task-dragged={(e) => changeTaskDeadline(e.detail)}
-          on:task-checkbox-change={(e) => toggleTaskCompleted(e.detail.id)}
-        /> 
-
-      {:else if currentMode === 'grandTreeMode' && allTasks}
-        <GrandTreeTodo 
-          {allTasks}
-          on:task-click={(e) => openDetailedCard(e.detail)}
-          on:task-create={(e) => modifyTaskTree(e.detail.updatedChildren, e.detail.taskAffected)} 
-          on:task-done={updateEntireTaskTree}
-          on:task-delete={updateEntireTaskTree}
-          on:task-repeating={updateEntireTaskTree}
-          on:drop={(e) => unscheduleTask(e)}
-        />
-      {:else if currentMode !== 'Week'}
-        <div class="flex-container blur">
-          <div class="calendar-section-container">
-            {#if currentMode === 'hourMode'}
-              <HourView
-                {allTasks}
-                scheduledTasksToday={todayScheduledTasks}
-                on:task-done={(e) => toggleTaskCompleted(e.detail.id)}
-                on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
-                on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
-                on:task-click={(e) => openDetailedCard(e.detail)}
-                on:task-dragged={(e) => changeTaskDeadline(e.detail)}
-                on:task-checkbox-change={(e) => toggleTaskCompleted(e.detail.id)}
-              />
-            {:else if currentMode === 'dayMode'}
-              <DayView
-                {allTasks}
-                scheduledTasksToday={todayScheduledTasks}
-                on:task-done={(e) => toggleTaskCompleted(e.detail.id)}
-                on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
-                on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
-                on:task-click={(e) => openDetailedCard(e.detail)}
-                on:task-dragged={(e) => changeTaskDeadline(e.detail)}
-                on:task-checkbox-change={(e) => toggleTaskCompleted(e.detail.id)}
-                {futureScheduledTasks}
-              />
-            {:else if currentMode === 'monthMode'}
-              <MonthView
-                {allTasks}
-                {thisMonthScheduledTasks}
-                on:task-click={(e) => openDetailedCard(e.detail)}
-                on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
-                on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
-                on:task-dragged={(e) => changeTaskDeadline(e.detail)}
-                on:task-checkbox-change={(e) => toggleTaskCompleted(e.detail.id)}
-              />
-            {/if}
+    
+        <!-- 3rd flex child -->
+        {#if currentMode === 'Week' && allTasks}
+          <div style="padding-top: {36}px; padding-left: 36px; padding-right: 36px; background-color: var(--todo-list-bg-color); width: 14vw; min-width: 332px;"
+          >
+            <FutureOverview
+              {futureScheduledTasks}
+              on:task-duration-adjusted
+              on:task-click={(e) => openDetailedCard(e.detail)}
+            />
           </div>
-        </div>
+        {/if}
       {/if}
-    </div>
-    <!-- end of 2nd flex child -->
-
-    <!-- optional 3rd flex child -->
-    {#if currentMode === 'Week' && allTasks}
-      <div style="padding-top: {36}px; padding-left: 40px; background-color: rgb(248, 248, 248); width: 100%; 
-        height: calc(100vh - 60px);"
-      >
-        <FutureOverview
-          {futureScheduledTasks}
-          on:task-duration-adjusted
-          on:task-click={(e) => openDetailedCard(e.detail)}
-        />
-      </div>
-    {/if}
+      <!-- END OF WEEK MODE SECTION -->
   </div>
+</NavbarAndContentWrapper>
 
-  <!-- End of flexbox -->
-
-  <!-- UNDO COMPLETED SNACKBAR -->
-  {#if $mostRecentlyDeletedOrCompletedTaskID && countdownRemaining > 0}
-    <TheSnackbar on:task-done={(e) => toggleTaskCompleted(e.detail.id)}></TheSnackbar>
-  {/if}
-</div>
+<!--  
+  LEGACY CODE FOR DAY AND MONTH CALENDARS
+  {:else if currentMode !== 'Week'}
+      <div class="flex-container blur">
+        <div class="calendar-section-container">
+          {#if currentMode === 'hourMode'}
+            <HourView
+              {allTasks}
+              scheduledTasksToday={todayScheduledTasks}
+              on:task-done={(e) => toggleTaskCompleted(e.detail.id)}
+              on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
+              on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
+              on:task-click={(e) => openDetailedCard(e.detail)}
+              on:task-dragged={(e) => changeTaskDeadline(e.detail)}
+              on:task-checkbox-change={(e) => toggleTaskCompleted(e.detail.id)}
+            />
+          {:else if currentMode === 'dayMode'}
+            <DayView
+              {allTasks}
+              scheduledTasksToday={todayScheduledTasks}
+              on:task-done={(e) => toggleTaskCompleted(e.detail.id)}
+              on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
+              on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
+              on:task-click={(e) => openDetailedCard(e.detail)}
+              on:task-dragged={(e) => changeTaskDeadline(e.detail)}
+              on:task-checkbox-change={(e) => toggleTaskCompleted(e.detail.id)}
+              {futureScheduledTasks}
+            />
+          {:else if currentMode === 'monthMode'}
+            <MonthView
+              {allTasks}
+              {thisMonthScheduledTasks}
+              on:task-click={(e) => openDetailedCard(e.detail)}
+              on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
+              on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
+              on:task-dragged={(e) => changeTaskDeadline(e.detail)}
+              on:task-checkbox-change={(e) => toggleTaskCompleted(e.detail.id)}
+            />
+          {/if}
+        </div>
+      </div>
+    {/if} 
+-->
 
 <script>
   export let data
@@ -308,6 +230,7 @@
   $: ({ userID } = data); // so it stays in sync when `data` changes
 
   // import FutureOverview from '../../lib/FutureOverview.svelte'
+  import NavbarAndContentWrapper from '$lib/NavbarAndContentWrapper.svelte'
   import DetailedCardPopup from '$lib/DetailedCardPopup.svelte'
   import { MIKA_PIXELS_PER_HOUR, PIXELS_PER_HOUR, getNicelyFormattedDate, computeDayDifference, convertDDMMYYYYToDateClassObject } from '../../helpers.js'
   import { onMount } from 'svelte'
@@ -316,7 +239,7 @@
   import { getRandomInt, getDateOfToday, getDateOfTomorrow, getDateInMMDD, getDateInDDMMYYYY, getRandomID, generateRepeatedTasks } from '/src/helpers.js'
   import JournalPopup from '$lib/JournalPopup.svelte'
   import FinancePopup from '$lib/FinancePopup.svelte'
-  import BedtimePopup from '$lib/BedtimePopup.svelte'
+  import BedtimePopupMaplestoryMusic from '$lib/BedtimePopupMaplestoryMusic.svelte'
 
   import HourView from '$lib/HourView.svelte'
   import DayView from '$lib/DayView.svelte'
@@ -467,6 +390,8 @@
   }
 
   function changeJournal({ newJournal }) {
+    console.log('newJournal =', newJournal)
+
     updateDoc(doc(db, userDocPath), {
       journal: newJournal
     })
@@ -1081,16 +1006,61 @@
   }
 </script>
 
-<style>
-  .glow-card-hover-effect {
-    /* #48abe0; was the original glow box shadow color */
-    box-shadow: 0 0 48px 15px #3b3b3b;  
+<style>  
+  .rounded-card {
+    /* border-radius: 36px; */
+    padding: 24px;
+    border-radius: 6px;
+  }
 
-    /* Additional ways to blend the cards to the background suggested by Claude AI */
-    /* 90% opacity without affecting children */
-    background-color: rgba(255, 255, 255, 0.95)
-  } 
+  .container-for-float-cards {
+    margin: auto;  
+    height: 70%;
+    min-width: 800px;
+    width: 70%;
+    max-width: 1200px;
+    z-index: 1; 
+    display: flex;
+  }
 
+  .circular-icon-button {
+    cursor: pointer;
+    margin-left: 48px;
+    z-index: 1; 
+    display: flex; align-items: center; 
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 22px;
+    text-align: center;
+  }
+
+  .calendar-section-flex-child {
+
+    /* take up full height of parent flexbox */
+    /* align-self: stretch;  */
+
+    /* take up all remaining horizontal space (after the left & right sidebars) */
+    flex-grow: 1;
+
+    overflow-x: auto;
+
+    /* user agent style sheet already implicitly applies overflow-y: auto, but it's clearer to be explicit */
+    overflow-y: auto;
+
+    background-color: rgb(250, 250, 250);
+  }
+
+  .day-week-toggle-segment {
+    display: flex; 
+    margin-left: 64px;
+    width: fit-content; 
+    justify-content: space-evenly; 
+    border-bottom: 0px solid rgb(200, 200, 200);
+    margin: auto;
+  }
+
+  
   .ux-tab-item {
     box-sizing: border-box;
     height: 60px;
@@ -1099,6 +1069,14 @@
     align-items: center;
     justify-content: center;
     border-bottom: 2px solid transparent;
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+  }
+
+  .transparent-glow-tab {
+    color: white;
+    font-weight: 500;
+    border-bottom: 1px solid white;
   }
 
   .active-ux-tab {
@@ -1106,6 +1084,37 @@
     color: #0085FF;
     font-weight: 500;
   }
+
+  .top-navbar {
+    height: var(--navbar-height);
+    display: flex; 
+    align-items: center; 
+    padding-left: 24px; 
+    padding-right: 24px; 
+    border-bottom: 1px solid lightgrey;
+    background-color: rgb(250, 250, 250);
+
+    /* background holder has z-index 0 but somehow z-index 1 is not enough to cover it */
+    z-index: 2;
+    position: relative;
+  }
+
+  .transparent-glow-navbar {
+    background-color: rgba(150, 150, 150, 0.1);
+    border-bottom: none;
+  }
+
+  .glow-card-hover-effect {
+    /* BOX SHADOW */
+    /* #48abe0; was the original glow box shadow color */
+    /* box-shadow: 0 0 48px 15px #3b3b3b;   */
+    box-shadow: 0 0 48px 15px #ffffff3b;  
+
+    /* Additional ways to blend the cards to the background suggested by Claude AI */
+    /* 90% opacity without affecting children */
+    background-color: rgba(40, 40, 40, 0.6);
+    color: white;
+  } 
 
   .mika-rectangle {
     display: flex;
@@ -1199,13 +1208,6 @@
     background-size: 100% 100%;
   }
 
-  .blur {
-    backdrop-filter: blur(0px);
-    height: 100vh; 
-  }
-  /* #radio-player-with-art {
-    background-image: url('../maplestory-watercolor.jpg')
-  } */
 
   .plus {
     display:inline-block;
@@ -1240,27 +1242,36 @@
    /* border: 1px solid #0085FF;*/
   }
 
-  .my-float{
-    margin-top: 12px;
-  }
-
   .mika-hover {
     /* color: #0085FF; */
-    transition: all 0.2s ease-out;
+    transition: all 0s ease-out;
   }
 
   .mika-hover:hover{
-    color: #ffffff;
-    background-color: #0085FF;
-   /* border: 1px solid #0085FF; */
+    color: #0085FF;
+    /* background-color: #0085FF; */
+    /* border: 1px solid #0085FF; */
     transition: all 0.2s ease-out;
+  }
+
+  .blue-icon {
+    color: #0085FF;
   }
 
   .blue-focus {
     /* color: #ffffff; */
-    color: darkgreen;
+    /* color: darkgreen; */
+    /* border: 1px solid #0085FF; */
     /* background-color: #0085FF; */
     /*  border: 1px solid #0085FF;*/
     transition: all 0.2s ease-out;
   }
+
+  .blur {
+    /* backdrop-filter: blur(0px);
+    height: 100vh; */
+  }
+  /* #radio-player-with-art {
+    background-image: url('../maplestory-watercolor.jpg')
+  } */
 </style>

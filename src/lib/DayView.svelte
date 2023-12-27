@@ -4,7 +4,6 @@
 <div style="display: flex; height: 100%;">
   <div>
     <div style="display: flex; width: 13vw;">  
-
       <ReusableUnscheduledTodoList
         {allTasks}
         pixelsPerHour={MIKA_PIXELS_PER_HOUR}

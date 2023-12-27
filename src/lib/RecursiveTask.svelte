@@ -24,7 +24,6 @@
       margin-left: {depth === 1 ? '0' : '5'}px; 
       margin-bottom: 10px; 
       width: {350 * 0.8 ** depth}px; 
-
       padding-left: {10 * 0.8 ** depth}px;
     "
     on:dragstart|self={(e) => dragstart_handler(e, taskObject.id)}
@@ -33,7 +32,6 @@
       <div 
         style="
           font-size: {1.26 * (0.8 ** (depth-1))}rem; 
-          font-family: Roboto,sans-serif; 
           font-weight: {800 - (100 * depth)};
           color: rgb({20 + depth * 30}, {20 + depth * 30}, {20 + depth * 30});
         "

@@ -3,52 +3,66 @@
 </span>
 
 {#if isPopupOpen}
-  <div class="my-popup" style="display: flex; justify-content: space-around; align-items: start; width: 100%" bind:this={elem} use:clickOutside on:click_outside={handleClickOutside}>    
-      <!-- <div>
-        <GrandTreeTodoReusableList
-          listTitle="TODAY"
-          {allIncompleteTasks}
-          dueInHowManyDays={1}
-          on:new-root-task
-          on:task-unscheduled
-          on:task-node-update
-          on:task-click
-          on:task-dragged
-        />  
-      </div> -->
+  <div class="my-popup" 
+    bind:this={elem} 
+    use:clickOutside on:click_outside={handleClickOutside}
+  >    
+    <div style="overflow: auto; height: 100%; width: 100%;">
+      <div style="
+        display: flex; 
+        height: 100%;
+        justify-content: space-between; 
+        align-items: start;
+        flex-wrap: nowrap;
+        "
+      >
+        <div style="width: 20%;">
+          <GrandTreeTodoReusableList
+            listTitle="TODAY"
+            {allIncompleteTasks}
+            dueInHowManyDays={1}
+            on:new-root-task
+            on:task-unscheduled
+            on:task-node-update
+            on:task-click
+            on:task-dragged
+          />  
 
-      <div>
-        <GrandTreeTodoReusableList
-          listTitle="THIS WEEK"
-          {allIncompleteTasks}
-          dueInHowManyDays={7}
-          on:new-root-task
-          on:task-unscheduled
-          on:task-node-update
-          on:task-click
-          on:task-dragged
-        />  
-      </div>
+          <!-- 6% height margin looks equivalent to 1% width margin (so separation between all todo lists look equal) -->
+          <div style="margin-bottom: 5%;"></div>
 
-      <div>
-        <GrandTreeTodoReusableList
-          listTitle="THIS MONTH"
-          {allIncompleteTasks}
-          dueInHowManyDays={30}
-          on:new-root-task
-          on:task-unscheduled
-          on:task-node-update
-          on:task-click
-          on:task-dragged
-        />  
-      </div>
+          <GrandTreeTodoReusableList
+            listTitle="THIS WEEK"
+            {allIncompleteTasks}
+            dueInHowManyDays={7}
+            on:new-root-task
+            on:task-unscheduled
+            on:task-node-update
+            on:task-click
+            on:task-dragged
+          />  
+        </div>
 
-      <div style="min-width: 38vw; overflow-x: auto;">
-        <slot>
-          <!-- GrandTreeTodo will be injected via the parent,, so no interface will need to be changed -->
-        </slot>
+        <div style="width: 20%;  height: 100%; overflow-y: auto;" class="round-scrollbar">
+          <GrandTreeTodoReusableList
+            listTitle="THIS MONTH"
+            {allIncompleteTasks}
+            dueInHowManyDays={30}
+            on:new-root-task
+            on:task-unscheduled
+            on:task-node-update
+            on:task-click
+            on:task-dragged
+          />  
+        </div>
+
+        <div style="width: 58%; height: 100%; overflow-x: auto;">
+          <slot>
+            <!-- GrandTreeTodo will be injected via the parent,, so no interface will need to be changed -->
+          </slot>
+        </div>
       </div>
-    <!-- </div> -->
+    </div>
   </div>
 {/if}
 
@@ -95,16 +109,19 @@ onDestroy(() => {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  overflow-y: auto;
-  overflow-x: auto;
+  /* overflow-y: auto;
+  overflow-x: auto; */
   z-index: 2;
   min-width: 300px;
-  width: 96%;
-  height: 94%;
+  width: 92%;
+  height: 88%;
+
+  /* 12px (todo list radius) + 12px (padding) for concentric border radii */
+  padding: 24px; 
   border-radius: 36px;
   background-color: white;
 
 /*    border: 1px solid #000; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);*/
-  -webkit-box-shadow:  0px 0px 0px 9999px rgba(0, 0, 0, 0.5);
+  box-shadow:  0px 0px 0px 9999px rgba(0, 0, 0, 0.5);
 }
 </style>

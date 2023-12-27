@@ -12,7 +12,7 @@
     height: {height}px; 
     min-height: 12px;
     font-size: {fontSize}rem;
-    border-left: {isBulletPoint ? 0 : 3}px solid {task.isDone ? '#509c13' : 'grey'};
+    border-left: {isBulletPoint ? 0 : 3}px solid {task.isDone ? 'grey' : 'grey'};
   "
 >
   <!-- As long as this parent div is correctly sized, the duration adjusting area 
@@ -55,12 +55,16 @@
             id: task.id
           })}
         >
+
+        <!-- <CustomRoundCheckbox></CustomRoundCheckbox> -->
+
+
       </div>
     {/if}
 
     <div 
-      style="margin-top: -1px; margin-left: 3px; font-size: 12px;"
-      class="task-name"
+      style="margin-top: -1px; margin-left: 3px; font-size: 12px; width: 100%;"
+      class="task-name truncate-to-one-line"
       draggable="true" 
       on:click={() => dispatch('task-click', { task })}
       on:dragstart={(e) => dragstart_handler(e, task.id)} 
@@ -104,6 +108,7 @@
   // Assumes `task` is hydrated
   import { createEventDispatcher } from 'svelte'
   import { getTrueY } from '/src/helpers.js'
+  import CustomRoundCheckbox from '$lib/CustomRoundCheckbox.svelte';
 
   export let task = null
   export let pixelsPerHour = null
@@ -165,7 +170,7 @@
   .task-name {
     width: 11vw; 
     cursor: pointer; 
-    font-family: sans-serif; color: #000000;
+    color: #000000;
   }
 
   .normal-text {

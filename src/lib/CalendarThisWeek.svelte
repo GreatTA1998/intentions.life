@@ -1,34 +1,67 @@
-<div style="overflow-y: auto; overflow-x: auto; height: 100%; margin-left: 48px;">
+<div style="position: relative;">
+
+      <!-- Absolute element is not in the flex flow -->
+    <!-- e.g. DEC 2023 -->
+    <div style="position: absolute; left: var(--calendar-section-left-spacing); top: {36 + 4}px; z-index: 2">
+      <div style="display: flex; font-size: 14px;">
+        <div style="color: rgb(80, 80, 80); font-weight: 400;">
+          {new Date().toLocaleString('en-US', { month: 'short'})}
+        </div>
+        <div style="margin-left: 6px; font-weight: 300; color: rgb(80, 80, 80)">
+          {new Date().toLocaleString('en-US', { year: 'numeric'})}
+        </div>
+      </div>
+
+      <!-- TO-DO: figure out a scroll-only solution -->
+      <!-- <div style="display: flex; margin-top: 4px;">
+        <div>
+          <span on:click={() => dispatch('calendar-shifted', { days: -1 })} class="material-icons shift-calendar-arrow">
+            arrow_left
+          </span>
+        </div>
+
+        <div>
+          <span on:click={() => dispatch('calendar-shifted', { days: 1 })} class="material-icons shift-calendar-arrow">
+            arrow_right
+          </span>
+        </div>
+      </div> -->
+    </div>
+    <!-- End of absolute element -->
+
+
   <div style="display: flex; width: fit-content;">
-    <!-- <div>
-      <span on:click={() => dispatch('calendar-shifted', { days: -1 })} class="material-icons shift-calendar-arrow">
-        navigate_before
-      </span>
+    <div class="x-sticky" style="margin-top: {totalCalStartTopOffset}px; margin-right: 0px;">
+      {#each timesOfDay as timestamp, i}
+        <div class="x-sticky timestamp-number" 
+          style="height: {MIKA_PIXELS_PER_HOUR}px;"
+        >
+          {timestamp.substring(0, 5)}
+        </div>
+      {/each}
     </div>
 
-    <div>
-      <span on:click={() => dispatch('calendar-shifted', { days: 1 })} class="material-icons shift-calendar-arrow">
-        keyboard_arrow_right
-      </span>
-    </div> -->
-
     {#each dateClassObjects as dateClassObj, i}
+      <!-- To vertically group the date label with the calendar component-->
       <div>
-        <div class="sticky-day-of-week-abbreviation">
+        <div class="sticky-day-of-week-abbreviation" style="padding-top: 36px; margin-bottom: {spacingBetweenLabelAndCal}px">
           <div>
             <div 
-              class="center-flex" 
-              style="font-size: 12px; margin-bottom: 4px;" 
-              class:orange-highlight={getDateInDDMMYYYY(dateClassObj) === getDateInDDMMYYYY(new Date())}
+              class="center-flex day-name-label" 
+              class:active-day-name={getDateInDDMMYYYY(dateClassObj) === getDateInDDMMYYYY(new Date())}
             >
               {dateClassObj.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase()}
             </div>
 
             <div 
               class="center-flex" 
-              style="font-size: 28px;" 
+              style="font-size: 16px; font-weight: 300" 
             >
-              <div class="center-flex" style="padding: 8px; width: 48px; height: 48px;" class:highlighted-circle={getDateInDDMMYYYY(dateClassObj) === getDateInDDMMYYYY(new Date())}>
+              <div class="center-flex" 
+                style="padding: 8px; width: 48px; height: 48px;" 
+                class:active-date-number={getDateInDDMMYYYY(dateClassObj) === getDateInDDMMYYYY(new Date())}
+                class:highlighted-circle={getDateInDDMMYYYY(dateClassObj) === getDateInDDMMYYYY(new Date())}
+              >
                 {dateClassObj.getDate()}
               </div>
             </div>
@@ -36,21 +69,23 @@
         </div>
 
         {#key intForTriggeringRerender}
-          <ReusableCalendarView
-            backgroundColor='rgb(250, 250, 250)'
-            willShowTimestamps={i === 0}
-            pixelsPerHour={MIKA_PIXELS_PER_HOUR}
-            timeBlockDurationInMinutes={60}
-            subdivisionsPerBlock={60}
-            calendarBeginningDateClassObject={dateClassObj}
-            timestamps={timesOfDay}
-            scheduledTasks={getScheduledTasks(dateClassObj)}
-            on:new-root-task
-            on:task-duration-adjusted
-            on:task-click
-            on:task-scheduled
-            on:task-checkbox-change
-          />
+          {#if timesOfDay.length !== 0}
+            <ReusableCalendarView
+              calendarBeginningDateClassObject={dateClassObj}
+              scheduledTasks={getScheduledTasks(dateClassObj)}
+              timestamps={timesOfDay}
+              backgroundColor='rgb(250, 250, 250)'
+              willShowTimestamps={false}
+              pixelsPerHour={MIKA_PIXELS_PER_HOUR}
+              timeBlockDurationInMinutes={60}
+              subdivisionsPerBlock={60}
+              on:new-root-task
+              on:task-duration-adjusted
+              on:task-click
+              on:task-scheduled
+              on:task-checkbox-change
+            />
+          {/if}
         {/key}
       </div>
     {/each}
@@ -71,6 +106,11 @@
   let numOfHourBlocksDisplayed = 24
   let dateClassObjects = []
   let intForTriggeringRerender = 0
+
+  const totalCalStartTopOffset = 100 + spacingBetweenLabelAndCal; // 100 is the height of the top label, 12 is the margin 
+  const spacingBetweenLabelAndCal = 36
+
+  const timeBlockDurationInMinutes = 60
 
   const dispatch = createEventDispatcher()
 
@@ -106,11 +146,11 @@
     dateClassObjects = []
     let d = dateClassObj
     // dateClassObjects.push(d)
-    for (let i = 0; i < 7; i++) {
+    for (let i = 0; i < 14; i++) {
       const independentCopy = new Date()
       independentCopy.setDate(d.getDate() + i) // quickfix: for some reason we're off by 1-index, will investigate
       // no longer start from 7 am, or else there will be missing hours
-      independentCopy.setHours(0, 0) // hours, minutes, note it's ZERO-indexed, 0-23, 0-59
+      independentCopy.setHours(0, 0, 0) // hours, minutes, seconds, note it's ZERO-indexed, 0-23, 0-59
       dateClassObjects.push(independentCopy)
     }
     dateClassObjects = dateClassObjects // manually trigger reactivity)
@@ -164,8 +204,28 @@
 </script>
 
 <style>
+  :root {
+    --calendar-section-left-spacing: 24px;
+  }
+
+  .x-sticky {
+    position: sticky;
+    left: 0px;
+    z-index: 1;
+  }
+
+  .timestamp-number {
+    padding-left: var(--calendar-section-left-spacing);
+    color: #6D6D6D;
+
+    /* opaque, so that shifted calendar content will go "underneath" the timestamps */
+    background-color: rgb(250, 250, 250);
+    z-index: 2;
+    font-size: 12px;
+  }
+
   .shift-calendar-arrow {
-    font-size: 36px; 
+    font-size: 32px; 
     cursor: pointer; 
     height: 40px; 
 
@@ -173,18 +233,34 @@
     top: 0;
     z-index: 1;
 
-    padding-top: 24px;
+    padding-top: 0px;
   }
 
-  .orange-highlight {
-    color: #0085FF;
+  .day-name-label {
+    font-size: 16px; 
+    margin-bottom: 0px; 
+    /* margin-top: 24px;  */
+    /* padding-top: 24px; */
     font-weight: 500;
   }
 
+  .active-day-name {
+    /* in the future, figure out why class: selectors are overriden by <styles> */
+    font-weight: 600;
+    color: black;
+  }
+
+  .active-date-number {
+    font-weight: 400;
+    color: black;
+  }
+/* 
+  .orange-highlight {
+    color: black;
+    font-weight: 600;
+  } */
+
   .highlighted-circle {
-    /* background-color: orange;  */
-    background-color: #0085FF;
-    color: white;
     border-radius: 25px;
   }
 
@@ -201,7 +277,12 @@
     height: 100px;
     
     position: sticky; 
-    top: 0;
+
+    /* FIGURE THIS OUT TOMORROW */
+    top: 0px;
     z-index: 1;
+
+    /* border-bottom: 1px solid rgb(212, 212, 212); */
+  
   }
 </style>

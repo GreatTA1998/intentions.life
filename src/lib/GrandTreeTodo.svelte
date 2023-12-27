@@ -1,10 +1,17 @@
 <!-- background-color:#F4F4F4; -->
 <div 
   class="todo-container" 
-  style="padding-top: 80px; background-color: {todoListBgColor};" 
+  style="padding-top: 24px; padding-left: 12px; padding-right: 12px; background-color: var(--todo-list-bg-color); border-radius: 24px;" 
   on:drop
   on:dragover={(e) => dragover_handler(e)}
 >
+
+  <div style="height: 24px; font-size: 16px; align-items: center; display: flex;">
+    <div style="margin-left: 8px; color: rgb(10, 10, 10); font-weight: 500">THIS LIFE</div> 
+  </div>
+
+  <div style="margin-bottom: 36px;"></div>
+
   <div class="todo-list">
     {#if allTasks}
       {#each allTasks as task}
@@ -54,7 +61,6 @@
   import { getRandomID } from '/src/helpers.js'
   import RecursiveTask from '$lib/RecursiveTask.svelte'
   import { createEventDispatcher } from 'svelte'
-  import { todoListBgColor } from '/src/constants.js'
 
   export let allTasks
 
@@ -114,7 +120,6 @@
     border: 0px solid; 
     margin-bottom: 25px; 
     padding-left: 0; 
-    padding-top: 10px; 
     padding-bottom: 10px; 
     padding-right: 0; 
     overflow: none;

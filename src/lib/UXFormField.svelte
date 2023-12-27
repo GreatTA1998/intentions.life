@@ -5,11 +5,13 @@
 -->
 <div class="ux-form-field">
   <div class="ux-field-label">
+    <slot name="icon">
+
+    </slot>
     {fieldLabel}
   </div>
 
   <input 
-
     value={value}
     on:input={(e) => dispatch('input', { value: e.target.value })}
     on:keyup={(e) => {
@@ -19,6 +21,7 @@
     }}
     bind:this={InputElem} 
     class="ux-input-text" 
+    placeholder={placeholder}
   >
 </div>
 
@@ -27,6 +30,7 @@
 
   export let fieldLabel = 'Field Label'
   export let value = ''
+  export let placeholder = ''
 
   const dispatch = createEventDispatcher()
 
@@ -50,12 +54,16 @@
     margin-bottom: 8px;
     font-size: 14px;
     color: gray;
+
+    display: flex;
+    align-items: center;
   }
 
   .ux-input-text {
     font-weight: 500;
     font-size: 16px;
     color: black;
+    width: 100%;
   }
 
   /* remove default input styling */
