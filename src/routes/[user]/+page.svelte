@@ -76,7 +76,8 @@
     </a>
   </div>
 
-  <div slot="content" style="display: flex; flex-grow: 1; z-index: 1; height: 100%; position: relative;">
+  <!-- position: relative; -->
+  <div slot="content" style="display: flex; flex-grow: 1; height: 100%; ">
       {#if currentMode === 'Dashboard'}
         <LifeDashboard {allTasks}/>  
       {:else if currentMode === 'Day'}
@@ -1023,6 +1024,7 @@
   }
 
   .circular-icon-button {
+    cursor: pointer;
     margin-left: 48px;
     z-index: 1; 
     display: flex; align-items: center; 
@@ -1047,8 +1049,6 @@
     overflow-y: auto;
 
     background-color: rgb(250, 250, 250);
-
-    padding-top: 24px;
   }
 
   .day-week-toggle-segment {

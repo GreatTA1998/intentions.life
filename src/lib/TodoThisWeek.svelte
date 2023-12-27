@@ -63,11 +63,10 @@
 
   import { 
     computeDayDifference, 
-    convertMMDDToDateClassObject, 
     applyFuncToEveryTreeNode,
     convertDDMMYYYYToDateClassObject,
     getDateInDDMMYYYY, 
-    getRandomID
+    getRandomID,
   } from '/src/helpers.js'
   import RecursiveTaskElement from '$lib/RecursiveTaskElement.svelte'
   import { createEventDispatcher, tick } from 'svelte'

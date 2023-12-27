@@ -63,6 +63,7 @@
     font-weight: 500;
     font-size: 16px;
     color: black;
+    width: 100%;
   }
 
   /* remove default input styling */
