@@ -86,7 +86,7 @@
       <div 
         id="calendar-direct-task-div"  
         style="
-          top: {yPosition - formFieldTopPadding}px;s
+          top: {yPosition - formFieldTopPadding}px;
           position: absolute;
           width: 90%; 
           padding-left: 0px; 
@@ -213,6 +213,7 @@
 
   function copyGetTrueY (e) {
     // const OverallContainer = document.getElementById('scroll-container')
+    console.log('return, =', e.clientY + OverallContainer.scrollTop - OverallContainer.getBoundingClientRect().top - OverallContainer.style.paddingTop)
     return e.clientY + OverallContainer.scrollTop - OverallContainer.getBoundingClientRect().top - OverallContainer.style.paddingTop
   }
 
