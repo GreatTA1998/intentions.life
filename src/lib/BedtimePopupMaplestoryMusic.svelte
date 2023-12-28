@@ -27,15 +27,16 @@
   const d = new Date()
 
   // most energetic music is the illiyard-moor none-lofi
-  if (d.getHours() < 12 - 1) {
+  if (d.getHours() < 13 - 1) {
     chosenMusicFile = musicFiles[0]
   }
 
-  else if  (d.getHours() >= 12 - 1) {
+  // afternoon more laid back
+  else if  (d.getHours() >= 13 - 1) {
     chosenMusicFile = musicFiles[1]
   }
 
-  else if (d.getHours() >= 17 - 1) {
+  else if (d.getHours() >= 19 - 1) {
     chosenMusicFile = musicFiles[2]
   }
 
