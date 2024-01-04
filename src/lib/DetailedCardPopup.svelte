@@ -222,7 +222,7 @@ function confirmDelete () {
 }
 
 function handleClickOutside (e) {
-  dispatch('card-close')
+  // dispatch('card-close')
 }
 
 function handleInput (e) {
