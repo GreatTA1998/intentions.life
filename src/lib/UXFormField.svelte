@@ -37,11 +37,18 @@
   export let fieldLabel = 'Field Label'
   export let value = ''
   export let placeholder = ''
+  export let willAutofocus = true
 
   const dispatch = createEventDispatcher()
 
   let InputElem
   let isFocused = false
+
+  onMount(() => {
+    if (willAutofocus) {
+      InputElem.focus()
+    }
+  })
 </script>
 
 
