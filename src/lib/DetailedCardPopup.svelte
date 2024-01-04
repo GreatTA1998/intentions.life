@@ -20,6 +20,10 @@
       placeholder="Untitled"
       style="width: 100%; box-sizing: border-box;"
     >
+
+    <span class="material-symbols-outlined" on:click={() => dispatch('card-close')} style="font-size: 30px; margin-left: 8px; cursor: pointer;">
+      close
+    </span>
   </div>
 
   <!-- In future, display in readable month / day form -->
@@ -332,7 +336,8 @@ function dispatchNewDeadline (e) {
     overflow-y: auto;
     z-index: 3;
     min-width: 360px;
-    height: 70%;
+    
+    height: fit-content;
 
     padding: 24px;
     border-radius: 24px;
@@ -352,15 +357,11 @@ function dispatchNewDeadline (e) {
     font-weight: 700;
     /* padding: 10px 0px; */
     padding-left: 0px;
-    padding-bottom: 10px;
+    padding-bottom: 6px;
   }
 
   .google-calendar-event-title {
     font-size: 24px;
-    font-weight: 400;
-    letter-spacing: .2px;
-    line-height: 20px;
-    color: #3c4043;
   }
 
   .selected {
