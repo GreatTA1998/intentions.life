@@ -187,7 +187,7 @@ onDestroy(() => {
 })
 
 const debouncedSaveTitle = _.debounce(saveTitle, 800)
-const debouncedSaveNotes = _.debounce(saveNotes, 800)
+const debouncedSaveNotes = _.debounce(saveNotes, 1500)
 
 function saveDeadline (DDMMYYYY, HHMM) {
   taskObject.deadlineDate = DDMMYYYY
