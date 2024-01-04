@@ -15,6 +15,7 @@
       on:task-notes-update={(e) => changeNotesOfATask(e.detail)}
       on:task-dragged={(e) => changeTaskDeadline(e.detail)}
       on:repeating-tasks-generate={(e) => uploadGeneratedTasks(e.detail)}
+      on:task-checkbox-change={(e) => toggleTaskCompleted(e.detail.id)}
     />
   {/if}
 {/key}
@@ -816,7 +817,6 @@
       applyFunc: (task) => {
         task.deadlineTime = deadlineTime
         task.deadlineDate = deadlineDate
-        task.startTime = ''
       }
     })
     await updateDoc(doc(db, userDocPath), { 

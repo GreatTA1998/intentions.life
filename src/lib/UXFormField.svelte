@@ -3,7 +3,11 @@
 
   More info: https://uxmovement.substack.com/p/8-rules-for-switching-to-infield
 -->
-<div class="ux-form-field">
+<div class="ux-form-field"
+  on:click={() => InputElem.focus()}
+  class:grey-border={!isFocused}
+  class:blue-border={isFocused}
+>
   <div class="ux-field-label">
     <slot name="icon">
 
@@ -12,6 +16,7 @@
   </div>
 
   <input 
+    bind:this={InputElem} 
     value={value}
     on:input={(e) => dispatch('input', { value: e.target.value })}
     on:keyup={(e) => {
@@ -19,7 +24,8 @@
         dispatch('task-entered', { taskName: value })
       }
     }}
-    bind:this={InputElem} 
+    on:focusin={() => isFocused = true}
+    on:focusout={() => isFocused = false}
     class="ux-input-text" 
     placeholder={placeholder}
   >
@@ -35,18 +41,22 @@
   const dispatch = createEventDispatcher()
 
   let InputElem
-
-  onMount(() => {
-    InputElem.focus()
-  })
+  let isFocused = false
 </script>
 
 
 <style>
+  .blue-border {
+    border: 2px solid #2757cf;
+  }
+
+  .grey-border {
+    border: 1px solid #DBDBDD;
+  }
+
   .ux-form-field {
     height: 68px;
     padding: 10px;
-    border: 2px solid gray;
     border-radius: 4px;
   }
 

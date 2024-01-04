@@ -1,21 +1,33 @@
-
-  <div class="detailed-card-popup" bind:this={elem} use:clickOutside on:click_outside={handleClickOutside}>
-    <div style="display: flex; align-items: center;">
-      <input 
-        type="text" 
-        class="google-calendar-event-title" 
-        bind:value={titleOfTask} 
-        on:input={handleInput2}
-        placeholder="Untitled"
-        style="width: 100%; box-sizing: border-box;"
-      >
-    </div>
-
-    <!-- In future, display in readable month / day form -->
-    <div
-      class:half-invisible={!isScheduled(taskObject)}
-      style="margin-top: 12px; font-size: 1.2em; display: flex; align-items: center;"
+<div class="detailed-card-popup" bind:this={elem} use:clickOutside on:click_outside={handleClickOutside}>
+  <div style="display: flex; align-items: center;">
+    <input
+      checked={taskObject.isDone}
+      on:change={(e) => {
+        dispatch('task-checkbox-change', {
+          isDone: e.target.checked,
+          id: taskObject.id
+        })
+      }} 
+      type="checkbox" 
+      style="zoom: 2.2; margin: 0; margin-right: 6px;"
     >
+
+    <input 
+      type="text" 
+      class="google-calendar-event-title" 
+      bind:value={titleOfTask} 
+      on:input={(e) => debouncedSaveTitle(e.target.value)}
+      placeholder="Untitled"
+      style="width: 100%; box-sizing: border-box;"
+    >
+  </div>
+
+  <!-- In future, display in readable month / day form -->
+  <div
+    class:half-invisible={!isScheduled(taskObject)}
+    style="display: flex; align-items: center; justify-content: space-between; margin-top: 24px; font-size: 1.2em; "
+  >
+    <div style="display: flex;">
       <div style="width: 134px;">
         <UXFormField
           fieldLabel="Start"
@@ -35,61 +47,6 @@
         />
       </div>
 
-      <!-- startDate -->
-      <!-- {#if !isEditingStartDate}
-        <div on:click={() => isEditingStartDate = true}
-          class="google-calendar-event-time" style="margin-left: 8px; background-color: grey; padding: 4px; color: white;"
-        >
-          {taskObject.startDate || 'mm/dd' }
-        </div>
-      {:else}
-        <input bind:value={newStartDate} 
-          style="margin-left: 8px; width: 44px;" 
-          class="google-calendar-event-time" 
-          placeholder={getDateOfToday()}
-          autofocus
-        >
-      {/if} -->
-
-      <!-- startTime -->
-      <!-- {#if !isEditingStartTime}
-        <div on:click={() => isEditingStartTime = true}
-          class="google-calendar-event-time" style="margin-left: 8px; background-color: grey; padding: 4px; color: white;"
-        >
-          {taskObject.startTime || 'hh:mm'}
-        </div>
-      {:else}
-        <input 
-          bind:value={newStartTime} 
-          on:keypress={detectEnterKey5}
-          style="margin-left: 8px; width: 44px;" class="google-calendar-event-time" 
-          placeholder={getCurrentTimeInHHMM()} 
-          autofocus
-        >
-      {/if} -->
-
-      <!-- <div style="margin-left: 8px;">
-        for
-      </div> -->
-
-      <!-- TO-DO: can input duration with `!isEditingDuration` -->
-      <!-- {#if true}
-        <div on:click={() => isEditingDuration = true}
-          style="margin-left: 8px; background-color: grey; padding: 4px; color: white;" class="google-calendar-event-time"
-        >
-          {Math.round(taskObject.duration) || 'n'} minutes
-        </div>
-      {:else}
-        <input style="margin-left: 8px; width: 18px;" 
-          class="google-calendar-event-time" 
-          placeholder="n"
-          autofocus
-        >
-        <div class="google-calendar-event-time" style="margin-left: 4px;">
-          minutes
-        </div>
-      {/if} -->
-
       {#if isEditingStartDate || isEditingStartTime}
         <div style="margin-left: 6px; opacity: 0.8">
           (press ENTER to apply changes)
@@ -97,104 +54,56 @@
       {/if}
     </div>
 
+    {#if isEditingDeadline}
+      <button on:click={() => saveDeadline(newDeadlineDate, newDeadlineTime)}>Save changes</button>
+    {/if}
 
     <div class:half-invisible={!hasDeadline(taskObject)} 
-      style="margin-top: 12px; font-size: 1.2em; display: flex; align-items: center;"
+      style="font-size: 1.2em; display: flex; align-items: center; width: 172px;"
     >
       <UXFormField
         fieldLabel="Deadline"
-        value={(taskObject.deadlineDate || '') + (taskObject.deadlineTime || '')}
+        value={currentDeadlineValue}
         placeholder="dd/mm/yyyy hh:mm"
+        on:input={(e) => handleDeadlineInput(e)}
       >
-        <span slot="icon" class="material-symbols-outlined" style="margin-right: 4px; font-size: 18px;">
+        <span slot="icon" class="material-symbols-outlined" style="margin-right: 4px; font-size: 18px; color: {hasDeadline(taskObject) ? 'red' : ''};">
           alarm
         </span>
       </UXFormField>
-
-<!-- 
-      Deadline: 
-      {#if !isEditingDeadlineDate}
-        <div on:click={() => isEditingDeadlineDate = true} class="google-calendar-event-time" style="margin-left: 8px; background-color: grey; padding: 4px; color: white;">
-          {taskObject.deadlineDate || 'dd/mm/yyyy'}
-        </div>
-      {:else}
-        <input bind:value={newDeadlineDate} placeholder={getDateInDDMMYYYY(new Date())} style="width: 77px; margin-left: 8px;" class="google-calendar-event-time"
-          autofocus
-        >
-      {/if} -->
-      <!-- getDateInDDMMYYYY(new Date()) -->
-
-      <!-- {#if !isEditingDeadlineTime}
-        <div on:click={() => isEditingDeadlineTime = true} 
-          class="google-calendar-event-time" style="margin-left: 8px; background-color: grey; padding: 4px; color: white;">
-          {taskObject.deadlineTime || 'hh:mm'}
-        </div>
-      {:else}
-        <input 
-          placeholder={getCurrentTimeInHHMM()} 
-          bind:value={newDeadlineTime} 
-          class="google-calendar-event-time" 
-          style="margin-left: 8px; width: 40px" 
-          on:keypress={dispatchNewDeadline}
-          autofocus
-        >
-      {/if} -->
-
-      {#if isEditingDeadlineDate || isEditingDeadlineTime}
-        <div style="margin-left: 6px; opacity: 0.8">
-          (press ENTER to apply changes)
-        </div>
-      {/if}
     </div>
+  </div>
 
-    <!-- <div class="google-calendar-event-detail" style="margin-top: 12px; margin-left: 16px;">
-      {#if taskObject.daysBeforeRepeating}
-        { taskObject.repeatType || ''}  repeats every {taskObject.daysBeforeRepeating} days, 
-        completed {taskObject.completionCount || 0} times, 
-        missed { taskObject.missedCount || 0} times
-      {/if}
-    </div> -->
+  <div style="width: 100%; margin-top: 24px; margin-bottom: 24px;">
+    <UXFormTextArea fieldLabel="Description"
+      value={notesAboutTask}
+      on:input={(e) => debouncedSaveNotes(e.detail)}
+      placeholder=""
+    />
+  </div>
 
-    <div style="margin-top: 20px;">
+  <div style="margin-top: 0px; display: flex; align-items: center; justify-content: space-between;">
+    <DetailedCardPopupRepeat 
+      {taskObject}
+      on:repeating-tasks-generate
+    />
 
-    </div>
-
-    <div stle="width: 100%; margin-bottom: 24px;">
-      <UXFormField fieldLabel="Details"/>
-
-      <!-- cols="48" determines width -->
-      <!-- <textarea 
-        bind:value={notesAboutTask}
-        on:input={handleInput}
-        rows="5"
-        placeholder="Type in details..."
-        style="width: 100%; margin-bottom: 20px; box-sizing: border-box;"
-      /> -->
-    </div>
-
-    <div style="margin-left: 12px; margin-top: 0px;">
-      <DetailedCardPopupRepeat 
-        {taskObject}
-        on:repeating-tasks-generate
-      />
-    </div>
-
-    <div style="margin-top: 24px; margin-bottom: 24px; margin-left: 12px;">
-      <a style="height: 20px;" on:click={() => dispatch('task-done')}>
-        Completed
+    <div style="display: flex; align-items: center;">
+      <a style="height: 36px; max-width: 240px;"
+        on:click={() => {dispatch('task-reusable'); alert('Success, when you click on the calendar and type a task, matching reusable tasks will appear. You can track how much time you spend on this task by visiting the time spent dashboard on the top right.')}}
+      >
+        Create reusable template
       </a>
 
-      <a style="height: 20px;" on:click={() => dispatch('task-reusable')}>
-        Set as reusable task
-      </a>
-
-      <a style="height: 20px;" on:click={confirmDelete}>
-        Delete
-      </a>
+      <span class="material-symbols-outlined"  on:click={confirmDelete} style="cursor: pointer; margin-left: 6px; border: 1px solid grey; border-radius: 24px; padding: 4px;">
+        delete
+      </span>
     </div>
+  </div>
 
-    <!-- This is the section where you show everything regardless of whether it is scheduled or not -->
-    <div style="font-size: 1.2rem; margin-top: 0px; margin-bottom: 12px; margin-left: 12px; font-weight: 600; font-family: roboto, sans-serif;">
+  <!-- This is the section where you show everything regardless of whether it is scheduled or not -->
+  {#if taskObject.children.length > 0}
+    <div style="font-size: 1rem; margin-top: 36px; margin-bottom: 12px; font-weight: 400;">
       Full task history
     </div>
 
@@ -208,16 +117,26 @@
       </RecursiveBulletPoint>
       </div>
     {/each}
-  </div>
+  {/if}
+
+  <!-- <div class="google-calendar-event-detail" style="margin-top: 12px; margin-left: 16px;">
+    {#if taskObject.daysBeforeRepeating}
+      { taskObject.repeatType || ''}  repeats every {taskObject.daysBeforeRepeating} days, 
+      completed {taskObject.completionCount || 0} times, 
+      missed { taskObject.missedCount || 0} times
+    {/if}
+  </div> -->
+</div>
 
 <script>
 import { createEventDispatcher, onMount, onDestroy, tick } from 'svelte'
 import _ from 'lodash'
 import RecursiveBulletPoint from '$lib/RecursiveBulletPoint.svelte'
 import { getDateOfToday, getRandomID, clickOutside, getDateInDDMMYYYY, getCurrentTimeInHHMM } from '/src/helpers.js'
-import ReusableDatePicker from '$lib/ReusableDatePicker.svelte'
 import DetailedCardPopupRepeat from '$lib/DetailedCardPopupRepeat.svelte'
 import UXFormField from '$lib/UXFormField.svelte'
+import UXFormTextArea from '$lib/UXFormTextArea.svelte'
+import ReusableDatePicker from '$lib/ReusableDatePicker.svelte'
 
 export let taskObject 
 
@@ -235,9 +154,13 @@ let isEditingDuration = false
 
 let isEditingDeadlineDate = false
 let isEditingDeadlineTime = false
+let isEditingDeadline = false
 
 let isTypingRepeatFrequency = false
 let daysBeforeRepeating = 7
+
+const initialDeadline = (taskObject.deadlineDate || '') + (taskObject.deadlineDate && taskObject.deadlineTime ? " " : "") + (taskObject.deadlineTime || '')
+$: currentDeadlineValue = (taskObject.deadlineDate || '') + (taskObject.deadlineDate && taskObject.deadlineTime ? " " : "") + (taskObject.deadlineTime || '')
 
 const dispatch = createEventDispatcher()
 
@@ -265,6 +188,27 @@ onDestroy(() => {
 const debouncedSaveTitle = _.debounce(saveTitle, 800)
 const debouncedSaveNotes = _.debounce(saveNotes, 800)
 
+function saveDeadline (DDMMYYYY, HHMM) {
+  taskObject.deadlineDate = DDMMYYYY
+  taskObject.deadlineTime = HHMM
+
+  // TO-DO: rename `task-dragged` to something else
+  dispatch('task-dragged', {
+    id: taskObject.id,
+    deadlineTime: newDeadlineTime, // 
+    deadlineDate: newDeadlineDate
+  })
+
+  isEditingDeadline = false
+}
+
+function handleDeadlineInput (e) {
+  isEditingDeadline = true
+  const newVal = e.detail.value
+  newDeadlineDate = newVal.split(" ")[0]
+  newDeadlineTime = newVal.split(" ")[1]
+}
+
 function confirmDelete () {
   if (confirm('Are you sure you want to delete the task? This is irreversible.')) {
     dispatch('task-delete')
@@ -279,11 +223,6 @@ function handleClickOutside (e) {
 function handleInput (e) {
   debouncedSaveNotes(e.target.value)
 }
-
-const handleInput2 = function (e) {
-  debouncedSaveTitle(e.target.value)
-}
-
 
 function saveNotes (newVal) {
   taskObject.notes = newVal
@@ -388,10 +327,10 @@ function dispatchNewDeadline (e) {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 60%;
+    width: 58%;
     overflow-y: auto;
     z-index: 3;
-    min-width: 300px;
+    min-width: 360px;
     height: 70%;
 
     padding: 24px;
@@ -406,30 +345,13 @@ function dispatchNewDeadline (e) {
   input[type=text] {
     background: transparent;
     border: none;
-    border-bottom: 1px solid #000000;
+    border-bottom: 1px solid #DBDBDD;
     outline: none;
     font-size: 23px;
     font-weight: 700;
     /* padding: 10px 0px; */
+    padding-left: 0px;
     padding-bottom: 10px;
-  }
-
-  .google-calendar-event-detail {
-    font-family: Roboto,Arial,sans-serif;
-    font-size: 20px;
-    font-weight: 400;
-    letter-spacing: .2px;
-    line-height: 20px;
-    color: #3c4043;
-  }
-
-  .google-calendar-event-time {
-    font-family: Roboto,Arial,sans-serif;
-    font-size: 14px;
-    font-weight: 400;
-    letter-spacing: .2px;
-    line-height: 20px;
-    color: #3c4043;
   }
 
   .google-calendar-event-title {

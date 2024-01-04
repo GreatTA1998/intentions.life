@@ -1,7 +1,7 @@
-<div style="display: flex; align-items: center; margin-top: 12px;">
+<div style="display: flex; align-items: center;">
   <div class:half-transparent={!taskObject.willRepeatOnWeekDayNumber}>
-    <span class="material-symbols-outlined" style="font-size: 28px; margin-top: 4px;">
-      repeat
+    <span class="material-symbols-outlined" style="font-size: 28px; margin-top: 4px; color: rgb(0, 0, 0);">
+      refresh
     </span>
   </div>
 
@@ -33,7 +33,7 @@
 
     {#if isChoosingRepeatDays}
       <button on:click={generateRepeatedTasks}>
-        Apply changes
+        Apply repeat schedule
       </button>
     {/if}
   </div>

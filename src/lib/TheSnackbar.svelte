@@ -16,7 +16,6 @@
   const dispatch = createEventDispatcher()
 
   function undoComplete () {
-    console.log('undo')
     dispatch('task-done', { id: $mostRecentlyDeletedOrCompletedTaskID })
   }
 
@@ -25,7 +24,6 @@
 <style>
 
 a {
-  font-family: Roboto,Arial,sans-serif;
   flex: 1;
   background-color: #323232;
   color: #fff;
@@ -33,12 +31,10 @@ a {
   padding-bottom: 5px;
   padding-left: 6px;
   padding-right: 6px;
-  border-radius: 6px;
   text-align: center;
   text-decoration: none;
   transition: all 0.2s ease-out;
    border: 1px solid #000;
-  font-family: sans-serif;
   font-size: 1rem;
   height: 5px;
 }
@@ -53,7 +49,7 @@ a:focus {
 .snack-wrap {
   display:block;
   position:fixed;
-  bottom:0px;
+  bottom:24px;
   left: 50%;
   right: 50%;
   padding:0px;
@@ -61,6 +57,9 @@ a:focus {
   margin-left: -225px; 
   /* half of width */
   width: 450px;
+
+  z-index: 1;
+  border-radius: 8px;
 }
 
 .snackbar {
@@ -69,10 +68,10 @@ a:focus {
   border:#f2f2f2;
   padding:10px 40px 10px 20px;
   color:#fff;
-  font-family:Arial;
   position:relative;
   left:0px;
   z-index:9;
+  border-radius: 16px;
 } 
 
 /* .animated {

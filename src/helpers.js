@@ -263,8 +263,13 @@ export function generateRepeatedTasks (taskObject) {
 
 export function createRepeatedTask ({ dateClassObj, repeatGroupID }, taskObject) {
   const taskObjCopy = {...taskObject}
+
   taskObjCopy.id = getRandomID()
-  taskObjCopy.willRepeatOnWeekDayNumber = [...taskObject.willRepeatOnWeekDayNumber]
+  taskObjCopy.isDone = false
+
+  // commented out because this is probably redundant 
+  // taskObjCopy.willRepeatOnWeekDayNumber = [...taskObject.willRepeatOnWeekDayNumber]
+  
   taskObjCopy.repeatGroupID = repeatGroupID // way to label separate tasks as essentially clones of an original repeating task
 
   const yyyy = `${dateClassObj.getFullYear()}`
