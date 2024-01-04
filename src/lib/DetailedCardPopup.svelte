@@ -58,8 +58,9 @@
       <button on:click={() => saveDeadline(newDeadlineDate, newDeadlineTime)}>Save changes</button>
     {/if}
 
+    <!-- 178px is the min. width that fully contains the placeholder text -->
     <div class:half-invisible={!hasDeadline(taskObject)} 
-      style="font-size: 1.2em; display: flex; align-items: center; width: 172px;"
+      style="font-size: 1.2em; display: flex; align-items: center; width: 178px;"
     >
       <UXFormField
         fieldLabel="Deadline"
