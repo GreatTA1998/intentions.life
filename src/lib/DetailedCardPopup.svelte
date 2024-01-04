@@ -241,6 +241,7 @@ let daysBeforeRepeating = 7
 
 const dispatch = createEventDispatcher()
 
+// don't delete yet, as these might be needed for input element bindings
 let notesAboutTask = taskObject.notes || ''
 let titleOfTask = taskObject.name || ''
 let elem
@@ -254,15 +255,15 @@ function hasDeadline (taskObj) {
 }
 
 onMount(() => {
-  // console.log('taskObject =', taskObject)
+
 })
 
 onDestroy(() => {
   
 })
 
-const throttledSaveTitle = _.throttle(saveTitle, 500)
-const throttledSaveNotes = _.throttle(saveNotes, 500)
+const debouncedSaveTitle = _.debounce(saveTitle, 800)
+const debouncedSaveNotes = _.debounce(saveNotes, 800)
 
 function confirmDelete () {
   if (confirm('Are you sure you want to delete the task? This is irreversible.')) {
@@ -276,23 +277,21 @@ function handleClickOutside (e) {
 }
 
 function handleInput (e) {
-  notesAboutTask = e.target.value
-  throttledSaveNotes()
+  debouncedSaveNotes(e.target.value)
 }
 
 const handleInput2 = function (e) {
-  titleOfTask = e.target.value
-  throttledSaveTitle()
+  debouncedSaveTitle(e.target.value)
 }
 
 
-function saveNotes () {
-  taskObject.notes = notesAboutTask
-  dispatch('task-notes-update', { id: taskObject.id, newNotes: notesAboutTask })
+function saveNotes (newVal) {
+  taskObject.notes = newVal
+  dispatch('task-notes-update', { id: taskObject.id, newNotes: newVal })
 }
 
-function saveTitle () {
-  dispatch('task-title-update', { id: taskObject.id, newName: titleOfTask })
+function saveTitle (newVal) {
+  dispatch('task-title-update', { id: taskObject.id, newName: newVal })
 }
 
 function detectEnterKey4 (e) {
