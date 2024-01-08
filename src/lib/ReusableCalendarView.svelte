@@ -100,7 +100,7 @@
             newTaskName = e.detail.value;
             searchTaskTemplates();
           }}
-          on:task-entered={(e) => createTaskDirectly(e)}
+          on:task-entered={(e) => handleEnterKey(e)}
         />
 
         <!-- Display reusable task templates here -->
@@ -108,7 +108,10 @@
           {#if $user && newTaskName.length >= 2}
             <div class="core-shadow cast-shadow" style="background-color: white; padding: 6px; border-radius: 12px">   
               {#each taskTemplateSearchResults as taskTemplate}
-                <div class="autocomplete-option" on:click={() => createNewInstanceOfReusableTask(taskTemplate)}>
+                <div class="autocomplete-option" 
+                  on:click={() => createNewInstanceOfReusableTask(taskTemplate)} 
+                  class:option-highlight={taskTemplateSearchResults.length === 1}
+                >
                   {taskTemplate.name}
                 </div>
               {/each}
@@ -196,6 +199,14 @@
 
   })
 
+  function handleEnterKey (e) {
+    if (taskTemplateSearchResults.length === 1) {
+      createNewInstanceOfReusableTask(taskTemplateSearchResults[0])
+    } else {
+      createTaskDirectly(e)
+    }
+  }
+
   function searchTaskTemplates () {
     const uniqueSet = new Set()
     const searchQuery = newTaskName
@@ -218,6 +229,7 @@
   }
 
   async function createNewInstanceOfReusableTask (taskObj) {
+    console.log('taskObj =', taskObj)
     const copy = {...taskObj}
     copy.id = getRandomID()
     copy.reusableTemplateID = taskObj.id
@@ -347,13 +359,18 @@
 
 </script>
 
-<style>
+<style lang="scss">
 .autocomplete-option {
   padding-top: 12px; padding-bottom: 12px; padding-left: 12px; padding-right: 12px; font-size: 16px; border-radius: 12px;
 }
 
-.autocomplete-option:hover {
+.option-highlight {
   background-color: rgb(240, 240, 240);
+}
+
+// background-color: rgb(240, 240, 240);
+.autocomplete-option:hover {
+  @extend .option-highlight
 }
 
 /* DO NOT REMOVE, BREAKS DRAG-AND-DROP AND DURATION ADJUSTMENT */

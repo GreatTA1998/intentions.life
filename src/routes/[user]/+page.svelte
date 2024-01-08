@@ -391,8 +391,6 @@
   }
 
   function changeJournal({ newJournal }) {
-    console.log('newJournal =', newJournal)
-
     updateDoc(doc(db, userDocPath), {
       journal: newJournal
     })

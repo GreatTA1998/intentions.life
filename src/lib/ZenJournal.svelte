@@ -18,8 +18,9 @@
 
 <!-- rgb(36, 33, 33) -->
 <textarea 
-  bind:value={journal[todayMMDD]}
+  value={journal[todayMMDD]}
   on:input={handleInput}
+  id={todayMMDD}
   class="reset-textarea" 
   name="hide" placeholder="Write anything..." 
   style="color: white; background-color: transparent; width: 100%; height: 90%; font-size: 16px;"
@@ -29,20 +30,32 @@
   import { convertMMDDToReadableMonthDayForm, getDateInMMDD } from '/src/helpers.js'
   import _ from 'lodash'
   import { onMount } from 'svelte'
-  import { createEventDispatcher } from 'svelte'
+  import { createEventDispatcher, afterUpdate } from 'svelte'
 
   export let journal
 
   let isJournalPopupOpen = false
+  let localValue = ''
+  let cursorPos
 
   const dispatch = createEventDispatcher()
   const todayMMDD = getDateInMMDD(new Date())
-  // const throttledSaveJournalPage = _.throttle(saveJournalPage, 500)
   const debouncedSaveJournalPage = _.debounce(saveJournalPage, 500)
 
   onMount(() => {
     createTodayJournal()
+    localValue = journal[todayMMDD]
   })
+
+  // after each major debounced update on `journal`, we manually restore the cursor position to where it was
+  $: restoreCursorPos (journal)  
+
+  function restoreCursorPos (journal) {
+    if (cursorPos) {
+      const Elem = document.getElementById(todayMMDD)
+      Elem.selectionEnd = cursorPos
+    }
+  }
 
   // checks if it exists already for today's date, if not it will initialize a new 
   // journal as empty string''
@@ -63,12 +76,14 @@
   }
 
   function saveJournalPage () {
+    journal[todayMMDD] = localValue
     dispatch('journal-update', { newJournal: journal })
   }
 
-  // make it debounce
   function handleInput (e) {
-    journal[todayMMDD] = e.target.value
+    const relevantInputElement = document.getElementById(todayMMDD)
+    cursorPos = relevantInputElement.selectionStart
+    localValue = e.target.value
     debouncedSaveJournalPage()
   }
 </script>
