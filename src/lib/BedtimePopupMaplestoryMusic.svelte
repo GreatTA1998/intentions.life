@@ -2,16 +2,24 @@
   src={maplestoryAirshipsBackgroundURL}
   style="height: 100vh; width: 100vw; object-fit: cover; position: fixed; top: 0;"
 >
-
-<audio 
-  bind:this={AudioElem} 
-  autoplay="true" 
-  loop="true">
-</audio>
+{#if willMusicAutoplay}
+  <audio 
+    bind:this={AudioElem} 
+    autoplay="true" 
+    loop="true">
+  </audio>
+{/if}
 
 <script>
+  export let willMusicAutoplay
+
   import { getRandomInt } from '/src/helpers.js'
   import { onMount } from 'svelte'
+
+  $: if (AudioElem) {
+    AudioElem.src = chosenMusicFile
+    AudioElem.volume = 0.02
+  }
 
   const maplestoryAirshipsBackgroundURL =  'https://i.imgur.com/ShnqIpJ.jpeg'
 
@@ -43,10 +51,12 @@
 
   // chosenMusicFile = musicFiles[getRandomInt(3)]
 
-  onMount(() => {
-    AudioElem.src = chosenMusicFile
-    AudioElem.volume = 0.1
-  })
+  // onMount(() => {
+  //   if (AudioElem) {
+  //     AudioElem.src = chosenMusicFile
+  //     AudioElem.volume = 0.1
+  //   }
+  // })
 
   function toggleMusic () {
     AudioElem.volume = 0.1

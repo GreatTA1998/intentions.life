@@ -85,9 +85,9 @@
         <!-- Note: .getHours() is 0-indexed from 0 to 23 -->
         <!-- Show daytime art from 5 am - 7 pm -->
         {#if new Date().getHours() > 5 && new Date().getHours() < 18} 
-          <BedtimePopupMaplestoryMusic/>
+          <BedtimePopupMaplestoryMusic willMusicAutoplay={userDoc.willMusicAutoplay}/>
         {:else} 
-          <BackgroundRainScene/>
+          <BackgroundRainScene willMusicAutoplay={userDoc.willMusicAutoplay}/>
         {/if}
 
         <div class="container-for-float-cards">
@@ -96,6 +96,7 @@
               journal={userDoc.journal} 
               journalTitleFromMMDD={userDoc.journalTitleFromMMDD}
               {currentJournalEntryMMDD}
+              on:toggle-music-autoplay={(e) => updateMusicAutoplay(e)}
               on:journal-entry-select={(e) => currentJournalEntryMMDD = e.detail.newMMDD}
             />
           </div>
@@ -106,6 +107,8 @@
                 journal={userDoc.journal}
                 journalTitleFromMMDD={userDoc.journalTitleFromMMDD}
                 {currentJournalEntryMMDD}
+                willMusicAutoplay={userDoc.willMusicAutoplay}
+                on:toggle-music-autoplay={(e) => updateMusicAutoplay(e)}
                 on:journal-update={(e) => changeJournal(e.detail)}
                 on:journal-entry-title-update={(e) => updateJournalEntryTitle(e.detail)}
               />
@@ -305,7 +308,6 @@
 
   let allIncompleteTasks = null
 
-
   onMount(() => {
     chosenBgImageURL = bgImageURLs[getRandomInt(1)]
     const div = document.getElementById("background-image-holder")
@@ -333,6 +335,16 @@
       const d2 = new Date(task2.startDate)
       return d1.getTime() - d2.getTime() // most recent to the top??
     })
+  }
+
+  function updateMusicAutoplay (e) {
+    const { newVal } = e.detail
+    updateDoc(doc(db, userDocPath), {
+      willMusicAutoplay: newVal
+    }) 
+    // quickfix
+    userDoc.willMusicAutoplay = newVal
+    userDoc = userDoc
   }
 
   function updateJournalEntryTitle ({ entryMMDD, newTitle }) {
@@ -1029,6 +1041,10 @@
     /* border-radius: 36px; */
     padding: 24px;
     border-radius: 6px;
+  }
+
+  .rounded-card::webkit-scrollbar {
+    width: 0px;
   }
 
   .container-for-float-cards {
