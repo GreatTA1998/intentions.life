@@ -14,11 +14,10 @@
 
     <input 
       type="text" 
-      class="google-calendar-event-title" 
       bind:value={titleOfTask} 
       on:input={(e) => debouncedSaveTitle(e.target.value)}
       placeholder="Untitled"
-      style="width: 100%; box-sizing: border-box;"
+      style="width: 100%; box-sizing: border-box; font-size: 24px;"
     >
 
     <span class="material-symbols-outlined" on:click={() => dispatch('card-close')} style="font-size: 30px; margin-left: 8px; cursor: pointer;">
@@ -358,10 +357,6 @@ function dispatchNewDeadline (e) {
     /* padding: 10px 0px; */
     padding-left: 0px;
     padding-bottom: 6px;
-  }
-
-  .google-calendar-event-title {
-    font-size: 24px;
   }
 
   .selected {

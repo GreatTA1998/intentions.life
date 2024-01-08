@@ -1,26 +1,34 @@
 <div style="display: flex; align-items: center;">
-  <span class="material-symbols-outlined my-float" 
+  <!-- <span class="material-symbols-outlined my-float" 
     style="font-size: 32px; cursor: pointer;"
     on:click={() => isJournalPopupOpen = !isJournalPopupOpen}
     class:blue-focus={isJournalPopupOpen}
   >
     auto_stories
-  </span>
+  </span> -->
 
     <!-- color: #091346 -->
-  <div style="font-size: 28px; font-weight: 500; margin-left: 12px;">
-    {convertMMDDToReadableMonthDayForm(todayMMDD)}
-  </div>
 </div>
 
+<input 
+  value={localTitle}
+  on:input={handleTitleInput}
+  class="reset-input"
+  type="text" 
+  style="width: 100%; box-sizing: border-box; font-size: 28px; background: transparent; color: white; border-bottom: 1px solid rgb(180, 180, 180); padding-bottom: 4px; font-weight: 500;"
+> 
 
-<div style="margin-bottom: 18px;"></div>
+<div style="font-size: 12px; font-weight: 400; margin-top: 6px; ">
+  {convertMMDDToReadableMonthDayForm(currentJournalEntryMMDD)}
+</div>
+
+<div style="margin-bottom: 24px;"></div>
 
 <!-- rgb(36, 33, 33) -->
 <textarea 
-  value={journal[todayMMDD]}
+  value={journal[currentJournalEntryMMDD]}
   on:input={handleInput}
-  id={todayMMDD}
+  id={currentJournalEntryMMDD}
   class="reset-textarea" 
   name="hide" placeholder="Write anything..." 
   style="color: white; background-color: transparent; width: 100%; height: 90%; font-size: 16px;"
@@ -33,18 +41,28 @@
   import { createEventDispatcher, afterUpdate } from 'svelte'
 
   export let journal
+  export let journalTitleFromMMDD
+  export let currentJournalEntryMMDD
 
   let isJournalPopupOpen = false
+  let localTitle = ''
   let localValue = ''
   let cursorPos
 
   const dispatch = createEventDispatcher()
-  const todayMMDD = getDateInMMDD(new Date())
+
   const debouncedSaveJournalPage = _.debounce(saveJournalPage, 500)
+  const debouncedSaveJournalEntryTitle = _.debounce(saveJournalEntryTitle, 500) 
 
   onMount(() => {
     createTodayJournal()
-    localValue = journal[todayMMDD]
+    localValue = journal[currentJournalEntryMMDD]
+
+    if (journalTitleFromMMDD) {
+      if (journalTitleFromMMDD[currentJournalEntryMMDD]) {
+        localTitle = journalTitleFromMMDD[currentJournalEntryMMDD] 
+      }
+    }
   })
 
   // after each major debounced update on `journal`, we manually restore the cursor position to where it was
@@ -52,7 +70,7 @@
 
   function restoreCursorPos (journal) {
     if (cursorPos) {
-      const Elem = document.getElementById(todayMMDD)
+      const Elem = document.getElementById(currentJournalEntryMMDD)
       Elem.selectionEnd = cursorPos
     }
   }
@@ -64,26 +82,48 @@
       journal = {}
     }
     else {
+      // don't create a blank journal if the journal already exists hence `return` 
       for (const journalDates of Object.keys(journal)) {
-        if (journalDates === todayMMDD) {
+        if (journalDates === currentJournalEntryMMDD) {
           return
         }
       }
-
     }
-    journal[todayMMDD] = ''
     saveJournalPage()
   }
 
+  function saveJournalEntryTitle () {
+    dispatch('journal-entry-title-update', { entryMMDD: currentJournalEntryMMDD, newTitle: localTitle })
+  }
+
   function saveJournalPage () {
-    journal[todayMMDD] = localValue
+    journal[currentJournalEntryMMDD] = localValue
     dispatch('journal-update', { newJournal: journal })
   }
 
+  function handleTitleInput (e) {
+    localTitle = e.target.value
+    debouncedSaveJournalEntryTitle()
+  }
+
   function handleInput (e) {
-    const relevantInputElement = document.getElementById(todayMMDD)
+    const relevantInputElement = document.getElementById(currentJournalEntryMMDD)
     cursorPos = relevantInputElement.selectionStart
     localValue = e.target.value
     debouncedSaveJournalPage()
   }
 </script>
+
+<style>
+  .reset-input {
+    border: none;
+    overflow: auto;
+    outline: none;
+
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+
+    resize: none; /*remove the resize handle on the bottom right*/
+  }
+</style>

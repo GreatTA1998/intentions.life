@@ -91,17 +91,25 @@
         {/if}
 
         <div class="container-for-float-cards">
-          <div class="glow-card-hover-effect rounded-card"
-            style="width: 36%;"
-          >
-            <ZenJournal journal={userDoc.journal}
-              on:journal-update={(e) => changeJournal(e.detail)}
+          <div class="glow-card-hover-effect rounded-card" style="width: 36%; overflow-y: auto;">
+            <ZenJournalLeftNavigation 
+              journal={userDoc.journal} 
+              journalTitleFromMMDD={userDoc.journalTitleFromMMDD}
+              {currentJournalEntryMMDD}
+              on:journal-entry-select={(e) => currentJournalEntryMMDD = e.detail.newMMDD}
             />
           </div>
 
-          <div class="glow-card-hover-effect rounded-card"
-            style="margin-left: 4%; width: 60%;"
-          >
+          <div class="glow-card-hover-effect rounded-card" style="margin-left: 4%; width: 60%;">
+            {#key currentJournalEntryMMDD}
+              <ZenJournal 
+                journal={userDoc.journal}
+                journalTitleFromMMDD={userDoc.journalTitleFromMMDD}
+                {currentJournalEntryMMDD}
+                on:journal-update={(e) => changeJournal(e.detail)}
+                on:journal-entry-title-update={(e) => updateJournalEntryTitle(e.detail)}
+              />
+            {/key}
             <!-- <DayView {allTasks}
               scheduledTasksToday={todayScheduledTasks}
               on:task-done={(e) => toggleTaskCompleted(e.detail.id)}
@@ -252,12 +260,11 @@
   import TodoThisWeek from '$lib/TodoThisWeek.svelte'
   import FutureOverview from '$lib/FutureOverview.svelte'
   import ZenJournal from '$lib/ZenJournal.svelte'
+  import ZenJournalLeftNavigation from '$lib/ZenJournaLeftNavigation.svelte'
   import BackgroundRainScene from '$lib/BackgroundRainScene.svelte'
   import LifeDashboard from '$lib/LifeDashboard.svelte'
   import GrandTreeTodoPopupButton from '$lib/GrandTreeTodoPopupButton.svelte'
   import GrandTreeTodo from '$lib/GrandTreeTodo.svelte'
-
-  const navbarHeight = 60
 
   let snackbarTimeoutID = null
   let countdownRemaining = 0
@@ -291,10 +298,13 @@
 
   let isDetailedCardOpen = false
   let isJournalPopupOpen = false
+  let currentJournalEntryMMDD = getDateOfToday()
+
   let clickedTask = {}
   let goalsAndPosters = ''
 
   let allIncompleteTasks = null
+
 
   onMount(() => {
     chosenBgImageURL = bgImageURLs[getRandomInt(1)]
@@ -324,6 +334,16 @@
       return d1.getTime() - d2.getTime() // most recent to the top??
     })
   }
+
+  function updateJournalEntryTitle ({ entryMMDD, newTitle }) {
+    let updateObj = {}
+    if (userDoc.journalTitleFromMMDD) updateObj = {...userDoc.journalTitleFromMMDD} 
+    
+    updateObj[entryMMDD] = newTitle    
+    updateDoc(doc(db, userDocPath), {
+      journalTitleFromMMDD: updateObj
+    }) 
+  }   
 
   function filterIncompleteTasks (tasksArray) {
     let output = []
