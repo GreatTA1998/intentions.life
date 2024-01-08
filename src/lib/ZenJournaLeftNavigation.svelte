@@ -36,7 +36,7 @@
     font-weight: 600;
     font-size: 16px;
     background-color: none;
-    border: 2px solid rgb(200, 200, 200);
+    border: 1px solid rgb(200, 200, 200);
     border-radius: 4px; 
     /* color: #0085FF; */
   }
