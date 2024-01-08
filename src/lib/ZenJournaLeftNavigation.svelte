@@ -3,14 +3,16 @@
   {#each sortedJournalDates as date}
     <div on:click={() => dispatch('journal-entry-select', { newMMDD: date })} 
       class="drawer-item"
-      style="display: flex; align-items: center; width: 100%; font-size: 16px; padding: 10px 8px;" 
+      style="align-items: center; width: 100%; font-size: 16px; padding: 10px 8px;" 
       class:blue-highlight={date === currentJournalEntryMMDD}
     >
-      <div style="opacity: 0.8; font-weight: 400;">{convertMMDDToReadableMonthDayForm(date)}</div>
+      <div style="opacity: 0.8; font-weight: 300; font-size: 12px; margin-top: 1px;">
+        {convertMMDDToReadableMonthDayForm(date)}
+      </div>
     {#if journalTitleFromMMDD}
       {#if journalTitleFromMMDD[date]}
         <div style="font-weight: 400;">
-        :{' ' + journalTitleFromMMDD[date]}
+        {journalTitleFromMMDD[date]}
         </div>
       {/if}
     {/if}

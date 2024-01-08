@@ -10,13 +10,17 @@
     <!-- color: #091346 -->
 </div>
 
+<div style="font-size: 16px; font-weight: 300; margin-left: 3px; margin-bottom: 2px; opacity: 0.8">
+  {convertMMDDToReadableMonthDayForm(currentJournalEntryMMDD)}
+</div>
+
 <div style="display: flex; align-items: center;">
   <input 
     value={localTitle}
     on:input={handleTitleInput}
     class="reset-input"
     type="text" 
-    style="width: 100%; box-sizing: border-box; font-size: 28px; background: transparent; color: white; border-bottom: 1px solid rgb(180, 180, 180); padding-bottom: 4px; font-weight: 500;"
+    style="width: 100%; box-sizing: border-box; font-size: 28px; background: transparent; color: white; border-bottom: 1px solid hsl(200,90%,40%,0.4); padding-bottom: 6px; font-weight: 500; margin-right: 12px;"
   >
     {#if willMusicAutoplay}
       <span class="material-symbols-outlined" on:click={() => dispatch('toggle-music-autoplay', { newVal: false })} style="cursor: pointer; font-size: 32px">
@@ -29,9 +33,6 @@
     {/if}
 </div>
 
-<div style="font-size: 12px; font-weight: 400; margin-top: 6px; ">
-  {convertMMDDToReadableMonthDayForm(currentJournalEntryMMDD)}
-</div>
 
 <div style="margin-bottom: 24px;"></div>
 
@@ -137,5 +138,9 @@
     box-shadow: none;
 
     resize: none; /*remove the resize handle on the bottom right*/
+  }
+
+  ::-webkit-scrollbar {
+    width: 0px;
   }
 </style>
