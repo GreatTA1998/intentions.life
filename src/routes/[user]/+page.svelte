@@ -91,7 +91,7 @@
         {/if}
 
         <div class="container-for-float-cards">
-          <div class="glow-card-hover-effect rounded-card" style="width: 36%; overflow-y: auto;">
+          <div class="glow-card-hover-effect rounded-card" style="width: 36%;">
             <ZenJournalLeftNavigation 
               journal={userDoc.journal} 
               journalTitleFromMMDD={userDoc.journalTitleFromMMDD}
@@ -1146,7 +1146,7 @@
 
     /* Additional ways to blend the cards to the background suggested by Claude AI */
     /* 90% opacity without affecting children */
-    background-color: rgba(40, 40, 40, 0.6);
+    background-color: rgba(40, 40, 40, 0.7);
     color: white;
   } 
 

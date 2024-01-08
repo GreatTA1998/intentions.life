@@ -18,12 +18,12 @@
     type="text" 
     style="width: 100%; box-sizing: border-box; font-size: 28px; background: transparent; color: white; border-bottom: 1px solid rgb(180, 180, 180); padding-bottom: 4px; font-weight: 500;"
   >
-    {#if !willMusicAutoplay}
-      <span class="material-symbols-outlined" on:click={() => dispatch('toggle-music-autoplay', { newVal: true })} style="cursor: pointer;">
-        music_note
+    {#if willMusicAutoplay}
+      <span class="material-symbols-outlined" on:click={() => dispatch('toggle-music-autoplay', { newVal: false })} style="cursor: pointer; font-size: 32px">
+        music_cast
       </span> 
     {:else}
-      <span class="material-symbols-outlined" on:click={() => dispatch('toggle-music-autoplay', { newVal: false })} style="cursor: pointer;">
+      <span class="material-symbols-outlined" on:click={() => dispatch('toggle-music-autoplay', { newVal: true })} style="cursor: pointer; color: rgb(180, 180, 180)">
         music_off
       </span> 
     {/if}
