@@ -1146,7 +1146,7 @@
 
     /* Additional ways to blend the cards to the background suggested by Claude AI */
     /* 90% opacity without affecting children */
-    background-color: rgba(40, 40, 40, 0.7);
+    background-color: rgba(40, 40, 40, 0.75);
     color: white;
   } 
 
