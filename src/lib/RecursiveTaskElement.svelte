@@ -165,7 +165,7 @@
   }
 
   // calculate if a task is 1 day before the deadline / overdue
-  $: {
+  $: if (taskObj.deadlineDate && taskObj.deadlineTime) {
     const d1 = new Date()
     const d2 = convertDDMMYYYYToDateClassObject(taskObj.deadlineDate, taskObj.deadlineTime)
 

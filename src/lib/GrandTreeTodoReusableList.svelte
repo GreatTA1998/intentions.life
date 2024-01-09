@@ -170,20 +170,20 @@
   }
 
   function dispatchNewDeadline ({ taskID, deadlineDateDDMMYYYY, deadlineTimeHHMM }) {
-  dispatch('task-dragged', {
-    id: taskID,
-    timeOfDay: '',
-    deadlineTime: deadlineTimeHHMM, // 
-    deadlineDate: deadlineDateDDMMYYYY
-  })
+    dispatch('task-dragged', {
+      id: taskID,
+      timeOfDay: '',
+      deadlineTime: deadlineTimeHHMM, // 
+      deadlineDate: deadlineDateDDMMYYYY
+    })
 
-  console.log('If event is handled, taskObject would be =',{
-    id: taskID, 
-    timeOfDay: '',
-    deadlineTime: deadlineTimeHHMM, // 
-    deadlineDate: deadlineDateDDMMYYYY
-  })
-}
+    // console.log('If event is handled, taskObject would be =',{
+    //   id: taskID, 
+    //   timeOfDay: '',
+    //   deadlineTime: deadlineTimeHHMM, // 
+    //   deadlineDate: deadlineDateDDMMYYYY
+    // })
+  }
 </script>
 
 <style>

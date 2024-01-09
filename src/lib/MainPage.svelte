@@ -101,8 +101,8 @@
         <div class="container-for-float-cards">
           <div class="glow-card-hover-effect rounded-card" style="width: 36%;">
             <ZenJournalLeftNavigation 
-              journal={$user.journal || {}} 
-              journalTitleFromMMDD={$user.journalTitleFromMMDD || {}}
+              journal={$user.journal} 
+              journalTitleFromMMDD={$user.journalTitleFromMMDD}
               {currentJournalEntryMMDD}
               on:toggle-music-autoplay={(e) => updateMusicAutoplay(e)}
               on:journal-entry-select={(e) => currentJournalEntryMMDD = e.detail.newMMDD}
@@ -244,12 +244,6 @@
 -->
 
 <script>
-  export let data
-  // RENAME THIS TO USER_UID
-  // let { userID } = data; // GxBbopqXHW0qgjKEwU4z 
-  // $: ({ userID } = data); // so it stays in sync when `data` changes
-
-  // import FutureOverview from '../../lib/FutureOverview.svelte'
   import NavbarAndContentWrapper from '$lib/NavbarAndContentWrapper.svelte'
   import DetailedCardPopup from '$lib/DetailedCardPopup.svelte'
   import { MIKA_PIXELS_PER_HOUR, PIXELS_PER_HOUR, getNicelyFormattedDate, computeDayDifference, convertDDMMYYYYToDateClassObject } from '/src/helpers.js'
@@ -273,8 +267,6 @@
   import GrandTreeTodoPopupButton from '$lib/GrandTreeTodoPopupButton.svelte'
   import GrandTreeTodo from '$lib/GrandTreeTodo.svelte'
   import PopupCustomerSupport from '$lib/PopupCustomerSupport.svelte'
-
-  console.log("main page is created()")
 
   let snackbarTimeoutID = null
   let countdownRemaining = 0

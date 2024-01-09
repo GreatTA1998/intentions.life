@@ -28,6 +28,7 @@
   import { getAuth, onAuthStateChanged } from 'firebase/auth'
   import { getFirestore, doc, deleteDoc, getDoc, setDoc, updateDoc, increment, snapshotEqual, onSnapshot } from 'firebase/firestore'
   import { onDestroy, onMount } from 'svelte'
+  import { updateFirestoreDoc } from "/src/crud.js"
 
   let unsubUserSnapListener = null
 
@@ -56,8 +57,12 @@
           }
           else {
             user.set({ ...snap.data() }) // augment with id, path, etc. when needed in the future
+
+            if (!$hasFetchedUser) {
+              guaranteeBackwardsCompatibility($user)
+              hasFetchedUser.set(true) 
+            }
           }
-          hasFetchedUser.set(true) 
         })
       }
     })
@@ -72,6 +77,16 @@
   onDestroy(() => {
     if (unsubUserSnapListener) unsubUserSnapListener()
   })
+
+  // NOTE: somewhat brittle code. If `.journal` is every empty temporariliy, for whatever reason, the entire journal will wipe.
+  function guaranteeBackwardsCompatibility (userDoc) {
+    const correctionObj = {}
+    if (!userDoc.journal) correctionObj.journal = {}
+    if (!userDoc.journalTitleFromMMDD) correctionObj.journalTitleFromMMDD = {}
+    if (!userDoc.reusableTaskTemplates) correctionObj.reusableTaskTemplates = []
+
+    updateFirestoreDoc(`/users/${userDoc.uid}`, correctionObj)
+  }
 
 
   async function initializeNewFirestoreUser (ref, resultUser) {
