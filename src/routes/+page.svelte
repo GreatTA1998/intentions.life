@@ -14,7 +14,7 @@
         <div style="margin-left: auto; margin-right: 0px; display: flex; align-items: center;">
           <div
             on:click={createTemporaryDemoAccount}
-            style="cursor: pointer; border-radius: 24px; background-color: grey; display: flex; align-items: center; justify-content: center; height: 40px; color: white; padding: 6px 24px; margin-right: 12px;">
+            style="cursor: pointer; border-radius: 24px; background-color: rgb(160, 160, 160); display: flex; align-items: center; justify-content: center; height: 40px; color: white; padding: 6px 24px; margin-right: 12px;">
             <span class="material-symbols-outlined" style="margin-right: 4px;">
               play_arrow
               </span> 
