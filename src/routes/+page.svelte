@@ -76,7 +76,7 @@
     const auth = getAuth();
     signInAnonymously(auth)
       .then(() => {
-        alert("Welcome! You are about to be redirected to the demo. If at any point you want to return to the home page, just click the tree logo on the top left.")
+        alert("Welcome! You are about to be redirected to the demo. If the website seems broken, try reloading the page. If at any point you want to return to the home page, just click the tree logo on the top left.")
         // Signed in..
       })
       .catch((error) => {
