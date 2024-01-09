@@ -1,7 +1,7 @@
 <!-- {#if hasFetchedUser} -->
   <!-- <div id="background-image-holder" style="height: 100vh; display: flex; justify-content: center; align-items: center;"> -->
     <NavbarAndContentWrapper>
-      <div slot="navbar" class="top-navbar transparent-glow-navbar">
+      <div slot="navbar" class="top-navbar transparent-glow-navbar" style="background: transparent; border-bottom: 1px solid lightgrey;">
         <img 
           src="hand-drawn-twig-no-bg-cropped.png" 
           style="width: 26px; height: 36px; margin-left: 24px; margin-right: 6px;"
