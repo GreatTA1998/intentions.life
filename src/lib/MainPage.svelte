@@ -52,7 +52,14 @@
 <NavbarAndContentWrapper>
   <div slot="navbar" class="top-navbar" class:transparent-glow-navbar={currentMode === 'Day'}>
     <PopupCustomerSupport let:setIsPopupOpen={setIsPopupOpen}>
-      <img on:click={() => setIsPopupOpen({ newVal: true })}
+      <img on:click={() => {
+        if (!$user.email && !$user.phoneNumber) {
+          signOutOnFirebase();
+          goto('/');
+        } else {
+          setIsPopupOpen({ newVal: true })
+        }
+      }}
         src="hand-drawn-twig-no-bg-cropped.png" 
         style="width: 26px; height: 36px; margin-left: 24px; margin-right: 6px; cursor: pointer;"
       >
@@ -267,6 +274,8 @@
   import GrandTreeTodoPopupButton from '$lib/GrandTreeTodoPopupButton.svelte'
   import GrandTreeTodo from '$lib/GrandTreeTodo.svelte'
   import PopupCustomerSupport from '$lib/PopupCustomerSupport.svelte'
+  import { goto } from '$app/navigation';
+  import { getAuth, signOut } from 'firebase/auth'
 
   let snackbarTimeoutID = null
   let countdownRemaining = 0
@@ -301,6 +310,15 @@
   $: allTasks = [...$user.allTasks]
 
   $: computeDataStructuresFromAllTasks(allTasks)
+
+  function signOutOnFirebase () {
+    const auth = getAuth();
+    signOut(auth).then(() => {
+      // Sign-out successful.
+    }).catch((error) => {
+      // An error happened.
+    });
+  }
 
   function computeDataStructuresFromAllTasks (allTasks) {
     allIncompleteTasks = filterIncompleteTasks(allTasks)

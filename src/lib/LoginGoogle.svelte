@@ -1,23 +1,24 @@
 <div style="
-  background-color: rgb(87, 87, 87);
+  background-color: var(--accent-color);
   color: white; 
   margin-bottom: 2px;
   width: 200px;
   padding-top: 6px;
   padding-bottom: 6px;
-  border-radius: 8px;
+  border-radius: 24px;
   align-text: center;
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
+  height: 40px;
 "
   on:click={signInWithGoogle}
 >
-  <span class="material-icons" style="margin-right: 6px;">
-    mail
+  Create Account
+  <span class="material-symbols-outlined" style="font-size: 32px; margin-left: 4px;">
+    arrow_right_alt
   </span>
-  Google
 </div>
 
 <script>
