@@ -21,7 +21,7 @@
     {#each Object.keys(datesToTasks) as date}
       <div style="margin-top: 20px; margin-bottom: 20px;">
         <div>
-          <div style="font-size: 14px; margin-bottom: 2px; color:#6D6D6D">    
+          <div style="font-size: 14px; margin-bottom: 2px; color: rgb(80, 80, 80); font-weight: 300;">    
             {convertMMDDToReadableMonthDayForm(date)} {getDayOfWeek(date).toUpperCase()}
           </div>
         </div>
@@ -29,15 +29,15 @@
         {#each datesToTasks[date] as task}
           <div
             on:click={() => dispatch('task-click', { task })} 
-            style="display: flex; align-items: center; flex-wrap: nowrap;"
+            style="display: flex; align-items: center; flex-wrap: nowrap; padding: 2px;"
           >
             <div 
-              style="font-size: 16px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"
+              style="font-size: 14px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"
               class:grey-text={task.daysBeforeRepeating}
               class:purple-text={!task.daysBeforeRepeating}
             >
-              <span style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: rgb(10, 10, 10); font-weight: 500;">
-                {task.name + ' '}
+              <span style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: rgb(10, 10, 10); font-weight: 400;">
+                -{' ' + task.name + ' '}
               </span>({task.startTime})
             </div>
           </div>

@@ -5,6 +5,8 @@
         Life Organizer
       </h1>
 
+      <LoginGoogle/>
+
       <div style="display: flex; align-items: center; margin-left: 60px; margin-right: 60px;">
         <a on:click={() => goto('GxBbopqXHW0qgjKEwU4z')} style="margin-right: 40px;">
           Play around
@@ -27,20 +29,14 @@
 <script>
   import { goto } from '$app/navigation'
   import PhoneLogin from '../PhoneLogin.svelte'
-  import { hasFetchedUser } from '../store.js'
+  import LoginGoogle from '$lib/LoginGoogle.svelte'
+  import { hasFetchedUser } from '/src/store.js'
   import { onMount } from 'svelte'
 
   let isSigningIn
 
   onMount(() => {
-    // let bgImageURLs = [
-    //   'https://i.imgur.com/ShnqIpJ.jpeg', // airships 
-    //   // 'https://i.imgur.com/rzkUMW8.jpeg', // cute monsters
-    // ]
-    // let chosenBgImageURL
-    // chosenBgImageURL = bgImageURLs[getRandomInt(2)]
-    // const div = document.getElementById("background-image-holder")
-    // div.style['background-image'] = `url(${chosenBgImageURL})`
+
   })
 
   function getRandomInt(max) {

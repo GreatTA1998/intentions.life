@@ -7,8 +7,8 @@
       <slot>
         <!-- <GrandTreeTodoPopup/> injected here -->
       </slot>
-      <div style="margin-left: 8px; color: rgb(10, 10, 10); font-weight: 500">THIS WEEK'S </div> 
-      <div style="color: rgb(10, 10, 10); font-weight: 500; margin-left: 6px;">TO-DO</div>
+      <div style="margin-left: 8px; color: rgb(60, 60, 60); font-weight: 400">THIS WEEK'S </div> 
+      <div style="color: rgb(10, 10, 10); font-weight: 600; margin-left: 6px;">TO-DO</div>
     </div>
 
     {#if isMouseHoveringOnTaskName}

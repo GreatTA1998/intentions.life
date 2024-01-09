@@ -13,3 +13,5 @@ export const appModePixelsPerHour = writable(200/24)
 export const hasInitialScrolled = writable(false)
 
 export const showSnackbar = writable(false)
+
+export const userInfoFromAuthProvider = writable({})

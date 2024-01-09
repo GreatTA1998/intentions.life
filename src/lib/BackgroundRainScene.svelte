@@ -17,13 +17,12 @@
 
 <script>
   export let willMusicAutoplay
-
+  
   import { onMount } from 'svelte'
 
   let AudioElem
 
   $: if (AudioElem) {
-    AudioElem.src = chosenMusicFile
     AudioElem.volume = 0.2
   }
 </script>

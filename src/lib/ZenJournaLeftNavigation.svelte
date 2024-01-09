@@ -30,8 +30,7 @@
   import { createEventDispatcher } from 'svelte'
 
   $: sortedJournalDates = [...Object.keys(journal)].sort()
-
-  let currentlySelectedDate = getDateOfToday()
+  
   const dispatch = createEventDispatcher()
 </script>
 

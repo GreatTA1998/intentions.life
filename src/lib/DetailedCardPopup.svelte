@@ -333,7 +333,7 @@ function dispatchNewDeadline (e) {
     transform: translate(-50%, -50%);
     width: 58%;
     overflow-y: auto;
-    z-index: 3;
+    z-index: 4;
     min-width: 360px;
     
     height: fit-content;
