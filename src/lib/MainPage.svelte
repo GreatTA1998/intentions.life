@@ -93,7 +93,7 @@
   </div>
 
   <!-- position: relative; -->
-  <div slot="content" style="display: flex; flex-grow: 1; height: 100%; ">
+  <div slot="content" style="display: flex; flex-grow: 1; height: 100%;">
       {#if currentMode === 'Dashboard'}
         <LifeDashboard {allTasks}/>  
       {:else if currentMode === 'Day'}
@@ -1074,20 +1074,6 @@
     border-bottom: 1px solid #0085FF;
     color: #0085FF;
     font-weight: 500;
-  }
-
-  .top-navbar {
-    height: var(--navbar-height);
-    display: flex; 
-    align-items: center; 
-    padding-left: 24px; 
-    padding-right: 24px; 
-    border-bottom: 1px solid lightgrey;
-    background-color: rgb(250, 250, 250);
-
-    /* background holder has z-index 0 but somehow z-index 1 is not enough to cover it */
-    z-index: 2;
-    position: relative;
   }
 
   .transparent-glow-navbar {
