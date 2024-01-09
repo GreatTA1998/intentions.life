@@ -44,11 +44,19 @@
   <TheSnackbar on:task-done={(e) => toggleTaskCompleted(e.detail.id)}></TheSnackbar>
 {/if}
 
+<!-- Copy & paste snackbar -->
+{#if $showSnackbar}
+  <TheSnackbar>Email copied to clipboard successfully.</TheSnackbar>
+{/if}
+
 <NavbarAndContentWrapper>
   <div slot="navbar" class="top-navbar" class:transparent-glow-navbar={currentMode === 'Day'}>
-    <img src="hand-drawn-twig-no-bg-cropped.png" 
-      style="width: 26px; height: 36px; margin-left: 24px; margin-right: 6px;"
-    >
+    <PopupCustomerSupport let:setIsPopupOpen={setIsPopupOpen}>
+      <img on:click={() => setIsPopupOpen({ newVal: true })}
+        src="hand-drawn-twig-no-bg-cropped.png" 
+        style="width: 26px; height: 36px; margin-left: 24px; margin-right: 6px; cursor: pointer;"
+      >
+    </PopupCustomerSupport>
 
     <div class="day-week-toggle-segment">
       <div on:click={() => currentMode = 'Day'}
@@ -258,7 +266,7 @@
   import WeekView from '$lib/WeekView.svelte'
   import MonthView from '$lib/MonthView.svelte'
   import TheSnackbar from '$lib/TheSnackbar.svelte'
-  import { mostRecentlyDeletedOrCompletedTaskID, mostRecentlyCompletedTaskName, user } from '/src/store.js'
+  import { mostRecentlyDeletedOrCompletedTaskID, mostRecentlyCompletedTaskName, user, showSnackbar } from '/src/store.js'
   import CalendarThisWeek from '$lib/CalendarThisWeek.svelte'
   import TodoThisWeek from '$lib/TodoThisWeek.svelte'
   import FutureOverview from '$lib/FutureOverview.svelte'
@@ -268,6 +276,7 @@
   import LifeDashboard from '$lib/LifeDashboard.svelte'
   import GrandTreeTodoPopupButton from '$lib/GrandTreeTodoPopupButton.svelte'
   import GrandTreeTodo from '$lib/GrandTreeTodo.svelte'
+  import PopupCustomerSupport from '$lib/PopupCustomerSupport.svelte'
 
   let snackbarTimeoutID = null
   let countdownRemaining = 0

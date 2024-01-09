@@ -69,7 +69,7 @@
     <!-- class:visible-line={(i % subdivisionsPerBlock) === 0} -->
     {#each {length: subdivisionsPerBlock * timestamps.length} as _, i}
       <div 
-        style="height: { (timeBlockDurationInMinutes * pixelsPerMinute) / subdivisionsPerBlock  }px; box-sizing: border-box; margin-right: 0; margin-left: auto; width: 100%"
+        style="height: { (timeBlockDurationInMinutes * pixelsPerMinute) / subdivisionsPerBlock  }px; box-sizing: border-box; margin-right: 0; margin-left: auto; width: 100%;"
         class:highlighted-background={highlightedMinute === i}
         on:click|self={(e) => {
           isDirectlyCreatingTask = true

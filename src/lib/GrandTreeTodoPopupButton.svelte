@@ -111,7 +111,9 @@ onDestroy(() => {
   transform: translate(-50%, -50%);
   /* overflow-y: auto;
   overflow-x: auto; */
-  z-index: 2;
+  
+  /* z-index 3 because the base calendar uses z-index 0, 1, 2 */
+  z-index: 3;
   min-width: 300px;
   width: 92%;
   height: 88%;

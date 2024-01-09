@@ -1,11 +1,15 @@
 <div class="snack-wrap">
   <!-- animated -->
   <div class="snackbar" style="display: flex; align-items: center;">
-     <p>"{$mostRecentlyCompletedTaskName}" will now be hidden because it's completed</p>
-     <div style="margin-right: 2px; margin-left: auto;">
+    <slot>
+      <p>"{$mostRecentlyCompletedTaskName}" will now be hidden because it's completed</p>
+
+      <div style="margin-right: 2px; margin-left: auto;">
+
       <a on:click={undoComplete}>Undo</a>
-  
-     </div>
+
+      </div>
+    </slot>
   </div>
 </div>
 

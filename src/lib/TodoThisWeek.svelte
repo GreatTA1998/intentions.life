@@ -1,13 +1,4 @@
-<div style="
-    min-width: 400px; 
-    background-color: var(--todo-list-bg-color);
-    padding-left: 48px; 
-    padding-right: 24px;
-    padding-top: 36px;
-    font-size: 2em;
-    overflow-y: auto;
-  "  
->
+<div class="todo-container">
   <div style="display: flex; align-items: center"
     on:mouseenter={() => isMouseHoveringOnTaskName = true}
     on:mouseleave={() => isMouseHoveringOnTaskName = false}
@@ -159,3 +150,15 @@
     e.preventDefault()
   }
 </script>
+
+<style>
+  .todo-container {
+    min-width: 400px; 
+    background-color: var(--todo-list-bg-color);
+    padding-left: 48px; 
+    padding-right: 24px;
+    padding-top: 36px;
+    font-size: 2em;
+    overflow-y: auto;
+  }
+</style>
