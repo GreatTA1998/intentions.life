@@ -3,44 +3,42 @@
 </slot>
 
 {#if isPopupOpen}
-  <div class="detailed-card-popup">
-    <div style="display: flex; align-items: center;">
-      <div style="font-size: 28px;">Have a problem?</div>
-
-      <span class="material-symbols-outlined" on:click={() => isPopupOpen = false} style="font-size: 24px; margin-left: 8px; cursor: pointer; margin-right: 0px; margin-left: auto;">
-        close
-      </span>
-    </div>
-
-    <div style="margin-top: 24px; margin-bottom: 24px;">
-      Thanks for trying Life Organizer. If you are running into issues or have any suggestions, let me know and I can often act on it within 24 hours.
-    </div>
-
-    <div style="display: flex; align-items: center;">
-      <span class="material-symbols-outlined" style="margin-right: 6px;">
-        call
-      </span>
-      <div style="font-weight: 500;"> 
-        +1 503 250 3868
-      </div>
-    </div>
-
-    <div style="display: flex; align-items: center;">
-      <span class="material-symbols-outlined" style="margin-right: 6px;">
-        mail
-      </span>
-
-      <div style="font-weight: 500; margin-right: 12px;">
-      elton@explanations.app
+  <div class="fullscreen-invisible-modular-popup-layer">
+    <div class="detailed-card-popup" use:clickOutside on:click_outside={() => isPopupOpen = false}>
+      <div style="display: flex; align-items: center;">
+        <div style="font-size: 28px;">Have a problem?</div>
       </div>
 
-      <div on:click={copyEmailToClipboard} style="color: #cc7837; border-radius: 24px; border: 2px solid #cc7837; cursor: pointer; display: flex; align-items: center; padding: 6px 8px; font-size: 24px;">
-        <div style="font-size: 14px; margin-right: 4px; color: #cc7837; font-weight: 600;">
-          Copy email
-        </div>
-        <span class="material-symbols-outlined">
-          content_copy
+      <div style="margin-top: 24px; margin-bottom: 24px;">
+        Hello! Thanks for trying Life Organizer. If you are running into issues or have any suggestions, let me know and I can often act on it within 24 hours.
+      </div>
+
+      <div style="display: flex; align-items: center;">
+        <span class="material-symbols-outlined" style="margin-right: 6px;">
+          call
         </span>
+        <div style="font-weight: 500;"> 
+          +1 503 250 3868
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: center;">
+        <span class="material-symbols-outlined" style="margin-right: 6px;">
+          mail
+        </span>
+
+        <div style="font-weight: 500; margin-right: 12px;">
+        elton@explanations.app
+        </div>
+
+        <div on:click={copyEmailToClipboard} style="color: #cc7837; border-radius: 24px; border: 2px solid #cc7837; cursor: pointer; display: flex; align-items: center; padding: 6px 8px; font-size: 24px;">
+          <div style="font-size: 14px; margin-right: 4px; color: #cc7837; font-weight: 600;">
+            Copy email
+          </div>
+          <span class="material-symbols-outlined">
+            content_copy
+          </span>
+        </div>
       </div>
     </div>
   </div>
@@ -48,6 +46,7 @@
 
 <script>
   import { showSnackbar } from '/src/store.js'
+  import { clickOutside } from '/src/helpers.js'
 
 
   let isPopupOpen = false

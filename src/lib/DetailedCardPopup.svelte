@@ -1,135 +1,133 @@
-<div class="detailed-card-popup" bind:this={elem} use:clickOutside on:click_outside={handleClickOutside}>
-  <div style="display: flex; align-items: center;">
-    <input
-      checked={taskObject.isDone}
-      on:change={(e) => {
-        dispatch('task-checkbox-change', {
-          isDone: e.target.checked,
-          id: taskObject.id
-        })
-      }} 
-      type="checkbox" 
-      style="zoom: 2.2; margin: 0; margin-right: 6px;"
-    >
-
-    <input 
-      type="text" 
-      bind:value={titleOfTask} 
-      on:input={(e) => debouncedSaveTitle(e.target.value)}
-      placeholder="Untitled"
-      style="width: 100%; box-sizing: border-box; font-size: 24px;"
-    >
-
-    <span class="material-symbols-outlined" on:click={() => dispatch('card-close')} style="font-size: 30px; margin-left: 8px; cursor: pointer;">
-      close
-    </span>
-  </div>
-
-  <!-- In future, display in readable month / day form -->
-  <div
-    class:half-invisible={!isScheduled(taskObject)}
-    style="display: flex; align-items: center; justify-content: space-between; margin-top: 24px; font-size: 1.2em; "
-  >
-    <div style="display: flex;">
-      <div style="width: 134px;">
-        <UXFormField
-          fieldLabel="Start"
-          value={taskObject.startDate + ' ' + taskObject.startTime}
-          placeholder="MM/DD hh:mm"
-        />
-      </div>
-
-      <div style="margin-left: 6px; margin-right: 6px;">
-        
-      </div>
-
-      <div style="width: 134px;">
-        <UXFormField
-          fieldLabel="End"
-          value={taskObject.startDate + ' ' + taskObject.startTime}
-        />
-      </div>
-
-      {#if isEditingStartDate || isEditingStartTime}
-        <div style="margin-left: 6px; opacity: 0.8">
-          (press ENTER to apply changes)
-        </div>
-      {/if}
-    </div>
-
-    {#if isEditingDeadline}
-      <button on:click={() => saveDeadline(newDeadlineDate, newDeadlineTime)}>Save changes</button>
-    {/if}
-
-    <!-- 178px is the min. width that fully contains the placeholder text -->
-    <div class:half-invisible={!hasDeadline(taskObject)} 
-      style="font-size: 1.2em; display: flex; align-items: center; width: 178px;"
-    >
-      <UXFormField
-        fieldLabel="Deadline"
-        value={currentDeadlineValue}
-        placeholder="dd/mm/yyyy hh:mm"
-        on:input={(e) => handleDeadlineInput(e)}
-      >
-        <span slot="icon" class="material-symbols-outlined" style="margin-right: 4px; font-size: 18px; color: {hasDeadline(taskObject) ? 'red' : ''};">
-          alarm
-        </span>
-      </UXFormField>
-    </div>
-  </div>
-
-  <div style="width: 100%; margin-top: 24px; margin-bottom: 24px;">
-    <UXFormTextArea fieldLabel="Description"
-      value={notesAboutTask}
-      on:input={(e) => debouncedSaveNotes(e.detail)}
-      placeholder=""
-    />
-  </div>
-
-  <div style="margin-top: 0px; display: flex; align-items: center; justify-content: space-between;">
-    <DetailedCardPopupRepeat 
-      {taskObject}
-      on:repeating-tasks-generate
-    />
-
+<div class="fullscreen-invisible-modular-popup-layer">
+  <div class="detailed-card-popup" bind:this={elem} use:clickOutside on:click_outside={handleClickOutside}>
     <div style="display: flex; align-items: center;">
-      <a style="height: 36px; max-width: 240px;"
-        on:click={() => {dispatch('task-reusable'); alert('Success, when you click on the calendar and type a task, matching reusable tasks will appear. You can track how much time you spend on this task by visiting the time spent dashboard on the top right.')}}
+      <input
+        checked={taskObject.isDone}
+        on:change={(e) => {
+          dispatch('task-checkbox-change', {
+            isDone: e.target.checked,
+            id: taskObject.id
+          })
+        }} 
+        type="checkbox" 
+        style="zoom: 2.2; margin: 0; margin-right: 6px;"
       >
-        Create reusable template
-      </a>
 
-      <span class="material-symbols-outlined"  on:click={confirmDelete} style="cursor: pointer; margin-left: 6px; border: 1px solid grey; border-radius: 24px; padding: 4px;">
-        delete
-      </span>
-    </div>
-  </div>
-
-  <!-- This is the section where you show everything regardless of whether it is scheduled or not -->
-  {#if taskObject.children.length > 0}
-    <div style="font-size: 1rem; margin-top: 36px; margin-bottom: 12px; font-weight: 400;">
-      Full task history
-    </div>
-
-    {#each taskObject.children as child}
-      <div style="margin-left: 12px;">
-      <RecursiveBulletPoint 
-        taskObject={child}
-        on:task-click
+      <input 
+        type="text" 
+        bind:value={titleOfTask} 
+        on:input={(e) => debouncedSaveTitle(e.target.value)}
+        placeholder="Untitled"
+        style="width: 100%; box-sizing: border-box; font-size: 24px;"
       >
-      
-      </RecursiveBulletPoint>
+    </div>
+
+    <!-- In future, display in readable month / day form -->
+    <div
+      class:half-invisible={!isScheduled(taskObject)}
+      style="display: flex; align-items: center; justify-content: space-between; margin-top: 24px; font-size: 1.2em; "
+    >
+      <div style="display: flex;">
+        <div style="width: 134px;">
+          <UXFormField
+            fieldLabel="Start"
+            value={taskObject.startDate + ' ' + taskObject.startTime}
+            placeholder="MM/DD hh:mm"
+          />
+        </div>
+
+        <div style="margin-left: 6px; margin-right: 6px;">
+          
+        </div>
+
+        <div style="width: 134px;">
+          <UXFormField
+            fieldLabel="End"
+            value={taskObject.startDate + ' ' + taskObject.startTime}
+          />
+        </div>
+
+        {#if isEditingStartDate || isEditingStartTime}
+          <div style="margin-left: 6px; opacity: 0.8">
+            (press ENTER to apply changes)
+          </div>
+        {/if}
       </div>
-    {/each}
-  {/if}
 
-  <!-- <div class="google-calendar-event-detail" style="margin-top: 12px; margin-left: 16px;">
-    {#if taskObject.daysBeforeRepeating}
-      { taskObject.repeatType || ''}  repeats every {taskObject.daysBeforeRepeating} days, 
-      completed {taskObject.completionCount || 0} times, 
-      missed { taskObject.missedCount || 0} times
+      {#if isEditingDeadline}
+        <button on:click={() => saveDeadline(newDeadlineDate, newDeadlineTime)}>Save changes</button>
+      {/if}
+
+      <!-- 178px is the min. width that fully contains the placeholder text -->
+      <div class:half-invisible={!hasDeadline(taskObject)} 
+        style="font-size: 1.2em; display: flex; align-items: center; width: 178px;"
+      >
+        <UXFormField
+          fieldLabel="Deadline"
+          value={currentDeadlineValue}
+          placeholder="dd/mm/yyyy hh:mm"
+          on:input={(e) => handleDeadlineInput(e)}
+        >
+          <span slot="icon" class="material-symbols-outlined" style="margin-right: 4px; font-size: 18px; color: {hasDeadline(taskObject) ? 'red' : ''};">
+            alarm
+          </span>
+        </UXFormField>
+      </div>
+    </div>
+
+    <div style="width: 100%; margin-top: 24px; margin-bottom: 24px;">
+      <UXFormTextArea fieldLabel="Description"
+        value={notesAboutTask}
+        on:input={(e) => debouncedSaveNotes(e.detail)}
+        placeholder=""
+      />
+    </div>
+
+    <div style="margin-top: 0px; display: flex; align-items: center; justify-content: space-between;">
+      <DetailedCardPopupRepeat 
+        {taskObject}
+        on:repeating-tasks-generate
+      />
+
+      <div style="display: flex; align-items: center;">
+        <a style="height: 36px; max-width: 240px;"
+          on:click={() => {dispatch('task-reusable'); alert('Success, when you click on the calendar and type a task, matching reusable tasks will appear. You can track how much time you spend on this task by visiting the time spent dashboard on the top right.')}}
+        >
+          Create reusable template
+        </a>
+
+        <span class="material-symbols-outlined"  on:click={confirmDelete} style="cursor: pointer; margin-left: 6px; border: 1px solid grey; border-radius: 24px; padding: 4px;">
+          delete
+        </span>
+      </div>
+    </div>
+
+    <!-- This is the section where you show everything regardless of whether it is scheduled or not -->
+    {#if taskObject.children.length > 0}
+      <div style="font-size: 1rem; margin-top: 36px; margin-bottom: 12px; font-weight: 400;">
+        Full task history
+      </div>
+
+      {#each taskObject.children as child}
+        <div style="margin-left: 12px;">
+        <RecursiveBulletPoint 
+          taskObject={child}
+          on:task-click
+        >
+        
+        </RecursiveBulletPoint>
+        </div>
+      {/each}
     {/if}
-  </div> -->
+
+    <!-- <div class="google-calendar-event-detail" style="margin-top: 12px; margin-left: 16px;">
+      {#if taskObject.daysBeforeRepeating}
+        { taskObject.repeatType || ''}  repeats every {taskObject.daysBeforeRepeating} days, 
+        completed {taskObject.completionCount || 0} times, 
+        missed { taskObject.missedCount || 0} times
+      {/if}
+    </div> -->
+  </div>
 </div>
 
 <script>
@@ -221,7 +219,7 @@ function confirmDelete () {
 }
 
 function handleClickOutside (e) {
-  // dispatch('card-close')
+  dispatch('card-close')
 }
 
 function handleInput (e) {

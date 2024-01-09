@@ -3,63 +3,65 @@
 </span>
 
 {#if isPopupOpen}
-  <div class="my-popup" 
-    bind:this={elem} 
-    use:clickOutside on:click_outside={handleClickOutside}
-  >    
-    <div style="overflow: auto; height: 100%; width: 100%;">
-      <div style="
-        display: flex; 
-        height: 100%;
-        justify-content: space-between; 
-        align-items: start;
-        flex-wrap: nowrap;
-        "
-      >
-        <div style="width: 20%;">
-          <GrandTreeTodoReusableList
-            listTitle="TODAY"
-            {allIncompleteTasks}
-            dueInHowManyDays={1}
-            on:new-root-task
-            on:task-unscheduled
-            on:task-node-update
-            on:task-click
-            on:task-dragged
-          />  
+  <div class="fullscreen-invisible-modular-popup-layer">
+    <div class="my-popup" 
+      bind:this={elem} 
+      use:clickOutside on:click_outside={handleClickOutside}
+    >    
+      <div style="overflow: auto; height: 100%; width: 100%;">
+        <div style="
+          display: flex; 
+          height: 100%;
+          justify-content: space-between; 
+          align-items: start;
+          flex-wrap: nowrap;
+          "
+        >
+          <div style="width: 20%;">
+            <GrandTreeTodoReusableList
+              listTitle="TODAY"
+              {allIncompleteTasks}
+              dueInHowManyDays={1}
+              on:new-root-task
+              on:task-unscheduled
+              on:task-node-update
+              on:task-click
+              on:task-dragged
+            />  
 
-          <!-- 6% height margin looks equivalent to 1% width margin (so separation between all todo lists look equal) -->
-          <div style="margin-bottom: 5%;"></div>
+            <!-- 6% height margin looks equivalent to 1% width margin (so separation between all todo lists look equal) -->
+            <div style="margin-bottom: 5%;"></div>
 
-          <GrandTreeTodoReusableList
-            listTitle="THIS WEEK"
-            {allIncompleteTasks}
-            dueInHowManyDays={7}
-            on:new-root-task
-            on:task-unscheduled
-            on:task-node-update
-            on:task-click
-            on:task-dragged
-          />  
-        </div>
+            <GrandTreeTodoReusableList
+              listTitle="THIS WEEK"
+              {allIncompleteTasks}
+              dueInHowManyDays={7}
+              on:new-root-task
+              on:task-unscheduled
+              on:task-node-update
+              on:task-click
+              on:task-dragged
+            />  
+          </div>
 
-        <div style="width: 20%;  height: 100%; overflow-y: auto;" class="round-scrollbar">
-          <GrandTreeTodoReusableList
-            listTitle="THIS MONTH"
-            {allIncompleteTasks}
-            dueInHowManyDays={30}
-            on:new-root-task
-            on:task-unscheduled
-            on:task-node-update
-            on:task-click
-            on:task-dragged
-          />  
-        </div>
+          <div style="width: 20%;  height: 100%; overflow-y: auto;" class="round-scrollbar">
+            <GrandTreeTodoReusableList
+              listTitle="THIS MONTH"
+              {allIncompleteTasks}
+              dueInHowManyDays={30}
+              on:new-root-task
+              on:task-unscheduled
+              on:task-node-update
+              on:task-click
+              on:task-dragged
+            />  
+          </div>
 
-        <div style="width: 58%; height: 100%; overflow-x: auto;">
-          <slot>
-            <!-- GrandTreeTodo will be injected via the parent,, so no interface will need to be changed -->
-          </slot>
+          <div style="width: 58%; height: 100%; overflow-x: auto;">
+            <slot>
+              <!-- GrandTreeTodo will be injected via the parent,, so no interface will need to be changed -->
+            </slot>
+          </div>
         </div>
       </div>
     </div>
