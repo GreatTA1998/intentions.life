@@ -30,15 +30,21 @@
       <div style="display: flex; align-items: center;">
         <div style="width: 134px;">
           <UXFormField
-            fieldLabel="Start"
+            fieldLabel="Scheduled for"
             value={taskObject.startDate + ' ' + taskObject.startTime}
             on:input={(e) => handleTaskStartInput(e)}
             placeholder="MM/DD hh:mm"
           />
         </div>
 
-        <div style="margin-left: 24px; margin-right: 6px;">
-          For {taskObject.duration || 0} minutes
+        <div style="margin-left: 24px; margin-right: 6px; width: 80px;">
+          <UXFormField
+            fieldLabel="Minutes"
+            value={taskObject.duration}
+            on:input={(e) => debouncedSaveDuration(e)}
+          >
+
+          </UXFormField>
         </div>
 
         <!-- <div style="width: 134px;">
@@ -51,15 +57,15 @@
       </div>
 
       {#if isEditingTaskStart}
-        <button on:click={() => saveTaskStart(newStartMMDD, newStartHHMM)}>Update task start</button>
+        <ReusableRoundButton on:click={() => saveTaskStart(newStartMMDD, newStartHHMM)} backgroundColor="rgb(0, 89, 125)" textColor="white">Save changes</ReusableRoundButton>
       {/if}
 
-      {#if isEditingTaskEnd}
-        <button on:click={() => saveTaskEnd(newEndMMDD, newEndHHMM)}>Update task end</button>
-      {/if}
+      <!-- {#if isEditingTaskEnd}
+        <ReusableRoundButton on:click={() => saveTaskEnd(newEndMMDD, newEndHHMM)}>Update task end</ReusableRoundButton>
+      {/if} -->
 
       {#if isEditingDeadline}
-        <button on:click={() => saveDeadline(newDeadlineDate, newDeadlineTime)}>Update deadline</button>
+        <ReusableRoundButton on:click={() => saveDeadline(newDeadlineDate, newDeadlineTime)} backgroundColor="rgb(0, 89, 125)" textColor="white">Save changes</ReusableRoundButton>
       {/if}
 
       <!-- 178px is the min. width that fully contains the placeholder text -->
@@ -144,6 +150,7 @@ import { getDateOfToday, getRandomID, clickOutside, getDateInDDMMYYYY, getCurren
 import DetailedCardPopupRepeat from '$lib/DetailedCardPopupRepeat.svelte'
 import UXFormField from '$lib/UXFormField.svelte'
 import UXFormTextArea from '$lib/UXFormTextArea.svelte'
+import ReusableRoundButton from '$lib/ReusableRoundButton.svelte'
 import ReusableDatePicker from '$lib/ReusableDatePicker.svelte'
 
 export let taskObject 
@@ -200,6 +207,15 @@ onDestroy(() => {
 
 const debouncedSaveTitle = _.debounce(saveTitle, 800)
 const debouncedSaveNotes = _.debounce(saveNotes, 1500)
+const debouncedSaveDuration = _.debounce(saveDuration, 1000)
+
+function saveDuration (e) {
+  const newValue = e.detail.value
+  if (typeof Number(newValue) !== 'number') {
+    return 
+  }
+  dispatch('task-duration-adjusted', { id: taskObject.id, duration: Number(newValue) })
+}
 
 function saveTaskStart (MMDD, HHMM) {
   taskObject.startTime = HHMM
@@ -209,6 +225,7 @@ function saveTaskStart (MMDD, HHMM) {
     newStartDate: MMDD,
     newStartTime: HHMM
   })
+  isEditingTaskStart = false
 }
 
 function saveTaskEnd () {

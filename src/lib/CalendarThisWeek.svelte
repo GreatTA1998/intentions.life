@@ -12,7 +12,7 @@
       </div>
 
       <!-- TO-DO: figure out a scroll-only solution -->
-      <!-- <div style="display: flex; margin-top: 4px;">
+      <div style="display: flex; margin-top: 4px;">
         <div>
           <span on:click={() => dispatch('calendar-shifted', { days: -1 })} class="material-icons shift-calendar-arrow">
             arrow_left
@@ -24,7 +24,7 @@
             arrow_right
           </span>
         </div>
-      </div> -->
+      </div>
     </div>
     <!-- End of absolute element -->
 

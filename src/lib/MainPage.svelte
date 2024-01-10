@@ -16,6 +16,7 @@
       on:task-dragged={(e) => changeTaskDeadline(e.detail)}
       on:repeating-tasks-generate={(e) => uploadGeneratedTasks(e.detail)}
       on:task-checkbox-change={(e) => toggleTaskCompleted(e.detail.id)}
+      on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
     />
   {/if}
 {/key}
@@ -810,7 +811,7 @@
     })
   }
 
-  async function changeTaskDuration ({ taskName, id, duration }) {
+  async function changeTaskDuration ({ id, duration }) {
     traverseAndUpdateTree({
       fulfilsCriteria: (task) => task.id === id,
       applyFunc: (task) => task.duration = duration
