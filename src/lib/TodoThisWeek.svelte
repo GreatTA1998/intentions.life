@@ -155,10 +155,16 @@
   .todo-container {
     min-width: 400px; 
     background-color: var(--todo-list-bg-color);
-    padding-left: 48px; 
-    padding-right: 24px;
+    padding-left: 2vw; 
+    padding-right: 2vw;
     padding-top: 36px;
     font-size: 2em;
     overflow-y: auto;
+  }
+
+  @media (max-width: 1279.99px) {
+    .todo-container {
+      min-width: 300px;
+    }
   }
 </style>

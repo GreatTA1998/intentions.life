@@ -37,7 +37,7 @@
               class:purple-text={!task.daysBeforeRepeating}
             >
               <span style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: rgb(10, 10, 10); font-weight: 400;">
-                -{' ' + task.name + ' '}
+                {' ' + task.name + ' '}
               </span>({task.startTime})
             </div>
           </div>
@@ -106,14 +106,13 @@ const minimumContainerHeight = 20
   @media only screen and (max-width : 480px) {
     #future-overview-scroll-parent {
       height: 100%; 
-      width: 200px;
+      width: 100%;
     }
   }
 
   @media only screen and (min-width : 480px) {
     #future-overview-scroll-parent {
-      height: 100vh;
-      width: 10vw; 
+      /* height: 100vh; */
     }
   }
 

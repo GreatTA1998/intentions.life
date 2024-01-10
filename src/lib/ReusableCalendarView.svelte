@@ -5,8 +5,8 @@
   class="scroll-container"
   style="
     position: relative;
-    width: {willShowTimestamps ? '15vw' : 'calc(15vw - 36px)'};
-    background-color: {backgroundColor};
+    width: 160px;
+    background-color: var(--calendar-bg-color);
     flex-grow: 1;
   "
 >
@@ -46,7 +46,7 @@
             pixelsPerMinute
           })}px;
           left: {willShowTimestamps ? 36 : 0}px;
-          width: calc(15vw - 48px);
+          width: 100%;
         "
       >
         <ReusableTaskElement
@@ -69,7 +69,7 @@
     <!-- class:visible-line={(i % subdivisionsPerBlock) === 0} -->
     {#each {length: subdivisionsPerBlock * timestamps.length} as _, i}
       <div 
-        style="height: { (timeBlockDurationInMinutes * pixelsPerMinute) / subdivisionsPerBlock  }px; box-sizing: border-box; margin-right: 0; margin-left: auto; width: 100%;"
+        style="height: { (timeBlockDurationInMinutes * pixelsPerMinute) / subdivisionsPerBlock  }px; box-sizing: border-box; margin-right: 0; margin-left: auto; width: 100%; outline: 0px solid red;"
         class:highlighted-background={highlightedMinute === i}
         on:click|self={(e) => {
           isDirectlyCreatingTask = true
@@ -88,9 +88,10 @@
         style="
           top: {yPosition - formFieldTopPadding}px;
           position: absolute;
-          width: 90%; 
+          width: 98%; 
           padding-left: 0px; 
           padding-right: 0px;
+          box-sizing: border-box;
         "
       >
         <UXFormField
@@ -168,7 +169,6 @@
   export let subdivisionsPerBlock 
 
   export let willShowTimestamps = true
-  export let backgroundColor = 'transparent'
 
   let overallContainerHeight 
 
@@ -404,24 +404,6 @@
   width: 100%;
 }
 
-
-@media only screen and (max-width : 480px) {
-  #scroll-container {
-    width: 200px;
-  }
-  #calendar-day-container {
-    width: 100px;
-  }
-}
-
-@media only screen and (min-width : 480px) {
-  #scroll-container {
-    width: 12vw;
-  }
-  #calendar-day-container {
-    width: 12vw;
-  }
-} 
 
   .green-text {
     color: #0085FF;

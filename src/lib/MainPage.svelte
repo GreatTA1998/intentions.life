@@ -50,7 +50,7 @@
 {/if}
 
 <NavbarAndContentWrapper>
-  <div slot="navbar" class="top-navbar" class:transparent-glow-navbar={currentMode === 'Day'}>
+  <div slot="navbar" class="top-navbar" class:transparent-glow-navbar={currentMode === 'Day'} style="padding-left: 2vw; padding-right: 2vw;">
     <PopupCustomerSupport let:setIsPopupOpen={setIsPopupOpen}>
       <img on:click={() => {
         if (!$user.email && !$user.phoneNumber) {
@@ -61,7 +61,7 @@
         }
       }}
         src="hand-drawn-twig-no-bg-cropped.png" 
-        style="width: 26px; height: 36px; margin-left: 24px; margin-right: 6px; cursor: pointer;"
+        style="width: 26px; height: 36px; margin-right: 6px; cursor: pointer;"
       >
     </PopupCustomerSupport>
 
@@ -81,15 +81,15 @@
       </div>
     </div>
 
-    <a on:click={() => currentMode === 'Dashboard' ? currentMode = 'Week' : currentMode = 'Dashboard'} 
+    <!-- <a on:click={() => currentMode === 'Dashboard' ? currentMode = 'Week' : currentMode = 'Dashboard'} 
       class="mika-hover circular-icon-button" 
       class:blue-focus={currentMode === 'Dashboard'}
       role="button" 
-    >
-      <span class="material-symbols-outlined mika-hover" class:blue-icon={currentMode === 'Dashboard'} style="font-size: 32px;">
+    > -->
+      <span on:click={() => currentMode === 'Dashboard' ? currentMode = 'Week' : currentMode = 'Dashboard'}  class="material-symbols-outlined mika-hover" class:blue-icon={currentMode === 'Dashboard'} style="font-size: 32px; cursor: pointer;">
         signal_cellular_alt
       </span>
-    </a>
+    <!-- </a> -->
   </div>
 
   <!-- position: relative; -->
@@ -192,8 +192,7 @@
     
         <!-- 3rd flex child -->
         {#if currentMode === 'Week' && allTasks}
-          <div style="padding-top: {36}px; padding-left: 36px; padding-right: 36px; background-color: var(--todo-list-bg-color); width: 14vw; min-width: 332px;"
-          >
+          <div class="future-overview-parent" style="background-color: var(--future-overview-bg-color)">
             <FutureOverview
               {futureScheduledTasks}
               on:task-duration-adjusted
@@ -994,6 +993,19 @@
 </script>
 
 <style>  
+  .future-overview-parent {
+    min-width: 332px;
+    padding-top: 36px; padding-left: 2vw; padding-right: 2vw;
+  }
+
+  @media (max-width: 1279.99px) {
+    .future-overview-parent {
+      min-width: 120px;
+      padding-left: 12px; 
+      padding-right: 12px;
+    }
+  }
+
   .rounded-card {
     /* border-radius: 36px; */
     padding: 24px;
@@ -1092,43 +1104,6 @@
     background-color: rgba(40, 40, 40, 0.75);
     color: white;
   } 
-
-  .mika-rectangle {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100px; 
-    height: 40px;
-    color: black;
-    /* color: #0085FF; */
-    border: 1px solid #F4F4F4;
-    background-color: #F4F4F4;
-    vertical-align: middle;
-    border-radius: 20px;
-    margin: 0px 2px;
-    padding: 0px;
-    font-size: 15px;
-  }
-
-  .mika-rectangle:hover {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100px; 
-    height: 40px;
-    color: #ffffff;
-    background-color: #0085FF;
-    border: 1px solid #F4F4F4;
-    vertical-align: middle;
-    border-radius: 20px;
-    margin: 0px 2px;
-    transition: all 0.2s ease-out;
-  }
-
-  .selected-rectangle {
-    background: #0085FF;
-    color: white;
-  }
 
   /* Small Devices, Tablets and bigger devices */
   @media only screen and (min-width : 480px) {

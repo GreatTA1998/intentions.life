@@ -1,6 +1,5 @@
-<div style="position: relative;">
-
-      <!-- Absolute element is not in the flex flow -->
+<div style="position: relative; background-color: var(--calendar-bg-color);">
+    <!-- Absolute element is not in the flex flow -->
     <!-- e.g. DEC 2023 -->
     <div style="position: absolute; left: var(--calendar-section-left-spacing); top: {36 + 4}px; z-index: 2">
       <div style="display: flex; font-size: 14px;">
@@ -74,7 +73,6 @@
               calendarBeginningDateClassObject={dateClassObj}
               scheduledTasks={getScheduledTasks(dateClassObj)}
               timestamps={timesOfDay}
-              backgroundColor='rgb(250, 250, 250)'
               willShowTimestamps={false}
               pixelsPerHour={MIKA_PIXELS_PER_HOUR}
               timeBlockDurationInMinutes={60}
@@ -219,7 +217,7 @@
     color: #6D6D6D;
 
     /* opaque, so that shifted calendar content will go "underneath" the timestamps */
-    background-color: rgb(250, 250, 250);
+    background-color: var(--calendar-bg-color);
     z-index: 2;
     font-size: 12px;
   }
@@ -272,7 +270,7 @@
 
   .sticky-day-of-week-abbreviation {
     font-size: 1.4em;
-    background-color: rgb(250, 250, 250);
+    background-color: var(--calendar-bg-color);
     color: #6D6D6D;
     height: 100px;
     
