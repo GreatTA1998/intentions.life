@@ -27,35 +27,39 @@
       class:half-invisible={!isScheduled(taskObject)}
       style="display: flex; align-items: center; justify-content: space-between; margin-top: 24px; font-size: 1.2em; "
     >
-      <div style="display: flex;">
+      <div style="display: flex; align-items: center;">
         <div style="width: 134px;">
           <UXFormField
             fieldLabel="Start"
             value={taskObject.startDate + ' ' + taskObject.startTime}
+            on:input={(e) => handleTaskStartInput(e)}
             placeholder="MM/DD hh:mm"
           />
         </div>
 
-        <div style="margin-left: 6px; margin-right: 6px;">
-          
+        <div style="margin-left: 24px; margin-right: 6px;">
+          For {taskObject.duration} minutes
         </div>
 
-        <div style="width: 134px;">
+        <!-- <div style="width: 134px;">
           <UXFormField
             fieldLabel="End"
             value={taskObject.startDate + ' ' + taskObject.startTime}
+            on:input={(e) => handleTaskEndInput(e)}
           />
-        </div>
-
-        {#if isEditingStartDate || isEditingStartTime}
-          <div style="margin-left: 6px; opacity: 0.8">
-            (press ENTER to apply changes)
-          </div>
-        {/if}
+        </div> -->
       </div>
 
+      {#if isEditingTaskStart}
+        <button on:click={() => saveTaskStart(newStartMMDD, newStartHHMM)}>Update task start</button>
+      {/if}
+
+      {#if isEditingTaskEnd}
+        <button on:click={() => saveTaskEnd(newEndMMDD, newEndHHMM)}>Update task end</button>
+      {/if}
+
       {#if isEditingDeadline}
-        <button on:click={() => saveDeadline(newDeadlineDate, newDeadlineTime)}>Save changes</button>
+        <button on:click={() => saveDeadline(newDeadlineDate, newDeadlineTime)}>Update deadline</button>
       {/if}
 
       <!-- 178px is the min. width that fully contains the placeholder text -->
@@ -146,13 +150,18 @@ export let taskObject
 
 let depth = 1
 
-let newStartDate 
-let newStartTime
 
 let newDeadlineDate
 let newDeadlineTime
 
-let isEditingStartTime = false
+let isEditingTaskStart = false
+let newStartMMDD
+let newStartHHMM
+
+let isEditingTaskEnd = false
+let newEndMMDD
+let newEndHHMM 
+
 let isEditingStartDate = false
 let isEditingDuration = false
 
@@ -192,6 +201,20 @@ onDestroy(() => {
 const debouncedSaveTitle = _.debounce(saveTitle, 800)
 const debouncedSaveNotes = _.debounce(saveNotes, 1500)
 
+function saveTaskStart (MMDD, HHMM) {
+  taskObject.startTime = HHMM
+  taskObject.startDate = MMDD
+  dispatch('task-schedule', {
+    id: taskObject.id,
+    newStartDate: MMDD,
+    newStartTime: HHMM
+  })
+}
+
+function saveTaskEnd () {
+
+}
+
 function saveDeadline (DDMMYYYY, HHMM) {
   taskObject.deadlineDate = DDMMYYYY
   taskObject.deadlineTime = HHMM
@@ -205,6 +228,20 @@ function saveDeadline (DDMMYYYY, HHMM) {
 
   isEditingDeadline = false
 }
+
+function handleTaskStartInput (e) {
+  isEditingTaskStart = true
+  const newVal = e.detail.value
+  newStartMMDD = newVal.split(" ")[0]
+  newStartHHMM = newVal.split(" ")[1]
+}
+
+// function handleTaskEndInput (e) {
+//   isEditingTaskEnd = true
+//   const newVal = e.detail.value
+//   newEndMMDD = newVal.split(" ")[0]
+//   newEndHHMM = newVal.split(" ")[1]
+// }
 
 function handleDeadlineInput (e) {
   isEditingDeadline = true

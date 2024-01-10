@@ -291,7 +291,10 @@ export function createRepeatedTask ({ dateClassObj, repeatGroupID }, taskObject)
 }
 
 export function convertMMDDToReadableMonthDayForm (mmdd) {
-  const dateStr = new Date(mmdd).toDateString() //  'Fri Apr 10 2020'
+  // Recommended Format: The most reliable format for cross-browser compatibility is "YYYY-MM-DD", often referred to as the ISO 8601 format (e.g., "2023-04-10").
+  const formattedDate = mmdd.replace('/', ''); // Remove slashes
+
+  const dateStr = new Date(formattedDate).toDateString() //  'Fri Apr 10 2020'
   const splitArr = dateStr.split(' ' )// ['Fri', 'Apr', '10', '2020']
   return splitArr[1] + ' ' + splitArr[2] 
 }
