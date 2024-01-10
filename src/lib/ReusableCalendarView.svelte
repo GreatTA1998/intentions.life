@@ -100,6 +100,11 @@
             newTaskName = e.detail.value;
             searchTaskTemplates();
           }}
+          on:focus-out={() => {
+            if (newTaskName === '') {
+              isDirectlyCreatingTask = false
+            }
+          }}
           on:task-entered={(e) => handleEnterKey(e)}
         />
 

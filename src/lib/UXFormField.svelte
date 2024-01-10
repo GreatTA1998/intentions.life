@@ -25,7 +25,10 @@
       }
     }}
     on:focusin={() => isFocused = true}
-    on:focusout={() => isFocused = false}
+    on:focusout={() => {
+      isFocused = false;
+      dispatch('focus-out')
+    }}
     class="ux-input-text" 
     placeholder={placeholder}
   >

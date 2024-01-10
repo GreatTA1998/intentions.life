@@ -38,7 +38,7 @@
         </div>
 
         <div style="margin-left: 24px; margin-right: 6px;">
-          For {taskObject.duration} minutes
+          For {taskObject.duration || 0} minutes
         </div>
 
         <!-- <div style="width: 134px;">
