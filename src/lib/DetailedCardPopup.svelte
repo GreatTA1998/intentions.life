@@ -1,4 +1,4 @@
-<div class="fullscreen-invisible-modular-popup-layer">
+<div class="fullscreen-invisible-modular-popup-layer" style="z-index: 10;">
   <div class="detailed-card-popup" bind:this={elem} use:clickOutside on:click_outside={handleClickOutside}>
     <div style="display: flex; align-items: center;">
       <input
@@ -108,16 +108,18 @@
         Full task history
       </div>
 
-      {#each taskObject.children as child}
-        <div style="margin-left: 12px;">
-        <RecursiveBulletPoint 
-          taskObject={child}
-          on:task-click
-        >
-        
-        </RecursiveBulletPoint>
-        </div>
-      {/each}
+      <div style="max-height: 500px; overflow-y: auto;">
+        {#each taskObject.children as child}
+          <div style="margin-left: 12px;">
+          <RecursiveBulletPoint 
+            taskObject={child}
+            on:task-click
+          >
+          
+          </RecursiveBulletPoint>
+          </div>
+        {/each}
+      </div>
     {/if}
 
     <!-- <div class="google-calendar-event-detail" style="margin-top: 12px; margin-left: 16px;">

@@ -80,6 +80,7 @@
 
   // NOTE: somewhat brittle code. If `.journal` is every empty temporariliy, for whatever reason, the entire journal will wipe.
   function guaranteeBackwardsCompatibility (userDoc) {
+    console.log("initializing backwards compatibility")
     const correctionObj = {}
     if (!userDoc.journal) correctionObj.journal = {}
     if (!userDoc.journalTitleFromMMDD) correctionObj.journalTitleFromMMDD = {}

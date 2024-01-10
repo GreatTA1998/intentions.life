@@ -3,10 +3,9 @@
 </span>
 
 {#if isPopupOpen}
-  <div class="fullscreen-invisible-modular-popup-layer">
+  <div class="fullscreen-invisible-modular-popup-layer" on:click|self={handleClickOutside}>
     <div class="my-popup" 
       bind:this={elem} 
-      use:clickOutside on:click_outside={handleClickOutside}
     >    
       <div style="overflow: auto; height: 100%; width: 100%;">
         <div style="
