@@ -123,7 +123,7 @@
   let startY = 0
 
   function dragstart_handler(e, id) {
-    e.preventDefault()
+    // e.preventDefault()
     e.dataTransfer.setData("text/plain", id)
   }
 

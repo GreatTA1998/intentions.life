@@ -291,8 +291,9 @@
   }
 
   function dragover_handler (e) {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = "move";
+    e.preventDefault()
+    e.stopPropagation()
+    e.dataTransfer.dropEffect = "move"
   }
 
   /**
@@ -313,6 +314,7 @@
   //   2. use the new date object to generate `startTime` and `startDate`
   function drop_handler (e) {
     e.preventDefault()
+    e.stopPropagation()
     highlightedMinute = null
 
     const trueY = copyGetTrueY(e)
