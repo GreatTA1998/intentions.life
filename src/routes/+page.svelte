@@ -1,4 +1,4 @@
-<!-- {#if hasFetchedUser} -->
+{#if hasFetchedUser}
   <!-- <div id="background-image-holder" style="height: 100vh; display: flex; justify-content: center; align-items: center;"> -->
     <NavbarAndContentWrapper>
       <div slot="navbar" class="top-navbar transparent-glow-navbar" style="background: transparent; border-bottom: 1px solid lightgrey; padding-left: 4%; padding-right: 4%;">
@@ -61,7 +61,7 @@
         {/if}
       </div> -->
   <!-- </div> -->
-<!-- {/if} -->
+{/if}
 
 <script>
   import { goto } from '$app/navigation'
