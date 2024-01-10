@@ -581,8 +581,8 @@
       fulfilsCriteria: (task) => { 
         return (task.startDate && task.startDate !== 'NaN/NaN') && 
                 (!task.willRepeatOnWeekDayNumber) &&
-                  (task.startTime && task.startDate > getDateOfToday()) &&
-                    (task.startYYYY === yearNumber.toString())
+                  (task.startTime && task.startDate > getDateOfToday()) 
+                    && (Number(task.startYYYY) === Number(yearNumber.toString()))
       }, // 'NaN' quick-fix bug
       applyFunc: (task) => futureScheduledTasks = [...futureScheduledTasks, task]
     })
