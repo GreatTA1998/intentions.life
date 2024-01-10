@@ -155,8 +155,8 @@
   .todo-container {
     min-width: 400px; 
     background-color: var(--todo-list-bg-color);
-    padding-left: 2vw; 
-    padding-right: 2vw;
+    padding-left: 3vw; 
+    padding-right: 3vw;
     padding-top: 36px;
     font-size: 2em;
     overflow-y: auto;

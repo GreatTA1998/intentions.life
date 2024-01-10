@@ -50,7 +50,7 @@
 {/if}
 
 <NavbarAndContentWrapper>
-  <div slot="navbar" class="top-navbar" class:transparent-glow-navbar={currentMode === 'Day'} style="padding-left: 2vw; padding-right: 2vw;">
+  <div slot="navbar" class="top-navbar" class:transparent-glow-navbar={currentMode === 'Day'} style="padding-left: 3vw; padding-right: 3vw;">
     <PopupCustomerSupport let:setIsPopupOpen={setIsPopupOpen}>
       <img on:click={() => {
         if (!$user.email && !$user.phoneNumber) {
@@ -995,7 +995,7 @@
 <style>  
   .future-overview-parent {
     min-width: 332px;
-    padding-top: 36px; padding-left: 2vw; padding-right: 2vw;
+    padding-top: 36px; padding-left: 3vw; padding-right: 3vw;
   }
 
   @media (max-width: 1279.99px) {
