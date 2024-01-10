@@ -1,17 +1,23 @@
 <!-- {#if hasFetchedUser} -->
   <!-- <div id="background-image-holder" style="height: 100vh; display: flex; justify-content: center; align-items: center;"> -->
     <NavbarAndContentWrapper>
-      <div slot="navbar" class="top-navbar transparent-glow-navbar" style="background: transparent; border-bottom: 1px solid lightgrey;">
+      <div slot="navbar" class="top-navbar transparent-glow-navbar" style="background: transparent; border-bottom: 1px solid lightgrey; padding-left: 4%; padding-right: 4%;">
         <img 
           src="hand-drawn-twig-no-bg-cropped.png" 
-          style="width: 26px; height: 36px; margin-left: 24px; margin-right: 6px;"
+          style="width: 26px; height: 36px;"
         >
+
+        <PopupLogin let:setIsPopupOpen={setIsPopupOpen}>
+          <div on:click={() => setIsPopupOpen({ newVal: true })} style="margin-right: 0px; margin-left: auto; color: rgb(60, 60, 60); font-size: 12px;">
+            Log in
+          </div>
+        </PopupLogin>
       </div>
       
       <div slot="content" style="display: flex; flex-grow: 1; height: 100%; padding: 4%;">
         <div style="background: transparent; width: 90vw; min-width: 200px; height: 80vh; border-radius: 10px;">
           <div class="hero-title">
-            Combine your todo-list with your calendar
+            Combine your todo-list with your calendar.
           </div>
     
           <div style="display: flex; margin-top: 24px; flex-wrap: wrap;">
@@ -59,8 +65,8 @@
 
 <script>
   import { goto } from '$app/navigation'
-  import PhoneLogin from '../PhoneLogin.svelte'
   import LoginGoogle from '$lib/LoginGoogle.svelte'
+  import PopupLogin from '$lib/PopupLogin.svelte'
   import { hasFetchedUser } from '/src/store.js'
   import { onMount } from 'svelte'
   import { getAuth, signInAnonymously } from "firebase/auth";
