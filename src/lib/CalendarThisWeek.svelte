@@ -54,10 +54,10 @@
 
             <div 
               class="center-flex" 
-              style="font-size: 16px; font-weight: 300" 
+              style="font-size: 12px; font-weight: 300" 
             >
               <div class="center-flex" 
-                style="padding: 8px; width: 48px; height: 48px;" 
+                style="padding: 8px; width: 48px; height: 36px;" 
                 class:active-date-number={getDateInDDMMYYYY(dateClassObj) === getDateInDDMMYYYY(new Date())}
                 class:highlighted-circle={getDateInDDMMYYYY(dateClassObj) === getDateInDDMMYYYY(new Date())}
               >
