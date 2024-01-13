@@ -78,7 +78,7 @@
               timeBlockDurationInMinutes={60}
               subdivisionsPerBlock={60}
               on:new-root-task
-              on:task-duration-adjusted
+              on:task-update
               on:task-click
               on:task-scheduled
               on:task-checkbox-change

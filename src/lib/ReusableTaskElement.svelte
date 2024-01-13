@@ -51,8 +51,8 @@
           "
           checked={task.isDone}
           on:change={(e) => dispatch('task-checkbox-change', {
-            isDone: e.target.checked,
-            id: task.id
+            id: task.id,
+            isDone: e.target.checked
           })}
         >
 
@@ -142,10 +142,11 @@
     const newY = getTrueY(e)
     const durationChange = minutesPerPixel * (newY - startY)
 
-    dispatch('task-duration-adjusted', {
-      taskName: task.name,
+    dispatch('task-update', {
       id: task.id,
-      duration: Math.max(1, task.duration + durationChange) // can't have a 0 duration event
+      keyValueChanges: {
+        duration: Math.max(1, task.duration + durationChange) // can't have a 0 duration event
+      }      
     })
   }
 </script> 

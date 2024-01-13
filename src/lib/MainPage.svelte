@@ -9,7 +9,7 @@
       on:repeating-tasks-generate={(e) => uploadGeneratedTasks(e.detail)}
       on:task-click={(e) => openDetailedCard(e.detail)}
       on:card-close={() => isDetailedCardOpen = false}
-      on:task-delete={() => deleteSubtree(clickedTask.id)}
+      on:task-delete={(e) => deleteTaskNode(e.detail)}
     />
   {/if}
 {/key}
@@ -160,7 +160,7 @@
               on:new-root-task={(e) => createNewRootTask(e.detail)}
               on:task-node-update={(e) => updateNode({ id: e.detail.id, newDeepValue: e.detail.newDeepValue })}
               on:task-click={(e) => openDetailedCard(e.detail)}
-              on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
+              on:task-update={(e) => updateTaskNode({ id: e.detail.id, keyValueChanges: e.detail.keyValueChanges })}
               on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
               on:task-dragged={(e) => changeTaskDeadline(e.detail)}
               on:task-checkbox-change={(e) => updateTaskNode({ id: e.detail.id, keyValueChanges: { isDone: e.detail.isDone }})} 
@@ -216,7 +216,7 @@
 
   import { getAuth, signOut } from 'firebase/auth'
   import db from '/src/db.js'
-  import { doc, collection, getFirestore, updateDoc, arrayUnion, onSnapshot } from 'firebase/firestore'
+  import { doc, collection, getFirestore, updateDoc, arrayUnion, onSnapshot, arrayRemove } from 'firebase/firestore'
   import { setFirestoreDoc, updateFirestoreDoc, deleteFirestoreDoc } from '/src/crud.js'
 
   let snackbarTimeoutID = null
@@ -281,18 +281,17 @@
 
   onMount(() => {
     const ref = collection(getFirestore(), `/users/${$user.uid}/tasks`)
-    const unsub = onSnapshot(ref, (querySnapshot) => {
+    unsub = onSnapshot(ref, (querySnapshot) => {
       const result = [] 
       querySnapshot.forEach((doc) => {
         result.push(doc.data())
       })
-      console.log('firestore result =', result)
       allTasks = reconstructTreeInMemory(result)
-
       // RE-WRITE / INTEGRATE THIS WHEN READY
       // maintainOneWeekPreviewWindowForRepeatingTasks(allTasks)
     })
 
+    const copy = [...$user.allTasks]
     // createIndividualFirestoreDocForEachTaskInAllTasks(copy, $user)
 
     // HANDLE TASKS THAT REPEAT
@@ -311,15 +310,23 @@
   }
 
   function updateTaskNode ({ id, keyValueChanges }) {
-    console.log('id, keyvalueChanges =', id, keyValueChanges)
+    console.log('id, keyValueChanges =', id, keyValueChanges)
     updateFirestoreDoc(tasksPath + id, keyValueChanges)
   }
 
-  // TO-DO: implement
-  function deleteTaskNode ({ id }) {
-    // delete is somewhat complicated because you need to also make sure the metadata on its children and parents are correct
+  function deleteTaskNode ({ id, parentID, childrenIDs }) {
+    console.log('id, parentID, childrenIDs =', id, parentID, childrenIDs)
+    updateFirestoreDoc(tasksPath + parentID, {
+      childrenIDs: arrayRemove(id)
+    })
 
-    // deleteFirestoreDoc(tasksPath + id)
+    for (const childID of childrenIDs) {
+      updateFirestoreDoc(tasksPath + childID, {
+        "parentID": parentID
+      })
+    }
+    // now safely delete itself
+    deleteFirestoreDoc(tasksPath + id)
   }
 
   function updateMusicAutoplay (e) {
@@ -736,6 +743,8 @@
     if (!task.startYYYY) output.startYYYY = ''
     if (!task.duration) output.duration = 15 
     if (!task.children) output.children = [] 
+    if (!task.parentID) output.parentID = ""
+    if (!task.childrenIDs) output.childrenIDs = []
       // { name: newTaskObj.name,
       //   id: newTaskObj.id,
       //   deadlineDate: newTaskObj.deadlineDate || '',

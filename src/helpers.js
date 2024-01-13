@@ -240,7 +240,6 @@ function helperFunction ({ node, applyFunc }) {
   }
 }
 
-
 export function generateRepeatedTasks (taskObject) {
   const allGeneratedTasksToUpload = []
   const repeatGroupID = taskObject.id // the first instance of the repeated task will represent the repeatGroupID
@@ -308,15 +307,16 @@ export function createIndividualFirestoreDocForEachTaskInAllTasks (tree, userDoc
   }
   helperFunc({ 
     node: artificialRootNode, 
-    parentID: null, 
+    parentID: "", 
     userDoc 
   })
 }
 
 function helperFunc ({ node, parentID, userDoc }) {
+  if (!node.id) return 
   const newDocObj = {
-    parentID: parentID || null,
-    childrenIDs: node.children ? node.children.map(child => child.id) : [], 
+    parentID: parentID || "", // handle legacy code where tasks didn't have IDs
+    childrenIDs: node.children.map(child => child.id), // assuming children is an array [], mapping an empty array is still an empty array
     ...node
   }
   
@@ -329,20 +329,32 @@ function helperFunc ({ node, parentID, userDoc }) {
 
 // recursively mutate this monolith data structure until its correct
 export function reconstructTreeInMemory (firestoreTaskDocs) {
+  // first, do an O(n) operation, so we don't perform a O(n^2) operation constantly traversing trees
+  // let's build a dictionary that maps a task to its children
+  const layers = { "": [] }
+  for (const taskDoc of firestoreTaskDocs) {
+    // edge case: some childrenless tasks will have `undefined` children unless we initialize it
+    if (!layers[taskDoc.id]) layers[taskDoc.id] = []
+
+    else { // this is the general case
+      if (!layers[taskDoc.parentID]) layers[taskDoc.parentID] = [] 
+      layers[taskDoc.parentID].push(taskDoc)
+    }
+  }
+
   const output = []
-  const rootTasks = firestoreTaskDocs.filter(task => task.parentID === null)
+  const rootTasks = layers[""]// firestoreTaskDocs.filter(task => task.parentID === null)
   for (const task of rootTasks) {
-    hydrateOneLayerOfChildren({ node: task, firestoreTaskDocs })
+    hydrateOneLayerOfChildren({ node: task, firestoreTaskDocs, layers})
     output.push(task)
   }
   return output
 }
 
-// hydrate one layer of children
-function hydrateOneLayerOfChildren ({ node, firestoreTaskDocs }) {
-  node.children = firestoreTaskDocs.filter(task => task.parentID === node.id)
+function hydrateOneLayerOfChildren ({ node, firestoreTaskDocs, layers }) {
+  node.children = layers[node.id]
   for (const child of node.children) {
-    hydrateOneLayerOfChildren({ node: child, firestoreTaskDocs })
+    hydrateOneLayerOfChildren({ node: child, firestoreTaskDocs, layers })
   }
 }
 

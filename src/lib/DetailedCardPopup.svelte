@@ -268,7 +268,9 @@ function handleDeadlineInput (e) {
 
 function confirmDelete () {
   if (confirm('Are you sure you want to delete the task? This is irreversible.')) {
-    dispatch('task-delete')
+    dispatch('task-delete', {...taskObject})
+
+    console.log('taskObject =', {...taskObject})
     dispatch('card-close')
   } 
 }
