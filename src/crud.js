@@ -1,5 +1,16 @@
 import { getRandomID } from '/src/helpers.js'
-import { deleteField, collection, query, orderBy, limit, getDoc, getDocs, getFirestore, updateDoc, arrayUnion, arrayRemove, increment, doc, setDoc, where } from 'firebase/firestore'
+import { 
+  deleteField, 
+  collection, 
+  query, 
+  orderBy, 
+  limit, 
+  getDoc, 
+  getDocs, 
+  getFirestore, 
+  updateDoc, 
+  deleteDoc, 
+  arrayUnion, arrayRemove, increment, doc, setDoc, where } from 'firebase/firestore'
 import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject, } from 'firebase/storage'
 
 // I prefix all Firestore helper functions with `firestore` prefix
@@ -11,10 +22,15 @@ export function firestoreRef (path) {
 }
 
 export function setFirestoreDoc (path, newObject) {
-  return new Promise(async (resolve) => {
-    const ref = firestoreRef(path)
-    await setDoc(ref, newObject)
-    resolve()
+  return new Promise(async (resolve, reject) => {
+    try {
+      const ref = firestoreRef(path)
+      await setDoc(ref, newObject)
+      resolve()
+    } catch (error) {
+      console.log("error =", error)
+      console.log("payload was =", newObject)
+    }
   })
 }
 

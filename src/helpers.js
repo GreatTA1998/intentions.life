@@ -300,6 +300,10 @@ export function convertMMDDToReadableMonthDayForm (mmdd, yyyy = '2024') {
   return splitArr[1] + ' ' + splitArr[2] 
 }
 
+
+// COMMON MISTAKES YOU MADE:
+// Here, you're converting the legacy `$user.allTasks` into a pointer-based data structure
+// So the data that you're starting with will have NO `parentID` nor `childrenIDs`
 export function createIndividualFirestoreDocForEachTaskInAllTasks (tree, userDoc) {
   const artificialRootNode = {
     name: 'root',
@@ -313,14 +317,18 @@ export function createIndividualFirestoreDocForEachTaskInAllTasks (tree, userDoc
 }
 
 function helperFunc ({ node, parentID, userDoc }) {
-  if (!node.id) return 
+  if (!node.children) return
+
   const newDocObj = {
     parentID: parentID || "", // handle legacy code where tasks didn't have IDs
     childrenIDs: node.children.map(child => child.id), // assuming children is an array [], mapping an empty array is still an empty array
     ...node
   }
+
+  if (!node.id) newDocObj.id = getRandomID()
   
-  setFirestoreDoc(`/users/${userDoc.uid}/tasks/${node.id}`, newDocObj)
+  console.log('setting a for node =', node)
+  setFirestoreDoc(`/users/${userDoc.uid}/tasks/${newDocObj.id}`, newDocObj)
  
   for (const child of node.children) {
     helperFunc({ node: child, parentID: node.id, userDoc })
@@ -329,6 +337,7 @@ function helperFunc ({ node, parentID, userDoc }) {
 
 // recursively mutate this monolith data structure until its correct
 export function reconstructTreeInMemory (firestoreTaskDocs) {
+  const output = []
   // first, do an O(n) operation, so we don't perform a O(n^2) operation constantly traversing trees
   // let's build a dictionary that maps a task to its children
   const layers = { "": [] }
@@ -336,13 +345,17 @@ export function reconstructTreeInMemory (firestoreTaskDocs) {
     // edge case: some childrenless tasks will have `undefined` children unless we initialize it
     if (!layers[taskDoc.id]) layers[taskDoc.id] = []
 
-    else { // this is the general case
-      if (!layers[taskDoc.parentID]) layers[taskDoc.parentID] = [] 
-      layers[taskDoc.parentID].push(taskDoc)
-    }
+    // this is the general case
+    if (!layers[taskDoc.parentID]) layers[taskDoc.parentID] = [] 
+
+    // NOTE: THERE ARE STIL MANY TASKS WITH NULL PARENTS,
+    // BUT NO CONSEQUENCES FOR NOW SO IGNORED FOR NOW
+    // if (taskDoc.parentID === null) {
+    //   console.log('this task has null parent =', taskDoc)
+    // }
+    layers[taskDoc.parentID].push(taskDoc)
   }
 
-  const output = []
   const rootTasks = layers[""]// firestoreTaskDocs.filter(task => task.parentID === null)
   for (const task of rootTasks) {
     hydrateOneLayerOfChildren({ node: task, firestoreTaskDocs, layers})

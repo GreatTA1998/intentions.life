@@ -225,11 +225,9 @@ function saveDuration (e) {
 }
 
 function saveTaskStart (MMDD, HHMM) {
-  taskObject.startTime = HHMM
-  taskObject.startDate = MMDD
   dispatch('task-update', { id: taskObject.id, keyValueChanges: {
-    newStartDate: MMDD,
-    newStartTime: HHMM
+    startDate: MMDD,
+    startTime: HHMM
   }})
   isEditingTaskStart = false
 }
@@ -269,8 +267,6 @@ function handleDeadlineInput (e) {
 function confirmDelete () {
   if (confirm('Are you sure you want to delete the task? This is irreversible.')) {
     dispatch('task-delete', {...taskObject})
-
-    console.log('taskObject =', {...taskObject})
     dispatch('card-close')
   } 
 }

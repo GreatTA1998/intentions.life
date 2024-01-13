@@ -126,16 +126,15 @@
           {allIncompleteTasks}
           on:new-root-task={(e) => createNewRootTask(e.detail)}
           on:task-unscheduled={(e) => putTaskToThisWeekTodo(e)}
-          on:subtask-create={(e) => createTaskNode({ id: e.detail.id, newTaskObj: e.detail.newTaskObj  })}
+          on:subtask-create={(e) => createSubtask(e.detail)}
           on:task-click={(e) => openDetailedCard(e.detail)}
         > 
           <GrandTreeTodoPopupButton
             {allIncompleteTasks}
             on:new-root-task={(e) => createNewRootTask(e.detail)}
             on:task-unscheduled={(e) => putTaskToThisWeekTodo(e)}
-            on:task-node-update={(e) => updateNode({ id: e.detail.id, newDeepValue: e.detail.newDeepValue })}
             on:task-click={(e) => openDetailedCard(e.detail)}
-            
+            on:subtask-create={(e) => createSubtask(e.detail)}
             on:task-dragged={(e) => changeTaskDeadline(e.detail)}
           > 
             <GrandTreeTodo 
@@ -217,7 +216,7 @@
   import { getAuth, signOut } from 'firebase/auth'
   import db from '/src/db.js'
   import { doc, collection, getFirestore, updateDoc, arrayUnion, onSnapshot, arrayRemove } from 'firebase/firestore'
-  import { setFirestoreDoc, updateFirestoreDoc, deleteFirestoreDoc } from '/src/crud.js'
+  import { setFirestoreDoc, updateFirestoreDoc, deleteFirestoreDoc, getFirestoreCollection } from '/src/crud.js'
 
   let snackbarTimeoutID = null
   let countdownRemaining = 0
@@ -264,6 +263,12 @@
     });
   }
 
+  function createSubtask ({ id, parentID, newTaskObj }) {
+    // the parent needs to update its pointers
+    updateTaskNode({ id: parentID, keyValueChanges: { children: arrayUnion(id)}})
+    createTaskNode({ id, newTaskObj })
+  }
+
   function computeDataStructuresFromAllTasks (allTasks) {
     allIncompleteTasks = filterIncompleteTasks(allTasks)
     collectTodayScheduledTasksToArray()
@@ -279,20 +284,18 @@
     })
   }
 
-  onMount(() => {
+  onMount(async () => {
     const ref = collection(getFirestore(), `/users/${$user.uid}/tasks`)
     unsub = onSnapshot(ref, (querySnapshot) => {
       const result = [] 
       querySnapshot.forEach((doc) => {
-        result.push(doc.data())
+        result.push({ id: doc.id, ...doc.data()})
       })
       allTasks = reconstructTreeInMemory(result)
       // RE-WRITE / INTEGRATE THIS WHEN READY
       // maintainOneWeekPreviewWindowForRepeatingTasks(allTasks)
     })
 
-    const copy = [...$user.allTasks]
-    // createIndividualFirestoreDocForEachTaskInAllTasks(copy, $user)
 
     // HANDLE TASKS THAT REPEAT
     // can't use `return` in reactive expression https://github.com/sveltejs/svelte/issues/2828  
@@ -305,8 +308,8 @@
   const tasksPath = `/users/${$user.uid}/tasks/`
 
   function createTaskNode ({ id, newTaskObj }) {
-    setFirestoreDoc(tasksPath + id, newTaskObj)
-    console.log('id =', id, newTaskObj)
+    const newTaskObjChecked = checkTaskObjSchema(newTaskObj)
+    setFirestoreDoc(tasksPath + id, newTaskObjChecked)
   }
 
   function updateTaskNode ({ id, keyValueChanges }) {
@@ -314,16 +317,29 @@
     updateFirestoreDoc(tasksPath + id, keyValueChanges)
   }
 
+  // THIS IS STILL NOT WORKING: THE ADOPTION IS NOT WORKING, RIGHT NOW ALL THE 
+  // SUBTREE WILL BE GONE FOR SOME REASON
   function deleteTaskNode ({ id, parentID, childrenIDs }) {
-    console.log('id, parentID, childrenIDs =', id, parentID, childrenIDs)
-    updateFirestoreDoc(tasksPath + parentID, {
-      childrenIDs: arrayRemove(id)
-    })
-
-    for (const childID of childrenIDs) {
-      updateFirestoreDoc(tasksPath + childID, {
-        "parentID": parentID
+    if (parentID !== "") {
+      updateFirestoreDoc(tasksPath + parentID, {
+        childrenIDs: arrayRemove(id)
       })
+      // parent will be deleted, so the grandparent will take care of the children
+      if (childrenIDs) {
+        updateFirestoreDoc(tasksPath + parentID, {
+          childrenIDs: arrayUnion(...childrenIDs)
+        })
+      }
+    }
+
+    // temporary to clean up tasks that were created that didn't conform to the schema
+    // surprisngly many, keep it in to save time
+    if (childrenIDs) {
+      for (const childID of childrenIDs) {
+        updateFirestoreDoc(tasksPath + childID, {
+          "parentID": parentID
+        })
+      }
     }
     // now safely delete itself
     deleteFirestoreDoc(tasksPath + id)
@@ -742,7 +758,6 @@
     const output = {...task}
     if (!task.startYYYY) output.startYYYY = ''
     if (!task.duration) output.duration = 15 
-    if (!task.children) output.children = [] 
     if (!task.parentID) output.parentID = ""
     if (!task.childrenIDs) output.childrenIDs = []
       // { name: newTaskObj.name,
@@ -759,10 +774,9 @@
   }
 
   function createNewRootTask (newTaskObj) {
-    const correctSchemaTaskObj = checkTaskObjSchema(newTaskObj)
     createTaskNode({ 
       id: newTaskObj.id, 
-      newTaskObj: correctSchemaTaskObj 
+      newTaskObj: newTaskObj
     })
   }
 

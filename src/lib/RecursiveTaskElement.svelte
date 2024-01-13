@@ -200,13 +200,13 @@
     const newTaskID = getRandomID()
     dispatch('subtask-create', {
       id: newTaskID,
+      parentID: taskObj.id,
       newTaskObj: {
         id: newTaskID,
         parentID: taskObj.id, 
         deadlineDate: getDateInDDMMYYYY(d),
         deadlineTime: '07:00',
         name,
-        children: []   
       }
     })
   }

@@ -24,7 +24,6 @@
     on:drop={(e) => unscheduleTask(e)}
     on:dragover={(e) => dragover_handler(e)}
   >
-
     <!-- TO-DO: Render all tasks with deadline of this week here -->
     {#each tasksDueThisWeek as taskObj}
       <RecursiveTaskElement 
