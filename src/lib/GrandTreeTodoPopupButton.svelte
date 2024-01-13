@@ -23,7 +23,7 @@
               dueInHowManyDays={1}
               on:new-root-task
               on:task-unscheduled
-              on:task-node-update
+              on:subtask-create
               on:task-click
               on:task-dragged
             />  
@@ -37,7 +37,7 @@
               dueInHowManyDays={7}
               on:new-root-task
               on:task-unscheduled
-              on:task-node-update
+              on:subtask-create
               on:task-click
               on:task-dragged
             />  
@@ -50,13 +50,13 @@
               dueInHowManyDays={30}
               on:new-root-task
               on:task-unscheduled
-              on:task-node-update
+              on:subtask-create
               on:task-click
               on:task-dragged
             />  
           </div>
 
-          <div style="width: 58%; height: 100%; overflow-x: auto;">
+          <div style="width: 58%; height: 100%; overflow-x: auto; opacity: 0.5;">
             <slot>
               <!-- GrandTreeTodo will be injected via the parent,, so no interface will need to be changed -->
             </slot>

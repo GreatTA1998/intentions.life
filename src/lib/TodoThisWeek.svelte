@@ -24,7 +24,6 @@
     on:drop={(e) => unscheduleTask(e)}
     on:dragover={(e) => dragover_handler(e)}
   >
-
     <!-- TO-DO: Render all tasks with deadline of this week here -->
     {#each tasksDueThisWeek as taskObj}
       <RecursiveTaskElement 
@@ -33,7 +32,7 @@
         doNotShowScheduledTasks={false}
         doNotShowCompletedTasks={true}
         on:task-click
-        on:task-node-update
+        on:subtask-create
       />
       <div style="margin-bottom: 24px;"></div>
     {/each}

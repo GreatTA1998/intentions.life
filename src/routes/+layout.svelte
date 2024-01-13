@@ -80,7 +80,6 @@
 
   // NOTE: somewhat brittle code. If `.journal` is every empty temporariliy, for whatever reason, the entire journal will wipe.
   function guaranteeBackwardsCompatibility (userDoc) {
-    console.log("initializing backwards compatibility")
     const correctionObj = {}
     if (!userDoc.journal) correctionObj.journal = {}
     if (!userDoc.journalTitleFromMMDD) correctionObj.journalTitleFromMMDD = {}
@@ -96,59 +95,9 @@
         uid: resultUser.uid,
         phoneNumber: resultUser.phoneNumber || '',
         email: resultUser.email || '',
-        allTasks: [
-          {
-            name: 'Try life-organizer',
-            children: [
-              {
-                name: 'Create a sub-task by hovering to the approximate region',
-                children: []
-              },
-              {
-                name: 'Schedule a task by dragging it to the calendar',
-                children: []
-              },
-              {
-                name: 'Schedule future task by inputting the date',
-                children: []
-              }
-            ]
-          },
-          {
-            name: 'Work',
-            children: [
-              {
-                name: 'Pitch idea to santa',
-                startDate: '12/25',
-                startTime: '12:00',
-                children: [
-                  {
-                    name: 'Email draft 1 to Rudolf',
-                    children: []
-                  },
-                  {
-                    name: 'Follow-up with Rudolf',
-                    startDate: '12/01',
-                    startTime: '12:00',
-                    children: []
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            name: 'Life-keeping',
-            notes: 'Press ENTER to save changes e.g. repeat, schedule, etc.',
-            children: [
-              {
-                name: 'meditate',
-                children: []
-              }
-            ]
-          }
-        ]
-      })
-
+        // allTasks: []
+      }, { merge: true })
+      resolve()
     })
   }
 </script>

@@ -1,3 +1,5 @@
+import { setFirestoreDoc } from '/src/crud.js'
+
 // how far, INCLUDING SCROLL, the actual position on the calendar is
 // // containerDistanceFromTopOfPage should be fixed, and not be affected by scrolling
 // so it's the e.clientY + initialOffset + scrollOffset 
@@ -227,7 +229,7 @@ export function applyFuncToEveryTreeNode ({ tree, applyFunc }) {
 }
 
 function helperFunction ({ node, applyFunc }) {
-  // this is a quick-fix: terminate once we find the deadlinet ask
+  // this is a quick-fix: terminate once we find the deadline ask
   if (applyFunc(node)) {
     return
   } 
@@ -237,7 +239,6 @@ function helperFunction ({ node, applyFunc }) {
     }
   }
 }
-
 
 export function generateRepeatedTasks (taskObject) {
   const allGeneratedTasksToUpload = []
@@ -298,3 +299,75 @@ export function convertMMDDToReadableMonthDayForm (mmdd, yyyy = '2024') {
   const splitArr = dateStr.split(' ' )// ['Fri', 'Apr', '10', '2020']
   return splitArr[1] + ' ' + splitArr[2] 
 }
+
+
+// COMMON MISTAKES YOU MADE:
+// Here, you're converting the legacy `$user.allTasks` into a pointer-based data structure
+// So the data that you're starting with will have NO `parentID` nor `childrenIDs`
+export function createIndividualFirestoreDocForEachTaskInAllTasks (tree, userDoc) {
+  const artificialRootNode = {
+    name: 'root',
+    children: tree
+  }
+  helperFunc({ 
+    node: artificialRootNode, 
+    parentID: "", 
+    userDoc 
+  })
+}
+
+function helperFunc ({ node, parentID, userDoc }) {
+  if (!node.children) return
+
+  const newDocObj = {
+    parentID: parentID || "", // handle legacy code where tasks didn't have IDs
+    childrenIDs: node.children.map(child => child.id), // assuming children is an array [], mapping an empty array is still an empty array
+    ...node
+  }
+
+  if (!node.id) newDocObj.id = getRandomID()
+  
+  console.log('setting a for node =', node)
+  setFirestoreDoc(`/users/${userDoc.uid}/tasks/${newDocObj.id}`, newDocObj)
+ 
+  for (const child of node.children) {
+    helperFunc({ node: child, parentID: node.id, userDoc })
+  }
+}
+
+// recursively mutate this monolith data structure until its correct
+export function reconstructTreeInMemory (firestoreTaskDocs) {
+  const output = []
+  // first, do an O(n) operation, so we don't perform a O(n^2) operation constantly traversing trees
+  // let's build a dictionary that maps a task to its children
+  const layers = { "": [] }
+  for (const taskDoc of firestoreTaskDocs) {
+    // edge case: some childrenless tasks will have `undefined` children unless we initialize it
+    if (!layers[taskDoc.id]) layers[taskDoc.id] = []
+
+    // this is the general case
+    if (!layers[taskDoc.parentID]) layers[taskDoc.parentID] = [] 
+
+    // NOTE: THERE ARE STIL MANY TASKS WITH NULL PARENTS,
+    // BUT NO CONSEQUENCES FOR NOW SO IGNORED FOR NOW
+    // if (taskDoc.parentID === null) {
+    //   console.log('this task has null parent =', taskDoc)
+    // }
+    layers[taskDoc.parentID].push(taskDoc)
+  }
+
+  const rootTasks = layers[""]// firestoreTaskDocs.filter(task => task.parentID === null)
+  for (const task of rootTasks) {
+    hydrateOneLayerOfChildren({ node: task, firestoreTaskDocs, layers})
+    output.push(task)
+  }
+  return output
+}
+
+function hydrateOneLayerOfChildren ({ node, firestoreTaskDocs, layers }) {
+  node.children = layers[node.id]
+  for (const child of node.children) {
+    hydrateOneLayerOfChildren({ node: child, firestoreTaskDocs, layers })
+  }
+}
+

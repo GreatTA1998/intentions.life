@@ -28,6 +28,7 @@
       doNotShowCompletedTasks={true}
       on:task-click
       on:task-node-update
+      on:subtask-create
     />
     <div style="margin-bottom: 24px;"></div>
   {/each}

@@ -4,19 +4,12 @@
   {#if isDetailedCardOpen}
     <DetailedCardPopup 
       taskObject={clickedTask}
+      on:task-update={(e) => updateTaskNode(e.detail)}
+      on:task-reusable={() => createReusableTaskTemplate(clickedTask.id)}
+      on:repeating-tasks-generate={(e) => uploadGeneratedTasks(e.detail)}
       on:task-click={(e) => openDetailedCard(e.detail)}
       on:card-close={() => isDetailedCardOpen = false}
-      on:task-done={() => toggleTaskCompleted(clickedTask.id)}
-      on:task-reusable={() => createReusableTaskTemplate(clickedTask.id)}
-      on:task-delete={() => deleteSubtree(clickedTask.id)}
-      on:task-repeat={updateEntireTaskTree}
-      on:task-schedule={(e) => scheduleATask(e.detail)}
-      on:task-title-update={(e) => changeNameOfATask(e.detail)}
-      on:task-notes-update={(e) => changeNotesOfATask(e.detail)}
-      on:task-dragged={(e) => changeTaskDeadline(e.detail)}
-      on:repeating-tasks-generate={(e) => uploadGeneratedTasks(e.detail)}
-      on:task-checkbox-change={(e) => toggleTaskCompleted(e.detail.id)}
-      on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
+      on:task-delete={(e) => deleteTaskNode(e.detail)}
     />
   {/if}
 {/key}
@@ -42,7 +35,7 @@
 
 <!-- UNDO COMPLETED SNACKBAR -->
 {#if $mostRecentlyDeletedOrCompletedTaskID && countdownRemaining > 0}
-  <TheSnackbar on:task-done={(e) => toggleTaskCompleted(e.detail.id)}></TheSnackbar>
+  <TheSnackbar on:task-done={(e) => toggleTaskCompleted({ id: e.detail.id, newVal: false })}></TheSnackbar>
 {/if}
 
 <!-- Copy & paste snackbar -->
@@ -82,15 +75,9 @@
       </div>
     </div>
 
-    <!-- <a on:click={() => currentMode === 'Dashboard' ? currentMode = 'Week' : currentMode = 'Dashboard'} 
-      class="mika-hover circular-icon-button" 
-      class:blue-focus={currentMode === 'Dashboard'}
-      role="button" 
-    > -->
-      <span on:click={() => currentMode === 'Dashboard' ? currentMode = 'Week' : currentMode = 'Dashboard'}  class="material-symbols-outlined mika-hover" class:blue-icon={currentMode === 'Dashboard'} style="font-size: 32px; cursor: pointer;">
-        signal_cellular_alt
-      </span>
-    <!-- </a> -->
+    <span on:click={() => currentMode === 'Dashboard' ? currentMode = 'Week' : currentMode = 'Dashboard'}  class="material-symbols-outlined mika-hover" class:blue-icon={currentMode === 'Dashboard'} style="font-size: 32px; cursor: pointer;">
+      signal_cellular_alt
+    </span>
   </div>
 
   <!-- position: relative; -->
@@ -129,16 +116,6 @@
                 on:journal-entry-title-update={(e) => updateJournalEntryTitle(e.detail)}
               />
             {/key}
-            <!-- <DayView {allTasks}
-              scheduledTasksToday={todayScheduledTasks}
-              on:task-done={(e) => toggleTaskCompleted(e.detail.id)}
-              on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
-              on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
-              on:task-click={(e) => openDetailedCard(e.detail)}
-              on:task-dragged={(e) => changeTaskDeadline(e.detail)}
-              on:task-checkbox-change={(e) => toggleTaskCompleted(e.detail.id)}
-              {futureScheduledTasks}
-            /> -->
           </div>
         </div>
       
@@ -149,16 +126,15 @@
           {allIncompleteTasks}
           on:new-root-task={(e) => createNewRootTask(e.detail)}
           on:task-unscheduled={(e) => putTaskToThisWeekTodo(e)}
-          on:task-node-update={(e) => updateNode({ id: e.detail.id, newDeepValue: e.detail.newDeepValue })}
+          on:subtask-create={(e) => createSubtask(e.detail)}
           on:task-click={(e) => openDetailedCard(e.detail)}
-        >
+        > 
           <GrandTreeTodoPopupButton
             {allIncompleteTasks}
             on:new-root-task={(e) => createNewRootTask(e.detail)}
             on:task-unscheduled={(e) => putTaskToThisWeekTodo(e)}
-            on:task-node-update={(e) => updateNode({ id: e.detail.id, newDeepValue: e.detail.newDeepValue })}
             on:task-click={(e) => openDetailedCard(e.detail)}
-            
+            on:subtask-create={(e) => createSubtask(e.detail)}
             on:task-dragged={(e) => changeTaskDeadline(e.detail)}
           > 
             <GrandTreeTodo 
@@ -183,10 +159,10 @@
               on:new-root-task={(e) => createNewRootTask(e.detail)}
               on:task-node-update={(e) => updateNode({ id: e.detail.id, newDeepValue: e.detail.newDeepValue })}
               on:task-click={(e) => openDetailedCard(e.detail)}
-              on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
+              on:task-update={(e) => updateTaskNode({ id: e.detail.id, keyValueChanges: e.detail.keyValueChanges })}
               on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
               on:task-dragged={(e) => changeTaskDeadline(e.detail)}
-              on:task-checkbox-change={(e) => toggleTaskCompleted(e.detail.id)}
+              on:task-checkbox-change={(e) => updateTaskNode({ id: e.detail.id, keyValueChanges: { isDone: e.detail.isDone }})} 
             /> 
           {/if}
         </div>
@@ -206,58 +182,18 @@
   </div>
 </NavbarAndContentWrapper>
 
-<!--  
-  LEGACY CODE FOR DAY AND MONTH CALENDARS
-  {:else if currentMode !== 'Week'}
-      <div class="flex-container blur">
-        <div class="calendar-section-container">
-          {#if currentMode === 'hourMode'}
-            <HourView
-              {allTasks}
-              scheduledTasksToday={todayScheduledTasks}
-              on:task-done={(e) => toggleTaskCompleted(e.detail.id)}
-              on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
-              on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
-              on:task-click={(e) => openDetailedCard(e.detail)}
-              on:task-dragged={(e) => changeTaskDeadline(e.detail)}
-              on:task-checkbox-change={(e) => toggleTaskCompleted(e.detail.id)}
-            />
-          {:else if currentMode === 'dayMode'}
-            <DayView
-              {allTasks}
-              scheduledTasksToday={todayScheduledTasks}
-              on:task-done={(e) => toggleTaskCompleted(e.detail.id)}
-              on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
-              on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
-              on:task-click={(e) => openDetailedCard(e.detail)}
-              on:task-dragged={(e) => changeTaskDeadline(e.detail)}
-              on:task-checkbox-change={(e) => toggleTaskCompleted(e.detail.id)}
-              {futureScheduledTasks}
-            />
-          {:else if currentMode === 'monthMode'}
-            <MonthView
-              {allTasks}
-              {thisMonthScheduledTasks}
-              on:task-click={(e) => openDetailedCard(e.detail)}
-              on:task-duration-adjusted={(e) => changeTaskDuration(e.detail)}
-              on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
-              on:task-dragged={(e) => changeTaskDeadline(e.detail)}
-              on:task-checkbox-change={(e) => toggleTaskCompleted(e.detail.id)}
-            />
-          {/if}
-        </div>
-      </div>
-    {/if} 
--->
-
 <script>
   import NavbarAndContentWrapper from '$lib/NavbarAndContentWrapper.svelte'
   import DetailedCardPopup from '$lib/DetailedCardPopup.svelte'
-  import { MIKA_PIXELS_PER_HOUR, PIXELS_PER_HOUR, getNicelyFormattedDate, computeDayDifference, convertDDMMYYYYToDateClassObject } from '/src/helpers.js'
-  import { onMount } from 'svelte'
-  import db from '/src/db.js'
-  import { doc, getDoc, onSnapshot, updateDoc, arrayUnion } from 'firebase/firestore'
-  import { getRandomInt, getDateOfToday, getDateOfTomorrow, getDateInMMDD, getDateInDDMMYYYY, getRandomID, generateRepeatedTasks } from '/src/helpers.js'
+  import { 
+    computeDayDifference, 
+    getDateOfToday, 
+    getDateInDDMMYYYY, 
+    generateRepeatedTasks, 
+    createIndividualFirestoreDocForEachTaskInAllTasks,
+    reconstructTreeInMemory
+  } from '/src/helpers.js'
+  import { onDestroy, onMount } from 'svelte'
   import JournalPopup from '$lib/JournalPopup.svelte'
   import FinancePopup from '$lib/FinancePopup.svelte'
   import BedtimePopupMaplestoryMusic from '$lib/BedtimePopupMaplestoryMusic.svelte'
@@ -274,8 +210,13 @@
   import GrandTreeTodoPopupButton from '$lib/GrandTreeTodoPopupButton.svelte'
   import GrandTreeTodo from '$lib/GrandTreeTodo.svelte'
   import PopupCustomerSupport from '$lib/PopupCustomerSupport.svelte'
+
   import { goto } from '$app/navigation';
+
   import { getAuth, signOut } from 'firebase/auth'
+  import db from '/src/db.js'
+  import { doc, collection, getFirestore, updateDoc, arrayUnion, onSnapshot, arrayRemove } from 'firebase/firestore'
+  import { setFirestoreDoc, updateFirestoreDoc, deleteFirestoreDoc, getFirestoreCollection } from '/src/crud.js'
 
   let snackbarTimeoutID = null
   let countdownRemaining = 0
@@ -307,7 +248,9 @@
 
   let allIncompleteTasks = null
 
-  $: allTasks = [...$user.allTasks]
+  let allTasks = []
+  let isInitialFetch = true
+  let unsub
 
   $: computeDataStructuresFromAllTasks(allTasks)
 
@@ -318,6 +261,12 @@
     }).catch((error) => {
       // An error happened.
     });
+  }
+
+  function createSubtask ({ id, parentID, newTaskObj }) {
+    // the parent needs to update its pointers
+    updateTaskNode({ id: parentID, keyValueChanges: { children: arrayUnion(id)}})
+    createTaskNode({ id, newTaskObj })
   }
 
   function computeDataStructuresFromAllTasks (allTasks) {
@@ -335,22 +284,66 @@
     })
   }
 
-  onMount(() => {
-    const copy = [...allTasks]
-    maintainOneWeekPreviewWindowForRepeatingTasks(copy)
+  onMount(async () => {
+    const ref = collection(getFirestore(), `/users/${$user.uid}/tasks`)
+    unsub = onSnapshot(ref, (querySnapshot) => {
+      const result = [] 
+      querySnapshot.forEach((doc) => {
+        result.push({ id: doc.id, ...doc.data()})
+      })
+      allTasks = reconstructTreeInMemory(result)
+      // RE-WRITE / INTEGRATE THIS WHEN READY
+      // maintainOneWeekPreviewWindowForRepeatingTasks(allTasks)
+    })
+
 
     // HANDLE TASKS THAT REPEAT
-    // can't use `return` in reactive expression https://github.com/sveltejs/svelte/issues/2828
-    
-    // yes, this reset algorithm won't run unless you open the app
-    // we explicitly assume we'll open organize-life every day : ) which simplifies the code 
-    if (($user.lastRanRepeatAtDate !== dateOfToday) || testRunOnce) {
-      testRunOnce = false
-      updateDoc(doc(db, userDocPath), { 
-        lastRanRepeatAtDate: dateOfToday // dateOfToday
-      })
-    }    
+    // can't use `return` in reactive expression https://github.com/sveltejs/svelte/issues/2828  
   })
+
+  onDestroy(() => {
+    if (unsub) unsub()
+  })
+
+  const tasksPath = `/users/${$user.uid}/tasks/`
+
+  function createTaskNode ({ id, newTaskObj }) {
+    const newTaskObjChecked = checkTaskObjSchema(newTaskObj)
+    setFirestoreDoc(tasksPath + id, newTaskObjChecked)
+  }
+
+  function updateTaskNode ({ id, keyValueChanges }) {
+    console.log('id, keyValueChanges =', id, keyValueChanges)
+    updateFirestoreDoc(tasksPath + id, keyValueChanges)
+  }
+
+  // THIS IS STILL NOT WORKING: THE ADOPTION IS NOT WORKING, RIGHT NOW ALL THE 
+  // SUBTREE WILL BE GONE FOR SOME REASON
+  function deleteTaskNode ({ id, parentID, childrenIDs }) {
+    if (parentID !== "") {
+      updateFirestoreDoc(tasksPath + parentID, {
+        childrenIDs: arrayRemove(id)
+      })
+      // parent will be deleted, so the grandparent will take care of the children
+      if (childrenIDs) {
+        updateFirestoreDoc(tasksPath + parentID, {
+          childrenIDs: arrayUnion(...childrenIDs)
+        })
+      }
+    }
+
+    // temporary to clean up tasks that were created that didn't conform to the schema
+    // surprisngly many, keep it in to save time
+    if (childrenIDs) {
+      for (const childID of childrenIDs) {
+        updateFirestoreDoc(tasksPath + childID, {
+          "parentID": parentID
+        })
+      }
+    }
+    // now safely delete itself
+    deleteFirestoreDoc(tasksPath + id)
+  }
 
   function updateMusicAutoplay (e) {
     const { newVal } = e.detail
@@ -667,45 +660,25 @@
     })
   }
 
-  async function toggleTaskCompleted (id) {
-    traverseAndUpdateTree({ 
-      fulfilsCriteria: (task) => task.id === id,
-      applyFunc: (task) => { 
-        task.isDone = !task.isDone
-        if (task.isDone) { 
-          task.completionCount = task.completionCount + 1 || 1
-          if (task.daysBeforeRepeating) {
-            task.lastCompletionDate = getDateOfToday()
-          }
-
-          mostRecentlyCompletedTaskName.set(task.name)
-          mostRecentlyDeletedOrCompletedTaskID.set(task.id)
-          // this code is terrible but my sanity is more important
-          countdownRemaining = 10
-          snackbarTimeoutID = setTimeout(
-            () => { 
-              countdownRemaining = 0
-              clearTimeout(snackbarTimeoutID)
-              snackbarTimeoutID = null
-            },
-            10000
-          )
-        }
-        else {
-          task.completionCount = task.completionCount - 1 || 0 
-          // TO-DO: think of consequences of not undoing `lastCompletionDate`
-          if (snackbarTimeoutID) {
-            clearInterval(snackbarTimeoutID)
-          }
-          countdownRemaining = 0
-        }
-      }
-    })
-    // update database
-    await updateDoc(
-      doc(db, userDocPath),
-      { allTasks }
+  function triggerSnackbar (id) {
+    // mostRecentlyCompletedTaskName.set(task.name)
+    mostRecentlyDeletedOrCompletedTaskID.set(id)
+    // this code is terrible but my sanity is more important
+    countdownRemaining = 10
+    snackbarTimeoutID = setTimeout(
+      () => { 
+        countdownRemaining = 0
+        clearTimeout(snackbarTimeoutID)
+        snackbarTimeoutID = null
+      },
+      10000
     )
+  }
+
+  async function toggleTaskCompleted ({ id, isDone }) {
+    updateTaskNode({ id, keyValueChanges: { 
+      "isDone": isDone
+    }})
   }
 
 
@@ -756,101 +729,37 @@
   }
 
   async function updateNode ({ id, newDeepValue }) {
-    traverseAndUpdateTree({
-      fulfilsCriteria: (task) => {
-        const filter = task.children.filter(child => child.id === id)
-        return filter.length === 1  
-      },  // `filter` according to MDN docs: empty array will be returned if no child passes the test
-      applyFunc: (task) => {
-        const copyOfChildren = [...task.children]
-        for (let i = 0; i < copyOfChildren.length; i++) {
-          if (copyOfChildren[i].id === id) {
-            copyOfChildren[i] = newDeepValue
-            // quick-fix for root pointer not updating: 
-            // https://explanations.app/KsPz7BOExANWvkaauNKE/tx3MKBOKCUnee9kbf7dH
-            if (task.name === 'root') {
-              allTasks = copyOfChildren
-            } else {
-              task.children = copyOfChildren
-            }
-            return
-          }
-        }
-      }
-    })
-    await updateDoc(doc(db, userDocPath), { 
-      allTasks 
-    })
+    return // to deprecate
   }
 
   async function changeTaskStartTime ({ id, timeOfDay, dateScheduled }) {
-    traverseAndUpdateTree({
-      fulfilsCriteria: (task) => task.id === id,
-      applyFunc: (task) => {
-        const yearNumber = new Date().getFullYear()
-        task.startTime = timeOfDay 
-        task.startDate = dateScheduled
-        task.startYYYY = yearNumber.toString()
-      }
-    })
-    await updateDoc(doc(db, userDocPath), { 
-      allTasks 
-    })
+    updateTaskNode({ id, keyValueChanges: {
+      startTime: timeOfDay,
+      startDate: dateScheduled, 
+      startYYYY: new Date().getFullYear().toString()
+    }})
   }
 
   async function changeTaskDeadline ({ id, deadlineTime, deadlineDate }) {
-    traverseAndUpdateTree({
-      fulfilsCriteria: (task) => task.id === id, 
-      applyFunc: (task) => {
-        task.deadlineTime = deadlineTime
-        task.deadlineDate = deadlineDate
-      }
-    })
-    await updateDoc(doc(db, userDocPath), { 
-      allTasks 
-    })
+    updateTaskNode({ id, keyValueChanges: {
+      "deadlineTime": deadlineTime,
+      "deadlineDate": deadlineDate
+    }})
   }
 
   async function changeTaskDuration ({ id, duration }) {
-    traverseAndUpdateTree({
-      fulfilsCriteria: (task) => task.id === id,
-      applyFunc: (task) => task.duration = duration
+    updateTaskNode({ 
+      id, 
+      keyValueChanges: { "duration": duration }
     })
-    await updateDoc(doc(db, userDocPath), { 
-      allTasks 
-    })
-  }
-
-  // NOTE: it works by mutating the task nodes directly, it assumes aliasing
-  function scheduleHabitsWithoutClashing () {
-    // initially deadline is end of day, 00:00
-    // but there's already a task there, so the actual deadline becomes 00:00 - task.duration
-    // now you just repeat it until no tasks are left
-    let trueEndOfDay = 1440 
-    const pixelsBetweenEachHabit = 20
-    for (const habit of habitPoolToResolveConflict) {
-      // convert everything into minutes, so military time 
-      // 00:00: start of new day := 0 minutes
-      // 24:00: end of new day := 1440 minutes
-      trueEndOfDay -= ((habit.duration || 5) + pixelsBetweenEachHabit) // note `.duration` is already in minutes
-
-      // convert to 'hh:mm' format
-      const militaryHours = trueEndOfDay / 60
-      const integerPart = parseInt(militaryHours)
-      const decimalPart = militaryHours - integerPart
-      const hh = integerPart
-      let mm = Math.round(decimalPart * 60) 
-      if (mm < 10) mm = `0${mm}`
-      habit.startTime = `${hh}:${mm}`
-      console.log(`habit ${habit.name} starts =`, habit.startTime)
-    }
   }
 
   function checkTaskObjSchema (task) {
     const output = {...task}
     if (!task.startYYYY) output.startYYYY = ''
     if (!task.duration) output.duration = 15 
-    if (!task.children) output.children = [] 
+    if (!task.parentID) output.parentID = ""
+    if (!task.childrenIDs) output.childrenIDs = []
       // { name: newTaskObj.name,
       //   id: newTaskObj.id,
       //   deadlineDate: newTaskObj.deadlineDate || '',
@@ -865,15 +774,10 @@
   }
 
   function createNewRootTask (newTaskObj) {
-    const correctSchemaTaskObj = checkTaskObjSchema(newTaskObj)
-    const newValue = [
-      ...allTasks, 
-      correctSchemaTaskObj
-    ]
-    updateDoc(
-      doc(db, userDocPath),
-      { allTasks: newValue }
-    )
+    createTaskNode({ 
+      id: newTaskObj.id, 
+      newTaskObj: newTaskObj
+    })
   }
 
   function modifyTaskTree (updatedChildren, task) {
@@ -909,19 +813,13 @@
     for (let i = 0; i < 7; i++) {
       d.setDate(d.getDate() + 1)
     }
-    traverseAndUpdateTree({
-      fulfilsCriteria: (task) => task.id === id,
-      applyFunc: (task) => { 
-        task.startTime = ''
-        task.startDate = ''
-        task.deadlineDate = getDateInDDMMYYYY(d)
-        task.deadlineTime = '07:00'
-      }
-    })
-    updateDoc(
-      doc(db, userDocPath),
-      { allTasks }
-    )
+
+    updateTaskNode({ id, keyValueChanges: {
+      startTime: '',
+      startDate: '',
+      deadlineDate: getDateInDDMMYYYY(d),
+      deadlineTime: '07:00'
+    }})
   }
 
   // unscheduling back to grand to-do

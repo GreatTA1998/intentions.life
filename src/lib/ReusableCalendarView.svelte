@@ -55,7 +55,7 @@
           fontSize={0.8}
           hasCheckbox
           on:task-click
-          on:task-duration-adjusted
+          on:task-update
           on:task-checkbox-change
         />
       </div>
@@ -228,8 +228,6 @@
   }
 
   function copyGetTrueY (e) {
-    // const OverallContainer = document.getElementById('scroll-container')
-    console.log('return, =', e.clientY + OverallContainer.scrollTop - OverallContainer.getBoundingClientRect().top - OverallContainer.style.paddingTop)
     return e.clientY + OverallContainer.scrollTop - OverallContainer.getBoundingClientRect().top - OverallContainer.style.paddingTop
   }
 
