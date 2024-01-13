@@ -283,11 +283,11 @@ function handleInput (e) {
 
 function saveNotes (newVal) {
   taskObject.notes = newVal
-  dispatch('task-update', { id: taskObject.id, keyValueChanges: { newNotes: newVal }})
+  dispatch('task-update', { id: taskObject.id, keyValueChanges: { notes: newVal }})
 }
 
 function saveTitle (newVal) {
-  dispatch('task-update', { id: taskObject.id, keyValueChanges: { newName: newVal }})
+  dispatch('task-update', { id: taskObject.id, keyValueChanges: { name: newVal }})
 }
 </script>
 
