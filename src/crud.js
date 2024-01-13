@@ -69,3 +69,11 @@ export function createFirestoreQuery ({ collectionPath, criteriaTerms }) {
   const q = query(ref, where(criteriaTerms[0], criteriaTerms[1], criteriaTerms[2]))
   return q
 }
+
+export function deleteFirestoreDoc (path) {
+  return new Promise(async (resolve) => {
+    const ref = firestoreRef(path)
+    await deleteDoc(ref)
+    resolve()
+  })
+}

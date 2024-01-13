@@ -4,8 +4,10 @@
       <input
         checked={taskObject.isDone}
         on:change={(e) => {
-          dispatch('task-checkbox-change', {
-            isDone: e.target.checked,
+          dispatch('task-update', {
+            keyValueChanges: {
+              isDone: e.target.checked,
+            },
             id: taskObject.id
           })
         }} 
@@ -214,17 +216,21 @@ function saveDuration (e) {
   if (typeof Number(newValue) !== 'number') {
     return 
   }
-  dispatch('task-duration-adjusted', { id: taskObject.id, duration: Number(newValue) })
+  dispatch('task-update', { 
+    id: taskObject.id, 
+    keyValueChanges: { 
+      duration: Number(newValue) 
+    } 
+  })
 }
 
 function saveTaskStart (MMDD, HHMM) {
   taskObject.startTime = HHMM
   taskObject.startDate = MMDD
-  dispatch('task-schedule', {
-    id: taskObject.id,
+  dispatch('task-update', { id: taskObject.id, keyValueChanges: {
     newStartDate: MMDD,
     newStartTime: HHMM
-  })
+  }})
   isEditingTaskStart = false
 }
 
@@ -236,13 +242,13 @@ function saveDeadline (DDMMYYYY, HHMM) {
   taskObject.deadlineDate = DDMMYYYY
   taskObject.deadlineTime = HHMM
 
-  // TO-DO: rename `task-dragged` to something else
-  dispatch('task-dragged', {
-    id: taskObject.id,
-    deadlineTime: newDeadlineTime, // 
-    deadlineDate: newDeadlineDate
+  dispatch('task-update', { 
+    id: taskObject.id, 
+    keyValueChanges: {
+      deadlineTime: newDeadlineTime, 
+      deadlineDate: newDeadlineDate
+    }
   })
-
   isEditingDeadline = false
 }
 
@@ -252,13 +258,6 @@ function handleTaskStartInput (e) {
   newStartMMDD = newVal.split(" ")[0]
   newStartHHMM = newVal.split(" ")[1]
 }
-
-// function handleTaskEndInput (e) {
-//   isEditingTaskEnd = true
-//   const newVal = e.detail.value
-//   newEndMMDD = newVal.split(" ")[0]
-//   newEndHHMM = newVal.split(" ")[1]
-// }
 
 function handleDeadlineInput (e) {
   isEditingDeadline = true
@@ -284,93 +283,11 @@ function handleInput (e) {
 
 function saveNotes (newVal) {
   taskObject.notes = newVal
-  dispatch('task-notes-update', { id: taskObject.id, newNotes: newVal })
+  dispatch('task-update', { id: taskObject.id, keyValueChanges: { newNotes: newVal }})
 }
 
 function saveTitle (newVal) {
-  dispatch('task-title-update', { id: taskObject.id, newName: newVal })
-}
-
-function detectEnterKey4 (e) {
-  if (e.charCode === 13) {
-    if (!daysBeforeRepeating) {
-      alert('Task is reset and will no longer repeat')
-      taskObject.daysBeforeRepeating = 0
-      taskObject.repeatType = ''
-    } 
-    else {
-      taskObject.daysBeforeRepeating = daysBeforeRepeating
-      if (!taskObject.repeatType) {
-        taskObject.repeatType = 'habit'
-      }
-    }
-    dispatch('task-repeat')
-    daysBeforeRepeating = 0
-    isTypingRepeatFrequency = false
-  }
-}
-
-function detectEnterKey5 (e) {
-  if (e.charCode === 13) {
-    if (!newStartDate && !newStartTime) {
-      taskObject.startDate = '' 
-      taskObject.startTime = ''
-    }
-    else if (!newStartDate || !newStartTime) {
-      alert('Need BOTH date and time')
-    } 
-    else {
-      // why do we mutate it directly,
-      // but also pass these event.detail to the parent?
-      taskObject.startDate = newStartDate // this will be redundantly set to `newStartDate` at the root parent as well
-      taskObject.startTime = newStartTime // this will be redundantly set to `newStartTime` at the root parent as well
-      const yearNumber = new Date().getFullYear() 
-      // this will reach the database because it's mutated here, and allTasks will be synced to Firebase
-      taskObject.startYYYY = yearNumber.toString() 
-    }
-    dispatch('task-schedule', { id: taskObject.id, newStartDate, newStartTime })
-
-    // reset
-    newStartDate = ''
-    newStartTime = ''
-    isEditingStartDate = false 
-    isEditingStartTime = false
-  }
-}
-
-function dispatchNewDeadline (e) {
-  if (e.charCode === 13) {
-    if (!newDeadlineDate && !newDeadlineTime) {
-      taskObject.deadlineDate = '' 
-      taskObject.deadlineTime = ''
-    }
-    else if (!newDeadlineDate || !newDeadlineTime) {
-      alert('Need BOTH date and time')
-    } 
-    else {
-      taskObject.deadlineDate = newDeadlineDate
-      taskObject.deadlineTime = newDeadlineTime
-
-      // I'll leave these lines in case they're useful 
-      const yearNumber = new Date().getFullYear()
-      taskObject.startYYYY = yearNumber.toString()
-    }
-
-    // `task-dragged` is an unideal name, but good for `unscheduledTasksForToday`
-    dispatch('task-dragged', {
-      id: taskObject.id,
-      timeOfDay: '',
-      dateScheduled: getDateOfToday(),
-      deadlineTime: newDeadlineTime, // 
-      deadlineDate: newDeadlineDate
-    })
-
-    // reset
-    newDeadlineDate = ''
-    newDeadlineTime = ''
-    isEditingDeadlineDate = false
-    isEditingDeadlineTime = false
-  }
+  dispatch('task-update', { id: taskObject.id, keyValueChanges: { newName: newVal }})
 }
 </script>
 

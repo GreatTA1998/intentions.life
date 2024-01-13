@@ -2,7 +2,7 @@
   <!-- animated -->
   <div class="snackbar" style="display: flex; align-items: center;">
     <slot>
-      <p>"{$mostRecentlyCompletedTaskName}" will now be hidden because it's completed</p>
+      <p>Task will be hidden from to-do because it's completed</p>
 
       <div style="margin-right: 2px; margin-left: auto;">
 

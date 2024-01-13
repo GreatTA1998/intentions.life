@@ -95,7 +95,7 @@
           {doNotShowScheduledTasks}
           {doNotShowCompletedTasks}
           on:task-click
-          on:task-node-update
+          on:subtask-create
         />
       {/each}
 
@@ -195,36 +195,19 @@
     const d = new Date()
     for (let i = 0; i < 7; i++) {
       d.setDate(d.getDate() + 1)
-    }
-    const newSubtaskObj = {
-      deadlineDate: getDateInDDMMYYYY(d),
-      deadlineTime: '07:00',
-      id: getRandomID(),
-      name,
-      children: []
-    }
+    }       
 
-    const copyOfTaskObj = {...taskObj}
-    copyOfTaskObj.children = [...taskObj.children, newSubtaskObj]
-    dispatch('task-node-update', {
-      id: taskObj.id,
-      newDeepValue: copyOfTaskObj
-    })
-    console.log('dispatched task-node-update =', taskObj.id)
-  }
-
-  function handleGrandchildUpdate (e, i) {
-    // to avoid confusion, don't mutate taskObject in this component,
-    // only let the parent mutate it (even if the side-effects happen to cancel each other out)
-    // therefore construct a new payload 
-    const childCopy = { ...taskObj.children[i] }
-    childCopy.children = e.detail.updatedChildren
-
-    const childrenCopy = [...taskObj.children]
-    childrenCopy[i] = childCopy
-
-    dispatch('task-create', {
-      updatedChildren: childrenCopy
+    const newTaskID = getRandomID()
+    dispatch('subtask-create', {
+      id: newTaskID,
+      newTaskObj: {
+        id: newTaskID,
+        parentID: taskObj.id, 
+        deadlineDate: getDateInDDMMYYYY(d),
+        deadlineTime: '07:00',
+        name,
+        children: []   
+      }
     })
   }
 </script>

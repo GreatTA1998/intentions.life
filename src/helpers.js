@@ -1,3 +1,5 @@
+import { setFirestoreDoc } from '/src/crud.js'
+
 // how far, INCLUDING SCROLL, the actual position on the calendar is
 // // containerDistanceFromTopOfPage should be fixed, and not be affected by scrolling
 // so it's the e.clientY + initialOffset + scrollOffset 
@@ -227,7 +229,7 @@ export function applyFuncToEveryTreeNode ({ tree, applyFunc }) {
 }
 
 function helperFunction ({ node, applyFunc }) {
-  // this is a quick-fix: terminate once we find the deadlinet ask
+  // this is a quick-fix: terminate once we find the deadline ask
   if (applyFunc(node)) {
     return
   } 
@@ -298,3 +300,49 @@ export function convertMMDDToReadableMonthDayForm (mmdd, yyyy = '2024') {
   const splitArr = dateStr.split(' ' )// ['Fri', 'Apr', '10', '2020']
   return splitArr[1] + ' ' + splitArr[2] 
 }
+
+export function createIndividualFirestoreDocForEachTaskInAllTasks (tree, userDoc) {
+  const artificialRootNode = {
+    name: 'root',
+    children: tree
+  }
+  helperFunc({ 
+    node: artificialRootNode, 
+    parentID: null, 
+    userDoc 
+  })
+}
+
+function helperFunc ({ node, parentID, userDoc }) {
+  const newDocObj = {
+    parentID: parentID || null,
+    childrenIDs: node.children ? node.children.map(child => child.id) : [], 
+    ...node
+  }
+  
+  setFirestoreDoc(`/users/${userDoc.uid}/tasks/${node.id}`, newDocObj)
+ 
+  for (const child of node.children) {
+    helperFunc({ node: child, parentID: node.id, userDoc })
+  }
+}
+
+// recursively mutate this monolith data structure until its correct
+export function reconstructTreeInMemory (firestoreTaskDocs) {
+  const output = []
+  const rootTasks = firestoreTaskDocs.filter(task => task.parentID === null)
+  for (const task of rootTasks) {
+    hydrateOneLayerOfChildren({ node: task, firestoreTaskDocs })
+    output.push(task)
+  }
+  return output
+}
+
+// hydrate one layer of children
+function hydrateOneLayerOfChildren ({ node, firestoreTaskDocs }) {
+  node.children = firestoreTaskDocs.filter(task => task.parentID === node.id)
+  for (const child of node.children) {
+    hydrateOneLayerOfChildren({ node: child, firestoreTaskDocs })
+  }
+}
+
