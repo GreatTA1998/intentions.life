@@ -304,20 +304,26 @@ export function convertMMDDToReadableMonthDayForm (mmdd, yyyy = '2024') {
 // COMMON MISTAKES YOU MADE:
 // Here, you're converting the legacy `$user.allTasks` into a pointer-based data structure
 // So the data that you're starting with will have NO `parentID` nor `childrenIDs`
+// TBH YOU DON'T EVEN NEED THE ARTIFICAL ROOT NODE
 export function createIndividualFirestoreDocForEachTaskInAllTasks (tree, userDoc) {
   const artificialRootNode = {
     name: 'root',
     children: tree
   }
-  helperFunc({ 
-    node: artificialRootNode, 
-    parentID: "", 
-    userDoc 
-  })
+  for (const child of artificialRootNode.children) {
+    helperFunc({ 
+      node: child, 
+      parentID: "", 
+      userDoc 
+    })
+  }
 }
 
+// "root" shouldn't be included in this
 function helperFunc ({ node, parentID, userDoc }) {
   if (!node.children) return
+
+  node.children = node.children.filter(child => child.id)
 
   const newDocObj = {
     parentID: parentID || "", // handle legacy code where tasks didn't have IDs
