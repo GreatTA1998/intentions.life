@@ -25,20 +25,42 @@
     on:dragover={(e) => dragover_handler(e)}
   >
     <!-- TO-DO: Render all tasks with deadline of this week here -->
-    {#each tasksDueThisWeek as taskObj}
-      {#if !taskObj.isDone}
-        <RecursiveTaskElement 
-          {taskObj}
-          depth={0}
-          doNotShowScheduledTasks={false}
-          doNotShowCompletedTasks={false}
-          on:task-click
-          on:subtask-create
-          on:task-checkbox-change
-        />
-        <div style="margin-bottom: 24px;"></div>
-      {/if}
+    {#each tasksToDisplay as taskObj, i}
+      <RecursiveTaskElement 
+        {taskObj}
+        depth={0}
+        doNotShowScheduledTasks={false}
+        doNotShowCompletedTasks={false}
+        ancestorRoomIDs={['']}
+        parentID={''}
+        on:task-click
+        on:subtask-create
+        on:task-checkbox-change
+      >   
+        <div slot="dropzone-above-task-name">
+          {#if tasksToDisplay.length > 2}
+            <ReusableHelperDropzone
+              ancestorRoomIDs={['']}
+              roomsInThisLevel={tasksToDisplay}
+              idxInThisLevel={i}
+              parentID={''}
+              colorForDebugging="purple"
+            />
+          {/if}
+        </div>
+      </RecursiveTaskElement>
+      <div style="margin-bottom: 24px;"></div>
     {/each}
+
+    {#if tasksToDisplay.length > 0}
+      <ReusableHelperDropzone
+        ancestorRoomIDs={['']}
+        roomsInThisLevel={tasksToDisplay}
+        idxInThisLevel={tasksToDisplay.length}
+        parentID={''}
+        colorForDebugging="blue"
+      />
+    {/if}
 
     {#if isTypingNewRootTask}
       <input 
@@ -60,9 +82,11 @@
     convertDDMMYYYYToDateClassObject,
     getDateInDDMMYYYY, 
     getRandomID,
+    sortByOrderValue
   } from '/src/helpers.js'
   import RecursiveTaskElement from '$lib/RecursiveTaskElement.svelte'
   import { createEventDispatcher, tick } from 'svelte'
+  import ReusableHelperDropzone from '$lib/ReusableHelperDropzone.svelte'
 
   let isMouseHoveringOnTaskName = false
   let tasksDueThisWeek = null
@@ -72,7 +96,14 @@
   let NewRootTaskInput = ''
   const dispatch = createEventDispatcher()
 
+  let tasksToDisplay = [] 
+
   $: getTasksDueThisWeek(allIncompleteTasks)
+
+  
+  $: if (tasksDueThisWeek) {
+    computeTasksToDisplay()
+  }
 
   $: {
     if (isTypingNewRootTask) {
@@ -82,6 +113,12 @@
         }
       })
     }
+  }
+
+  function computeTasksToDisplay () {
+    tasksToDisplay = tasksDueThisWeek.filter(t => !t.isDone)
+    tasksToDisplay = sortByOrderValue(tasksToDisplay)
+    console.log('tasksToDisplay')
   }
 
   function getTasksDueThisWeek (taskArray) {

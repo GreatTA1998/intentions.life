@@ -306,9 +306,12 @@
 
   const tasksPath = `/users/${$user.uid}/tasks/`
 
-  function createTaskNode ({ id, newTaskObj }) {
+  async function createTaskNode ({ id, newTaskObj }) {
     const newTaskObjChecked = checkTaskObjSchema(newTaskObj)
     setFirestoreDoc(tasksPath + id, newTaskObjChecked)
+    updateFirestoreDoc(`users/${$user.uid}`, {
+      maxOrderValue: $user.maxOrderValue + 3
+    })
   }
 
   function updateTaskNode ({ id, keyValueChanges }) {
@@ -567,9 +570,10 @@
   function checkTaskObjSchema (task) {
     const output = {...task}
     if (!task.startYYYY) output.startYYYY = ''
-    if (!task.duration) output.duration = 15 
+    if (!task.duration) output.duration = 1
     if (!task.parentID) output.parentID = ""
     if (!task.childrenIDs) output.childrenIDs = []
+    if (!task.orderValue) output.orderValue = ($user.maxOrderValue || 0) + 3
     return output
   }
 

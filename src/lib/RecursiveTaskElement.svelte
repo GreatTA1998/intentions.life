@@ -29,17 +29,20 @@
     width: 100%;
     font-weight: {depthAdjustedFontWeight};
   "
-  draggable="true"
-  on:dragstart|self={(e) => dragstart_handler(e, taskObj.id)}
 
   on:mouseenter={() => isMouseHoveringOnTaskName = true}
   on:mouseleave={() => isMouseHoveringOnTaskName = false}
 >
+  <slot name="dropzone-above-task-name">
+
+  </slot>
   <div 
+    draggable="true"
+    on:dragstart|self={(e) => dragstart_handler(e, taskObj.id)}
     style="
     display: flex; 
     align-items: center; 
-    opacity: {taskObj.isDone ? '0.6' : '1'}
+    opacity: {taskObj.isDone ? '0.6' : '1'};
   ">
     <!--  no more fixed width: width: calc(100% - 30px); 
         min-width and height to make it easy to delete legacy tasks with no titles
@@ -99,12 +102,33 @@
         {doNotShowScheduledTasks}
         {doNotShowCompletedTasks}
         {willShowCheckbox}
+        parentID={taskObj.id}
         on:task-click
         on:subtask-create
         on:task-checkbox-change
-      />
+      > 
+        <div slot="dropzone-above-task-name"> 
+          {#if taskObj.children.length > 1}
+            <ReusableHelperDropzone
+              ancestorRoomIDs={[taskObj.id, ...ancestorRoomIDs]}
+              roomsInThisLevel={taskObj.children}
+              idxInThisLevel={i}
+              parentID={taskObj.id}
+              {colorForDebugging}
+            /> 
+          {/if}
+        </div>
+      </RecursiveTaskElement>
     {/each}
-
+    
+    <ReusableHelperDropzone
+      ancestorRoomIDs={[taskObj.id, ...ancestorRoomIDs]}
+      roomsInThisLevel={taskObj.children}
+      idxInThisLevel={taskObj.children.length}
+      parentID={taskObj.id}
+      {colorForDebugging}
+    /> 
+    
     <!-- If this task level has a deadline, new sub-tasks will also be 
       initialized with the same deadline
     -->
@@ -122,15 +146,18 @@
 
 <script>
   import RecursiveTaskElement from '$lib/RecursiveTaskElement.svelte'
-  import { getDateInDDMMYYYY, convertDDMMYYYYToDateClassObject, computeDayDifference, getRandomID } from '/src/helpers'
+  import ReusableHelperDropzone from '$lib/ReusableHelperDropzone.svelte'
+  import { getDateInDDMMYYYY, convertDDMMYYYYToDateClassObject, computeDayDifference, getRandomID, getRandomColor } from '/src/helpers'
   import { createEventDispatcher, tick } from 'svelte'
-  import { mostRecentlyCompletedTaskID } from '/src/store.js'
+  import { mostRecentlyCompletedTaskID, whatIsBeingDragged, whatIsBeingDraggedID } from '/src/store.js'
 
   export let taskObj
   export let depth 
   export let doNotShowScheduledTasks = false
   export let doNotShowCompletedTasks = false
   export let willShowCheckbox = true
+  export let ancestorRoomIDs = []
+  export let colorForDebugging = getRandomColor()
 
   let NewSubtaskInput
   let newSubtaskStringValue = ''
@@ -191,6 +218,8 @@
 
   function dragstart_handler(e, id) {
     e.dataTransfer.setData("text/plain", id);
+    whatIsBeingDragged.set("room")
+    whatIsBeingDraggedID.set(id)
   }
 
   function handleKeypress (e) {

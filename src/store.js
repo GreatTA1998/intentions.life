@@ -16,3 +16,6 @@ export const hasInitialScrolled = writable(false)
 export const showSnackbar = writable(false)
 
 export const userInfoFromAuthProvider = writable({})
+
+export const whatIsBeingDragged = writable("")
+export const whatIsBeingDraggedID = writable("")

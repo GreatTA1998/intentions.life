@@ -1,6 +1,33 @@
- import { getFirestoreCollection } from '/src/crud.js'
- import { createIndividualFirestoreDocForEachTaskInAllTasks } from '/src/helpers.js'
+ import { getFirestoreCollection, updateFirestoreDoc } from '/src/crud.js'
+ import { createIndividualFirestoreDocForEachTaskInAllTasks, applyFuncToEveryTreeNode, reconstructTreeInMemory } from '/src/helpers.js'
  
+export async function runGrandScript () {
+  const allUserDocs = await getFirestoreCollection('/users')
+  for (const userDoc of allUserDocs) {
+    if (!userDoc.phoneNumber && !userDoc.email) continue
+    console.log('handling userDoc =', userDoc.email || userDoc.phoneNumber)
+    const allTaskDocs = await getFirestoreCollection(`/users/${userDoc.uid}/tasks`)
+    const allTasks = reconstructTreeInMemory(allTaskDocs)
+    console.log('allTasks =', allTasks)
+    assignOrderValueToEachTask(allTasks, userDoc)
+    await delayTime(15 * 1000)
+  }
+}
+
+  export async function assignOrderValueToEachTask (builtMemoryTree, userDoc) {
+    applyFuncToEveryTreeNode({ tree: builtMemoryTree, applyFunc: (task) => {
+      let i = 33 // if it starts from 0 you cause bugs because order value should never get to 0
+      for (const child of task.children) {
+        updateFirestoreDoc(`/users/${userDoc.uid}/tasks/${child.id}`, {
+          orderValue: i
+        })
+        console.log('assigning order value i =', i)
+        delayTime(1)
+        i += 1
+      }
+    }})
+  } 
+
  // first update the null pointers
   export async function runScript () {
     const allUsers = await getFirestoreCollection(`/users/`)
@@ -14,7 +41,7 @@
         console.log('migrating to new data format for userDoc =', userDoc)
         const copyOfData = [...userDoc.allTasks]
         createIndividualFirestoreDocForEachTaskInAllTasks(copyOfData, userDoc)
-        await delayTime()
+        await delayTime(10000)
       }
       // THAT'S ONLY FOR ME AS I GENERATED TASK COLLECTIONS WITH NULL POINTERS, OTHER USERS DON'T HAVE THIS PROBLEM
       // const taskDbDocs = await getFirestoreCollection(`/users/${userDoc.uid}/tasks`)
@@ -32,8 +59,8 @@
     // END OF ONE TIME SCRIPT
   }
 
-  function delayTime () {
+  function delayTime (ms) {
     return new Promise(resolve => {
-      setTimeout(() => resolve(), 10000)
+      setTimeout(() => resolve(), ms)
     })
   }

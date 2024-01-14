@@ -10,6 +10,12 @@ export function round (value, precision) {
   return Math.round(value * multiplier) / multiplier;
 }
 
+export function getRandomColor () {
+  return "hsla(" + ~~(360 * Math.random()) + "," + // hue i.e. the "color"
+                "100%,"+  // 100% saturation i.e. maximize on its vividness and purity
+                "60%,1)"; // 60% lightness (how much black / white mix, otherwise too faded), 1 alpha
+}
+
 export function getTrueY (e) {
   const ScrollContainers = document.getElementsByClassName('scroll-container')
   const ScrollContainer = ScrollContainers[0]
@@ -382,9 +388,30 @@ export function reconstructTreeInMemory (firestoreTaskDocs) {
 }
 
 function hydrateOneLayerOfChildren ({ node, firestoreTaskDocs, layers }) {
-  node.children = layers[node.id]
+  node.children = sortByOrderValue(layers[node.id])
   for (const child of node.children) {
     hydrateOneLayerOfChildren({ node: child, firestoreTaskDocs, layers })
   }
+}
+
+export function sortByOrderValue(array) {
+  array.sort((a, b) => {
+    // If both elements have "orderValue", compare them directly
+    if (a.orderValue !== undefined && b.orderValue !== undefined) {
+      return a.orderValue - b.orderValue;
+    }
+
+    // If only one element has "orderValue", place it first
+    if (a.orderValue !== undefined) {
+      return -1;
+    }
+    if (b.orderValue !== undefined) {
+      return 1;
+    }
+
+    // If neither element has "orderValue", maintain their original order
+    return 0;
+  });
+  return array;
 }
 
