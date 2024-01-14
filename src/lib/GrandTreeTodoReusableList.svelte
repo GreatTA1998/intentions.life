@@ -145,7 +145,7 @@
       deadlineTime: '23:59',
       id: getRandomID(),
       name: taskName,
-      children: []
+      parentID: ""
     }
     dispatch('new-root-task', newRootTaskObj)
     // use same API as legacy code

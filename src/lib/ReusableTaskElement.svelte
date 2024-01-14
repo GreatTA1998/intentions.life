@@ -108,7 +108,6 @@
   // Assumes `task` is hydrated
   import { createEventDispatcher } from 'svelte'
   import { getTrueY } from '/src/helpers.js'
-  import CustomRoundCheckbox from '$lib/CustomRoundCheckbox.svelte';
 
   export let task = null
   export let pixelsPerHour = null

@@ -33,6 +33,7 @@
         doNotShowCompletedTasks={true}
         on:task-click
         on:subtask-create
+        on:task-checkbox-change
       />
       <div style="margin-bottom: 24px;"></div>
     {/each}
@@ -128,6 +129,7 @@
       d.setDate(d.getDate() + 1)
     }
     const newRootTaskObj = {
+      duration: 1,
       deadlineDate: getDateInDDMMYYYY(d),
       deadlineTime: '23:59',
       id: getRandomID(),

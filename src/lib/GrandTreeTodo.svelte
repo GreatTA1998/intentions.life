@@ -1,13 +1,24 @@
 <!-- background-color:#F4F4F4; -->
 <div 
   class="todo-container" 
-  style="padding-top: 24px; padding-left: 12px; padding-right: 12px; background-color: var(--todo-list-bg-color); border-radius: 24px;" 
   on:drop
   on:dragover={(e) => dragover_handler(e)}
+  style="font-size: 36px;"
 >
 
-  <div style="height: 24px; font-size: 16px; align-items: center; display: flex;">
-    <div style="margin-left: 8px; color: rgb(10, 10, 10); font-weight: 500">THIS LIFE</div> 
+  <div style="height: 24px; font-size: 16px; align-items: center; display: flex;"
+    on:mouseenter={() => isMouseHoveringOnTaskName = true}
+    on:mouseleave={() => isMouseHoveringOnTaskName = false}
+  >
+    <div style="margin-left: 8px; color: rgb(10, 10, 10); font-weight: 500">
+      THIS LIFE
+    </div> 
+
+    {#if isMouseHoveringOnTaskName}
+      <span on:click={() => isTypingNewRootTask = true} class="material-icons" style="margin-left: 6px; cursor: pointer;">
+        add
+      </span>
+    {/if}
   </div>
 
   <div style="margin-bottom: 36px;"></div>
@@ -15,86 +26,83 @@
   <div class="todo-list">
     {#if allTasks}
       {#each allTasks as task}
-        {#if !task.isDeleted}
+        {#if !task.isDeleted && !task.isDone && !task.deadlineDate}
           <div class="task-container">
-            <RecursiveTask 
+            <RecursiveTaskElement 
+              taskObj={task}
+              depth={0}
+              doNotShowScheduledTasks={true}
+              doNotShowCompletedTasks={true}
+              willShowCheckbox={false}
               on:task-click
-              on:task-create={(e) => dispatch('task-create', { 
-                updatedChildren: e.detail.updatedChildren,
-                taskAffected: task 
-              })}
-              on:task-done
-              on:task-delete
-              on:task-repeating
-              taskObject={task}
-              depth={1}
+              on:task-node-update
+              on:subtask-create
             />
           </div>
         {/if}
       {/each}
 
-      <!-- CREATE NEW TASK (invisible but hoverable region) -->
-      <div style="height: 300px; width: 200px;"
-        on:mouseenter={() => isShowingCreateButton = true}
-        on:mouseleave={() => isShowingCreateButton = false}
-      >
-        {#if isShowingCreateButton}
-          {#if !isTypingNewRootTask}
-            <div style="font-size: 2rem; color: #000000;" on:click={() => isTypingNewRootTask = true}>
-              New task 
-            </div>
-          {:else}
-            <div style="display: flex; align-content: center; justify-items: center">
-              <input 
-                bind:value={newTopLevelTask} placeholder="Type task..." 
-                on:keypress={detectEnterKey2}
-              >
-            </div>
-          {/if}
-        {/if}
-      </div>
+      {#if isTypingNewRootTask}
+        <div style="height: 60px; display: flex; align-content: center; justify-items: center">
+          <input 
+            bind:this={NewRootTaskInput}
+            bind:value={newRootTaskStringValue} 
+            on:keydown={(e) => handleKeyDown(e)}
+            placeholder="Type task here..."
+          >
+        </div>
+      {/if}     
     {/if}
   </div>
 </div>
 
 <script>
+  import RecursiveTaskElement from '$lib/RecursiveTaskElement.svelte'
+  import { createEventDispatcher, tick } from 'svelte'
   import { getRandomID } from '/src/helpers.js'
-  import RecursiveTask from '$lib/RecursiveTask.svelte'
-  import { createEventDispatcher } from 'svelte'
 
   export let allTasks
 
-  let newTopLevelTask = ''
+  let newRootTaskStringValue = ''
   let isTypingNewRootTask = false
-  let isShowingCreateButton = false
   const dispatch = createEventDispatcher()
 
-  function detectEnterKey2 (e) { 
-    if (e.charCode === 13) {
-      createTask()
+  let NewRootTaskInput
+
+  let isMouseHoveringOnTaskName = false
+
+  $: {
+    if (isTypingNewRootTask) {
+      tick().then(() => {
+        if (NewRootTaskInput) {// quick-fix {
+          NewRootTaskInput.focus()
+        }
+      })
     }
   }
 
-  function createTask () {
-    if (!newTopLevelTask) {
-      alert("You have to type something first")
+  function handleKeyDown (e) {
+    if (e.key !== 'Enter') return
+
+    if (newRootTaskStringValue === '') {
+      isTypingNewRootTask = false
+      newRootTaskStringValue = ''
     }
-    const newValue = [
-      ...allTasks, 
-      { name: newTopLevelTask,
-        duration: 15, // minutes 
-        children: [],
-        id: getRandomID()
-      }
-    ]
+    // nice side-effect of this: double-tap ENTER to be done
+    else  {
+      createRootTaskWithoutDeadline(newRootTaskStringValue)
+      // then reset
+      newRootTaskStringValue = ''
+    }
+  }
 
-    updateDoc(
-      doc(db, userDocPath),
-      { allTasks: newValue }
-    )
-
-    newTopLevelTask = ''
-    isTypingNewTask = false
+  function createRootTaskWithoutDeadline (taskName) {
+    const newRootTaskObj = {
+      id: getRandomID(),
+      name: taskName,
+      parentID: ""
+    }
+    dispatch('new-root-task', newRootTaskObj)
   }
 
   function dragover_handler (e) {
@@ -109,6 +117,8 @@
     box-sizing: border-box;
     width: 100%;
     height: 100%;
+
+    padding-top: 24px; padding-left: 12px; padding-right: 12px; background-color: var(--todo-list-bg-color); border-radius: 24px;
   }
 
   .todo-list {

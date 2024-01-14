@@ -85,8 +85,7 @@
       {#if currentMode === 'Dashboard'}
         <LifeDashboard {allTasks}/>  
       {:else if currentMode === 'Day'}
-        <!-- Note: .getHours() is 0-indexed from 0 to 23 -->
-        <!-- Show daytime art from 5 am - 7 pm -->
+        <!-- Show daytime art from 5 am - 7 pm, note `.getHours()` is 0-indexed from 0 to 23 -->
         {#if new Date().getHours() > 5 && new Date().getHours() < 18} 
           <BedtimePopupMaplestoryMusic willMusicAutoplay={$user.willMusicAutoplay}/>
         {:else} 
@@ -128,6 +127,7 @@
           on:task-unscheduled={(e) => putTaskToThisWeekTodo(e)}
           on:subtask-create={(e) => createSubtask(e.detail)}
           on:task-click={(e) => openDetailedCard(e.detail)}
+          on:task-checkbox-change={(e) => updateTaskNode({ id: e.detail.id, keyValueChanges: { isDone: e.detail.isDone }})} 
         > 
           <GrandTreeTodoPopupButton
             {allIncompleteTasks}
@@ -139,11 +139,9 @@
           > 
             <GrandTreeTodo 
               {allTasks}
+              on:new-root-task={(e) => createNewRootTask(e.detail)}
+              on:subtask-create={(e) => createSubtask(e.detail)}
               on:task-click={(e) => openDetailedCard(e.detail)}
-              on:task-create={(e) => modifyTaskTree(e.detail.updatedChildren, e.detail.taskAffected)} 
-              on:task-done={updateEntireTaskTree}
-              on:task-delete={updateEntireTaskTree}
-              on:task-repeating={updateEntireTaskTree}
               on:drop={(e) => unscheduleTask(e)}
             />
           </GrandTreeTodoPopupButton>
@@ -593,26 +591,6 @@
     })
   }
 
-  // TO-DO: deprecate=
-  function modifyTaskTree (updatedChildren, task) {
-    // change the reference
-    task.children = [...updatedChildren]
-
-    updateEntireTaskTree()
-  }
-
-  // change the pointer to the updatedChildren
-  // allTasks' subtree is mutated, and it will correctly reference it,
-    
-  // but the reactivity system does not KNOW when exactly it has been mutated, 
-  // TO-DO: also deprecate this
-  function updateEntireTaskTree () {
-    updateDoc(
-      doc(db, userDocPath),
-      { allTasks }
-    )
-  }
-
   // mvoe to this week's todo
   function putTaskToThisWeekTodo (e) {
     e.preventDefault()
@@ -648,20 +626,13 @@
     } else {
       id = e.dataTransfer.getData('text/plain')
     }
-    traverseAndUpdateTree({
-      fulfilsCriteria: (task) => task.id === id,
-      applyFunc: (task) => { 
-        task.startTime = ''
-        task.startDate = ''
-        task.deadlineDate = '' 
-        task.deadlineTime = ''
-        task.isDone = false
-      }
-    })
-    updateDoc(
-      doc(db, userDocPath),
-      { allTasks }
-    )
+    updateTaskNode({ id, keyValueChanges: {
+      startTime: '',
+      startDate: '',
+      deadlineDate: '',
+      deadlineTime: '',
+      isDone: false
+    }})
   }
 
   // WORK IN PROGRESS: node.children will be undefined 
@@ -804,8 +775,8 @@
   }
 
   .active-ux-tab {
-    border-bottom: 1px solid #0085FF;
-    color: #0085FF;
+    border-bottom: 1px solid #48cae4;
+    color: #48cae4;
     font-weight: 500;
   }
 
