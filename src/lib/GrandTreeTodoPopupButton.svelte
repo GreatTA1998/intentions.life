@@ -56,7 +56,7 @@
             />  
           </div>
 
-          <div style="width: 58%; height: 100%; overflow-x: auto; opacity: 0.5;">
+          <div style="width: 58%; height: 100%; overflow-x: auto; opacity: 0.8;">
             <slot>
               <!-- GrandTreeTodo will be injected via the parent,, so no interface will need to be changed -->
             </slot>

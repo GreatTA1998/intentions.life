@@ -10,6 +10,7 @@
       on:task-click={(e) => openDetailedCard(e.detail)}
       on:card-close={() => isDetailedCardOpen = false}
       on:task-delete={(e) => deleteTaskNode(e.detail)}
+      on:task-checkbox-change={(e) => updateTaskNode({ id: e.detail.id, keyValueChanges: { isDone: e.detail.isDone }})} 
     />
   {/if}
 {/key}
@@ -34,8 +35,17 @@
 
 
 <!-- UNDO COMPLETED SNACKBAR -->
-{#if $mostRecentlyDeletedOrCompletedTaskID && countdownRemaining > 0}
-  <TheSnackbar on:task-done={(e) => toggleTaskCompleted({ id: e.detail.id, newVal: false })}></TheSnackbar>
+{#if $mostRecentlyCompletedTaskID}
+  <TheSnackbar on:undo-task-completion={() => {
+    updateTaskNode({ 
+      id: $mostRecentlyCompletedTaskID,
+      keyValueChanges: {
+        isDone: false
+      }
+    })
+    mostRecentlyCompletedTaskID.set('')
+  }}>
+  </TheSnackbar>
 {/if}
 
 <!-- Copy & paste snackbar -->
@@ -85,8 +95,7 @@
       {#if currentMode === 'Dashboard'}
         <LifeDashboard {allTasks}/>  
       {:else if currentMode === 'Day'}
-        <!-- Note: .getHours() is 0-indexed from 0 to 23 -->
-        <!-- Show daytime art from 5 am - 7 pm -->
+        <!-- Show daytime art from 5 am - 7 pm, note `.getHours()` is 0-indexed from 0 to 23 -->
         {#if new Date().getHours() > 5 && new Date().getHours() < 18} 
           <BedtimePopupMaplestoryMusic willMusicAutoplay={$user.willMusicAutoplay}/>
         {:else} 
@@ -128,6 +137,7 @@
           on:task-unscheduled={(e) => putTaskToThisWeekTodo(e)}
           on:subtask-create={(e) => createSubtask(e.detail)}
           on:task-click={(e) => openDetailedCard(e.detail)}
+          on:task-checkbox-change={(e) => updateTaskNode({ id: e.detail.id, keyValueChanges: { isDone: e.detail.isDone }})} 
         > 
           <GrandTreeTodoPopupButton
             {allIncompleteTasks}
@@ -139,11 +149,9 @@
           > 
             <GrandTreeTodo 
               {allTasks}
+              on:new-root-task={(e) => createNewRootTask(e.detail)}
+              on:subtask-create={(e) => createSubtask(e.detail)}
               on:task-click={(e) => openDetailedCard(e.detail)}
-              on:task-create={(e) => modifyTaskTree(e.detail.updatedChildren, e.detail.taskAffected)} 
-              on:task-done={updateEntireTaskTree}
-              on:task-delete={updateEntireTaskTree}
-              on:task-repeating={updateEntireTaskTree}
               on:drop={(e) => unscheduleTask(e)}
             />
           </GrandTreeTodoPopupButton>
@@ -190,16 +198,14 @@
     getDateOfToday, 
     getDateInDDMMYYYY, 
     generateRepeatedTasks, 
-    createIndividualFirestoreDocForEachTaskInAllTasks,
     reconstructTreeInMemory
   } from '/src/helpers.js'
   import { onDestroy, onMount } from 'svelte'
   import JournalPopup from '$lib/JournalPopup.svelte'
   import FinancePopup from '$lib/FinancePopup.svelte'
   import BedtimePopupMaplestoryMusic from '$lib/BedtimePopupMaplestoryMusic.svelte'
-
   import TheSnackbar from '$lib/TheSnackbar.svelte'
-  import { mostRecentlyDeletedOrCompletedTaskID, mostRecentlyCompletedTaskName, user, showSnackbar } from '/src/store.js'
+  import { mostRecentlyCompletedTaskID, user, showSnackbar, isSnackbarHidden } from '/src/store.js'
   import CalendarThisWeek from '$lib/CalendarThisWeek.svelte'
   import TodoThisWeek from '$lib/TodoThisWeek.svelte'
   import FutureOverview from '$lib/FutureOverview.svelte'
@@ -210,9 +216,7 @@
   import GrandTreeTodoPopupButton from '$lib/GrandTreeTodoPopupButton.svelte'
   import GrandTreeTodo from '$lib/GrandTreeTodo.svelte'
   import PopupCustomerSupport from '$lib/PopupCustomerSupport.svelte'
-
   import { goto } from '$app/navigation';
-
   import { getAuth, signOut } from 'firebase/auth'
   import db from '/src/db.js'
   import { doc, collection, getFirestore, updateDoc, arrayUnion, onSnapshot, arrayRemove } from 'firebase/firestore'
@@ -227,12 +231,7 @@
   let isFinancePopupOpen = false
 
   const userDocPath = `users/${$user.uid}`
-  const habitPoolToResolveConflict = []
 
-  // let allTasks = null // WARNING, DON'T INITIALIZE TO []
-  // I once tried `allTasks = []`, it wiped my entire task tree because it synced the empty [] (which it thinks is fully fetched) with the database.task
-  // AF(null) --> unfetched 
-  // AF([]) --> fresh new todo-list
   let dateOfToday = getDateOfToday()
   let todayScheduledTasks = []
   let futureScheduledTasks = [] // AF([])
@@ -243,12 +242,9 @@
   let isJournalPopupOpen = false
   let currentJournalEntryMMDD = getDateOfToday()
 
-  let clickedTask = {}
-  let goalsAndPosters = ''
-
-  let allIncompleteTasks = null
-
   let allTasks = []
+  let clickedTask = {}
+  let allIncompleteTasks = null
   let isInitialFetch = true
   let unsub
 
@@ -293,7 +289,10 @@
       })
       allTasks = reconstructTreeInMemory(result)
       // RE-WRITE / INTEGRATE THIS WHEN READY
-      // maintainOneWeekPreviewWindowForRepeatingTasks(allTasks)
+      if (isInitialFetch) {
+        isInitialFetch = false
+        maintainOneWeekPreviewWindowForRepeatingTasks(allTasks)
+      }
     })
 
 
@@ -393,43 +392,6 @@
     return new Intl.DateTimeFormat('en-US', options).format(dateClassObj)
   }
 
-
-  async function uploadGeneratedTasks (param) {
-    const { allGeneratedTasksToUpload } = param
-    const { repeatGroupID, willRepeatOnWeekDayNumber } = allGeneratedTasksToUpload[0]
-
-    // quickfix: the generated tasks have the repeat schedule, but the original task doesn't, so add it here
-    traverseAndUpdateTree({
-      fulfilsCriteria: task => task.id === repeatGroupID,
-      applyFunc: task => {
-        task.willRepeatOnWeekDayNumber = willRepeatOnWeekDayNumber
-        task.lastRanRepeatAtIsoString = new Date().toISOString()
-      }
-    })
-
-    traverseAndUpdateTree({
-      fulfilsCriteria: (task) => {
-        // `filter` according to MDN docs: empty array will be returned if no child passes the test
-        const filter = task.children.filter(child => child.id === repeatGroupID)
-        return filter.length === 1      
-      }, 
-      applyFunc: (task) => {
-        const updatedChildren = [...task.children, ...allGeneratedTasksToUpload]
-        if (task.name === 'root') {
-          // without this, `task.children' will point to an `updatedChildren`, but `allTasks` will be unaffected
-          // so we set it manually
-          // https://explanations.app/KsPz7BOExANWvkaauNKE/tx3MKBOKCUnee9kbf7dH
-          allTasks = updatedChildren
-        } else {
-          task.children = updatedChildren
-        }
-      }
-    })
-    await updateDoc(doc(db, userDocPath), { 
-      allTasks 
-    })
-  }
-
   function changeJournal({ newJournal }) {
     updateDoc(doc(db, userDocPath), {
       journal: newJournal
@@ -438,69 +400,6 @@
 
   // FOR DEBUGGING PURPOSES, TURN IT ON TO TRUE TO RUN SCRIPT ONCE
   let testRunOnce = false
-
-  /**
-   *  Handle repeating habits e.g. meditate every 3 day, run every 7 days
-   *  @see https://explain.mit.edu/mDbUrvjy4pe8Q5s5wyoD/2bePUmmRDGP6KR61Hgqa
-   */
-  //  TO-DO: 
-  //     - Use a date manipulation / date arithmetic library e.g. moment.js
-  function recursivelyResetRepeatingTasks (node) {
-    // TO-DO: handle repeating events 
-    
-    // FULL LOGIC FOR HABITS
-    // A habit should always repeat regardless of whether it was done or not
-    // `daysBeforeRepeating` and `deadlineDate` are the key quantities we will use
-
-    // This can be easily corrected/upgraded by running it once per day with Cloud Functions,
-    // but the core logic works
-
-    // for now we ignore hour mode and the implications of more specific `deadlineTime`
-    if (node.repeatType === 'habit' && node.daysBeforeRepeating && node.deadlineDate && node.deadlineTime) {
-      console.log('habit being reset =', node)
-      // update stats for this habit
-      if (!node.isDone) {
-        node.missedCount = (node.missedCount += 1) || 1
-      } else {
-        // note: if it's completed, the `completionCount` would've already been updated
-      }
-      node.isDone = false 
-      
-      // WE COMPARE deadlineDate + daysBeforeRepeating vs today
-      const { daysBeforeRepeating, deadlineDate, deadlineTime } = node
-
-      const [dd, mm, yyyy] = deadlineDate.split('/')
-      const d1 = new Date(yyyy, mm - 1, dd) // mm is 0 indxed when initializing (I KNOW)
-      d1.setDate(d1.getDate() + Number(daysBeforeRepeating))
-
-      const today = new Date()
-   
-      const dayDiff = computeDayDifference(d1, today)
-
-      // USEFUL DEBUGGING LOGS
-      // if (node.name === 'Exercise') {
-        // console.log('d1, d2 =', d1, today)
-        // console.log('dayDiff =', dayDiff)
-      // }
-
-      if (dayDiff >= 0) { // i.e. today is larger than the next repeating date for the habit
-        node.deadlineDate = getDateInDDMMYYYY(today)
-
-        // just because it was scheduled at a particular time a few days ago
-        // does not mean you want to do it at exactly the same time today
-        node.startDate = ''
-        node.startTime = ''
-
-        console.log('successfully shifted new deadline for habit =', node)
-        // we leave `deadlineTime` untouched for now
-      }
-    }
-    
-    // RECURSIVELY CALL FOR CHILDREN TASKS
-    for (const child of node.children) {
-      recursivelyResetRepeatingTasks(child)
-    }
-  }
 
   function openDetailedCard ({ task }) {
     clickedTask = task
@@ -524,39 +423,6 @@
       helperFunction({ node: child, fulfilsCriteria, applyFunc })
     }
   }
-
-  async function scheduleATask (id, newStartTime, newStartDate) {
-    traverseAndUpdateTree({
-      fulfilsCriteria: (task) => task.id === id, 
-      applyFunc: (task) => {
-        task.startDate = newStartDate
-        task.startTime = newStartTime
-      }
-    })
-    await updateDoc(doc(db, userDocPath), {
-      allTasks
-    })
-  }
-
-  async function changeNotesOfATask ({ id, newNotes }) {
-    traverseAndUpdateTree({
-      fulfilsCriteria: (task) => task.id === id, 
-      applyFunc: (task) => task.notes = newNotes
-    })
-    await updateDoc(doc(db, userDocPath), { 
-      allTasks 
-    })
-  } 
-
-  async function changeNameOfATask ({ id, newName }) {
-    traverseAndUpdateTree({
-      fulfilsCriteria: (task) => task.id === id, 
-      applyFunc: (task) => task.name = newName
-    })
-    await updateDoc(doc(db, userDocPath), { 
-      allTasks 
-    })
-  } 
 
   function collectTodayScheduledTasksToArray () {
     todayScheduledTasks = [] // reset
@@ -611,8 +477,6 @@
     })
   } 
 
-
-
   // note due to a bug, sometimes `mm` is like 131 instead of a valid hour, 
   // which fucks up the computation
 
@@ -660,51 +524,8 @@
     })
   }
 
-  function triggerSnackbar (id) {
-    // mostRecentlyCompletedTaskName.set(task.name)
-    mostRecentlyDeletedOrCompletedTaskID.set(id)
-    // this code is terrible but my sanity is more important
-    countdownRemaining = 10
-    snackbarTimeoutID = setTimeout(
-      () => { 
-        countdownRemaining = 0
-        clearTimeout(snackbarTimeoutID)
-        snackbarTimeoutID = null
-      },
-      10000
-    )
-  }
-
-  async function toggleTaskCompleted ({ id, isDone }) {
-    updateTaskNode({ id, keyValueChanges: { 
-      "isDone": isDone
-    }})
-  }
-
-
-  async function deleteSubtree (id) {
-    traverseAndUpdateTree({
-      fulfilsCriteria: (task) => task.children.filter(child => child.id === id).length >= 1, // inequality is important because sometimes 2 or more tasks have the same name
-      applyFunc: (task) => { 
-        let idx = null
-        // do not use `forEach` it might mutate the array while it iterates even if you use return statements etc. it's unintuitive code
-        for (let i = 0; i < task.children.length; i++) {
-          if (task.children[i].id === id) {
-            idx = i
-            break
-          }
-        }
-        if (idx >= 0) { // sometimes `idx` is undefined for some reason, meaning the last item of the array will be deleted
-          task.children.splice(idx, 1)
-        }
-      }
-    })
-    await updateDoc(doc(db, userDocPath), { 
-      allTasks 
-    })
-  }
-
   /*
+  // TODO: IMPLEMENT THIS LOGIC
     When a task is scheduled but missed, there are 2 possibilities:
       - It's a special i.e. non-repeating event: return it to the to-do
       - It's a repeating event: just increment the miss count 
@@ -728,10 +549,6 @@
     })
   }
 
-  async function updateNode ({ id, newDeepValue }) {
-    return // to deprecate
-  }
-
   async function changeTaskStartTime ({ id, timeOfDay, dateScheduled }) {
     updateTaskNode({ id, keyValueChanges: {
       startTime: timeOfDay,
@@ -747,29 +564,12 @@
     }})
   }
 
-  async function changeTaskDuration ({ id, duration }) {
-    updateTaskNode({ 
-      id, 
-      keyValueChanges: { "duration": duration }
-    })
-  }
-
   function checkTaskObjSchema (task) {
     const output = {...task}
     if (!task.startYYYY) output.startYYYY = ''
     if (!task.duration) output.duration = 15 
     if (!task.parentID) output.parentID = ""
     if (!task.childrenIDs) output.childrenIDs = []
-      // { name: newTaskObj.name,
-      //   id: newTaskObj.id,
-      //   deadlineDate: newTaskObj.deadlineDate || '',
-      //   deadlineTime: newTaskObj.deadlineTime || '',
-      //   startTime: newTaskObj.startTime || '',
-      //   startDate: newTaskObj.startDate || '',
-      //   startYYYY: newTaskObj.startYYYY || '',
-      //   duration: 15, // minutes 
-      //   children: [],
-      // }
     return output
   }
 
@@ -778,24 +578,6 @@
       id: newTaskObj.id, 
       newTaskObj: newTaskObj
     })
-  }
-
-  function modifyTaskTree (updatedChildren, task) {
-    // change the reference
-    task.children = [...updatedChildren]
-
-    updateEntireTaskTree()
-  }
-
-  // change the pointer to the updatedChildren
-  // allTasks' subtree is mutated, and it will correctly reference it,
-    
-  // but the reactivity system does not KNOW when exactly it has been mutated, 
-  function updateEntireTaskTree () {
-    updateDoc(
-      doc(db, userDocPath),
-      { allTasks }
-    )
   }
 
   // mvoe to this week's todo
@@ -822,6 +604,7 @@
     }})
   }
 
+  // TO-DO: also refactor this
   // unscheduling back to grand to-do
   function unscheduleTask (e) {
     e.preventDefault()
@@ -832,20 +615,13 @@
     } else {
       id = e.dataTransfer.getData('text/plain')
     }
-    traverseAndUpdateTree({
-      fulfilsCriteria: (task) => task.id === id,
-      applyFunc: (task) => { 
-        task.startTime = ''
-        task.startDate = ''
-        task.deadlineDate = '' 
-        task.deadlineTime = ''
-        task.isDone = false
-      }
-    })
-    updateDoc(
-      doc(db, userDocPath),
-      { allTasks }
-    )
+    updateTaskNode({ id, keyValueChanges: {
+      startTime: '',
+      startDate: '',
+      deadlineDate: '',
+      deadlineTime: '',
+      isDone: false
+    }})
   }
 
   // WORK IN PROGRESS: node.children will be undefined 
@@ -856,7 +632,6 @@
   // and also passing explicit parameters. Might deserve an explanation video. ,
   // as mutations, pointers are a concern with these deeply nested data structures. 
   function maintainOneWeekPreviewWindowForRepeatingTasks () {
-    // STEP 1: collect repeatIDs
     const uniqueRepeatIDs = new Set()
     traverseAndUpdateTree({
       fulfilsCriteria: (task) => task.repeatGroupID,
@@ -865,28 +640,35 @@
       }
     })
 
-    // STEP 2: check if we need to generate more tasks
-    //   - Find the original member of each repeat group (as it contains the key info)
-    //   - if the !mmddyyyy.includes() add it to the PARENT of the repeating tasks
-    //   - NOTE: we rely on the "origin repeating task", because it stores information about whether the task should continue
-    //   - etc. see https://www.explanations.app/KsPz7BOExANWvkaauNKE/i4udjmZVtXToD9JKyMCD
-    const repeatIDsArray = [...uniqueRepeatIDs]
-    for (const repeatID of repeatIDsArray) {
+    // STEP 2: for each repeated task, check if it's necessary to extend the preview window
+    // https://www.explanations.app/KsPz7BOExANWvkaauNKE/i4udjmZVtXToD9JKyMCD
+    for (const repeatID of [...uniqueRepeatIDs]) {
       traverseAndUpdateTree({
         fulfilsCriteria: (task) => task.id === repeatID, 
-        applyFunc: (task) => {
-          const dayDiff = computeDayDifference(
-            new Date(task.lastRanRepeatAtIsoString), 
-            new Date()
-          )
-          if (dayDiff >= 7) {
-            // STEP 3: update database
-            const allGeneratedTasksToUpload = generateRepeatedTasks(task)
-            uploadGeneratedTasks({ allGeneratedTasksToUpload }) 
-            // we put it in destructure form to conform to the function's current API, we can change it later
+        applyFunc: (originalTask) => {
+          const daysWithoutRepeating = computeDayDifference(new Date(originalTask.lastRanRepeatAtIsoString), new Date())
+          if (7 <= daysWithoutRepeating || !originalTask.lastRanRepeatAtIsoString) {
+            const allGeneratedTasksToUpload = generateRepeatedTasks(originalTask)
+            uploadGeneratedTasks({ 
+              allGeneratedTasksToUpload, 
+              repeatGroupID: repeatID,
+              willRepeatOnWeekDayNumber: originalTask.willRepeatOnWeekDayNumber
+            }) 
           }
         }
       })
+    }
+  }
+
+  async function uploadGeneratedTasks ({ allGeneratedTasksToUpload, repeatGroupID, willRepeatOnWeekDayNumber }) {
+    // quickfix: the generated tasks have the repeat schedule, but the original task doesn't, so add it here
+    updateTaskNode({ id: repeatGroupID, keyValueChanges: {
+      "willRepeatOnWeekDayNumber": willRepeatOnWeekDayNumber,
+      lastRanRepeatAtIsoString: new Date().toISOString()
+    }})
+
+    for (const generatedTask of allGeneratedTasksToUpload) {
+      createTaskNode({ id: generatedTask.id, newTaskObj: generatedTask })
     }
   }
 </script>
@@ -982,8 +764,8 @@
   }
 
   .active-ux-tab {
-    border-bottom: 1px solid #0085FF;
-    color: #0085FF;
+    border-bottom: 1px solid #48cae4;
+    color: #48cae4;
     font-weight: 500;
   }
 

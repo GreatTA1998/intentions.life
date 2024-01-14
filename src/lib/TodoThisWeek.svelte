@@ -26,15 +26,18 @@
   >
     <!-- TO-DO: Render all tasks with deadline of this week here -->
     {#each tasksDueThisWeek as taskObj}
-      <RecursiveTaskElement 
-        {taskObj}
-        depth={0}
-        doNotShowScheduledTasks={false}
-        doNotShowCompletedTasks={true}
-        on:task-click
-        on:subtask-create
-      />
-      <div style="margin-bottom: 24px;"></div>
+      {#if !taskObj.isDone}
+        <RecursiveTaskElement 
+          {taskObj}
+          depth={0}
+          doNotShowScheduledTasks={false}
+          doNotShowCompletedTasks={false}
+          on:task-click
+          on:subtask-create
+          on:task-checkbox-change
+        />
+        <div style="margin-bottom: 24px;"></div>
+      {/if}
     {/each}
 
     {#if isTypingNewRootTask}
@@ -128,6 +131,7 @@
       d.setDate(d.getDate() + 1)
     }
     const newRootTaskObj = {
+      duration: 1,
       deadlineDate: getDateInDDMMYYYY(d),
       deadlineTime: '23:59',
       id: getRandomID(),

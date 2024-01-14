@@ -22,7 +22,6 @@
 </div>
 
 <script>
-  import { getDateOfToday, getDateInDDMMYYYY } from '/src/helpers.js'
   import { createEventDispatcher } from 'svelte'
   import ReusableTaskElement from '$lib/ReusableTaskElement.svelte'
 

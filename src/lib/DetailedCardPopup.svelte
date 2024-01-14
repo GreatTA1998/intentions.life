@@ -3,14 +3,7 @@
     <div style="display: flex; align-items: center;">
       <input
         checked={taskObject.isDone}
-        on:change={(e) => {
-          dispatch('task-update', {
-            keyValueChanges: {
-              isDone: e.target.checked,
-            },
-            id: taskObject.id
-          })
-        }} 
+        on:change={(e) => handleCheckboxChange(e)} 
         type="checkbox" 
         style="zoom: 2.2; margin: 0; margin-right: 6px;"
       >
@@ -146,6 +139,7 @@
 
 <script>
 import { createEventDispatcher, onMount, onDestroy, tick } from 'svelte'
+import { mostRecentlyCompletedTaskID } from '/src/store.js'
 import _ from 'lodash'
 import RecursiveBulletPoint from '$lib/RecursiveBulletPoint.svelte'
 import { getDateOfToday, getRandomID, clickOutside, getDateInDDMMYYYY, getCurrentTimeInHHMM } from '/src/helpers.js'
@@ -153,12 +147,8 @@ import DetailedCardPopupRepeat from '$lib/DetailedCardPopupRepeat.svelte'
 import UXFormField from '$lib/UXFormField.svelte'
 import UXFormTextArea from '$lib/UXFormTextArea.svelte'
 import ReusableRoundButton from '$lib/ReusableRoundButton.svelte'
-import ReusableDatePicker from '$lib/ReusableDatePicker.svelte'
 
 export let taskObject 
-
-let depth = 1
-
 
 let newDeadlineDate
 let newDeadlineTime
@@ -167,21 +157,8 @@ let isEditingTaskStart = false
 let newStartMMDD
 let newStartHHMM
 
-let isEditingTaskEnd = false
-let newEndMMDD
-let newEndHHMM 
-
-let isEditingStartDate = false
-let isEditingDuration = false
-
-let isEditingDeadlineDate = false
-let isEditingDeadlineTime = false
 let isEditingDeadline = false
 
-let isTypingRepeatFrequency = false
-let daysBeforeRepeating = 7
-
-const initialDeadline = (taskObject.deadlineDate || '') + (taskObject.deadlineDate && taskObject.deadlineTime ? " " : "") + (taskObject.deadlineTime || '')
 $: currentDeadlineValue = (taskObject.deadlineDate || '') + (taskObject.deadlineDate && taskObject.deadlineTime ? " " : "") + (taskObject.deadlineTime || '')
 
 const dispatch = createEventDispatcher()
@@ -206,6 +183,19 @@ onMount(() => {
 onDestroy(() => {
   
 })
+
+// the other place to pay attention to is <RecursiveTaskElement/>
+// but the idea is still the same, provide an "undo"
+// for root level tasks because they disappear on completion
+function handleCheckboxChange (e) {
+  if (taskObject.parentID === '') {
+    mostRecentlyCompletedTaskID.set(taskObject.id)
+  }
+  dispatch('task-checkbox-change', {
+    id: taskObject.id,
+    isDone: e.target.checked
+  })
+}
 
 const debouncedSaveTitle = _.debounce(saveTitle, 800)
 const debouncedSaveNotes = _.debounce(saveNotes, 1500)
