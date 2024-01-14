@@ -64,6 +64,12 @@ export function getRandomInt(max) {
   return Math.floor(Math.random() * max);
 }
 
+
+// % gives the remainder, not the modulus, see https://stackoverflow.com/a/17323608/7812829
+export function mod (n, m) {
+  return ((n % m) + m) % m;
+}
+
 export function getDayOfWeek (MMDDString) {
   const d = new Date()
   d.setMonth(parseInt(MMDDString.substring(0, 2)) - 1) // `-1` because setMonth() is 0-indexed whereas MMDD is 1-indexed
@@ -247,14 +253,14 @@ export function generateRepeatedTasks (taskObject) {
   for (let i = 0; i < 7; i++) { // as it's a new feature, try 7 day foresight window to avoid taking forever to delete everything manually
     d.setDate(d.getDate() + 1)
 
-    // % gives the remainder, not the modulus, see https://stackoverflow.com/a/17323608/7812829
-    function mod (n, m) {
-      return ((n % m) + m) % m;
-    }
-           
     const weekDayNumber = mod(d.getDay() - 1, 7) // for getDay(), Sunday = 0, Monday = 1
     if (taskObject.willRepeatOnWeekDayNumber[weekDayNumber]) {
-      const generatedTask = createRepeatedTask({ dateClassObj: new Date(d.getTime()), repeatGroupID }, taskObject)
+      const generatedTask = createRepeatedTask(
+        { 
+          repeatGroupID,
+          dateClassObj: new Date(d.getTime()),
+        },
+        taskObject)
       allGeneratedTasksToUpload.push(generatedTask)
     }
   }
@@ -267,9 +273,6 @@ export function createRepeatedTask ({ dateClassObj, repeatGroupID }, taskObject)
 
   taskObjCopy.id = getRandomID()
   taskObjCopy.isDone = false
-
-  // commented out because this is probably redundant 
-  // taskObjCopy.willRepeatOnWeekDayNumber = [...taskObject.willRepeatOnWeekDayNumber]
   
   taskObjCopy.repeatGroupID = repeatGroupID // way to label separate tasks as essentially clones of an original repeating task
 
@@ -277,16 +280,24 @@ export function createRepeatedTask ({ dateClassObj, repeatGroupID }, taskObject)
   const mm = twoDigits(dateClassObj.getMonth() + 1) // month is 0-indexed
   const dd = twoDigits(dateClassObj.getDate())
 
-  // CASE 1: DEADLINE
-  // deadline takes priority: a deadlined task that repeats but is scheduled, will STILL be treated like a deadline
-  if (taskObjCopy.deadlineDate && taskObjCopy.deadlineTime) {
-    // set new `deadlineDate` to the dd/mm/yyyy format of `dateClassObj` (but keep the deadline time the same)
-    taskObjCopy.deadlineDate = `${dd}/${mm}/${yyyy}`
+  // reference https://www.explanations.app/KsPz7BOExANWvkaauNKE/Xau9NekRv7t9iNJEJrPt
+  function hasDeadline (task) {
+    return task.deadlineDate && task.deadlineTime
   }
-  // CASE 2: SCHEDULED 
-  if (taskObjCopy.startYYYY && taskObjCopy.startDate && taskObjCopy.startTime) {
+
+  function isScheduled (task) {
+    return task.startYYYY && task.startDate && task.startTime
+  }
+
+  // note: we do nothing for tasks that have neither deadlines nor a scheduled time
+  if (!isScheduled(taskObjCopy) && hasDeadline(taskObjCopy)) {
+    // notice we keep `deadlineTime` unchanged, but shift the `deadlineDate`
+    taskObjCopy.deadlineDate = `${dd}/${mm}/${yyyy}`
+  } 
+  else if (isScheduled(taskObjCopy)) {
     taskObjCopy.startYYYY = yyyy
     taskObjCopy.startDate = `${mm}/${dd}` 
+    // keep all other attributes whatever they were
   }
   return taskObjCopy
 }
@@ -304,7 +315,7 @@ export function convertMMDDToReadableMonthDayForm (mmdd, yyyy = '2024') {
 // COMMON MISTAKES YOU MADE:
 // Here, you're converting the legacy `$user.allTasks` into a pointer-based data structure
 // So the data that you're starting with will have NO `parentID` nor `childrenIDs`
-// TBH YOU DON'T EVEN NEED THE ARTIFICAL ROOT NODE
+// YOU DON'T EVEN NEED THE ARTIFICAL ROOT NODE, just run a for loop on `tree` directly
 export function createIndividualFirestoreDocForEachTaskInAllTasks (tree, userDoc) {
   const artificialRootNode = {
     name: 'root',

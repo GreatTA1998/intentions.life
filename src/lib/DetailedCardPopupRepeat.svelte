@@ -40,7 +40,7 @@
 </div>
 
 <script>
-  import { twoDigits, getRandomID } from '/src/helpers.js'
+  import { twoDigits, getRandomID, mod } from '/src/helpers.js'
   import { createEventDispatcher } from 'svelte'
 
   export let taskObject
@@ -62,24 +62,21 @@
   }
 
   function generateRepeatedTasks () {
-    const repeatGroupID = taskObject.id // the first instance of the repeated task will represent the repeatGroupID
+    const repeatGroupID = taskObject.id // the first instance of the repeated task will represent the `repeatGroupID`
     const d = new Date()
     for (let i = 0; i < 7; i++) { // as it's a new feature, try 7 day foresight window to avoid taking forever to delete everything manually
       d.setDate(d.getDate() + 1)
-
-      // % gives the remainder, not the modulus, see https://stackoverflow.com/a/17323608/7812829
-      function mod (n, m) {
-        return ((n % m) + m) % m;
-      }
              
       const weekDayNumber = mod(d.getDay() - 1, 7) // for getDay(), Sunday = 0, Monday = 1
       if (willRepeatOnWeekDayNumber[weekDayNumber]) {
-        const generatedTask = createRepeatedTask({ dateClassObj: new Date(d.getTime()), repeatGroupID })
+        const generatedTask = createRepeatedTask({ 
+          dateClassObj: new Date(d.getTime()), repeatGroupID 
+        })
         allGeneratedTasksToUpload.push(generatedTask)
       }
     }
 
-    dispatch('repeating-tasks-generate', { allGeneratedTasksToUpload })
+    dispatch('repeating-tasks-generate', { allGeneratedTasksToUpload, repeatGroupID: taskObject.repeatGroupID, willRepeatOnWeekDayNumber })
     isChoosingRepeatDays = false 
   }
 
