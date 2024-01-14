@@ -23,7 +23,7 @@
 
   <div style="margin-bottom: 36px;"></div>
 
-  <div class="todo-list">
+  <div class="life-task-tree-container">
     {#if allTasks}
       {#each allTasks as task}
         {#if !task.isDeleted && !task.isDone && !task.deadlineDate}
@@ -121,8 +121,8 @@
     padding-top: 24px; padding-left: 12px; padding-right: 12px; background-color: var(--todo-list-bg-color); border-radius: 24px;
   }
 
-  .todo-list {
-    width: 100%; 
+  .life-task-tree-container {
+    width: 80vw; 
     display: flex; 
   }
 
@@ -132,7 +132,6 @@
     padding-left: 0; 
     padding-bottom: 10px; 
     padding-right: 0; 
-    overflow: none;
   }
 
   /* Small Devices, Tablets and bigger devices */
