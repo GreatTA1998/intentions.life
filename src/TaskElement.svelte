@@ -1,4 +1,3 @@
-<!-- offset from top  -->
 {#if offsetFromTop || disableAbsolutePosition}
   <div 
     on:click={() => dispatch('task-click', { task })}

@@ -13,6 +13,7 @@
     min-height: 12px;
     font-size: {fontSize}rem;
     border-left: {isBulletPoint ? 0 : 3}px solid {task.isDone ? 'grey' : 'grey'};
+    opacity: {task.isDone ? '0.6' : '1'};
   "
 >
   <!-- As long as this parent div is correctly sized, the duration adjusting area 

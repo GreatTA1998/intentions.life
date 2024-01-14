@@ -10,6 +10,7 @@
       on:task-click={(e) => openDetailedCard(e.detail)}
       on:card-close={() => isDetailedCardOpen = false}
       on:task-delete={(e) => deleteTaskNode(e.detail)}
+      on:task-checkbox-change={(e) => updateTaskNode({ id: e.detail.id, keyValueChanges: { isDone: e.detail.isDone }})} 
     />
   {/if}
 {/key}
@@ -34,8 +35,17 @@
 
 
 <!-- UNDO COMPLETED SNACKBAR -->
-{#if $mostRecentlyDeletedOrCompletedTaskID && countdownRemaining > 0}
-  <TheSnackbar on:task-done={(e) => toggleTaskCompleted({ id: e.detail.id, newVal: false })}></TheSnackbar>
+{#if $mostRecentlyCompletedTaskID}
+  <TheSnackbar on:undo-task-completion={() => {
+    updateTaskNode({ 
+      id: $mostRecentlyCompletedTaskID,
+      keyValueChanges: {
+        isDone: false
+      }
+    })
+    mostRecentlyCompletedTaskID.set('')
+  }}>
+  </TheSnackbar>
 {/if}
 
 <!-- Copy & paste snackbar -->
@@ -195,7 +205,7 @@
   import FinancePopup from '$lib/FinancePopup.svelte'
   import BedtimePopupMaplestoryMusic from '$lib/BedtimePopupMaplestoryMusic.svelte'
   import TheSnackbar from '$lib/TheSnackbar.svelte'
-  import { mostRecentlyDeletedOrCompletedTaskID, user, showSnackbar } from '/src/store.js'
+  import { mostRecentlyCompletedTaskID, user, showSnackbar, isSnackbarHidden } from '/src/store.js'
   import CalendarThisWeek from '$lib/CalendarThisWeek.svelte'
   import TodoThisWeek from '$lib/TodoThisWeek.svelte'
   import FutureOverview from '$lib/FutureOverview.svelte'
@@ -512,27 +522,6 @@
         })
       }
     })
-  }
-
-  function triggerSnackbar (id) {
-    // mostRecentlyCompletedTaskName.set(task.name)
-    mostRecentlyDeletedOrCompletedTaskID.set(id)
-    // this code is terrible but my sanity is more important
-    countdownRemaining = 10
-    snackbarTimeoutID = setTimeout(
-      () => { 
-        countdownRemaining = 0
-        clearTimeout(snackbarTimeoutID)
-        snackbarTimeoutID = null
-      },
-      10000
-    )
-  }
-
-  async function toggleTaskCompleted ({ id, isDone }) {
-    updateTaskNode({ id, keyValueChanges: { 
-      "isDone": isDone
-    }})
   }
 
   /*

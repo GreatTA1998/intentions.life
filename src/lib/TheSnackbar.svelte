@@ -1,32 +1,45 @@
-<div class="snack-wrap">
-  <!-- animated -->
-  <div class="snackbar" style="display: flex; align-items: center;">
-    <slot>
-      <p>Task will be hidden from to-do because it's completed</p>
+{#if !$isSnackbarHidden}
+  <div class="snack-wrap">
+    <div class="snackbar" style="display: flex; align-items: center;">
+      <slot>
+        <p>Task will be hidden from to-do because it's completed</p>
 
-      <div style="margin-right: 2px; margin-left: auto;">
+        <div style="margin-right: 2px; margin-left: auto;">
 
-      <a on:click={undoComplete}>Undo</a>
+        <a on:click={undoComplete}>Undo</a>
 
-      </div>
-    </slot>
+        </div>
+      </slot>
+    </div>
   </div>
-</div>
+{/if}
 
 <script>
-  import { mostRecentlyDeletedOrCompletedTaskID, mostRecentlyCompletedTaskName } from "/src/store";
-  import { createEventDispatcher } from "svelte";
+  import { createEventDispatcher } from "svelte"
+  import { mostRecentlyCompletedTaskID, isSnackbarHidden } from '/src/store.js'
+
+  $: if ($mostRecentlyCompletedTaskID) {
+    resetDisappearCountdown()
+  }
+
+  function resetDisappearCountdown () {
+    isSnackbarHidden.set(false)
+    clearTimeout(countdownID)
+    countdownID = setTimeout(() => {
+      isSnackbarHidden.set(true)
+    }, 5000)
+  }
+
+  let countdownID = ''
 
   const dispatch = createEventDispatcher()
 
   function undoComplete () {
-    dispatch('task-done', { id: $mostRecentlyDeletedOrCompletedTaskID })
+    dispatch('undo-task-completion')
   }
-
 </script>
 
 <style>
-
 a {
   flex: 1;
   background-color: #323232;

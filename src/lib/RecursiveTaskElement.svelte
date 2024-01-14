@@ -39,6 +39,7 @@
     style="
     display: flex; 
     align-items: center; 
+    opacity: {taskObj.isDone ? '0.6' : '1'}
   ">
     <!--  no more fixed width: width: calc(100% - 30px); 
         min-width and height to make it easy to delete legacy tasks with no titles
@@ -52,7 +53,7 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        color: {taskObj.startDate && taskObj.startTime ? 'rgb(220, 220, 220)' : 'black'};
+        color: {taskObj.startDate && taskObj.startTime ? 'rgb(180, 180, 180)' : 'black'};
         display: flex;
         align-items: center;
       "
@@ -66,13 +67,10 @@
           "
           checked={taskObj.isDone}
           on:click|stopPropagation={() => {}}
-          on:change={(e) => dispatch('task-checkbox-change', {
-            id: taskObj.id,
-            isDone: e.target.checked
-          })}
+          on:change={(e) => handleCheckboxChange(e)}
         >
       {/if}
-      <div class="truncate-to-one-line" style="margin-top: -1px; margin-left: 3px;">
+      <div class="truncate-to-one-line" class:cross-out-todo={taskObj.isDone} style="margin-top: -1px; margin-left: 3px;">
         {taskObj.name}
       </div>
     </div>
@@ -126,7 +124,7 @@
   import RecursiveTaskElement from '$lib/RecursiveTaskElement.svelte'
   import { getDateInDDMMYYYY, convertDDMMYYYYToDateClassObject, computeDayDifference, getRandomID } from '/src/helpers'
   import { createEventDispatcher, tick } from 'svelte'
-  import { appModePixelsPerHour } from '/src/store'
+  import { mostRecentlyCompletedTaskID } from '/src/store.js'
 
   export let taskObj
   export let depth 
@@ -141,7 +139,7 @@
   let isTaskDueSoonOrOverdue = false
 
   let depthAdjustedFontSize 
-  
+
   const dispatch = createEventDispatcher()
 
   $: if (depth >= 0) {
@@ -176,6 +174,19 @@
     if (dayDiff <= 1) {
       isTaskDueSoonOrOverdue = true
     }
+  }
+
+  // the other place to pay attention to is <DetailedCardPopup/>
+  // but the idea is still the same, provide an "undo"
+  // for root level tasks because they disappear on completion
+  function handleCheckboxChange (e) {
+    if (depth === 0) {
+      mostRecentlyCompletedTaskID.set(taskObj.id)
+    }
+    dispatch('task-checkbox-change', {
+      id: taskObj.id,
+      isDone: e.target.checked
+    })
   }
 
   function dragstart_handler(e, id) {
@@ -217,6 +228,10 @@
 </script>
 
 <style>
+  .cross-out-todo {
+    text-decoration: line-through;
+  }
+
   .hide-subtree {
     display: none;
   }

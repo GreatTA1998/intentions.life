@@ -4,7 +4,8 @@ export const user = writable({}) // {} means not logged in, cannot be null
 export const hasFetchedUser = writable(false)
 export const hasLogoExited = writable(false)
 
-export const mostRecentlyDeletedOrCompletedTaskID = writable('')
+export const mostRecentlyCompletedTaskID = writable('')
+export const isSnackbarHidden = writable(false)
 export const mostRecentlyCompletedTaskName = writable('')
 
 // 200/24 is the week view value
