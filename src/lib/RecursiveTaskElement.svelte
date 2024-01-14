@@ -141,10 +141,7 @@
       case 0:
         depthAdjustedFontSize = 0.5
         break
-      case 1:
-        depthAdjustedFontSize = 0.4
-        break
-      case 2:
+      default: 
         depthAdjustedFontSize = 0.4
     }
   }
