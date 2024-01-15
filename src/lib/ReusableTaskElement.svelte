@@ -17,7 +17,9 @@
     opacity: {task.isDone ? '0.6' : '1'};
     outline: 0px solid red;
     background-color: {isBulletPoint ? '' : 'hsla(210, 20%, 80%, 0.9)'};
-  "
+    background-image: {task.imageDownloadURL ? `url(${task.imageDownloadURL})` : ''};
+    background-size: cover;
+  " 
   on:keydown={() => {}}
 >
   <!-- As long as this parent div is correctly sized, the duration adjusting area 
@@ -71,7 +73,7 @@
       style="margin-top: -1px; margin-left: 3px; font-size: 12px; width: 100%;"
       class="task-name truncate-to-one-line"
     >
-      {task.name} 
+      {task.name}
     </div>
   </div>
 

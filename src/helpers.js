@@ -1,5 +1,15 @@
 import { setFirestoreDoc } from '/src/crud.js'
 
+export function checkTaskObjSchema (task, userDoc) {
+  const output = {...task}
+  if (!task.startYYYY) output.startYYYY = ''
+  if (!task.duration) output.duration = 1
+  if (!task.parentID) output.parentID = ""
+  if (!task.childrenIDs) output.childrenIDs = []
+  if (!task.orderValue) output.orderValue = (userDoc.maxOrderValue || 0) + 3
+  return output
+}
+
 // how far, INCLUDING SCROLL, the actual position on the calendar is
 // // containerDistanceFromTopOfPage should be fixed, and not be affected by scrolling
 // so it's the e.clientY + initialOffset + scrollOffset 
@@ -226,7 +236,11 @@ export function twoDigits (number) {
 
 // https://stackoverflow.com/a/18229149/7812829
 export function getCurrentTimeInHHMM () {
-  const d = new Date()
+  return getTimeInHHMM({ dateClassObj: new Date() })
+}
+
+export function getTimeInHHMM ({ dateClassObj }) {
+  const d = dateClassObj
   const hh = ("0" + d.getHours()).slice(-2) 
   const mm = ("0" + d.getMinutes()).slice(-2)
   return hh + ":" + mm

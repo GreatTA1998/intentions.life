@@ -140,7 +140,6 @@
           on:task-checkbox-change={(e) => updateTaskNode({ id: e.detail.id, keyValueChanges: { isDone: e.detail.isDone }})} 
         > 
           <GrandTreeTodoPopupButton
-            {allTasks}
             on:new-root-task={(e) => createNewRootTask(e.detail)}
             on:task-unscheduled={(e) => putTaskToThisWeekTodo(e)}
             on:task-click={(e) => openDetailedCard(e.detail)}
@@ -199,7 +198,8 @@
     getDateInDDMMYYYY, 
     generateRepeatedTasks, 
     reconstructTreeInMemory,
-    computeTodoMemoryTrees
+    computeTodoMemoryTrees,
+    checkTaskObjSchema
   } from '/src/helpers.js'
   import { onDestroy, onMount } from 'svelte'
   import JournalPopup from '$lib/JournalPopup.svelte'
@@ -300,7 +300,7 @@
   const tasksPath = `/users/${$user.uid}/tasks/`
 
   async function createTaskNode ({ id, newTaskObj }) {
-    const newTaskObjChecked = checkTaskObjSchema(newTaskObj)
+    const newTaskObjChecked = checkTaskObjSchema(newTaskObj, $user)
     setFirestoreDoc(tasksPath + id, newTaskObjChecked)
     updateFirestoreDoc(`users/${$user.uid}`, {
       maxOrderValue: increment(3)
@@ -308,7 +308,6 @@
   }
 
   function updateTaskNode ({ id, keyValueChanges }) {
-    console.log('id, keyValueChanges =', id, keyValueChanges)
     updateFirestoreDoc(tasksPath + id, keyValueChanges)
   }
 
@@ -476,16 +475,6 @@
       "deadlineTime": deadlineTime,
       "deadlineDate": deadlineDate
     }})
-  }
-
-  function checkTaskObjSchema (task) {
-    const output = {...task}
-    if (!task.startYYYY) output.startYYYY = ''
-    if (!task.duration) output.duration = 1
-    if (!task.parentID) output.parentID = ""
-    if (!task.childrenIDs) output.childrenIDs = []
-    if (!task.orderValue) output.orderValue = ($user.maxOrderValue || 0) + 3
-    return output
   }
 
   function createNewRootTask (newTaskObj) {
