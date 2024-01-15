@@ -26,11 +26,14 @@
   >
     <!-- TO-DO: Render all tasks with deadline of this week here -->
     {#each tasksToDisplay as taskObj, i}
+      <!-- again, refrain from using `doNotShowCompletedTasks` 
+        and aim for a data-driven implementation instead
+      -->
       <RecursiveTaskElement 
         {taskObj}
         depth={0}
         doNotShowScheduledTasks={false}
-        doNotShowCompletedTasks={false}
+        doNotShowCompletedTasks={true}
         ancestorRoomIDs={['']}
         parentID={''}
         on:task-click
@@ -52,7 +55,7 @@
       <div style="margin-bottom: 24px;"></div>
     {/each}
 
-    {#if tasksToDisplay.length > 0}
+    {#if tasksToDisplay.length > 2}
       <ReusableHelperDropzone
         ancestorRoomIDs={['']}
         roomsInThisLevel={tasksToDisplay}
@@ -74,34 +77,35 @@
 </div>
 
 <script>
-  export let allIncompleteTasks
+  export let allTasks
 
   import { 
     computeDayDifference, 
-    applyFuncToEveryTreeNode,
     convertDDMMYYYYToDateClassObject,
     getDateInDDMMYYYY, 
     getRandomID,
-    sortByOrderValue
+    sortByUnscheduledThenByOrderValue
   } from '/src/helpers.js'
   import RecursiveTaskElement from '$lib/RecursiveTaskElement.svelte'
   import { createEventDispatcher, tick } from 'svelte'
   import ReusableHelperDropzone from '$lib/ReusableHelperDropzone.svelte'
 
-  let isMouseHoveringOnTaskName = false
-  let tasksDueThisWeek = null
+  let tasksToDisplay = [] 
+  let allTasksDueThisWeek = []
 
+  let isMouseHoveringOnTaskName = false
   let isTypingNewRootTask = false
   let newRootTaskStringValue = ''
   let NewRootTaskInput = ''
   const dispatch = createEventDispatcher()
 
-  let tasksToDisplay = [] 
 
-  $: getTasksDueThisWeek(allIncompleteTasks)
+  // basically copy and pasted from <GrandTreeTodoPopup/>
+  $: if (allTasks.length > 0) {
+    computeThisWeekTodoMemoryTree(allTasks)
+  }
 
-  
-  $: if (tasksDueThisWeek) {
+  $: if (allTasksDueThisWeek.length > 0) {
     computeTasksToDisplay()
   }
 
@@ -115,36 +119,53 @@
     }
   }
 
-  function computeTasksToDisplay () {
-    tasksToDisplay = tasksDueThisWeek.filter(t => !t.isDone)
-    tasksToDisplay = sortByOrderValue(tasksToDisplay)
-    console.log('tasksToDisplay')
+  function computeThisWeekTodoMemoryTree (allTasks) {
+    allTasksDueThisWeek = []
+    for (const parentlessTask of allTasks) {
+      helper({ node: parentlessTask })
+    }
+    allTasksDueThisWeek = allTasksDueThisWeek // manually trigger reactivity
   }
 
-  function getTasksDueThisWeek (taskArray) {
-    const output = []
-    const copy = [...taskArray]
-
-    applyFuncToEveryTreeNode({ 
-      tree: copy, 
-      applyFunc: (task) => {
-        if (!task.deadlineDate) return false
-
-        // check if it's already scheduled on calendar
-        if (task.startTime && task.startDate) return false
-
-        const d1 = new Date()
-        const d2 = convertDDMMYYYYToDateClassObject(task.deadlineDate)
-        const dayDiff = computeDayDifference(
-          d1, d2
-        )
-        if (dayDiff <= 7) {
-          output.push(task)
-          return true // this will terminate further traversal down its children
+  let i = 0
+  function helper ({ node, parentCategory = '', parentObjReference = null }) {
+    if (!node.deadlineDate) {
+      if (parentObjReference && parentCategory) {
+        parentObjReference.children.push(node)
+        for (const child of node.children) {
+          helper({ node: child, parentCategory, parentObjReference })
+        }
+      } 
+      else {
+        for (const child of node.children) {
+          helper({ node: child })
         }
       }
-    })
-    tasksDueThisWeek = output
+    }
+    else {
+      const shallowCopy = {...node}
+      shallowCopy.children = []
+      const dueInHowManyDays = computeDayDifference(
+        new Date(),
+        convertDDMMYYYYToDateClassObject(node.deadlineDate)
+      )
+      if (dueInHowManyDays <= 7 && dueInHowManyDays >= 0) {
+        if (parentCategory === 'WEEK' && parentObjReference !== null) {
+          parentObjReference.children.push(shallowCopy)
+        }
+        else allTasksDueThisWeek.push(shallowCopy)
+
+        // notice we iterate on the original tree that still has a `.children` array preserved
+        for (const child of node.children) {
+          i += 1
+          helper({ node: child, parentCategory: 'WEEK', parentObjReference: shallowCopy})
+        }
+      }
+    }
+  }
+
+  function computeTasksToDisplay () {
+    tasksToDisplay = sortByUnscheduledThenByOrderValue(allTasksDueThisWeek)
   }
 
   function handleKeyDown (e) {

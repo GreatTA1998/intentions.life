@@ -394,6 +394,21 @@ function hydrateOneLayerOfChildren ({ node, firestoreTaskDocs, layers }) {
   }
 }
 
+export function sortByUnscheduledThenByOrderValue (array) {
+  array.sort((a, b) => {
+    // first, put all scheduled / grey-out tasks to the bottom
+    // !! is great for situations where you're sorting
+    // simply based on whether they have the property defined.
+    if (!!a.startDate !== !!b.startDate) {
+      return !!a.startDate - !!b.startDate
+    }
+    else {
+      return a.orderValue - b.orderValue
+    }
+  })
+  return array
+}
+
 export function sortByOrderValue(array) {
   array.sort((a, b) => {
     // If both elements have "orderValue", compare them directly

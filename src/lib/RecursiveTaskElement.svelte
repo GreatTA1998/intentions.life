@@ -56,7 +56,7 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        color: {taskObj.startDate && taskObj.startTime ? 'rgb(180, 180, 180)' : 'black'};
+        color: {taskObj.startDate && taskObj.startTime ? 'rgb(160, 160, 160)' : 'black'};
         display: flex;
         align-items: center;
       "
@@ -103,6 +103,7 @@
         {doNotShowCompletedTasks}
         {willShowCheckbox}
         parentID={taskObj.id}
+        {dueInHowManyDays}
         on:task-click
         on:subtask-create
         on:task-checkbox-change
@@ -129,7 +130,8 @@
       {colorForDebugging}
     /> 
     
-    <!-- If this task level has a deadline, new sub-tasks will also be 
+    <!-- 
+      If this task level has a deadline, new sub-tasks should also be 
       initialized with the same deadline
     -->
     {#if isTypingNewSubtask}
@@ -158,6 +160,8 @@
   export let willShowCheckbox = true
   export let ancestorRoomIDs = []
   export let colorForDebugging = getRandomColor()
+  export let dueInHowManyDays = null
+  export let parentID = ''
 
   let NewSubtaskInput
   let newSubtaskStringValue = ''
@@ -235,23 +239,27 @@
   }
 
   function createSubtask (name) {
-    const d = new Date()
-    for (let i = 0; i < 7; i++) {
-      d.setDate(d.getDate() + 1)
-    }       
-
     const newTaskID = getRandomID()
+    const subtaskObj = {
+      id: newTaskID,
+      parentID: taskObj.id, 
+      name,
+      duration: 1
+    }
+    
+    if (dueInHowManyDays !== null) {
+      const d = new Date()
+      for (let i = 0; i < dueInHowManyDays; i++) {
+        d.setDate(d.getDate() + 1)
+      }       
+      subtaskObj.deadlineDate = getDateInDDMMYYYY(d)
+      subtaskObj.deadlineTime = '07:00'
+    }
+
     dispatch('subtask-create', {
       id: newTaskID,
       parentID: taskObj.id,
-      newTaskObj: {
-        id: newTaskID,
-        parentID: taskObj.id, 
-        deadlineDate: getDateInDDMMYYYY(d),
-        deadlineTime: '07:00',
-        name,
-        duration: 1
-      }
+      newTaskObj: subtaskObj
     })
   }
 </script>

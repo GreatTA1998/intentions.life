@@ -19,7 +19,7 @@
           <div style="width: 20%;">
             <GrandTreeTodoReusableList
               listTitle="TODAY"
-              {allIncompleteTasks}
+              allTasksDue={allTasksDueToday}
               dueInHowManyDays={1}
               on:new-root-task
               on:task-unscheduled
@@ -33,7 +33,7 @@
 
             <GrandTreeTodoReusableList
               listTitle="THIS WEEK"
-              {allIncompleteTasks}
+              allTasksDue={allTasksDueThisWeek}
               dueInHowManyDays={7}
               on:new-root-task
               on:task-unscheduled
@@ -46,7 +46,7 @@
           <div style="width: 20%;  height: 100%; overflow-y: auto;" class="round-scrollbar">
             <GrandTreeTodoReusableList
               listTitle="THIS MONTH"
-              {allIncompleteTasks}
+              allTasksDue={allTasksDueThisMonth}
               dueInHowManyDays={30}
               on:new-root-task
               on:task-unscheduled
@@ -68,35 +68,131 @@
 {/if}
 
 <script>
+export let allTasks
+
 import { createEventDispatcher, onMount, onDestroy, tick } from 'svelte'
 import _ from 'lodash'
-import { getDateOfToday, getRandomID, clickOutside, getDateInDDMMYYYY, getCurrentTimeInHHMM } from '/src/helpers.js'
+import { computeDayDifference, getDateOfToday, getRandomID, clickOutside, getDateInDDMMYYYY, convertDDMMYYYYToDateClassObject, getCurrentTimeInHHMM } from '/src/helpers.js'
 import GrandTreeTodoReusableList from '$lib/GrandTreeTodoReusableList.svelte'
 
-export let allIncompleteTasks
+let allTasksDueToday = []
+let allTasksDueThisWeek = []
+let allTasksDueThisMonth = []
+let allTasksDueThisYear = []
 
-const dispatch = createEventDispatcher()
+$: computeTodoMemoryTree(allTasks)
 
-let isPopupOpen = false
-
-function setIsPopupOpen ({ newVal }) {
-  isPopupOpen = newVal
+function computeTodoMemoryTree (allTasks) {
+  allTasksDueToday = []
+  allTasksDueThisWeek = []
+  allTasksDueThisMonth = []
+  allTasksDueThisYear = []
+  for (const parentlessTask of allTasks) {
+    helper({ node: parentlessTask })
+  }
+  console.log('i should be around 1200', i)
 }
 
-let elem
+// parent category is 'DAY', 'WEEK', 'MONTH', 'YEAR'
+// recursively scan the ORIGINAL tree, so we separate the scanning tree from the editing tree
+//   - node is for scanning 
+//   - node is for mutating
+let i = 0
+function helper ({ node, parentCategory = '', parentObjReference = null }) {
+  if (!node.deadlineDate) {
+    // be lenient with children that have no due dates, as it wouldn't make sense 
+    // that a task due in 3 days has a sub-task that has no due dates
+    if (parentObjReference && parentCategory) {
+      parentObjReference.children.push(node)
+      for (const child of node.children) {
+        // a sub-task (i.e. has parentID) can still appear as the top-level task within a to-do,
+        // hence no parentObjReference nor parentCategory yet
+        helper({ node: child, parentCategory, parentObjReference })
+      }
+    } 
+    else {
+      // console.log('give someone else a chance to be head case')
+      // a sub-task (i.e. has parentID) can still appear as the top-level task within a to-do,
+      // hence no parentObjReference nor parentCategory yet
+      for (const child of node.children) {
+        helper({ node: child })
+      }
+    }
+  }
+  else {
+    const shallowCopy = {...node}
+    shallowCopy.children = []
+    const dueInHowManyDays = computeDayDifference(
+      new Date(),
+      convertDDMMYYYYToDateClassObject(node.deadlineDate)
+    )
+    if (dueInHowManyDays <= 1 && dueInHowManyDays >= 0) {
+      if (parentCategory === 'DAY' && parentObjReference !== null) {
+        parentObjReference.children.push(shallowCopy)
+      }
+      else allTasksDueToday.push(node)
+      
+      for (const child of node.children) {
+        helper({ node: child, parentCategory: 'DAY', parentObjReference: shallowCopy})
+      }
+    } 
+    else if (dueInHowManyDays <= 7 && dueInHowManyDays >= 0) {
+      if (parentCategory === 'WEEK' && parentObjReference !== null) {
+        parentObjReference.children.push(shallowCopy)
+      }
+      else allTasksDueThisWeek.push(shallowCopy)
 
-function handleClickOutside (e) {
-  isPopupOpen = false
-  dispatch('card-close')
+      // notice we iterate on the original tree that still has a `.children` array preserved
+      for (const child of node.children) {
+        i += 1
+        helper({ node: child, parentCategory: 'WEEK', parentObjReference: shallowCopy})
+      }
+    }
+    else if (dueInHowManyDays <= 31 && dueInHowManyDays >= 0) {
+      if (parentCategory === 'MONTH' && parentObjReference !== null) {
+        parentObjReference.children.push(shallowCopy)
+      } 
+      else allTasksDueThisMonth.push(shallowCopy)
+
+      for (const child of node.children) {
+        helper({ node: child, parentCategory: 'MONTH', parentObjReference: shallowCopy})
+      }
+    }
+    else if (dueInHowManyDays <= 365 && dueInHowManyDays >= 0) {
+      if (parentCategory === 'YEAR' && parentObjReference !== null) {
+        parentObjReference.children.push(shallowCopy)
+      }
+      else allTasksDueThisYear.push(shallowCopy)
+
+      for (const child of node.children) {
+        helper({ node: child, parentCategory: 'YEAR', parentObjReference: shallowCopy})
+      }
+    } 
+  }
 }
 
-onMount(() => {
+  const dispatch = createEventDispatcher()
 
-})
+  let isPopupOpen = false
 
-onDestroy(() => {
+  function setIsPopupOpen ({ newVal }) {
+    isPopupOpen = newVal
+  }
 
-})
+  let elem
+
+  function handleClickOutside (e) {
+    isPopupOpen = false
+    dispatch('card-close')
+  }
+
+  onMount(() => {
+
+  })
+
+  onDestroy(() => {
+
+  })
 </script>
 
 <style>

@@ -34,6 +34,7 @@
               doNotShowScheduledTasks={true}
               doNotShowCompletedTasks={true}
               willShowCheckbox={false}
+              dueInHowManyDays={null}
               on:task-click
               on:task-node-update
               on:subtask-create

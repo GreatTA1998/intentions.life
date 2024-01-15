@@ -1,5 +1,5 @@
 <div bind:this={ReorderDropzone} 
-  style="height: 4px; border-radius: 2px; border: 0px solid {colorForDebugging};" 
+  style="height: 4px; border-radius: 2px; border: 2px solid {colorForDebugging};" 
   on:dragenter={() => {
     if (!isInvalidReorderDrop()) {
       ReorderDropzone.style.background = 'rgb(87, 172, 247)' 
