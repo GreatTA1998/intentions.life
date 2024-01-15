@@ -75,9 +75,6 @@
           isDirectlyCreatingTask = true
           yPosition = copyGetTrueY(e)
         }}
-        on:dragenter={() => highlightedMinute = i}
-        on:dragend={() => console.log('dragend') }
-        on:dragover={(e) => dragover_handler(e)}
       >
       </div>
     {/each}
@@ -156,7 +153,7 @@
   import ReusableTaskElement from '$lib/ReusableTaskElement.svelte'
   import { onMount, beforeUpdate, afterUpdate, tick, createEventDispatcher, onDestroy } from 'svelte'
   import { browser } from '$app/environment';
-  import { user, hasInitialScrolled } from '/src/store.js'
+  import { user, hasInitialScrolled, yPosWithinBlock } from '/src/store.js'
   import { getDateInDDMMYYYY, getDateInMMDD, getRandomID } from '/src/helpers';
   import UXFormField from '$lib/UXFormField.svelte'
 
@@ -320,12 +317,17 @@
     e.stopPropagation()
     highlightedMinute = null
 
-    const trueY = copyGetTrueY(e)
+    // `trueY` is the end position of the mouse
+    const finalMousePosY = copyGetTrueY(e)
 
     // origin
     const calendarStartAsMs = calendarBeginningDateClassObject.getTime()
-    
-    // difference
+
+    // account for dragging the block from really low or from really high up 
+    const trueY = finalMousePosY - $yPosWithinBlock
+    yPosWithinBlock.set(0)
+
+    // resultant time based on difference difference
     const resultantDateClassObject = getResultantDateClassObject(trueY)
     const d = resultantDateClassObject
     const hhmm = ensureTwoDigits(d.getHours()) + ':' + ensureTwoDigits(d.getMinutes())

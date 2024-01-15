@@ -56,7 +56,7 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        color: {taskObj.startDate && taskObj.startTime ? 'rgb(180, 180, 180)' : 'black'};
+        color: {taskObj.startDate && taskObj.startTime ? 'rgb(160, 160, 160)' : 'black'};
         display: flex;
         align-items: center;
       "
@@ -74,7 +74,7 @@
         >
       {/if}
       <div class="truncate-to-one-line" class:cross-out-todo={taskObj.isDone} style="margin-top: -1px; margin-left: 3px;">
-        {taskObj.name}
+        {taskObj.orderValue} {taskObj.name}
       </div>
     </div>
     {#if isMouseHoveringOnTaskName}
@@ -92,10 +92,9 @@
     {/if}
   </div>
 
-  <div style="margin-left: 32px;">
+  <!-- the 6px compensates for the fact there is only 1 dropzone for the first child but 2 dropzones (reorder + sub-reorder) for the 2nd child onwards -->
+  <div style="margin-left: 32px; padding-top: 6px;">
     {#each taskObj.children as subtaskObj, i}
-      <!-- little bit of spacing between each children for readability -->
-      <div style="margin-top: 3px"></div>
       <RecursiveTaskElement 
         taskObj={subtaskObj}
         depth={depth+1}
@@ -103,12 +102,14 @@
         {doNotShowCompletedTasks}
         {willShowCheckbox}
         parentID={taskObj.id}
+        {dueInHowManyDays}
+        ancestorRoomIDs={[taskObj.id, ...ancestorRoomIDs]}
         on:task-click
         on:subtask-create
         on:task-checkbox-change
       > 
         <div slot="dropzone-above-task-name"> 
-          {#if taskObj.children.length > 1}
+          {#if taskObj.children.length > 0}
             <ReusableHelperDropzone
               ancestorRoomIDs={[taskObj.id, ...ancestorRoomIDs]}
               roomsInThisLevel={taskObj.children}
@@ -129,7 +130,8 @@
       {colorForDebugging}
     /> 
     
-    <!-- If this task level has a deadline, new sub-tasks will also be 
+    <!-- 
+      If this task level has a deadline, new sub-tasks should also be 
       initialized with the same deadline
     -->
     {#if isTypingNewSubtask}
@@ -156,8 +158,12 @@
   export let doNotShowScheduledTasks = false
   export let doNotShowCompletedTasks = false
   export let willShowCheckbox = true
-  export let ancestorRoomIDs = []
+  // ancestorRoomIDs prevent a parent from becoming its own parent,
+  // creating an infinite cycle that will not get rendered by Svelte
+  export let ancestorRoomIDs
   export let colorForDebugging = getRandomColor()
+  export let dueInHowManyDays = null
+  export let parentID = ''
 
   let NewSubtaskInput
   let newSubtaskStringValue = ''
@@ -218,7 +224,10 @@
 
   function dragstart_handler(e, id) {
     e.dataTransfer.setData("text/plain", id);
-    whatIsBeingDragged.set("room")
+
+    if (depth === 0) whatIsBeingDragged.set("top-level-task-within-this-todo-list")
+    else whatIsBeingDragged.set("room")
+  
     whatIsBeingDraggedID.set(id)
   }
 
@@ -235,23 +244,27 @@
   }
 
   function createSubtask (name) {
-    const d = new Date()
-    for (let i = 0; i < 7; i++) {
-      d.setDate(d.getDate() + 1)
-    }       
-
     const newTaskID = getRandomID()
+    const subtaskObj = {
+      id: newTaskID,
+      parentID: taskObj.id, 
+      name,
+      duration: 1
+    }
+    
+    if (dueInHowManyDays !== null) {
+      const d = new Date()
+      for (let i = 0; i < dueInHowManyDays; i++) {
+        d.setDate(d.getDate() + 1)
+      }       
+      subtaskObj.deadlineDate = getDateInDDMMYYYY(d)
+      subtaskObj.deadlineTime = '07:00'
+    }
+
     dispatch('subtask-create', {
       id: newTaskID,
       parentID: taskObj.id,
-      newTaskObj: {
-        id: newTaskID,
-        parentID: taskObj.id, 
-        deadlineDate: getDateInDDMMYYYY(d),
-        deadlineTime: '07:00',
-        name,
-        duration: 1
-      }
+      newTaskObj: subtaskObj
     })
   }
 </script>

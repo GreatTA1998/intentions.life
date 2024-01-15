@@ -7,7 +7,9 @@
     on:mouseleave={() => isMouseHoveringOnTaskName = false}
   >
     <div style="height: 24px; font-size: 16px; align-items: center; display: flex;">
-      <div style="margin-left: 8px; color: rgb(10, 10, 10); font-weight: 500">{listTitle}</div> 
+      <div style="margin-left: 8px; color: rgb(10, 10, 10); font-weight: 500">
+        {listTitle}
+      </div> 
     </div>
 
     {#if isMouseHoveringOnTaskName}
@@ -19,19 +21,47 @@
 
   <div style="margin-bottom: 36px;"></div>
 
-  <!-- TO-DO: Render all tasks with deadline of this week here -->
-  {#each tasksDueThisWeek as taskObj}
+  {#each tasksToDisplay as taskObj, i}
     <RecursiveTaskElement 
       {taskObj}
       depth={0}
+      {dueInHowManyDays}
+      ancestorRoomIDs={['']}
       doNotShowScheduledTasks={false}
       doNotShowCompletedTasks={true}
       on:task-click
       on:task-node-update
       on:subtask-create
-    />
+    > 
+      <div slot="dropzone-above-task-name">
+        {#if tasksToDisplay.length > 2}
+          <ReusableHelperDropzone
+            ancestorRoomIDs={['']}
+            roomsInThisLevel={tasksToDisplay}
+            idxInThisLevel={i}
+            parentID={''}
+            colorForDebugging="purple"
+          />
+        {/if}
+      </div>
+    </RecursiveTaskElement>
     <div style="margin-bottom: 24px;"></div>
   {/each}
+
+  {#if tasksToDisplay.length > 2}
+    <!-- NOTE: BECAUSE WE DON'T DISPLAY TASKS THAT ARE COMPLETED,
+      WE HAVE A DEVIATION BETWEEN STATE AND UI
+      IN THE FUTURE IF THERE ARE UNEXPECTED BUGS, THIS IS THE LIKELY CAUSE
+    -->
+    <!-- {tasksToDisplay.length} -->
+    <ReusableHelperDropzone
+      ancestorRoomIDs={['']}
+      roomsInThisLevel={tasksToDisplay}
+      idxInThisLevel={tasksToDisplay.length}
+      parentID={''}
+      colorForDebugging="blue"
+    />
+  {/if}
 
   {#if isTypingNewRootTask}
     <input 
@@ -45,30 +75,33 @@
 
 <script>
   import { 
-    computeDayDifference, 
-    convertMMDDToDateClassObject, 
-    applyFuncToEveryTreeNode,
-    convertDDMMYYYYToDateClassObject,
     getDateInDDMMYYYY, 
     getRandomID,
+    sortByUnscheduledThenByOrderValue
   } from '/src/helpers.js'
   import RecursiveTaskElement from '$lib/RecursiveTaskElement.svelte'
   import { createEventDispatcher, tick } from 'svelte'
+  import ReusableHelperDropzone from '$lib/ReusableHelperDropzone.svelte'
 
-  export let allIncompleteTasks
-  export let dueInHowManyDays
+  export let dueInHowManyDays = null // AF(null) means it's a life todo, otherwise it should be a number
+  export let allTasksDue = []
 
   export let listTitle
 
   let defaultDeadline
 
   let isMouseHoveringOnTaskName = false
-  let tasksDueThisWeek = null
+
+  let tasksToDisplay = []
 
   let isTypingNewRootTask = false
   let newRootTaskStringValue = ''
   let NewRootTaskInput = ''
   const dispatch = createEventDispatcher()
+
+  function computeTasksToDisplay () {
+    tasksToDisplay = sortByUnscheduledThenByOrderValue(allTasksDue)
+  }
 
   // COMPUTE DEFAULT DEADLINE 
   $: {
@@ -79,7 +112,10 @@
     defaultDeadline = getDateInDDMMYYYY(d)
   }
 
-  $: getTasksDueThisWeek(allIncompleteTasks)
+  // svelte reactive statements are order sensitive
+  $: if (allTasksDue.length > 0) {
+    computeTasksToDisplay()
+  }
 
   $: {
     if (isTypingNewRootTask) {
@@ -89,34 +125,6 @@
         }
       })
     }
-  }
-
-  function getTasksDueThisWeek (taskArray) {
-    const output = []
-    const copy = [...taskArray]
-
-    applyFuncToEveryTreeNode({ 
-      tree: copy, 
-      applyFunc: (task) => {
-        if (!task.deadlineDate) return false
-
-        // check if it's already scheduled on calendar
-        if (task.startTime && task.startDate) return false
-
-        const d1 = new Date()
-        const d2 = convertDDMMYYYYToDateClassObject(task.deadlineDate)
-        const dayDiff = computeDayDifference(
-          d1, d2
-        )
-
-        // KEY INTERFACE HERE
-        if (dayDiff <= dueInHowManyDays) {
-          output.push(task)
-          return true // this will terminate further traversal down its children
-        }
-      }
-    })
-    tasksDueThisWeek = output
   }
 
   function handleKeyDown (e) {
@@ -174,16 +182,9 @@
     dispatch('task-dragged', {
       id: taskID,
       timeOfDay: '',
-      deadlineTime: deadlineTimeHHMM, // 
+      deadlineTime: deadlineTimeHHMM, 
       deadlineDate: deadlineDateDDMMYYYY
     })
-
-    // console.log('If event is handled, taskObject would be =',{
-    //   id: taskID, 
-    //   timeOfDay: '',
-    //   deadlineTime: deadlineTimeHHMM, // 
-    //   deadlineDate: deadlineDateDDMMYYYY
-    // })
   }
 </script>
 

@@ -19,7 +19,7 @@
           <div style="width: 20%;">
             <GrandTreeTodoReusableList
               listTitle="TODAY"
-              {allIncompleteTasks}
+              allTasksDue={$allTasksDueToday}
               dueInHowManyDays={1}
               on:new-root-task
               on:task-unscheduled
@@ -33,7 +33,7 @@
 
             <GrandTreeTodoReusableList
               listTitle="THIS WEEK"
-              {allIncompleteTasks}
+              allTasksDue={$allTasksDueThisWeek}
               dueInHowManyDays={7}
               on:new-root-task
               on:task-unscheduled
@@ -46,7 +46,7 @@
           <div style="width: 20%;  height: 100%; overflow-y: auto;" class="round-scrollbar">
             <GrandTreeTodoReusableList
               listTitle="THIS MONTH"
-              {allIncompleteTasks}
+              allTasksDue={$allTasksDueThisMonth}
               dueInHowManyDays={30}
               on:new-root-task
               on:task-unscheduled
@@ -68,35 +68,34 @@
 {/if}
 
 <script>
-import { createEventDispatcher, onMount, onDestroy, tick } from 'svelte'
-import _ from 'lodash'
-import { getDateOfToday, getRandomID, clickOutside, getDateInDDMMYYYY, getCurrentTimeInHHMM } from '/src/helpers.js'
-import GrandTreeTodoReusableList from '$lib/GrandTreeTodoReusableList.svelte'
+  import { createEventDispatcher, onMount, onDestroy, tick } from 'svelte'
+  import _ from 'lodash'
+  import { computeDayDifference, getDateOfToday, getRandomID, clickOutside, getDateInDDMMYYYY, convertDDMMYYYYToDateClassObject, getCurrentTimeInHHMM } from '/src/helpers.js'
+  import GrandTreeTodoReusableList from '$lib/GrandTreeTodoReusableList.svelte'
+  import { allTasksDueToday, allTasksDueThisWeek, allTasksDueThisMonth } from '/src/store.js'
 
-export let allIncompleteTasks
+  const dispatch = createEventDispatcher()
 
-const dispatch = createEventDispatcher()
+  let isPopupOpen = false
 
-let isPopupOpen = false
+  function setIsPopupOpen ({ newVal }) {
+    isPopupOpen = newVal
+  }
 
-function setIsPopupOpen ({ newVal }) {
-  isPopupOpen = newVal
-}
+  let elem
 
-let elem
+  function handleClickOutside (e) {
+    isPopupOpen = false
+    dispatch('card-close')
+  }
 
-function handleClickOutside (e) {
-  isPopupOpen = false
-  dispatch('card-close')
-}
+  onMount(() => {
 
-onMount(() => {
+  })
 
-})
+  onDestroy(() => {
 
-onDestroy(() => {
-
-})
+  })
 </script>
 
 <style>

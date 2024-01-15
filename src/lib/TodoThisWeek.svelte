@@ -26,11 +26,14 @@
   >
     <!-- TO-DO: Render all tasks with deadline of this week here -->
     {#each tasksToDisplay as taskObj, i}
+      <!-- again, refrain from using `doNotShowCompletedTasks` 
+        and aim for a data-driven implementation instead
+      -->
       <RecursiveTaskElement 
         {taskObj}
         depth={0}
         doNotShowScheduledTasks={false}
-        doNotShowCompletedTasks={false}
+        doNotShowCompletedTasks={true}
         ancestorRoomIDs={['']}
         parentID={''}
         on:task-click
@@ -49,10 +52,10 @@
           {/if}
         </div>
       </RecursiveTaskElement>
-      <div style="margin-bottom: 24px;"></div>
+      <div style="margin-bottom: 12px;"></div>
     {/each}
 
-    {#if tasksToDisplay.length > 0}
+    {#if tasksToDisplay.length > 2}
       <ReusableHelperDropzone
         ancestorRoomIDs={['']}
         roomsInThisLevel={tasksToDisplay}
@@ -74,34 +77,29 @@
 </div>
 
 <script>
-  export let allIncompleteTasks
+  export let allTasks
 
   import { 
     computeDayDifference, 
-    applyFuncToEveryTreeNode,
     convertDDMMYYYYToDateClassObject,
     getDateInDDMMYYYY, 
     getRandomID,
-    sortByOrderValue
+    sortByUnscheduledThenByOrderValue
   } from '/src/helpers.js'
+  import { allTasksDueThisWeek } from '/src/store.js'
   import RecursiveTaskElement from '$lib/RecursiveTaskElement.svelte'
   import { createEventDispatcher, tick } from 'svelte'
   import ReusableHelperDropzone from '$lib/ReusableHelperDropzone.svelte'
 
-  let isMouseHoveringOnTaskName = false
-  let tasksDueThisWeek = null
+  let tasksToDisplay = [] 
 
+  let isMouseHoveringOnTaskName = false
   let isTypingNewRootTask = false
   let newRootTaskStringValue = ''
   let NewRootTaskInput = ''
   const dispatch = createEventDispatcher()
 
-  let tasksToDisplay = [] 
-
-  $: getTasksDueThisWeek(allIncompleteTasks)
-
-  
-  $: if (tasksDueThisWeek) {
+  $: if ($allTasksDueThisWeek.length > 0) {
     computeTasksToDisplay()
   }
 
@@ -116,35 +114,7 @@
   }
 
   function computeTasksToDisplay () {
-    tasksToDisplay = tasksDueThisWeek.filter(t => !t.isDone)
-    tasksToDisplay = sortByOrderValue(tasksToDisplay)
-    console.log('tasksToDisplay')
-  }
-
-  function getTasksDueThisWeek (taskArray) {
-    const output = []
-    const copy = [...taskArray]
-
-    applyFuncToEveryTreeNode({ 
-      tree: copy, 
-      applyFunc: (task) => {
-        if (!task.deadlineDate) return false
-
-        // check if it's already scheduled on calendar
-        if (task.startTime && task.startDate) return false
-
-        const d1 = new Date()
-        const d2 = convertDDMMYYYYToDateClassObject(task.deadlineDate)
-        const dayDiff = computeDayDifference(
-          d1, d2
-        )
-        if (dayDiff <= 7) {
-          output.push(task)
-          return true // this will terminate further traversal down its children
-        }
-      }
-    })
-    tasksDueThisWeek = output
+    tasksToDisplay = sortByUnscheduledThenByOrderValue($allTasksDueThisWeek)
   }
 
   function handleKeyDown (e) {

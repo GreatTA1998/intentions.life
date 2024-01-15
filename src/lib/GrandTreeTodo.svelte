@@ -34,6 +34,8 @@
               doNotShowScheduledTasks={true}
               doNotShowCompletedTasks={true}
               willShowCheckbox={false}
+              dueInHowManyDays={null}
+              ancestorRoomIDs={['']}
               on:task-click
               on:task-node-update
               on:subtask-create

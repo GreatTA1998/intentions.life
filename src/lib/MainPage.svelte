@@ -129,10 +129,10 @@
         </div>
       
       <!-- WEEK MODE -->
-      {:else if (currentMode === 'Week') && allIncompleteTasks}
+      {:else if (currentMode === 'Week')}
         <!-- 1st flex child -->
         <TodoThisWeek
-          {allIncompleteTasks}
+          {allTasks}
           on:new-root-task={(e) => createNewRootTask(e.detail)}
           on:task-unscheduled={(e) => putTaskToThisWeekTodo(e)}
           on:subtask-create={(e) => createSubtask(e.detail)}
@@ -140,7 +140,7 @@
           on:task-checkbox-change={(e) => updateTaskNode({ id: e.detail.id, keyValueChanges: { isDone: e.detail.isDone }})} 
         > 
           <GrandTreeTodoPopupButton
-            {allIncompleteTasks}
+            {allTasks}
             on:new-root-task={(e) => createNewRootTask(e.detail)}
             on:task-unscheduled={(e) => putTaskToThisWeekTodo(e)}
             on:task-click={(e) => openDetailedCard(e.detail)}
@@ -198,14 +198,22 @@
     getDateOfToday, 
     getDateInDDMMYYYY, 
     generateRepeatedTasks, 
-    reconstructTreeInMemory
+    reconstructTreeInMemory,
+    computeTodoMemoryTrees
   } from '/src/helpers.js'
   import { onDestroy, onMount } from 'svelte'
   import JournalPopup from '$lib/JournalPopup.svelte'
   import FinancePopup from '$lib/FinancePopup.svelte'
   import BedtimePopupMaplestoryMusic from '$lib/BedtimePopupMaplestoryMusic.svelte'
   import TheSnackbar from '$lib/TheSnackbar.svelte'
-  import { mostRecentlyCompletedTaskID, user, showSnackbar, isSnackbarHidden } from '/src/store.js'
+  import { 
+    mostRecentlyCompletedTaskID, 
+    user, 
+    showSnackbar, 
+    allTasksDueToday,
+    allTasksDueThisWeek,
+    allTasksDueThisMonth
+  } from '/src/store.js'
   import CalendarThisWeek from '$lib/CalendarThisWeek.svelte'
   import TodoThisWeek from '$lib/TodoThisWeek.svelte'
   import FutureOverview from '$lib/FutureOverview.svelte'
@@ -216,39 +224,34 @@
   import GrandTreeTodoPopupButton from '$lib/GrandTreeTodoPopupButton.svelte'
   import GrandTreeTodo from '$lib/GrandTreeTodo.svelte'
   import PopupCustomerSupport from '$lib/PopupCustomerSupport.svelte'
+
   import { goto } from '$app/navigation';
   import { getAuth, signOut } from 'firebase/auth'
   import db from '/src/db.js'
-  import { doc, collection, getFirestore, updateDoc, arrayUnion, onSnapshot, arrayRemove } from 'firebase/firestore'
+  import { doc, collection, getFirestore, updateDoc, arrayUnion, onSnapshot, arrayRemove, increment } from 'firebase/firestore'
   import { setFirestoreDoc, updateFirestoreDoc, deleteFirestoreDoc, getFirestoreCollection } from '/src/crud.js'
 
-  let snackbarTimeoutID = null
-  let countdownRemaining = 0
-  let calStartDateClassObj = new Date()
-
   let currentMode = 'Week' // weekMode hourMode monthMode
-
-  let isFinancePopupOpen = false
-
   const userDocPath = `users/${$user.uid}`
 
-  let dateOfToday = getDateOfToday()
-  let todayScheduledTasks = []
-  let futureScheduledTasks = [] // AF([])
-  let thisWeekScheduledTasks = [] 
-  let thisMonthScheduledTasks = []
-
+  let isFinancePopupOpen = false
   let isDetailedCardOpen = false
   let isJournalPopupOpen = false
+
+  let calStartDateClassObj = new Date()
   let currentJournalEntryMMDD = getDateOfToday()
+  let dateOfToday = getDateOfToday()
 
   let allTasks = []
+  let futureScheduledTasks = [] // AF([])
+
   let clickedTask = {}
-  let allIncompleteTasks = null
   let isInitialFetch = true
   let unsub
 
-  $: computeDataStructuresFromAllTasks(allTasks)
+  $: if (allTasks.length > 0) {
+    computeDataStructuresFromAllTasks(allTasks)
+  }
 
   function signOutOnFirebase () {
     const auth = getAuth();
@@ -266,18 +269,11 @@
   }
 
   function computeDataStructuresFromAllTasks (allTasks) {
-    allIncompleteTasks = filterIncompleteTasks(allTasks)
-    collectTodayScheduledTasksToArray()
     collectFutureScheduledTasksToArray() // NOTE: this will not include REPEATING tasks
-    collectThisWeekScheduledTasksToArray()
-    collectThisMonthScheduledTasksToArray()
-
-    // TO-DO: don't include all the tasks in the future, only if it is bounded by < 7 days for the week view, and < 30 days for the month view
-    futureScheduledTasks.sort((task1, task2) => {
-      const d1 = new Date(task1.startDate)
-      const d2 = new Date(task2.startDate)
-      return d1.getTime() - d2.getTime() // most recent to the top??
-    })
+    const todoMemoryTrees = computeTodoMemoryTrees(allTasks)
+    allTasksDueToday.set(todoMemoryTrees[0])
+    allTasksDueThisWeek.set(todoMemoryTrees[1])
+    allTasksDueThisMonth.set(todoMemoryTrees[2])
   }
 
   onMount(async () => {
@@ -294,9 +290,6 @@
         maintainOneWeekPreviewWindowForRepeatingTasks(allTasks)
       }
     })
-
-
-    // HANDLE TASKS THAT REPEAT
     // can't use `return` in reactive expression https://github.com/sveltejs/svelte/issues/2828  
   })
 
@@ -310,7 +303,7 @@
     const newTaskObjChecked = checkTaskObjSchema(newTaskObj)
     setFirestoreDoc(tasksPath + id, newTaskObjChecked)
     updateFirestoreDoc(`users/${$user.uid}`, {
-      maxOrderValue: $user.maxOrderValue + 3
+      maxOrderValue: increment(3)
     })
   }
 
@@ -367,22 +360,6 @@
     }) 
   }   
 
-  function filterIncompleteTasks (tasksArray) {
-    let output = []
-    const copy = [...tasksArray]
-    traverseAndUpdateTree({
-      tree: copy,
-      fulfilsCriteria: (task) => {
-        // make an independent copy
-        const filteredChildren = task.children.filter(t => t.isCompleted === false)
-        task.children = filteredChildren
-      },
-      applyFunc: (task) => output.push(task) // output = [...output, task]
-    })
-    output = copy
-    return output
-  }
-
   function incrementDateClassObj ({ days }) {
     calStartDateClassObj.setDate(calStartDateClassObj.getDate() + days)
     calStartDateClassObj = calStartDateClassObj // to manually trigger reactivity
@@ -427,14 +404,6 @@
     }
   }
 
-  function collectTodayScheduledTasksToArray () {
-    todayScheduledTasks = [] // reset
-    traverseAndUpdateTree({
-      fulfilsCriteria: (task) => task.startDate === getDateOfToday() && task.startTime, 
-      applyFunc: (task) => todayScheduledTasks = [...todayScheduledTasks, task]
-    })
-  } 
-
   // quick-fix for NaN/NaN bug
   function collectFutureScheduledTasksToArray () {
     const yearNumber = new Date().getFullYear()
@@ -448,72 +417,14 @@
       }, // 'NaN' quick-fix bug
       applyFunc: (task) => futureScheduledTasks = [...futureScheduledTasks, task]
     })
+
+    // TO-DO: don't include all the tasks in the future, only if it is bounded by < 7 days for the week view, and < 30 days for the month view
+    futureScheduledTasks.sort((task1, task2) => {
+      const d1 = new Date(task1.startDate)
+      const d2 = new Date(task2.startDate)
+      return d1.getTime() - d2.getTime() // most recent to the top??
+    })
   }
-
-
-  function collectThisMonthScheduledTasksToArray () {
-    thisMonthScheduledTasks = [] // reset
-    traverseAndUpdateTree({
-      fulfilsCriteria: (task) => {
-        if (!task.startDate) return false
-        
-        // create d2 date object
-        let d2 
-        if (task.startDate.length === 5) {
-          const yyyy = new Date().getFullYear()
-          const [mm, dd] = task.startDate.split('/')
-          d2 = new Date(yyyy, mm, dd) 
-        } else {
-          const [dd, mm, yyyy] = task.startDate.split('/')
-          d2 = new Date(yyyy, mm, dd) 
-        }
-        const today = new Date()
-
-        const d1 = new Date(today.getFullYear(), 1 + today.getMonth(), today.getDate())
-        // the reason for +1 see Stackoverflow, getMonth() is zero-indexed which VERY stupid
-        // // https://stackoverflow.com/a/18624336
-
-        const dayDiff = computeDayDifference(d1, d2)
-        return dayDiff >= 0 && dayDiff <= 30
-      }, 
-      applyFunc: (task) => thisMonthScheduledTasks = [...thisMonthScheduledTasks, task]
-    })
-  } 
-
-  // note due to a bug, sometimes `mm` is like 131 instead of a valid hour, 
-  // which fucks up the computation
-
-  // note it's not always dd:mm for mat
-  // I actually do the US format of 06/14
-  // which fucks it up
-  function collectThisWeekScheduledTasksToArray () {
-    thisWeekScheduledTasks = [] // reset
-    traverseAndUpdateTree({
-      fulfilsCriteria: (task) => {
-        if (!task.startDate) return false
-        
-        // create d2 date object
-        let d2 
-        if (task.startDate.length === 5) {
-          const yyyy = new Date().getFullYear()
-          const [mm, dd] = task.startDate.split('/')
-          d2 = new Date(yyyy, mm, dd) 
-        } else {
-          const [dd, mm, yyyy] = task.startDate.split('/')
-          d2 = new Date(yyyy, mm, dd) 
-        }
-        const today = new Date()
-
-        const d1 = new Date(today.getFullYear(), 1 + today.getMonth(), today.getDate())
-        // the reason for +1 see Stackoverflow, getMonth() is zero-indexed which VERY stupid
-        // // https://stackoverflow.com/a/18624336
-
-        const dayDiff = computeDayDifference(d1, d2)
-        return dayDiff >= 0 && dayDiff <= 7 
-      }, 
-      applyFunc: (task) => thisWeekScheduledTasks = [...thisWeekScheduledTasks, task]
-    })
-  } 
   
   async function createReusableTaskTemplate (id) {
     traverseAndUpdateTree({
