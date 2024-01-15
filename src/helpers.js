@@ -430,3 +430,100 @@ export function sortByOrderValue(array) {
   return array;
 }
 
+export function computeTodoMemoryTrees (allTasks) {
+  const allTasksDueToday = []
+  const allTasksDueThisWeek = []
+  const allTasksDueThisMonth = []
+  const allTasksDueThisYear = []
+
+  // use VS code's collpase feature
+  // this is so the function can access the arrays we define above
+  function helper ({ node, parentCategory = '', parentObjReference = null }) {
+    if (!node.deadlineDate) {
+      // be lenient with children that have no due dates, as it wouldn't make sense 
+      // that a task due in 3 days has a sub-task that has no due dates
+      if (parentObjReference && parentCategory) {
+        parentObjReference.children.push(node)
+        for (const child of node.children) {
+          // a sub-task (i.e. has parentID) can still appear as the top-level task within a to-do,
+          // hence no parentObjReference nor parentCategory yet
+          helper({ node: child, parentCategory, parentObjReference })
+        }
+      } 
+      else {
+        // console.log('give someone else a chance to be head case')
+        // a sub-task (i.e. has parentID) can still appear as the top-level task within a to-do,
+        // hence no parentObjReference nor parentCategory yet
+        for (const child of node.children) {
+          helper({ node: child })
+        }
+      }
+    }
+    else {
+      const shallowCopy = {...node}
+      shallowCopy.children = []
+      const dueInHowManyDays = computeDayDifference(
+        new Date(),
+        convertDDMMYYYYToDateClassObject(node.deadlineDate)
+      )
+      if (dueInHowManyDays <= 1 && dueInHowManyDays >= 0) {
+        if (parentCategory === 'DAY' && parentObjReference !== null) {
+          parentObjReference.children.push(shallowCopy)
+        }
+        else allTasksDueToday.push(node)
+        
+        for (const child of node.children) {
+          helper({ node: child, parentCategory: 'DAY', parentObjReference: shallowCopy})
+        }
+      } 
+      else if (dueInHowManyDays <= 7 && dueInHowManyDays >= 0) {
+        if (parentCategory === 'WEEK' && parentObjReference !== null) {
+          parentObjReference.children.push(shallowCopy)
+        }
+        else allTasksDueThisWeek.push(shallowCopy)
+  
+        // notice we iterate on the original tree that still has a `.children` array preserved
+        for (const child of node.children) {
+          i += 1
+          helper({ node: child, parentCategory: 'WEEK', parentObjReference: shallowCopy})
+        }
+      }
+      else if (dueInHowManyDays <= 31 && dueInHowManyDays >= 0) {
+        if (parentCategory === 'MONTH' && parentObjReference !== null) {
+          parentObjReference.children.push(shallowCopy)
+        } 
+        else allTasksDueThisMonth.push(shallowCopy)
+  
+        for (const child of node.children) {
+          helper({ node: child, parentCategory: 'MONTH', parentObjReference: shallowCopy})
+        }
+      }
+      else if (dueInHowManyDays <= 365 && dueInHowManyDays >= 0) {
+        if (parentCategory === 'YEAR' && parentObjReference !== null) {
+          parentObjReference.children.push(shallowCopy)
+        }
+        else allTasksDueThisYear.push(shallowCopy)
+  
+        for (const child of node.children) {
+          helper({ node: child, parentCategory: 'YEAR', parentObjReference: shallowCopy})
+        }
+      } 
+    }
+  }
+  
+
+  for (const parentlessTask of allTasks) {
+    helper({ node: parentlessTask })
+  }
+
+  console.log('i should be around 1200', i)
+  return [allTasksDueToday, allTasksDueThisWeek, allTasksDueThisMonth]
+}
+
+// parent category is 'DAY', 'WEEK', 'MONTH', 'YEAR'
+// recursively scan the ORIGINAL tree, so we separate the scanning tree from the editing tree
+//   - node is for scanning 
+//   - node is for mutating
+let i = 0
+
+

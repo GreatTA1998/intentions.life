@@ -74,7 +74,7 @@
         >
       {/if}
       <div class="truncate-to-one-line" class:cross-out-todo={taskObj.isDone} style="margin-top: -1px; margin-left: 3px;">
-        {taskObj.name}
+        {taskObj.orderValue} {taskObj.name}
       </div>
     </div>
     {#if isMouseHoveringOnTaskName}

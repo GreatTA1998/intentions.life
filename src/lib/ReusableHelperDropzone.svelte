@@ -1,5 +1,5 @@
 <div bind:this={ReorderDropzone} 
-  style="height: 4px; border-radius: 2px; border: 2px solid {colorForDebugging};" 
+  style="height: 4px; border-radius: 2px; border: 0px solid {colorForDebugging};" 
   on:dragenter={() => {
     if (!isInvalidReorderDrop()) {
       ReorderDropzone.style.background = 'rgb(87, 172, 247)' 
@@ -84,9 +84,21 @@
       newVal = (order1 + order2) / 2
     }
 
-    updateFirestoreDoc(`users/${$user.uid}/tasks/${$whatIsBeingDraggedID}`, {
-      parentID,
+    // edge case: top-level has an edge case (recursive does not), where
+    // the tasks have mixed parents, and you don't want to accidentally 
+    // wipe a task's parent to be "" when it actually belongs to anothe rparent
+    const updateObj = {
       orderValue: newVal
-    })
+    }
+
+    if (ancestorRoomIDs.length > 1) {
+      updateObj.parentID = parentID
+    } else {
+      console.log('Top level task, parent will not be wiped')
+    }
+    updateFirestoreDoc(
+      `users/${$user.uid}/tasks/${$whatIsBeingDraggedID}`, 
+      updateObj
+    )
   }
 </script>

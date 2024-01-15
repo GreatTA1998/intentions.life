@@ -86,12 +86,12 @@
     getRandomID,
     sortByUnscheduledThenByOrderValue
   } from '/src/helpers.js'
+  import { allTasksDueThisWeek } from '/src/store.js'
   import RecursiveTaskElement from '$lib/RecursiveTaskElement.svelte'
   import { createEventDispatcher, tick } from 'svelte'
   import ReusableHelperDropzone from '$lib/ReusableHelperDropzone.svelte'
 
   let tasksToDisplay = [] 
-  let allTasksDueThisWeek = []
 
   let isMouseHoveringOnTaskName = false
   let isTypingNewRootTask = false
@@ -99,13 +99,7 @@
   let NewRootTaskInput = ''
   const dispatch = createEventDispatcher()
 
-
-  // basically copy and pasted from <GrandTreeTodoPopup/>
-  $: if (allTasks.length > 0) {
-    computeThisWeekTodoMemoryTree(allTasks)
-  }
-
-  $: if (allTasksDueThisWeek.length > 0) {
+  $: if ($allTasksDueThisWeek.length > 0) {
     computeTasksToDisplay()
   }
 
@@ -119,53 +113,8 @@
     }
   }
 
-  function computeThisWeekTodoMemoryTree (allTasks) {
-    allTasksDueThisWeek = []
-    for (const parentlessTask of allTasks) {
-      helper({ node: parentlessTask })
-    }
-    allTasksDueThisWeek = allTasksDueThisWeek // manually trigger reactivity
-  }
-
-  let i = 0
-  function helper ({ node, parentCategory = '', parentObjReference = null }) {
-    if (!node.deadlineDate) {
-      if (parentObjReference && parentCategory) {
-        parentObjReference.children.push(node)
-        for (const child of node.children) {
-          helper({ node: child, parentCategory, parentObjReference })
-        }
-      } 
-      else {
-        for (const child of node.children) {
-          helper({ node: child })
-        }
-      }
-    }
-    else {
-      const shallowCopy = {...node}
-      shallowCopy.children = []
-      const dueInHowManyDays = computeDayDifference(
-        new Date(),
-        convertDDMMYYYYToDateClassObject(node.deadlineDate)
-      )
-      if (dueInHowManyDays <= 7 && dueInHowManyDays >= 0) {
-        if (parentCategory === 'WEEK' && parentObjReference !== null) {
-          parentObjReference.children.push(shallowCopy)
-        }
-        else allTasksDueThisWeek.push(shallowCopy)
-
-        // notice we iterate on the original tree that still has a `.children` array preserved
-        for (const child of node.children) {
-          i += 1
-          helper({ node: child, parentCategory: 'WEEK', parentObjReference: shallowCopy})
-        }
-      }
-    }
-  }
-
   function computeTasksToDisplay () {
-    tasksToDisplay = sortByUnscheduledThenByOrderValue(allTasksDueThisWeek)
+    tasksToDisplay = sortByUnscheduledThenByOrderValue($allTasksDueThisWeek)
   }
 
   function handleKeyDown (e) {

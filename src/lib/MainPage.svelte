@@ -198,14 +198,22 @@
     getDateOfToday, 
     getDateInDDMMYYYY, 
     generateRepeatedTasks, 
-    reconstructTreeInMemory
+    reconstructTreeInMemory,
+    computeTodoMemoryTrees
   } from '/src/helpers.js'
   import { onDestroy, onMount } from 'svelte'
   import JournalPopup from '$lib/JournalPopup.svelte'
   import FinancePopup from '$lib/FinancePopup.svelte'
   import BedtimePopupMaplestoryMusic from '$lib/BedtimePopupMaplestoryMusic.svelte'
   import TheSnackbar from '$lib/TheSnackbar.svelte'
-  import { mostRecentlyCompletedTaskID, user, showSnackbar, isSnackbarHidden } from '/src/store.js'
+  import { 
+    mostRecentlyCompletedTaskID, 
+    user, 
+    showSnackbar, 
+    allTasksDueToday,
+    allTasksDueThisWeek,
+    allTasksDueThisMonth
+  } from '/src/store.js'
   import CalendarThisWeek from '$lib/CalendarThisWeek.svelte'
   import TodoThisWeek from '$lib/TodoThisWeek.svelte'
   import FutureOverview from '$lib/FutureOverview.svelte'
@@ -216,33 +224,34 @@
   import GrandTreeTodoPopupButton from '$lib/GrandTreeTodoPopupButton.svelte'
   import GrandTreeTodo from '$lib/GrandTreeTodo.svelte'
   import PopupCustomerSupport from '$lib/PopupCustomerSupport.svelte'
+
   import { goto } from '$app/navigation';
   import { getAuth, signOut } from 'firebase/auth'
   import db from '/src/db.js'
-  import { doc, collection, getFirestore, updateDoc, arrayUnion, onSnapshot, arrayRemove } from 'firebase/firestore'
+  import { doc, collection, getFirestore, updateDoc, arrayUnion, onSnapshot, arrayRemove, increment } from 'firebase/firestore'
   import { setFirestoreDoc, updateFirestoreDoc, deleteFirestoreDoc, getFirestoreCollection } from '/src/crud.js'
 
-  let calStartDateClassObj = new Date()
-
   let currentMode = 'Week' // weekMode hourMode monthMode
-
-  let isFinancePopupOpen = false
-
   const userDocPath = `users/${$user.uid}`
 
-  let dateOfToday = getDateOfToday()
-  let futureScheduledTasks = [] // AF([])
-
+  let isFinancePopupOpen = false
   let isDetailedCardOpen = false
   let isJournalPopupOpen = false
+
+  let calStartDateClassObj = new Date()
   let currentJournalEntryMMDD = getDateOfToday()
+  let dateOfToday = getDateOfToday()
 
   let allTasks = []
+  let futureScheduledTasks = [] // AF([])
+
   let clickedTask = {}
   let isInitialFetch = true
   let unsub
 
-  $: computeDataStructuresFromAllTasks(allTasks)
+  $: if (allTasks.length > 0) {
+    computeDataStructuresFromAllTasks(allTasks)
+  }
 
   function signOutOnFirebase () {
     const auth = getAuth();
@@ -261,13 +270,10 @@
 
   function computeDataStructuresFromAllTasks (allTasks) {
     collectFutureScheduledTasksToArray() // NOTE: this will not include REPEATING tasks
-
-    // TO-DO: don't include all the tasks in the future, only if it is bounded by < 7 days for the week view, and < 30 days for the month view
-    futureScheduledTasks.sort((task1, task2) => {
-      const d1 = new Date(task1.startDate)
-      const d2 = new Date(task2.startDate)
-      return d1.getTime() - d2.getTime() // most recent to the top??
-    })
+    const todoMemoryTrees = computeTodoMemoryTrees(allTasks)
+    allTasksDueToday.set(todoMemoryTrees[0])
+    allTasksDueThisWeek.set(todoMemoryTrees[1])
+    allTasksDueThisMonth.set(todoMemoryTrees[2])
   }
 
   onMount(async () => {
@@ -297,7 +303,7 @@
     const newTaskObjChecked = checkTaskObjSchema(newTaskObj)
     setFirestoreDoc(tasksPath + id, newTaskObjChecked)
     updateFirestoreDoc(`users/${$user.uid}`, {
-      maxOrderValue: $user.maxOrderValue + 3
+      maxOrderValue: increment(3)
     })
   }
 
@@ -410,6 +416,13 @@
                     && (Number(task.startYYYY) === Number(yearNumber.toString()))
       }, // 'NaN' quick-fix bug
       applyFunc: (task) => futureScheduledTasks = [...futureScheduledTasks, task]
+    })
+
+    // TO-DO: don't include all the tasks in the future, only if it is bounded by < 7 days for the week view, and < 30 days for the month view
+    futureScheduledTasks.sort((task1, task2) => {
+      const d1 = new Date(task1.startDate)
+      const d2 = new Date(task2.startDate)
+      return d1.getTime() - d2.getTime() // most recent to the top??
     })
   }
   

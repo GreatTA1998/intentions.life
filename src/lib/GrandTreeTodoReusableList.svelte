@@ -48,7 +48,11 @@
   {/each}
 
   {#if tasksToDisplay.length > 2}
-    {tasksToDisplay.length}
+    <!-- NOTE: BECAUSE WE DON'T DISPLAY TASKS THAT ARE COMPLETED,
+      WE HAVE A DEVIATION BETWEEN STATE AND UI
+      IN THE FUTURE IF THERE ARE UNEXPECTED BUGS, THIS IS THE LIKELY CAUSE
+    -->
+    <!-- {tasksToDisplay.length} -->
     <ReusableHelperDropzone
       ancestorRoomIDs={['']}
       roomsInThisLevel={tasksToDisplay}
