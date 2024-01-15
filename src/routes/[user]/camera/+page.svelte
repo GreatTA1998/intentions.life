@@ -1,12 +1,19 @@
 <div style="padding: 12px;">
-  <input on:change={(e) =>  handleFileChange(e)} type="file" accept="image/*" capture>
+  <h2>
+    Photo button
+  </h2>
+  <input style="font-size: 24px;" on:change={(e) =>  handleFileChange(e)} type="file" accept="image/*" capture>
 
   <div style="font-weight: 300; font-size: 14px; margin-top: 24px;">
     Tip: Put this URL as your home icon on your iPhone
   </div>
   <div style="font-weight: 500; font-size: 16px;">
-    Take a picture / upload a picture. When the photo uploads to the calendar, this page will reload.
+    Take a mobile picture / upload a PC picture. When the photo uploads to the calendar, this page will reload.
   </div>
+
+  <button on:click={() => goto(`/${$user.uid}`)} style="margin-top: 24px;">
+    Go back to calendar
+  </button>
 </div>
 
 <script>
@@ -14,6 +21,12 @@
   import { setFirestoreDoc } from '/src/crud.js'
   import { getRandomID, checkTaskObjSchema, getDateInMMDD, getTimeInHHMM } from '/src/helpers.js'
   import { user } from '/src/store.js'
+  import { goto } from '$app/navigation'
+  import { onMount } from 'svelte'
+
+  onMount(() => {
+
+  })
 
   const storage = getStorage()
   const id = getRandomID()
@@ -67,3 +80,16 @@
     )  
   }
 </script>
+
+<style>
+  input[type="file"] {
+    font-family: sans-serif;
+    font-size: 16px;
+    color: #333;
+    background-color: purple;
+    border: 1px solid #ccc;
+    padding: 10px 15px;
+    border-radius: 36px;
+    cursor: pointer;
+  }
+</style>

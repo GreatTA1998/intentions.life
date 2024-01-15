@@ -85,6 +85,10 @@
       </div>
     </div>
 
+    <span on:click={() => goto(`/${$user.uid}/camera`)} class="material-symbols-outlined mika-hover" class:blue-icon={currentMode === 'Dashboard'} style="margin-right: 24px; font-size: 32px; cursor: pointer;">
+      photo_camera
+    </span>
+
     <span on:click={() => currentMode === 'Dashboard' ? currentMode = 'Week' : currentMode = 'Dashboard'}  class="material-symbols-outlined mika-hover" class:blue-icon={currentMode === 'Dashboard'} style="font-size: 32px; cursor: pointer;">
       signal_cellular_alt
     </span>
