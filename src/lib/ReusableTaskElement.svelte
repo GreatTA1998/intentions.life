@@ -5,16 +5,20 @@
   or vice versa
  -->
 <div 
-  on:keydown={() => {}}
-  class:scheduled-task={!isBulletPoint}
+  on:click={() => dispatch('task-click', { task })}
+  draggable="true" 
+  on:dragstart|self={(e) => startDragMove(e, task.id)} 
+  class:calendar-block={!isBulletPoint}
   style="
     position: relative;
     height: {height}px; 
     min-height: 12px;
     font-size: {fontSize}rem;
-    border-left: {isBulletPoint ? 0 : 3}px solid {task.isDone ? 'grey' : 'grey'};
     opacity: {task.isDone ? '0.6' : '1'};
+    outline: 0px solid red;
+    background-color: {isBulletPoint ? '' : 'hsla(210, 20%, 80%, 0.9)'};
   "
+  on:keydown={() => {}}
 >
   <!-- As long as this parent div is correctly sized, the duration adjusting area 
     will be positioned correctly (it's glued to the bottom of this parent div)
@@ -66,9 +70,6 @@
     <div 
       style="margin-top: -1px; margin-left: 3px; font-size: 12px; width: 100%;"
       class="task-name truncate-to-one-line"
-      draggable="true" 
-      on:click={() => dispatch('task-click', { task })}
-      on:dragstart={(e) => dragstart_handler(e, task.id)} 
     >
       {task.name} 
     </div>
@@ -97,9 +98,10 @@
         position: absolute;
         left: -3px; 
         bottom: {0}px;
-        height: {height/8}px; 
-        min-height: 4px;
-        width: 0.5vw; 
+        height: {height/12}px; 
+        min-height: 3px;
+        width: 100%; 
+        outline: 0px solid blue;
       "
     >
   </div>
@@ -109,6 +111,7 @@
   // Assumes `task` is hydrated
   import { createEventDispatcher } from 'svelte'
   import { getTrueY } from '/src/helpers.js'
+  import { yPosWithinBlock } from '/src/store.js'
 
   export let task = null
   export let pixelsPerHour = null
@@ -117,13 +120,18 @@
   export let fontSize = 1
 
   $: height = (pixelsPerHour / 60) * task.duration
-  $: isBulletPoint = height < 10
+  $: isBulletPoint = height < 20
 
   const dispatch = createEventDispatcher()
   let startY = 0
 
-  function dragstart_handler(e, id) {
+  function startDragMove (e, id) {
     e.dataTransfer.setData("text/plain", id)
+    // record distance from the top of the element
+    const rect = e.target.getBoundingClientRect()
+    const y = e.clientY - rect.top // y position within el ement
+
+    yPosWithinBlock.set(y)
   }
 
   function startAdjustingDuration (e) {
@@ -152,8 +160,11 @@
 </script> 
 
 <style>
-  .scheduled-task {
+  .calendar-block {
     width: 100%;
+    padding-top: 6px;
+    cursor: pointer;
+    border-radius: 3px;
 
     /* font-size: 0.8rem; */
     /* display: inline; */
@@ -169,6 +180,7 @@
   }
 
   .task-name {
+    font-weight: 500;
     width: 11vw; 
     cursor: pointer; 
     color: #000000;

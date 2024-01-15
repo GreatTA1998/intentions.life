@@ -23,3 +23,5 @@ export const whatIsBeingDraggedID = writable("")
 export const allTasksDueToday = writable([])
 export const allTasksDueThisWeek = writable([])
 export const allTasksDueThisMonth = writable([])
+
+export const yPosWithinBlock = writable(0)

@@ -42,7 +42,8 @@
 
     {#each dateClassObjects as dateClassObj, i}
       <!-- To vertically group the date label with the calendar component-->
-      <div>
+      <!-- 4px for gap between each calendar so the calendar blocks don't visually merge -->
+      <div style="margin-right: 4px;">
         <div class="sticky-day-of-week-abbreviation" style="padding-top: 36px; margin-bottom: {spacingBetweenLabelAndCal}px">
           <div>
             <div 
