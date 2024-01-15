@@ -70,7 +70,6 @@
 <script>
   import { createEventDispatcher, onMount, onDestroy, tick } from 'svelte'
   import _ from 'lodash'
-  import { computeDayDifference, getDateOfToday, getRandomID, clickOutside, getDateInDDMMYYYY, convertDDMMYYYYToDateClassObject, getCurrentTimeInHHMM } from '/src/helpers.js'
   import GrandTreeTodoReusableList from '$lib/GrandTreeTodoReusableList.svelte'
   import { allTasksDueToday, allTasksDueThisWeek, allTasksDueThisMonth } from '/src/store.js'
 
