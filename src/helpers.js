@@ -516,7 +516,7 @@ export function computeTodoMemoryTrees (allTasks) {
     helper({ node: parentlessTask })
   }
 
-  console.log('i should be around 1200', i)
+  // console.log('# of recursion should be at most the total number of tasks', i)
   return [allTasksDueToday, allTasksDueThisWeek, allTasksDueThisMonth]
 }
 

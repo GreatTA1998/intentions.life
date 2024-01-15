@@ -52,7 +52,7 @@
           {/if}
         </div>
       </RecursiveTaskElement>
-      <div style="margin-bottom: 24px;"></div>
+      <div style="margin-bottom: 12px;"></div>
     {/each}
 
     {#if tasksToDisplay.length > 2}

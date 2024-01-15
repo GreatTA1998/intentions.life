@@ -1,5 +1,5 @@
 <div bind:this={ReorderDropzone} 
-  style="height: 4px; border-radius: 2px; border: 0px solid {colorForDebugging};" 
+  style="height: 6px; border-radius: 2px; border: 0px solid {colorForDebugging};" 
   on:dragenter={() => {
     if (!isInvalidReorderDrop()) {
       ReorderDropzone.style.background = 'rgb(87, 172, 247)' 
@@ -7,7 +7,7 @@
   }}
   on:dragleave={() => ReorderDropzone.style.background = '' }
   on:dragover={(e) => dragover_handler(e)}
-  on:drop|stopPropagation={(e) => onReorderDrop(e)}
+  on:drop={(e) => onReorderDrop(e)}
 >
 
 </div>
@@ -27,7 +27,7 @@
   $: n = roomsInThisLevel.length
 
   function isInvalidReorderDrop () {
-    return $whatIsBeingDragged !== 'room' || ancestorRoomIDs.includes($whatIsBeingDraggedID)
+    return !['room', 'top-level-task-within-this-todo-list'].includes($whatIsBeingDragged) || ancestorRoomIDs.includes($whatIsBeingDraggedID)
   }
 
   function dragover_handler (e) {
@@ -84,18 +84,19 @@
       newVal = (order1 + order2) / 2
     }
 
-    // edge case: top-level has an edge case (recursive does not), where
-    // the tasks have mixed parents, and you don't want to accidentally 
-    // wipe a task's parent to be "" when it actually belongs to anothe rparent
+    // FINALLY UPDATE THE TASK ITSELF
     const updateObj = {
       orderValue: newVal
     }
 
-    if (ancestorRoomIDs.length > 1) {
-      updateObj.parentID = parentID
+    if ($whatIsBeingDragged === 'top-level-task-within-this-todo-list' && ancestorRoomIDs.length === 1) {
+      // don't override the true parentID of this top level task
     } else {
-      console.log('Top level task, parent will not be wiped')
+      updateObj.parentID = parentID
     }
+
+    // when destination is the top level 
+    // if the task itself is already at the top level (how do you tell)
     updateFirestoreDoc(
       `users/${$user.uid}/tasks/${$whatIsBeingDraggedID}`, 
       updateObj
