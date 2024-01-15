@@ -26,6 +26,7 @@
       {taskObj}
       depth={0}
       {dueInHowManyDays}
+      ancestorRoomIDs={['']}
       doNotShowScheduledTasks={false}
       doNotShowCompletedTasks={true}
       on:task-click
