@@ -4,13 +4,15 @@
   --base-color: rgb(0, 89, 125);
   --sub-color: rgb(172, 160, 78);
 
+  --logo-twig-color: #b34f1b;
+
   /* gradation effect */
   --todo-list-bg-color: hsl(100, 40%, 86%);
   --calendar-bg-color: hsl(98, 40%, 90%);
   --future-overview-bg-color: hsl(98, 40%, 94%);
   --navbar-bg-color: hsla(98, 30%, 94%);
 
-  --location-indicator-color: #c05914;
+  --location-indicator-color: #b34f1b;
 }
 
 * {

@@ -56,16 +56,9 @@
 <NavbarAndContentWrapper>
   <div slot="navbar" class="top-navbar" class:transparent-glow-navbar={currentMode === 'Day'} style="padding-left: 3vw; padding-right: 3vw;">
     <PopupCustomerSupport let:setIsPopupOpen={setIsPopupOpen}>
-      <img on:click={() => {
-        if (!$user.email && !$user.phoneNumber) {
-          signOutOnFirebase();
-          goto('/');
-        } else {
-          setIsPopupOpen({ newVal: true })
-        }
-      }}
-        src="hand-drawn-twig-no-bg-cropped.png" 
-        style="width: 26px; height: 36px; margin-right: 6px; cursor: pointer;"
+      <img on:click={() => handleLogoClick(setIsPopupOpen)}
+        src="trueoutput-square-nobg.png" 
+        style="width: 38px; height: 38px; margin-right: 6px; margin-left: -4px; cursor: pointer;"
       >
     </PopupCustomerSupport>
 
@@ -256,6 +249,15 @@
 
   $: if (allTasks.length > 0) {
     computeDataStructuresFromAllTasks(allTasks)
+  }
+
+  function handleLogoClick (setIsPopupOpen) {
+    if (!$user.email && !$user.phoneNumber) {
+      signOutOnFirebase();
+      goto('/');
+    } else {
+      setIsPopupOpen({ newVal: true })
+    }
   }
 
   function signOutOnFirebase () {
@@ -686,9 +688,9 @@
   }
 
   .active-ux-tab {
-    border-bottom: 2px solid var(--location-indicator-color);
+    border-bottom: 1px solid var(--location-indicator-color);
     color: var(--location-indicator-color);
-    font-weight: 600;
+    font-weight: 500;
   }
 
   .transparent-glow-navbar {

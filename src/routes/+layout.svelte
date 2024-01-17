@@ -5,10 +5,10 @@
     class="elementToFadeInAndOut center"
   >
     <img 
-      src="/hand-drawn-twig-no-bg-cropped.png" 
+      src="/trueoutput-square-nobg.png" 
       class="app-loading-logo center"
       alt="logo"
-      style="width: 38px; height: 48px;"
+      style="width: 48px; height: 48px;"
     />
   </div>
 {/if}
