@@ -3,7 +3,7 @@
     <NavbarAndContentWrapper>
       <div slot="navbar" class="top-navbar transparent-glow-navbar" style="background: transparent; border-bottom: 1px solid lightgrey; padding-left: 4%; padding-right: 4%;">
         <img 
-          src="hand-drawn-twig-no-bg-cropped.png" 
+          src="trueoutput-square-nobg.png" 
           style="width: 26px; height: 36px;"
         >
 
