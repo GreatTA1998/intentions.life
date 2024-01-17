@@ -80,6 +80,7 @@
       <div on:click={() => currentMode = 'Week'}
         class="ux-tab-item" 
         class:active-ux-tab={currentMode === 'Week'} 
+        class:transparent-inactive-tab={currentMode === 'Day'}
       >
         Week
       </div>
@@ -663,6 +664,8 @@
     border-bottom: 2px solid transparent;
     transition: all 0.2s ease-in-out;
     cursor: pointer;
+    color: rgb(120, 120, 120);
+    font-weight: 300;
   }
 
   .transparent-glow-tab {
@@ -671,10 +674,15 @@
     border-bottom: 1px solid white;
   }
 
+  .transparent-inactive-tab {
+    color: black;
+    font-weight: 400;
+  }
+
   .active-ux-tab {
     border-bottom: 1px solid var(--location-indicator-color);
     color: var(--location-indicator-color);
-    font-weight: 600;
+    font-weight: 400;
   }
 
   .transparent-glow-navbar {

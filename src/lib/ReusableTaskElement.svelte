@@ -16,7 +16,7 @@
     font-size: {fontSize}rem;
     opacity: {task.isDone ? '0.6' : '1'};
     outline: 0px solid red;
-    background-color: {isBulletPoint ? '' : 'hsla(210, 20%, 80%, 0.9)'};
+    background-color: {isBulletPoint ? '' : 'hsla(210, 20%, 40%, 1)'};
     background-image: {task.imageDownloadURL ? `url(${task.imageDownloadURL})` : ''};
     background-size: cover;
     padding-left: {isBulletPoint ? '0px' : 'var(--left-padding)'};
@@ -57,7 +57,7 @@
       </div>
     {/if}
 
-    <div class="task-name truncate-to-one-line">
+    <div class="task-name truncate-to-one-line" style="color: {isBulletPoint ? '' : 'white'}">
       {task.name}
     </div>
   </div>
