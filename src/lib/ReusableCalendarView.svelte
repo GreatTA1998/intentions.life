@@ -5,7 +5,7 @@
   class="scroll-container"
   style="
     position: relative;
-    width: 160px;
+    width: var(--calendar-day-section-width);
     background-color: var(--calendar-bg-color);
     flex-grow: 1;
   "
@@ -131,25 +131,28 @@
     <!-- A red line that indicates the current time -->
     <!-- `willShowTimestamps` is a quick-fix to identify today's calendar -->
     {#if currentTimeInHHMM && calendarBeginningDateClassObject.getDate() === new Date().getDate()}
-      <hr 
-        bind:this={CurrentTimeIndicator}
-        style="
-        border-top: 3px solid var(--location-indicator-color); 
-        position: absolute; 
-        top: {computeOffsetGeneral({ 
-          d1: calendarBeginningDateClassObject, 
-          d2: new Date(), 
-          pixelsPerMinute 
-        })}px;
-        width: 11vw;  
-      "
-      >
+      <div class="current-time-indicator-container" style="
+          top: {computeOffsetGeneral({ 
+            d1: calendarBeginningDateClassObject, 
+            d2: new Date(), 
+            pixelsPerMinute 
+          })}px;
+        "
+      > 
+       <div style="font-size: 12px; color: var(--location-indicator-color); font-weight: 600;">
+        {getTimeInHHMM({ dateClassObj: new Date() })}
+        </div>
+        <hr 
+          style="width: 11vw; border: 2px solid var(--location-indicator-color); border-radius: 5px; width: 100%; margin-top: 2px;"
+          bind:this={CurrentTimeIndicator}
+        > 
+      </div>
     {/if}
   </div>
 </div>
 
 <script>
-  import { getDateOfToday, getTrueY, computeMillisecsDifference, convertDDMMYYYYToDateClassObject} from '/src/helpers.js'
+  import { getDateOfToday, getTrueY, computeMillisecsDifference, convertDDMMYYYYToDateClassObject, getTimeInHHMM } from '/src/helpers.js'
   import ReusableTaskElement from '$lib/ReusableTaskElement.svelte'
   import { onMount, beforeUpdate, afterUpdate, tick, createEventDispatcher, onDestroy } from 'svelte'
   import { browser } from '$app/environment';
@@ -367,6 +370,20 @@
 </script>
 
 <style lang="scss">
+:root {
+  --calendar-day-section-width: 160px; 
+}
+
+.current-time-indicator-container {
+  display: block; 
+  align-items: center;
+  position: absolute; 
+  width: var(--calendar-day-section-width);
+  padding-left: 6px;
+  padding-right: 6px;
+  pointer-events: none;
+}
+
 .autocomplete-option {
   padding-top: 12px; padding-bottom: 12px; padding-left: 12px; padding-right: 12px; font-size: 16px; border-radius: 12px;
 }

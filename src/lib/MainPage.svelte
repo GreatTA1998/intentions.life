@@ -686,9 +686,9 @@
   }
 
   .active-ux-tab {
-    border-bottom: 1px solid var(--location-indicator-color);
+    border-bottom: 2px solid var(--location-indicator-color);
     color: var(--location-indicator-color);
-    font-weight: 400;
+    font-weight: 600;
   }
 
   .transparent-glow-navbar {
