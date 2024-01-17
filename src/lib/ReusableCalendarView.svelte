@@ -134,7 +134,7 @@
       <hr 
         bind:this={CurrentTimeIndicator}
         style="
-        border-top: 3px solid #48cae4; 
+        border-top: 3px solid var(--location-indicator-color); 
         position: absolute; 
         top: {computeOffsetGeneral({ 
           d1: calendarBeginningDateClassObject, 

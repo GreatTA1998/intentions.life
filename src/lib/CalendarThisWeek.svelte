@@ -30,7 +30,7 @@
 
 
   <div style="display: flex; width: fit-content;">
-    <div class="x-sticky" style="margin-top: {totalCalStartTopOffset}px; margin-right: 0px;">
+    <div class="x-sticky" style="margin-top: {totalCalStartTopOffset}px;">
       {#each timesOfDay as timestamp, i}
         <div class="x-sticky timestamp-number" 
           style="height: {MIKA_PIXELS_PER_HOUR}px;"
@@ -43,7 +43,7 @@
     {#each dateClassObjects as dateClassObj, i}
       <!-- To vertically group the date label with the calendar component-->
       <!-- 4px for gap between each calendar so the calendar blocks don't visually merge -->
-      <div style="margin-right: 4px;">
+      <div style="margin-left: 4px;">
         <div class="sticky-day-of-week-abbreviation" style="padding-top: 36px; margin-bottom: {spacingBetweenLabelAndCal}px">
           <div>
             <div 

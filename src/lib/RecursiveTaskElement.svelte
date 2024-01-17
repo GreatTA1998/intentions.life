@@ -62,18 +62,14 @@
       "
     >   
       {#if willShowCheckbox}
-        <input type="checkbox" 
-          style="
-            accent-color: {taskObj.isDone ? '#509c13' : ''};
-            margin: 0; 
-            margin-left: 2px;
-          "
-          checked={taskObj.isDone}
-          on:click|stopPropagation={() => {}}
-          on:change={(e) => handleCheckboxChange(e)}
-        >
+        <div style="margin-left: 2px;">
+          <ReusableCheckbox 
+            value={taskObj.isDone}
+            on:change={(e) => handleCheckboxChange(e)}
+          />
+        </div>
       {/if}
-      <div class="truncate-to-one-line" class:cross-out-todo={taskObj.isDone} style="margin-top: -1px; margin-left: 3px;">
+      <div class="truncate-to-one-line" class:cross-out-todo={taskObj.isDone} style="margin-top: -1px; margin-left: 4px;">
         {taskObj.name}
       </div>
     </div>
@@ -148,6 +144,7 @@
 
 <script>
   import RecursiveTaskElement from '$lib/RecursiveTaskElement.svelte'
+  import ReusableCheckbox from '$lib/ReusableCheckbox.svelte'
   import ReusableHelperDropzone from '$lib/ReusableHelperDropzone.svelte'
   import { getDateInDDMMYYYY, convertDDMMYYYYToDateClassObject, computeDayDifference, getRandomID, getRandomColor } from '/src/helpers'
   import { createEventDispatcher, tick } from 'svelte'

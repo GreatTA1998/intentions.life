@@ -85,7 +85,7 @@
       </div>
     </div>
 
-    <span on:click={() => goto(`/${$user.uid}/camera`)} class="material-symbols-outlined mika-hover" class:blue-icon={currentMode === 'Dashboard'} style="margin-right: 24px; font-size: 32px; cursor: pointer;">
+    <span on:click={() => goto(`/${$user.uid}/camera`)} class="material-symbols-outlined mika-hover" class:blue-icon={currentMode === 'Dashboard'} style="margin-right: 32px; font-size: 30px; cursor: pointer;">
       photo_camera
     </span>
 
@@ -672,9 +672,9 @@
   }
 
   .active-ux-tab {
-    border-bottom: 1px solid #48cae4;
-    color: #48cae4;
-    font-weight: 500;
+    border-bottom: 1px solid var(--location-indicator-color);
+    color: var(--location-indicator-color);
+    font-weight: 600;
   }
 
   .transparent-glow-navbar {

@@ -9,6 +9,8 @@
   --calendar-bg-color: hsl(98, 40%, 90%);
   --future-overview-bg-color: hsl(98, 40%, 94%);
   --navbar-bg-color: hsla(98, 30%, 94%);
+
+  --location-indicator-color: #70492e;
 }
 
 * {

@@ -19,6 +19,7 @@
     background-color: {isBulletPoint ? '' : 'hsla(210, 20%, 80%, 0.9)'};
     background-image: {task.imageDownloadURL ? `url(${task.imageDownloadURL})` : ''};
     background-size: cover;
+    padding-left: {isBulletPoint ? '0px' : 'var(--left-padding)'};
   " 
   on:keydown={() => {}}
 >
@@ -27,21 +28,18 @@
 
     `min-height` prevents the parent from being super small when it's bullet point mode
   -->
-  <div style="display: flex; align-items: start; width: 100%;">
+  <div style="display: flex; align-items: center; width: 100%;">
     {#if isBulletPoint}
       <span class="material-icons" 
         style="
           font-size: 2px; 
-          color: {task.isDone ? '#509c13' : 'grey'}; 
-          margin-top: 6px;
-          margin-right: -1px;
+          margin-right: calc(var(--left-padding) - 2px);
+          color: {task.isDone ? '#509c13' : 'rgb(20, 20, 20)'}; 
         "
       >
         circle
       </span>
     {/if}
-
-    <div style="margin-right: 2px;"></div>
 
     {#if hasCheckbox}
       <div>
@@ -49,45 +47,20 @@
           `task-checkbox-change` event will just toggle the checkbox, 
           but in case we ever need the new value, it's `e.target.checked`
         -->
-        <input type="checkbox" 
-          style="
-            zoom: {isBulletPoint ? 1 : 1};
-            accent-color: {task.isDone ? '#509c13' : ''};
-            margin: 0; 
-            margin-left: 2px;
-          "
-          checked={task.isDone}
+        <ReusableCheckbox
+          value={task.isDone}
           on:change={(e) => dispatch('task-checkbox-change', {
             id: task.id,
             isDone: e.target.checked
           })}
-        >
-
-        <!-- <CustomRoundCheckbox></CustomRoundCheckbox> -->
-
-
+        />
       </div>
     {/if}
 
-    <div 
-      style="margin-top: -1px; margin-left: 3px; font-size: 12px; width: 100%;"
-      class="task-name truncate-to-one-line"
-    >
+    <div class="task-name truncate-to-one-line">
       {task.name}
     </div>
   </div>
-
-  <!-- Continuation of re-scheduling zone -->
-  <slot>
-    <!-- <div 
-      class="task-drag-zone"
-      style="height: {height * 7/16}px;" 
-      draggable="true" 
-      on:dragstart={(e) => dragstart_handler(e, task.id)}
-    >
-
-    </div> -->
-  </slot>
 
     <!-- 
       `1vw`: if it's too wide, it overlaps with the task name for short duration tasks 
@@ -114,6 +87,7 @@
   import { createEventDispatcher } from 'svelte'
   import { getTrueY } from '/src/helpers.js'
   import { yPosWithinBlock } from '/src/store.js'
+  import ReusableCheckbox from '$lib/ReusableCheckbox.svelte'
 
   export let task = null
   export let pixelsPerHour = null
@@ -162,58 +136,24 @@
 </script> 
 
 <style>
+  :root {
+    --left-padding: 6px;
+  }
+
   .calendar-block {
     width: 100%;
-    padding-top: 6px;
+    padding-top: var(--left-padding);
     cursor: pointer;
-    border-radius: 3px;
-
-    /* font-size: 0.8rem; */
-    /* display: inline; */
-    /* position: absolute; */
-  }
-
-  .green {
-    border-left: 2px solid #0085FF;
-  }
-
-  .task-drag-zone {
-    width: 10vw;
+    border-radius: var(--left-padding);
   }
 
   .task-name {
+    margin-top: -1px; 
+    margin-left: 4px; 
+    width: 100%;
+    font-size: 14px;
     font-weight: 500;
-    width: 11vw; 
     cursor: pointer; 
-    color: #000000;
-  }
-
-  .normal-text {
-    font-family: Roboto, sans-serif; 
-    font-family: sans-serif; color: #6D6D6D;
-  }
-
-  /* Small Devices, Tablets and bigger devices */
-  @media only screen and (max-width : 480px) {
-    .task-drag-zone {
-      width: 150px;
-    }
-    .task-name {
-      width: 150px
-    }
-  }
-
-  @media only screen and (min-width : 480px) {
-    .task-drag-zone {
-      width: 11vw;
-    }
-    .task-name {
-      width: 11vw;
-    }
-  }
-
-  .smallest-text {
-    font-size: 12px;
-    color: black;
+    color: rgb(0, 0, 0);
   }
 </style>
