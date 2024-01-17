@@ -63,6 +63,8 @@
 
     // STEP 2: create a task scheduled at the same time with the imageDownloadURL
     const dateClassObj = new Date(timeCreated)
+
+    // TO-DO: STORE THE REFERENCE OR PATH, SO DELETION IS FAST FOR THE USER WITHOUT ADDITIONAL FETCH
     let newTaskObj = {
       id, 
       name: `Photo ${getTimeInHHMM({ dateClassObj })}`,

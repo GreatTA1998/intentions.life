@@ -25,7 +25,7 @@
     on:dragover={(e) => dragover_handler(e)}
   >
     <!-- TO-DO: Render all tasks with deadline of this week here -->
-    {#each tasksToDisplay as taskObj, i}
+    {#each tasksToDisplay.filter(topLevelTask => !topLevelTask.isDone) as taskObj, i}
       <!-- again, refrain from using `doNotShowCompletedTasks` 
         and aim for a data-driven implementation instead
       -->
@@ -33,7 +33,7 @@
         {taskObj}
         depth={0}
         doNotShowScheduledTasks={false}
-        doNotShowCompletedTasks={true}
+        doNotShowCompletedTasks={false}
         ancestorRoomIDs={['']}
         parentID={''}
         on:task-click

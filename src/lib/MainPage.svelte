@@ -318,7 +318,7 @@
 
   // THIS IS STILL NOT WORKING: THE ADOPTION IS NOT WORKING, RIGHT NOW ALL THE 
   // SUBTREE WILL BE GONE FOR SOME REASON
-  function deleteTaskNode ({ id, parentID, childrenIDs }) {
+  function deleteTaskNode ({ id, parentID, childrenIDs, imageDownloadURL = "" }) {
     if (parentID !== "") {
       updateFirestoreDoc(tasksPath + parentID, {
         childrenIDs: arrayRemove(id)
@@ -340,6 +340,12 @@
         })
       }
     }
+
+    // TO-DO: handle pointerless images
+    // if (imageDownloadURL) {
+
+    // }
+
     // now safely delete itself
     deleteFirestoreDoc(tasksPath + id)
   }
