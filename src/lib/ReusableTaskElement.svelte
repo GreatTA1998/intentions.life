@@ -20,6 +20,7 @@
     background-image: {task.imageDownloadURL ? `url(${task.imageDownloadURL})` : ''};
     background-size: cover;
     padding-left: {isBulletPoint ? '0px' : 'var(--left-padding)'};
+    padding-right: var(--left-padding);
   " 
   on:keydown={() => {}}
 >
