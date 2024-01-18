@@ -26,7 +26,7 @@
   <div class="life-task-tree-container">
     {#if allTasks}
       {#each allTasks as task}
-        {#if !task.isDeleted && !task.isDone && !task.deadlineDate}
+        {#if !task.isDone && !task.deadlineDate}
           <div class="task-container">
             <RecursiveTaskElement 
               taskObj={task}
@@ -34,7 +34,6 @@
               doNotShowScheduledTasks={true}
               doNotShowCompletedTasks={true}
               willShowCheckbox={false}
-              dueInHowManyDays={null}
               ancestorRoomIDs={['']}
               on:task-click
               on:task-node-update

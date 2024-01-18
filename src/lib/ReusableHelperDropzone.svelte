@@ -107,18 +107,23 @@
       updateObj.parentID = parentID
     }
 
-    // edge case: task's deadline is now invalid within the subtree
-    // even if it's invalid, if it's moved to a different deadline interval, it should match 
+    // TO-DO: let the task its deadline if it is strictly within the interval of 
+    // the region e.g. 1 < n <= 7 for this week's to-do
+    // 
+    // QUICKFIX
+    // even if task's old deadline is within invalid, if it's moved to a different deadline interval, it should match 
     // that interval e.g. when you drag from week to month
-    const { deadlineDate, deadlineTime } = $whatIsBeingDraggedFullObj
-    const d1 = convertDDMMYYYYToDateClassObject(deadlineDate, deadlineTime)
-    if (true || d1.getTime() > parentObj.subtreeDeadlineInMsElapsed) {
-      console.log('dropzone parentObj =', parentObj)
+    const { subtreeDeadlineInMsElapsed } = parentObj
+    if (subtreeDeadlineInMsElapsed && subtreeDeadlineInMsElapsed !== Infinity) {
       const d2 = new Date(parentObj.subtreeDeadlineInMsElapsed)
       updateObj.deadlineDate = getDateInDDMMYYYY(d2)
       updateObj.deadlineTime = getTimeInHHMM({ dateClassObj: d2 })
-      console.log('updateObj would be =', updateObj)
     }
+
+    // when you drag to the to-do list, it always unschedules it from the calendar
+    updateObj.startTime = '' 
+    updateObj.startDate = ''
+    updateObj.startYYYY = ''
 
     // when destination is the top level 
     // if the task itself is already at the top level (how do you tell)

@@ -46,7 +46,7 @@
               roomsInThisLevel={tasksToDisplay}
               idxInThisLevel={i}
               parentID={''}
-              parentObj={{ subtreeDeadlineInMsElapsed: Infinity }}
+              parentObj={{ subtreeDeadlineInMsElapsed: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) }}
               colorForDebugging="purple"
             />
           {/if}
@@ -61,7 +61,7 @@
         roomsInThisLevel={tasksToDisplay}
         idxInThisLevel={tasksToDisplay.length}
         parentID={''}
-        parentObj={{ subtreeDeadlineInMsElapsed: Infinity }}
+        parentObj={{ subtreeDeadlineInMsElapsed: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) }}
         colorForDebugging="blue"
       />
     {/if}

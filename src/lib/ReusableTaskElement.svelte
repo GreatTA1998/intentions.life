@@ -76,7 +76,7 @@
         bottom: {0}px;
         height: {height/12}px; 
         min-height: 3px;
-        width: 100%; 
+        width: {isBulletPoint ? '20%' : '100%'}; 
         outline: 0px solid blue;
       "
     >

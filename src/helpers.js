@@ -427,12 +427,19 @@ export function updateSubtreeDeadlineInMsElapsed (node, oldVal) {
   }
   else {
     const [dd, MM, yyyy] = node.deadlineDate.split("/")
-    const d = new Date(convertToISO8061({ mmdd: `${MM}/${dd}`, yyyy }))
+    const iso8061 = convertToISO8061({ mmdd: `${MM}/${dd}`, yyyy })
+    const d = new Date(iso8061)
     const [hh, mm] = node.deadlineTime.split(':')
     d.setHours(hh, mm)
 
     if (d.toString() === "Invalid Date") {
-      console.log('node has invalid deadline =', node)
+      // useful test logs for detecting tasks 
+      // to be garbage collected
+      // console.log('dd, MM, yyyy =', dd, MM, yyyy)
+      // console.log('hh, mm =', hh, mm)
+      // console.log('iso8061 =', iso8061)
+      // console.log('node has invalid deadline =', node)
+      // console.log('d =', d)
       return oldVal
     }
     const result = Math.min(d.getTime(), oldVal)

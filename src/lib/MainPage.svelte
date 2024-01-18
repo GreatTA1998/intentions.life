@@ -240,6 +240,7 @@
   import db from '/src/db.js'
   import { doc, collection, getFirestore, updateDoc, arrayUnion, onSnapshot, arrayRemove, increment } from 'firebase/firestore'
   import { setFirestoreDoc, updateFirestoreDoc, deleteFirestoreDoc, getFirestoreCollection } from '/src/crud.js'
+  import { garbageCollectInvalidTasks } from '/src/scripts.js'
 
   let currentMode = 'Week' // weekMode hourMode monthMode
   const userDocPath = `users/${$user.uid}`
@@ -296,6 +297,8 @@
   }
 
   onMount(async () => {
+    // garbageCollectInvalidTasks($user)
+    // return
     const ref = collection(getFirestore(), `/users/${$user.uid}/tasks`)
     unsub = onSnapshot(ref, (querySnapshot) => {
       const result = [] 
@@ -328,6 +331,8 @@
 
   function updateTaskNode ({ id, keyValueChanges }) {
     updateFirestoreDoc(tasksPath + id, keyValueChanges)
+    // very useful for debugging
+    // console.log('id, keyValueChanges =', id, keyValueChanges)
   }
 
   // THIS IS STILL NOT WORKING: THE ADOPTION IS NOT WORKING, RIGHT NOW ALL THE 
@@ -559,6 +564,7 @@
       startDate: '',
       deadlineDate: '',
       deadlineTime: '',
+      parentID: '', // this is a quickfix, in the future handle data in This Life Todo properly
       isDone: false
     }})
   }

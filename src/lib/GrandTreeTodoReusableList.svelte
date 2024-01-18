@@ -39,7 +39,7 @@
             roomsInThisLevel={tasksToDisplay}
             idxInThisLevel={i}
             parentID={''}
-            parentObj={{ subtreeDeadlineInMsElapsed: Infinity }}
+            parentObj={{ subtreeDeadlineInMsElapsed: convertDDMMYYYYToDateClassObject(defaultDeadline).getTime() }}
             colorForDebugging="purple"
           />
         {/if}
@@ -59,7 +59,7 @@
       roomsInThisLevel={tasksToDisplay}
       idxInThisLevel={tasksToDisplay.length}
       parentID={''}
-      parentObj={{ subtreeDeadlineInMsElapsed: Infinity }}
+      parentObj={{ subtreeDeadlineInMsElapsed: convertDDMMYYYYToDateClassObject(defaultDeadline).getTime() }}
       colorForDebugging="blue"
     />
   {/if}
@@ -83,10 +83,10 @@
   import RecursiveTaskElement from '$lib/RecursiveTaskElement.svelte'
   import { createEventDispatcher, tick } from 'svelte'
   import ReusableHelperDropzone from '$lib/ReusableHelperDropzone.svelte'
+  import { convertDDMMYYYYToDateClassObject } from '/src/helpers';
 
   export let dueInHowManyDays = null // AF(null) means it's a life todo, otherwise it should be a number
   export let allTasksDue = []
-
   export let listTitle
 
   let defaultDeadline
@@ -99,10 +99,6 @@
   let newRootTaskStringValue = ''
   let NewRootTaskInput = ''
   const dispatch = createEventDispatcher()
-
-  function computeTasksToDisplay () {
-    tasksToDisplay = sortByUnscheduledThenByOrderValue(allTasksDue)
-  }
 
   // COMPUTE DEFAULT DEADLINE 
   $: {
@@ -126,6 +122,10 @@
         }
       })
     }
+  }
+
+  function computeTasksToDisplay () {
+    tasksToDisplay = sortByUnscheduledThenByOrderValue(allTasksDue)
   }
 
   function handleKeyDown (e) {
