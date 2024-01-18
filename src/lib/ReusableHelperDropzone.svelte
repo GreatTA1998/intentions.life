@@ -7,19 +7,30 @@
   }}
   on:dragleave={() => ReorderDropzone.style.background = '' }
   on:dragover={(e) => dragover_handler(e)}
-  on:drop={(e) => onReorderDrop(e)}
+  on:drop|stopPropagation={(e) => onReorderDrop(e)}
 >
 
 </div>
 
 <script>
-  import { whatIsBeingDragged, whatIsBeingDraggedID, user } from '/src/store.js'
+  import { 
+    whatIsBeingDragged, 
+    whatIsBeingDraggedID, 
+    whatIsBeingDraggedFullObj,
+    user 
+  } from '/src/store.js'
   import { updateFirestoreDoc } from '/src/crud.js'
+  import { 
+    convertDDMMYYYYToDateClassObject, 
+    getDateInDDMMYYYY, 
+    getTimeInHHMM 
+  } from '/src/helpers.js'
 
   export let ancestorRoomIDs
   export let roomsInThisLevel
   export let idxInThisLevel
   export let parentID = ''
+  export let parentObj
   export let colorForDebugging = "red"
 
   let ReorderDropzone
@@ -89,10 +100,24 @@
       orderValue: newVal
     }
 
+    // edge case: top level task
     if ($whatIsBeingDragged === 'top-level-task-within-this-todo-list' && ancestorRoomIDs.length === 1) {
       // don't override the true parentID of this top level task
     } else {
       updateObj.parentID = parentID
+    }
+
+    // edge case: task's deadline is now invalid within the subtree
+    // even if it's invalid, if it's moved to a different deadline interval, it should match 
+    // that interval e.g. when you drag from week to month
+    const { deadlineDate, deadlineTime } = $whatIsBeingDraggedFullObj
+    const d1 = convertDDMMYYYYToDateClassObject(deadlineDate, deadlineTime)
+    if (true || d1.getTime() > parentObj.subtreeDeadlineInMsElapsed) {
+      console.log('dropzone parentObj =', parentObj)
+      const d2 = new Date(parentObj.subtreeDeadlineInMsElapsed)
+      updateObj.deadlineDate = getDateInDDMMYYYY(d2)
+      updateObj.deadlineTime = getTimeInHHMM({ dateClassObj: d2 })
+      console.log('updateObj would be =', updateObj)
     }
 
     // when destination is the top level 

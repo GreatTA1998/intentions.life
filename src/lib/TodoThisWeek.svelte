@@ -35,7 +35,6 @@
         doNotShowScheduledTasks={false}
         doNotShowCompletedTasks={false}
         ancestorRoomIDs={['']}
-        parentID={''}
         on:task-click
         on:subtask-create
         on:task-checkbox-change
@@ -47,6 +46,7 @@
               roomsInThisLevel={tasksToDisplay}
               idxInThisLevel={i}
               parentID={''}
+              parentObj={{ subtreeDeadlineInMsElapsed: Infinity }}
               colorForDebugging="purple"
             />
           {/if}
@@ -61,6 +61,7 @@
         roomsInThisLevel={tasksToDisplay}
         idxInThisLevel={tasksToDisplay.length}
         parentID={''}
+        parentObj={{ subtreeDeadlineInMsElapsed: Infinity }}
         colorForDebugging="blue"
       />
     {/if}
@@ -77,11 +78,7 @@
 </div>
 
 <script>
-  export let allTasks
-
   import { 
-    computeDayDifference, 
-    convertDDMMYYYYToDateClassObject,
     getDateInDDMMYYYY, 
     getRandomID,
     sortByUnscheduledThenByOrderValue

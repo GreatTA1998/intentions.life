@@ -254,7 +254,7 @@ export function applyFuncToEveryTreeNode ({ tree, applyFunc }) {
   helperFunction({ node: artificialRootNode, applyFunc })
 }
 
-function helperFunction ({ node, applyFunc }) {
+export function helperFunction ({ node, applyFunc }) {
   // this is a quick-fix: terminate once we find the deadline ask
   if (applyFunc(node)) {
     return
@@ -376,39 +376,67 @@ function helperFunc ({ node, parentID, userDoc }) {
   }
 }
 
+// CREATE A NEW FILE THAT SEPARATES DIFFERENT HELPER FUNCTIONS
+// IN MORE MODULAR WAYS
+
+
 // recursively mutate this monolith data structure until its correct
 export function reconstructTreeInMemory (firestoreTaskDocs) {
   const output = []
+
   // first, do an O(n) operation, so we don't perform a O(n^2) operation constantly traversing trees
-  // let's build a dictionary that maps a task to its children
-  const layers = { "": [] }
+  // let's build a dictionary that maps a task to its children ([] if no children)
+  const memo = { "": [] }
+
   for (const taskDoc of firestoreTaskDocs) {
-    // edge case: some childrenless tasks will have `undefined` children unless we initialize it
-    if (!layers[taskDoc.id]) layers[taskDoc.id] = []
+    if (!memo[taskDoc.parentID]) memo[taskDoc.parentID] = [] 
+    memo[taskDoc.parentID].push(taskDoc)
 
-    // this is the general case
-    if (!layers[taskDoc.parentID]) layers[taskDoc.parentID] = [] 
-
-    // NOTE: THERE ARE STIL MANY TASKS WITH NULL PARENTS,
-    // BUT NO CONSEQUENCES FOR NOW SO IGNORED FOR NOW
-    // if (taskDoc.parentID === null) {
-    //   console.log('this task has null parent =', taskDoc)
-    // }
-    layers[taskDoc.parentID].push(taskDoc)
+    if (!memo[taskDoc.id]) memo[taskDoc.id] = []
   }
 
-  const rootTasks = layers[""]// firestoreTaskDocs.filter(task => task.parentID === null)
+  // now construct the recursive tree
+  const rootTasks = memo[""] 
   for (const task of rootTasks) {
-    hydrateOneLayerOfChildren({ node: task, firestoreTaskDocs, layers})
+    recursivelyHydrateChildren({ node: task, firestoreTaskDocs, memo, subtreeDeadlineInMsElapsed: Infinity })
     output.push(task)
   }
   return output
 }
 
-function hydrateOneLayerOfChildren ({ node, firestoreTaskDocs, layers }) {
-  node.children = sortByOrderValue(layers[node.id])
+function recursivelyHydrateChildren ({ node, firestoreTaskDocs, memo, subtreeDeadlineInMsElapsed }) {
+  node.subtreeDeadlineInMsElapsed = updateSubtreeDeadlineInMsElapsed(node, subtreeDeadlineInMsElapsed)
+  node.children = sortByOrderValue( memo[node.id] )
   for (const child of node.children) {
-    hydrateOneLayerOfChildren({ node: child, firestoreTaskDocs, layers })
+    recursivelyHydrateChildren({ 
+      node: child, 
+      firestoreTaskDocs, 
+      memo, 
+      subtreeDeadlineInMsElapsed: node.subtreeDeadlineInMsElapsed
+    })
+  }
+}
+
+export function updateSubtreeDeadlineInMsElapsed (node, oldVal) {
+  if (!node.deadlineDate || !node.deadlineTime) {
+    if (oldVal !== Infinity) {
+      return oldVal
+    } else  {
+      return oldVal
+    }
+  }
+  else {
+    const [dd, MM, yyyy] = node.deadlineDate.split("/")
+    const d = new Date(convertToISO8061({ mmdd: `${MM}/${dd}`, yyyy }))
+    const [hh, mm] = node.deadlineTime.split(':')
+    d.setHours(hh, mm)
+
+    if (d.toString() === "Invalid Date") {
+      console.log('node has invalid deadline =', node)
+      return oldVal
+    }
+    const result = Math.min(d.getTime(), oldVal)
+    return result
   }
 }
 
@@ -454,32 +482,22 @@ export function computeTodoMemoryTrees (allTasks) {
   const allTasksDueThisMonth = []
   const allTasksDueThisYear = []
 
+  for (const parentlessTask of allTasks) {
+    helper({ node: parentlessTask })
+  }
+
   // use VS code's collpase feature
   // this is so the function can access the arrays we define above
   function helper ({ node, parentCategory = '', parentObjReference = null }) {
+    const shallowCopy = {...node}
+    shallowCopy.children = []
     if (!node.deadlineDate) {
-      // be lenient with children that have no due dates, as it wouldn't make sense 
-      // that a task due in 3 days has a sub-task that has no due dates
-      if (parentObjReference && parentCategory) {
-        parentObjReference.children.push(node)
-        for (const child of node.children) {
-          // a sub-task (i.e. has parentID) can still appear as the top-level task within a to-do,
-          // hence no parentObjReference nor parentCategory yet
-          helper({ node: child, parentCategory, parentObjReference })
-        }
-      } 
-      else {
-        // console.log('give someone else a chance to be head case')
-        // a sub-task (i.e. has parentID) can still appear as the top-level task within a to-do,
-        // hence no parentObjReference nor parentCategory yet
-        for (const child of node.children) {
-          helper({ node: child })
-        }
+      // continue scanning for a todo's top-level task
+      for (const child of node.children) {
+        helper({ node: child })
       }
     }
     else {
-      const shallowCopy = {...node}
-      shallowCopy.children = []
       const dueInHowManyDays = computeDayDifference(
         new Date(),
         convertDDMMYYYYToDateClassObject(node.deadlineDate)
@@ -528,11 +546,7 @@ export function computeTodoMemoryTrees (allTasks) {
       } 
     }
   }
-  
 
-  for (const parentlessTask of allTasks) {
-    helper({ node: parentlessTask })
-  }
 
   // console.log('# of recursion should be at most the total number of tasks', i)
   return [allTasksDueToday, allTasksDueThisWeek, allTasksDueThisMonth]

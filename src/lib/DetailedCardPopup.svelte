@@ -142,7 +142,10 @@ import { createEventDispatcher, onMount, onDestroy, tick } from 'svelte'
 import { mostRecentlyCompletedTaskID } from '/src/store.js'
 import _ from 'lodash'
 import RecursiveBulletPoint from '$lib/RecursiveBulletPoint.svelte'
-import { getDateOfToday, getRandomID, clickOutside, getDateInDDMMYYYY, getCurrentTimeInHHMM } from '/src/helpers.js'
+import { 
+  convertDDMMYYYYToDateClassObject,
+  clickOutside, 
+} from '/src/helpers.js'
 import DetailedCardPopupRepeat from '$lib/DetailedCardPopupRepeat.svelte'
 import UXFormField from '$lib/UXFormField.svelte'
 import UXFormTextArea from '$lib/UXFormTextArea.svelte'
@@ -227,14 +230,17 @@ function saveTaskEnd () {
 }
 
 function saveDeadline (DDMMYYYY, HHMM) {
-  taskObject.deadlineDate = DDMMYYYY
-  taskObject.deadlineTime = HHMM
+  const d1 = convertDDMMYYYYToDateClassObject(DDMMYYYY, HHMM)
+  if (d1.getTime() > taskObject.subtreeDeadlineInMsElapsed) {
+    alert("Invalid deadline: a subtask's can't be due later than the overall task")
+    return
+  }
 
   dispatch('task-update', { 
     id: taskObject.id, 
     keyValueChanges: {
-      deadlineTime: newDeadlineTime, 
-      deadlineDate: newDeadlineDate
+      deadlineTime: HHMM, 
+      deadlineDate: DDMMYYYY
     }
   })
   isEditingDeadline = false

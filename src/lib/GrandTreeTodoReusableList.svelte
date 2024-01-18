@@ -25,7 +25,6 @@
     <RecursiveTaskElement 
       {taskObj}
       depth={0}
-      {dueInHowManyDays}
       ancestorRoomIDs={['']}
       doNotShowScheduledTasks={false}
       doNotShowCompletedTasks={true}
@@ -40,6 +39,7 @@
             roomsInThisLevel={tasksToDisplay}
             idxInThisLevel={i}
             parentID={''}
+            parentObj={{ subtreeDeadlineInMsElapsed: Infinity }}
             colorForDebugging="purple"
           />
         {/if}
@@ -59,6 +59,7 @@
       roomsInThisLevel={tasksToDisplay}
       idxInThisLevel={tasksToDisplay.length}
       parentID={''}
+      parentObj={{ subtreeDeadlineInMsElapsed: Infinity }}
       colorForDebugging="blue"
     />
   {/if}
