@@ -7,19 +7,30 @@
   }}
   on:dragleave={() => ReorderDropzone.style.background = '' }
   on:dragover={(e) => dragover_handler(e)}
-  on:drop={(e) => onReorderDrop(e)}
+  on:drop|stopPropagation={(e) => onReorderDrop(e)}
 >
 
 </div>
 
 <script>
-  import { whatIsBeingDragged, whatIsBeingDraggedID, user } from '/src/store.js'
+  import { 
+    whatIsBeingDragged, 
+    whatIsBeingDraggedID, 
+    whatIsBeingDraggedFullObj,
+    user 
+  } from '/src/store.js'
   import { updateFirestoreDoc } from '/src/crud.js'
+  import { 
+    convertDDMMYYYYToDateClassObject, 
+    getDateInDDMMYYYY, 
+    getTimeInHHMM 
+  } from '/src/helpers.js'
 
   export let ancestorRoomIDs
   export let roomsInThisLevel
   export let idxInThisLevel
   export let parentID = ''
+  export let parentObj
   export let colorForDebugging = "red"
 
   let ReorderDropzone
@@ -89,11 +100,30 @@
       orderValue: newVal
     }
 
+    // edge case: top level task
     if ($whatIsBeingDragged === 'top-level-task-within-this-todo-list' && ancestorRoomIDs.length === 1) {
       // don't override the true parentID of this top level task
     } else {
       updateObj.parentID = parentID
     }
+
+    // TO-DO: let the task its deadline if it is strictly within the interval of 
+    // the region e.g. 1 < n <= 7 for this week's to-do
+    // 
+    // QUICKFIX
+    // even if task's old deadline is within invalid, if it's moved to a different deadline interval, it should match 
+    // that interval e.g. when you drag from week to month
+    const { subtreeDeadlineInMsElapsed } = parentObj
+    if (subtreeDeadlineInMsElapsed && subtreeDeadlineInMsElapsed !== Infinity) {
+      const d2 = new Date(parentObj.subtreeDeadlineInMsElapsed)
+      updateObj.deadlineDate = getDateInDDMMYYYY(d2)
+      updateObj.deadlineTime = getTimeInHHMM({ dateClassObj: d2 })
+    }
+
+    // when you drag to the to-do list, it always unschedules it from the calendar
+    updateObj.startTime = '' 
+    updateObj.startDate = ''
+    updateObj.startYYYY = ''
 
     // when destination is the top level 
     // if the task itself is already at the top level (how do you tell)

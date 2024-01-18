@@ -77,6 +77,14 @@
       >
         Week
       </div>
+
+      <div on:click={() => currentMode = 'Year'}
+        class="ux-tab-item" 
+        class:active-ux-tab={currentMode === 'Year'} 
+        class:transparent-inactive-tab={currentMode === 'Year'}
+      >
+        Year
+      </div>
     </div>
 
     <span on:click={() => goto(`/${$user.uid}/camera`)} class="material-symbols-outlined mika-hover" class:blue-icon={currentMode === 'Dashboard'} style="margin-right: 32px; font-size: 30px; cursor: pointer;">
@@ -130,7 +138,6 @@
       {:else if (currentMode === 'Week')}
         <!-- 1st flex child -->
         <TodoThisWeek
-          {allTasks}
           on:new-root-task={(e) => createNewRootTask(e.detail)}
           on:task-unscheduled={(e) => putTaskToThisWeekTodo(e)}
           on:subtask-create={(e) => createSubtask(e.detail)}
@@ -182,14 +189,15 @@
             />
           </div>
         {/if}
-      {/if}
       <!-- END OF WEEK MODE SECTION -->
+      
+      {:else if currentMode === 'Year'}
+          <YearView/>
+      {/if}
   </div>
 </NavbarAndContentWrapper>
 
 <script>
-  import NavbarAndContentWrapper from '$lib/NavbarAndContentWrapper.svelte'
-  import DetailedCardPopup from '$lib/DetailedCardPopup.svelte'
   import { 
     computeDayDifference, 
     getDateOfToday, 
@@ -200,11 +208,6 @@
     checkTaskObjSchema,
     convertToISO8061
   } from '/src/helpers.js'
-  import { onDestroy, onMount } from 'svelte'
-  import JournalPopup from '$lib/JournalPopup.svelte'
-  import FinancePopup from '$lib/FinancePopup.svelte'
-  import BedtimePopupMaplestoryMusic from '$lib/BedtimePopupMaplestoryMusic.svelte'
-  import TheSnackbar from '$lib/TheSnackbar.svelte'
   import { 
     mostRecentlyCompletedTaskID, 
     user, 
@@ -213,22 +216,31 @@
     allTasksDueThisWeek,
     allTasksDueThisMonth
   } from '/src/store.js'
+  import JournalPopup from '$lib/JournalPopup.svelte'
+  import FinancePopup from '$lib/FinancePopup.svelte'
+  import BedtimePopupMaplestoryMusic from '$lib/BedtimePopupMaplestoryMusic.svelte'
+  import TheSnackbar from '$lib/TheSnackbar.svelte'
   import CalendarThisWeek from '$lib/CalendarThisWeek.svelte'
   import TodoThisWeek from '$lib/TodoThisWeek.svelte'
   import FutureOverview from '$lib/FutureOverview.svelte'
-  import ZenJournal from '$lib/ZenJournal.svelte'
-  import ZenJournalLeftNavigation from '$lib/ZenJournaLeftNavigation.svelte'
   import BackgroundRainScene from '$lib/BackgroundRainScene.svelte'
   import LifeDashboard from '$lib/LifeDashboard.svelte'
   import GrandTreeTodoPopupButton from '$lib/GrandTreeTodoPopupButton.svelte'
   import GrandTreeTodo from '$lib/GrandTreeTodo.svelte'
   import PopupCustomerSupport from '$lib/PopupCustomerSupport.svelte'
+  import NavbarAndContentWrapper from '$lib/NavbarAndContentWrapper.svelte'
+  import DetailedCardPopup from '$lib/DetailedCardPopup.svelte'
+  import YearView from '$lib/YearView.svelte'
+  import ZenJournal from '$lib/ZenJournal.svelte'
+  import ZenJournalLeftNavigation from '$lib/ZenJournaLeftNavigation.svelte'
 
+  import { onDestroy, onMount } from 'svelte'
   import { goto } from '$app/navigation';
   import { getAuth, signOut } from 'firebase/auth'
   import db from '/src/db.js'
   import { doc, collection, getFirestore, updateDoc, arrayUnion, onSnapshot, arrayRemove, increment } from 'firebase/firestore'
   import { setFirestoreDoc, updateFirestoreDoc, deleteFirestoreDoc, getFirestoreCollection } from '/src/crud.js'
+  import { garbageCollectInvalidTasks } from '/src/scripts.js'
 
   let currentMode = 'Week' // weekMode hourMode monthMode
   const userDocPath = `users/${$user.uid}`
@@ -285,6 +297,8 @@
   }
 
   onMount(async () => {
+    // garbageCollectInvalidTasks($user)
+    // return
     const ref = collection(getFirestore(), `/users/${$user.uid}/tasks`)
     unsub = onSnapshot(ref, (querySnapshot) => {
       const result = [] 
@@ -317,6 +331,8 @@
 
   function updateTaskNode ({ id, keyValueChanges }) {
     updateFirestoreDoc(tasksPath + id, keyValueChanges)
+    // very useful for debugging
+    // console.log('id, keyValueChanges =', id, keyValueChanges)
   }
 
   // THIS IS STILL NOT WORKING: THE ADOPTION IS NOT WORKING, RIGHT NOW ALL THE 
@@ -548,6 +564,7 @@
       startDate: '',
       deadlineDate: '',
       deadlineTime: '',
+      parentID: '', // this is a quickfix, in the future handle data in This Life Todo properly
       isDone: false
     }})
   }

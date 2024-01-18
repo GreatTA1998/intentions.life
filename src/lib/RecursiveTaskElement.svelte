@@ -52,11 +52,11 @@
       style="
         min-width: 30px; 
         max-width: 320px;
-        font-size: {depthAdjustedFontSize}em;
+        font-size: {depthAdjustedFontSize};
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        color: {taskObj.startDate && taskObj.startTime ? 'rgb(160, 160, 160)' : 'black'};
+        color: {taskObj.startDate && taskObj.startTime ? 'rgb(160, 160, 160)' : ''};
         display: flex;
         align-items: center;
       "
@@ -97,9 +97,8 @@
         {doNotShowScheduledTasks}
         {doNotShowCompletedTasks}
         {willShowCheckbox}
-        parentID={taskObj.id}
-        {dueInHowManyDays}
         ancestorRoomIDs={[taskObj.id, ...ancestorRoomIDs]}
+        subtreeDeadlineInMsElapsed={updateSubtreeDeadlineInMsElapsed(taskObj, subtreeDeadlineInMsElapsed)}
         on:task-click
         on:subtask-create
         on:task-checkbox-change
@@ -111,6 +110,7 @@
               roomsInThisLevel={taskObj.children}
               idxInThisLevel={i}
               parentID={taskObj.id}
+              parentObj={taskObj}
               {colorForDebugging}
             /> 
           {/if}
@@ -123,6 +123,7 @@
       roomsInThisLevel={taskObj.children}
       idxInThisLevel={taskObj.children.length}
       parentID={taskObj.id}
+      parentObj={taskObj}
       {colorForDebugging}
     /> 
     
@@ -146,9 +147,22 @@
   import RecursiveTaskElement from '$lib/RecursiveTaskElement.svelte'
   import ReusableCheckbox from '$lib/ReusableCheckbox.svelte'
   import ReusableHelperDropzone from '$lib/ReusableHelperDropzone.svelte'
-  import { getDateInDDMMYYYY, convertDDMMYYYYToDateClassObject, computeDayDifference, getRandomID, getRandomColor } from '/src/helpers'
+  import { 
+    convertDDMMYYYYToDateClassObject, 
+    computeDayDifference, 
+    getDateInDDMMYYYY, 
+    getRandomID, 
+    getRandomColor,
+    getTimeInHHMM,
+    updateSubtreeDeadlineInMsElapsed
+  } from '/src/helpers'
   import { createEventDispatcher, tick } from 'svelte'
-  import { mostRecentlyCompletedTaskID, whatIsBeingDragged, whatIsBeingDraggedID } from '/src/store.js'
+  import { 
+    mostRecentlyCompletedTaskID, 
+    whatIsBeingDragged, 
+    whatIsBeingDraggedID,
+    whatIsBeingDraggedFullObj
+  } from '/src/store.js'
 
   export let taskObj
   export let depth 
@@ -159,8 +173,7 @@
   // creating an infinite cycle that will not get rendered by Svelte
   export let ancestorRoomIDs
   export let colorForDebugging = getRandomColor()
-  export let dueInHowManyDays = null
-  export let parentID = ''
+  export let subtreeDeadlineInMsElapsed = Infinity
 
   let NewSubtaskInput
   let newSubtaskStringValue = ''
@@ -175,10 +188,10 @@
   $: if (depth >= 0) {
     switch (depth) {
       case 0:
-        depthAdjustedFontSize = 0.5
+        depthAdjustedFontSize = '16px'
         break
       default: 
-        depthAdjustedFontSize = 0.4
+        depthAdjustedFontSize = '14px'
     }
   }
   
@@ -226,6 +239,7 @@
     else whatIsBeingDragged.set("room")
   
     whatIsBeingDraggedID.set(id)
+    whatIsBeingDraggedFullObj.set(taskObj)
   }
 
   function handleKeypress (e) {
@@ -249,14 +263,10 @@
       duration: 1
     }
     
-    if (dueInHowManyDays !== null) {
-      const d = new Date()
-      for (let i = 0; i < dueInHowManyDays; i++) {
-        d.setDate(d.getDate() + 1)
-      }       
-      subtaskObj.deadlineDate = getDateInDDMMYYYY(d)
-      subtaskObj.deadlineTime = '07:00'
-    }
+    // default deadline is `subtreeDeadline`
+    const d = new Date(taskObj.subtreeDeadlineInMsElapsed)
+    subtaskObj.deadlineDate = getDateInDDMMYYYY(d)
+    subtaskObj.deadlineTime = getTimeInHHMM({ dateClassObj: d })
 
     dispatch('subtask-create', {
       id: newTaskID,

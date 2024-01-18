@@ -1,76 +1,93 @@
-<div class="todo-list-container"  
-  on:drop={(e) => handleDroppedTask(e)}
+<div 
+  class="todo-list-container" 
+  style={$$props.style}
+  on:drop|stopPropagation={(e) => handleDroppedTask(e)}
   on:dragover={(e) => dragover_handler(e)}
 >
-  <div style="display: flex; align-items: center"
-    on:mouseenter={() => isMouseHoveringOnTaskName = true}
-    on:mouseleave={() => isMouseHoveringOnTaskName = false}
-  >
-    <div style="height: 24px; font-size: 16px; align-items: center; display: flex;">
-      <div style="margin-left: 8px; color: rgb(10, 10, 10); font-weight: 500">
-        {listTitle}
-      </div> 
+  <slot name="above-list-title">
+
+  </slot>
+
+  <div>
+    <div style="display: flex; align-items: center; margin-bottom: 10px;"
+      on:mouseenter={() => isMouseHoveringOnTaskName = true}
+      on:mouseleave={() => isMouseHoveringOnTaskName = false}
+    >
+      <div style="height: 24px; align-items: center; display: flex;">
+        <div style="font-weight: 500; font-size: 16px;">
+          {listTitle}
+        </div> 
+      </div>
+
+      {#if isMouseHoveringOnTaskName}
+        <span on:click={() => isTypingNewRootTask = true} class="material-icons" style="margin-left: 6px; cursor: pointer;">
+          add
+        </span>
+      {/if}
     </div>
 
-    {#if isMouseHoveringOnTaskName}
-      <span on:click={() => isTypingNewRootTask = true} class="material-icons" style="margin-left: 6px; cursor: pointer;">
-        add
-      </span>
-    {/if}
+    <slot name="below-list-title">
+
+    </slot>
   </div>
 
-  <div style="margin-bottom: 36px;"></div>
+  <div style="outline: 0px solid blue; margin-top: 12px; padding-left: {cheatToAddPadding ? '12px' : ''}">
+    <slot name="alternative-title" openNewTaskInput={() => isTypingNewRootTask = true}>
 
-  {#each tasksToDisplay as taskObj, i}
-    <RecursiveTaskElement 
-      {taskObj}
-      depth={0}
-      {dueInHowManyDays}
-      ancestorRoomIDs={['']}
-      doNotShowScheduledTasks={false}
-      doNotShowCompletedTasks={true}
-      on:task-click
-      on:task-node-update
-      on:subtask-create
-    > 
-      <div slot="dropzone-above-task-name">
-        {#if tasksToDisplay.length > 2}
-          <ReusableHelperDropzone
-            ancestorRoomIDs={['']}
-            roomsInThisLevel={tasksToDisplay}
-            idxInThisLevel={i}
-            parentID={''}
-            colorForDebugging="purple"
-          />
-        {/if}
-      </div>
-    </RecursiveTaskElement>
-    <div style="margin-bottom: 24px;"></div>
-  {/each}
+    </slot>
 
-  {#if tasksToDisplay.length > 2}
-    <!-- NOTE: BECAUSE WE DON'T DISPLAY TASKS THAT ARE COMPLETED,
-      WE HAVE A DEVIATION BETWEEN STATE AND UI
-      IN THE FUTURE IF THERE ARE UNEXPECTED BUGS, THIS IS THE LIKELY CAUSE
-    -->
-    <!-- {tasksToDisplay.length} -->
-    <ReusableHelperDropzone
-      ancestorRoomIDs={['']}
-      roomsInThisLevel={tasksToDisplay}
-      idxInThisLevel={tasksToDisplay.length}
-      parentID={''}
-      colorForDebugging="blue"
-    />
-  {/if}
+    {#each tasksToDisplay as taskObj, i}
+      <RecursiveTaskElement 
+        {taskObj}
+        depth={0}
+        ancestorRoomIDs={['']}
+        doNotShowScheduledTasks={false}
+        doNotShowCompletedTasks={true}
+        on:task-click
+        on:task-node-update
+        on:subtask-create
+      > 
+        <div slot="dropzone-above-task-name">
+          {#if tasksToDisplay.length > 2}
+            <ReusableHelperDropzone
+              ancestorRoomIDs={['']}
+              roomsInThisLevel={tasksToDisplay}
+              idxInThisLevel={i}
+              parentID={''}
+              parentObj={{ subtreeDeadlineInMsElapsed: convertDDMMYYYYToDateClassObject(defaultDeadline).getTime() }}
+              colorForDebugging="purple"
+            />
+          {/if}
+        </div>
+      </RecursiveTaskElement>
+      <div style="margin-bottom: 24px;"></div>
+    {/each}
 
-  {#if isTypingNewRootTask}
-    <input 
-      bind:this={NewRootTaskInput}
-      bind:value={newRootTaskStringValue} 
-      on:keydown={(e) => handleKeyDown(e)}
-      placeholder="Type task here..."
-    >
-  {/if}
+    {#if tasksToDisplay.length > 2}
+      <!-- NOTE: BECAUSE WE DON'T DISPLAY TASKS THAT ARE COMPLETED,
+        WE HAVE A DEVIATION BETWEEN STATE AND UI
+        IN THE FUTURE IF THERE ARE UNEXPECTED BUGS, THIS IS THE LIKELY CAUSE
+      -->
+      <!-- {tasksToDisplay.length} -->
+      <ReusableHelperDropzone
+        ancestorRoomIDs={['']}
+        roomsInThisLevel={tasksToDisplay}
+        idxInThisLevel={tasksToDisplay.length}
+        parentID={''}
+        parentObj={{ subtreeDeadlineInMsElapsed: convertDDMMYYYYToDateClassObject(defaultDeadline).getTime() }}
+        colorForDebugging="blue"
+      />
+    {/if}
+
+    {#if isTypingNewRootTask}
+      <input 
+        bind:this={NewRootTaskInput}
+        bind:value={newRootTaskStringValue} 
+        on:keydown={(e) => handleKeyDown(e)}
+        placeholder="Type task here..."
+      >
+    {/if}
+  </div>
 </div>
 
 <script>
@@ -82,11 +99,12 @@
   import RecursiveTaskElement from '$lib/RecursiveTaskElement.svelte'
   import { createEventDispatcher, tick } from 'svelte'
   import ReusableHelperDropzone from '$lib/ReusableHelperDropzone.svelte'
+  import { convertDDMMYYYYToDateClassObject } from '/src/helpers';
 
   export let dueInHowManyDays = null // AF(null) means it's a life todo, otherwise it should be a number
   export let allTasksDue = []
-
   export let listTitle
+  export let cheatToAddPadding = false
 
   let defaultDeadline
 
@@ -98,10 +116,6 @@
   let newRootTaskStringValue = ''
   let NewRootTaskInput = ''
   const dispatch = createEventDispatcher()
-
-  function computeTasksToDisplay () {
-    tasksToDisplay = sortByUnscheduledThenByOrderValue(allTasksDue)
-  }
 
   // COMPUTE DEFAULT DEADLINE 
   $: {
@@ -125,6 +139,10 @@
         }
       })
     }
+  }
+
+  function computeTasksToDisplay () {
+    tasksToDisplay = sortByUnscheduledThenByOrderValue(allTasksDue)
   }
 
   function handleKeyDown (e) {
@@ -192,12 +210,9 @@
   .todo-list-container {
     height: 100%;
     width: 100%;
-    /* min-width: 300px;  */
     background-color: var(--todo-list-bg-color);
-    padding-left: 12px; 
     border-radius: 12px;
-    padding-right: 12px;
-    padding-top: 24px;
+    padding: 16px;
     font-size: 2em;
     overflow-y: auto;
   }

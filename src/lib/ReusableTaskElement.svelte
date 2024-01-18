@@ -76,7 +76,7 @@
         bottom: {0}px;
         height: {height/12}px; 
         min-height: 3px;
-        width: 100%; 
+        width: {isBulletPoint ? '20%' : '100%'}; 
         outline: 0px solid blue;
       "
     >
@@ -87,7 +87,7 @@
   // Assumes `task` is hydrated
   import { createEventDispatcher } from 'svelte'
   import { getTrueY } from '/src/helpers.js'
-  import { yPosWithinBlock } from '/src/store.js'
+  import { yPosWithinBlock, whatIsBeingDragged, whatIsBeingDraggedID } from '/src/store.js'
   import ReusableCheckbox from '$lib/ReusableCheckbox.svelte'
 
   export let task = null
@@ -104,9 +104,13 @@
 
   function startDragMove (e, id) {
     e.dataTransfer.setData("text/plain", id)
+
     // record distance from the top of the element
     const rect = e.target.getBoundingClientRect()
     const y = e.clientY - rect.top // y position within el ement
+
+    whatIsBeingDraggedID.set(id)
+    whatIsBeingDragged.set('room')
 
     yPosWithinBlock.set(y)
   }
