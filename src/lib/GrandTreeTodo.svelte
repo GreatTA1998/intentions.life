@@ -119,7 +119,9 @@
     width: 100%;
     height: 100%;
 
-    padding-top: 24px; padding-left: 12px; padding-right: 12px; background-color: var(--todo-list-bg-color); border-radius: 24px;
+    padding-top: 24px; padding-left: 6px; padding-right: 12px; 
+    background-color: white;
+    border-radius: 24px;
   }
 
   .life-task-tree-container {

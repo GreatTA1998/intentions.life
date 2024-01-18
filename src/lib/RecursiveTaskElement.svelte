@@ -52,11 +52,11 @@
       style="
         min-width: 30px; 
         max-width: 320px;
-        font-size: {depthAdjustedFontSize}em;
+        font-size: {depthAdjustedFontSize};
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        color: {taskObj.startDate && taskObj.startTime ? 'rgb(160, 160, 160)' : 'black'};
+        color: {taskObj.startDate && taskObj.startTime ? 'rgb(160, 160, 160)' : ''};
         display: flex;
         align-items: center;
       "
@@ -188,10 +188,10 @@
   $: if (depth >= 0) {
     switch (depth) {
       case 0:
-        depthAdjustedFontSize = 0.5
+        depthAdjustedFontSize = '16px'
         break
       default: 
-        depthAdjustedFontSize = 0.4
+        depthAdjustedFontSize = '14px'
     }
   }
   
