@@ -322,10 +322,15 @@ export function createRepeatedTask ({ dateClassObj, repeatGroupID }, taskObject)
   return taskObjCopy
 }
 
-export function convertMMDDToReadableMonthDayForm (mmdd, yyyy = '2024') {
-  // Recommended Format: The most reliable format for cross-browser compatibility is "YYYY-MM-DD", often referred to as the ISO 8601 format (e.g., "2023-04-10").
+// Recommended Format: The most reliable format for cross-browser compatibility is "YYYY-MM-DD", often referred to as the ISO 8601 format (e.g., "2023-04-10").
+export function convertToISO8061 ({ mmdd, yyyy = '2024' }) {
   const formattedDate = mmdd.replace('/', '-')
   const iso8061 = yyyy + '-' + formattedDate
+  return iso8061
+}
+
+export function convertMMDDToReadableMonthDayForm (mmdd, yyyy = '2024') {
+  const iso8061 = convertToISO8061({ mmdd, yyyy })
   const dateStr = new Date(iso8061).toDateString() //  'Fri Apr 10 2020'
   const splitArr = dateStr.split(' ' )// ['Fri', 'Apr', '10', '2020']
   return splitArr[1] + ' ' + splitArr[2] 
@@ -364,7 +369,6 @@ function helperFunc ({ node, parentID, userDoc }) {
 
   if (!node.id) newDocObj.id = getRandomID()
   
-  console.log('setting a for node =', node)
   setFirestoreDoc(`/users/${userDoc.uid}/tasks/${newDocObj.id}`, newDocObj)
  
   for (const child of node.children) {

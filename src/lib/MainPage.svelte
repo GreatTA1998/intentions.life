@@ -197,7 +197,8 @@
     generateRepeatedTasks, 
     reconstructTreeInMemory,
     computeTodoMemoryTrees,
-    checkTaskObjSchema
+    checkTaskObjSchema,
+    convertToISO8061
   } from '/src/helpers.js'
   import { onDestroy, onMount } from 'svelte'
   import JournalPopup from '$lib/JournalPopup.svelte'
@@ -422,10 +423,20 @@
     futureScheduledTasks = [] // reset 
     traverseAndUpdateTree({
       fulfilsCriteria: (task) => { 
+        if (!task.startTime) return 
+        if (task.willRepeatOnWeekDayNumber) return 
+
+        const d1 = new Date(convertToISO8061({ mmdd: task.startDate }))
+        
+        // setHours(hoursValue 0 - 23, minutesValue 0 - 59)
+        // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/setHours
+        const [hh, mm] = task.startTime.split(":")
+        d1.setHours(Number(hh), Number(mm))
         return (task.startDate && task.startDate !== 'NaN/NaN') && 
                 (!task.willRepeatOnWeekDayNumber) &&
-                  (task.startTime && task.startDate > getDateOfToday()) 
-                    && (Number(task.startYYYY) === Number(yearNumber.toString()))
+                  (task.startTime) &&
+                    (d1.getTime() >= new Date().getTime()) && 
+                      (Number(task.startYYYY) === Number(yearNumber.toString())) // this line is a quickfix because we don't store YYYY values in legacy versions
       }, // 'NaN' quick-fix bug
       applyFunc: (task) => futureScheduledTasks = [...futureScheduledTasks, task]
     })
