@@ -81,7 +81,7 @@
     </div>
 
     <div style="width: 100%; margin-top: 24px; margin-bottom: 24px;">
-      <UXFormTextArea fieldLabel="Description"
+      <UXFormTextArea fieldLabel="Notes"
         value={notesAboutTask}
         on:input={(e) => debouncedSaveNotes(e.detail)}
         placeholder=""
