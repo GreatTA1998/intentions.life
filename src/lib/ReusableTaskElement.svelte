@@ -21,6 +21,8 @@
     background-size: cover;
     padding-left: {isBulletPoint ? '0px' : 'var(--left-padding)'};
     padding-right: var(--left-padding);
+
+    display: flex; flex-direction: column;
   " 
   on:keydown={() => {}}
 >
@@ -62,6 +64,15 @@
       {task.name}
     </div>
   </div>
+  <!-- End of task name flexbox -->
+
+  {#if !isBulletPoint}
+    <div style="flex-grow: 1; overflow: hidden; margin-top: 6px;">
+      <div style="font-size: 12px; font-weight: 300; color: {isBulletPoint ? '' : 'white'};">
+        {task.notes || ''}
+      </div>
+    </div>
+  {/if}
 
     <!-- 
       `1vw`: if it's too wide, it overlaps with the task name for short duration tasks 
