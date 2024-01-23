@@ -150,6 +150,7 @@
             on:task-click={(e) => openDetailedCard(e.detail)}
             on:subtask-create={(e) => createSubtask(e.detail)}
             on:task-dragged={(e) => changeTaskDeadline(e.detail)}
+            on:task-checkbox-change={(e) => updateTaskNode({ id: e.detail.id, keyValueChanges: { isDone: e.detail.isDone }})}
           > 
             <GrandTreeTodo 
               {allTasks}

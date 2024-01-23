@@ -62,6 +62,7 @@
                       on:subtask-create
                       on:task-click
                       on:task-dragged
+                      on:task-checkbox-change
                     />  
                   </div>
                 </GrandTreeTodoReusableList>

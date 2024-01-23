@@ -1,10 +1,11 @@
-<label style="zoom: 0.6" on:click|stopPropagation class="container">
+<label style="zoom: {zoom}" on:click|stopPropagation class="container">
   <input type="checkbox" checked={value} on:change>
   <span class="checkmark"></span>
 </label>
 
 <script>
   export let value
+  export let zoom = 0.6
 </script>
 
 <style>
@@ -38,10 +39,9 @@
     left: 0;
     height: 25px;
     width: 25px;
-    background-color: #eee;
-    
+    background-color: transparent;
     border-radius: 15px;
-    border: 1px solid rgb(120, 120, 120);
+    border: 2px solid rgb(120, 120, 120);
   }
 
   /* On mouse-over, add a grey background color */

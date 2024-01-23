@@ -1,19 +1,18 @@
 <div class="fullscreen-invisible-modular-popup-layer" style="z-index: 10;">
   <div class="detailed-card-popup" bind:this={elem} use:clickOutside on:click_outside={handleClickOutside}>
     <div style="display: flex; align-items: center;">
-      <input
-        checked={taskObject.isDone}
-        on:change={(e) => handleCheckboxChange(e)} 
-        type="checkbox" 
-        style="zoom: 2.2; margin: 0; margin-right: 6px;"
-      >
+      <ReusableCheckbox 
+        value={taskObject.isDone}
+        on:change={(e) => handleCheckboxChange(e)}
+        zoom={1.2}
+      />
 
       <input 
         type="text" 
         bind:value={titleOfTask} 
         on:input={(e) => debouncedSaveTitle(e.target.value)}
         placeholder="Untitled"
-        style="width: 100%; box-sizing: border-box; font-size: 24px;"
+        style="margin-left: 12px; width: 100%; box-sizing: border-box; font-size: 24px;"
       >
     </div>
 
@@ -150,6 +149,7 @@ import DetailedCardPopupRepeat from '$lib/DetailedCardPopupRepeat.svelte'
 import UXFormField from '$lib/UXFormField.svelte'
 import UXFormTextArea from '$lib/UXFormTextArea.svelte'
 import ReusableRoundButton from '$lib/ReusableRoundButton.svelte'
+import ReusableCheckbox from '$lib/ReusableCheckbox.svelte'
 
 export let taskObject 
 

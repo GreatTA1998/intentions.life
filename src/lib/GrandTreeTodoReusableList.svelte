@@ -44,6 +44,7 @@
         doNotShowScheduledTasks={false}
         doNotShowCompletedTasks={true}
         on:task-click
+        on:task-checkbox-change
         on:task-node-update
         on:subtask-create
       > 
