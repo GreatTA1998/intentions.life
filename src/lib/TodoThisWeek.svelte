@@ -1,7 +1,5 @@
 <div class="todo-container">
   <div style="display: flex; align-items: center"
-    on:mouseenter={() => isMouseHoveringOnTaskName = true}
-    on:mouseleave={() => isMouseHoveringOnTaskName = false}
   >
     <div style="height: 24px; font-size: 16px; align-items: center; display: flex;">
       <slot>
@@ -11,11 +9,17 @@
       <div style="color: rgb(10, 10, 10); font-weight: 600; margin-left: 6px;">TO-DO</div>
     </div>
 
-    {#if isMouseHoveringOnTaskName}
-      <span on:click={() => isTypingNewRootTask = true} class="material-icons" style="margin-left: 6px; cursor: pointer;">
-        add
-      </span>
-    {/if}
+    <span on:click={() => isTypingNewRootTask = true} 
+      class="material-icons" 
+      style="
+        margin-left: 6px; 
+        cursor: pointer;         
+        opacity: 0.5;
+        color: var(--logo-twig-color);
+      "
+    >
+      add
+    </span>
   </div>
 
   <div style="margin-bottom: 36px;"></div>
@@ -90,7 +94,6 @@
 
   let tasksToDisplay = [] 
 
-  let isMouseHoveringOnTaskName = false
   let isTypingNewRootTask = false
   let newRootTaskStringValue = ''
   let NewRootTaskInput = ''

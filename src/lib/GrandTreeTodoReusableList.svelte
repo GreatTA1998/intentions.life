@@ -9,21 +9,17 @@
   </slot>
 
   <div>
-    <div style="display: flex; align-items: center; margin-bottom: 10px;"
-      on:mouseenter={() => isMouseHoveringOnTaskName = true}
-      on:mouseleave={() => isMouseHoveringOnTaskName = false}
-    >
+    <div style="display: flex; align-items: center; margin-bottom: 10px;">
       <div style="height: 24px; align-items: center; display: flex;">
         <div style="font-weight: 500; font-size: 16px;">
           {listTitle}
         </div> 
       </div>
 
-      {#if isMouseHoveringOnTaskName}
-        <span on:click={() => isTypingNewRootTask = true} class="material-icons" style="margin-left: 6px; cursor: pointer;">
-          add
-        </span>
-      {/if}
+      <span on:click={() => isTypingNewRootTask = true} class="material-icons" style="margin-left: 6px; cursor: pointer; opacity: 0.5;
+        color: var(--logo-twig-color);">
+        add
+      </span>
     </div>
 
     <slot name="below-list-title">
@@ -108,8 +104,6 @@
   export let cheatToAddPadding = false
 
   let defaultDeadline
-
-  let isMouseHoveringOnTaskName = false
 
   let tasksToDisplay = []
 

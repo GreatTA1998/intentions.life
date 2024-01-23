@@ -29,9 +29,6 @@
     width: 100%;
     font-weight: {depthAdjustedFontWeight};
   "
-
-  on:mouseenter={() => isMouseHoveringOnTaskName = true}
-  on:mouseleave={() => isMouseHoveringOnTaskName = false}
 >
   <slot name="dropzone-above-task-name">
 
@@ -69,23 +66,24 @@
           />
         </div>
       {/if}
-      <div class="truncate-to-one-line" class:cross-out-todo={taskObj.isDone} style="margin-top: -1px; margin-left: 4px;">
+      <div class="truncate-to-one-line" class:cross-out-todo={taskObj.isDone} style="margin-top: -1px; margin-left: 4px; cursor: pointer;">
         {taskObj.name}
       </div>
     </div>
-    {#if isMouseHoveringOnTaskName}
-      <span 
-        style="
-          font-size: 1.2rem;
-          margin-left: 4px;
-          cursor: pointer;
-        "
-        class="material-icons" 
-        on:click={() => isTypingNewSubtask = true}
-      >
-        add
-      </span>
-    {/if}
+
+    <span 
+      style="
+        font-size: 1.2rem;
+        margin-left: 12px;
+        cursor: pointer;
+        opacity: 0.5;
+        color: var(--logo-twig-color);
+      "
+      class="material-icons" 
+      on:click={() => isTypingNewSubtask = true}
+    >
+      add
+    </span>
   </div>
 
   <!-- the 6px compensates for the fact there is only 1 dropzone for the first child but 2 dropzones (reorder + sub-reorder) for the 2nd child onwards -->
@@ -178,7 +176,6 @@
   let NewSubtaskInput
   let newSubtaskStringValue = ''
   let isTypingNewSubtask = false
-  let isMouseHoveringOnTaskName = false
   let isTaskDueSoonOrOverdue = false
 
   let depthAdjustedFontSize 
