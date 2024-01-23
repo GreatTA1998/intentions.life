@@ -5,18 +5,17 @@
       <slot>
         <!-- <GrandTreeTodoPopup/> injected here -->
       </slot>
-      <div style="margin-left: 8px; color: rgb(60, 60, 60); font-weight: 400">THIS WEEK'S </div> 
-      <div style="color: rgb(10, 10, 10); font-weight: 600; margin-left: 6px;">TO-DO</div>
+      <div style="margin-left: 8px; color: rgb(60, 60, 60); font-weight: 400">
+        THIS WEEK'S
+      </div> 
+      <div style="color: rgb(10, 10, 10); font-weight: 600; margin-left: 6px;">
+        TO-DO
+      </div>
     </div>
 
     <span on:click={() => isTypingNewRootTask = true} 
-      class="material-icons" 
-      style="
-        margin-left: 6px; 
-        cursor: pointer;         
-        opacity: 0.5;
-        color: var(--logo-twig-color);
-      "
+      class="material-icons new-task-icon" 
+      style="margin-left: 6px;"
     >
       add
     </span>

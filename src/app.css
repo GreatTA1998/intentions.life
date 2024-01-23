@@ -20,6 +20,12 @@
   font-family: 'Inter', sans-serif;
 }
 
+.new-task-icon {  
+  opacity: 0.3;
+  color: var(--logo-twig-color);  
+  cursor: pointer;  
+}
+
 /* NOTE: must have a explicitly set width */
 .truncate-to-one-line {
   /*  width: 250px; */

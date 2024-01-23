@@ -16,8 +16,10 @@
         </div> 
       </div>
 
-      <span on:click={() => isTypingNewRootTask = true} class="material-icons" style="margin-left: 6px; cursor: pointer; opacity: 0.5;
-        color: var(--logo-twig-color);">
+      <span on:click={() => isTypingNewRootTask = true} 
+        class="new-task-icon material-icons" 
+        style="margin-left: 6px;"
+      >
         add
       </span>
     </div>

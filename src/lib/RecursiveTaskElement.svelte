@@ -71,15 +71,7 @@
       </div>
     </div>
 
-    <span 
-      style="
-        font-size: 1.2rem;
-        margin-left: 12px;
-        cursor: pointer;
-        opacity: 0.5;
-        color: var(--logo-twig-color);
-      "
-      class="material-icons" 
+    <span class="new-task-icon material-icons" style="font-size: 1.2rem; margin-left: 12px;"
       on:click={() => isTypingNewSubtask = true}
     >
       add
