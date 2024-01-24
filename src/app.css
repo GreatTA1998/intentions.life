@@ -21,8 +21,8 @@
 }
 
 .new-task-icon {  
-  opacity: 0.3;
-  color: var(--logo-twig-color);  
+  /* same as checkbox ticked state green */
+  color: #509c13;  
   cursor: pointer;  
 }
 
