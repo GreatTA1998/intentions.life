@@ -1,7 +1,7 @@
 <div style="position: relative; background-color: var(--calendar-bg-color);">
     <!-- Absolute element is not in the flex flow -->
     <!-- e.g. DEC 2023 -->
-    <div style="position: absolute; left: var(--calendar-section-left-spacing); top: {36 + 4}px; z-index: 2">
+    <div style="position: absolute; left: var(--calendar-section-left-spacing); top: {36 + 4}px; z-index: 1">
       <div style="display: flex; font-size: 14px;">
         <div style="color: rgb(80, 80, 80); font-weight: 400;">
           {new Date().toLocaleString('en-US', { month: 'short'})}
@@ -271,7 +271,7 @@
 
   .sticky-day-of-week-abbreviation {
     font-size: 1.4em;
-    background-color: var(--calendar-bg-color);
+    /* background-color: var(--calendar-bg-color); */
     color: #6D6D6D;
     height: 100px;
     

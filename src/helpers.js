@@ -509,7 +509,7 @@ export function computeTodoMemoryTrees (allTasks) {
         new Date(),
         convertDDMMYYYYToDateClassObject(node.deadlineDate)
       )
-      if (dueInHowManyDays <= 1 && dueInHowManyDays >= 0) {
+      if (dueInHowManyDays <= 1 && dueInHowManyDays >= -Infinity) { // quickfix for now
         if (parentCategory === 'DAY' && parentObjReference !== null) {
           parentObjReference.children.push(shallowCopy)
         }

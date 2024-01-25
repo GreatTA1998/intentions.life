@@ -54,7 +54,7 @@
 {/if}
 
 <NavbarAndContentWrapper>
-  <div slot="navbar" class="top-navbar" class:transparent-glow-navbar={currentMode === 'Day'} style="padding-left: 3vw; padding-right: 3vw;">
+  <div slot="navbar" class="top-navbar" class:transparent-glow-navbar={currentMode === 'Day'} style="padding-left: 2vw; padding-right: 2vw;">
     <PopupCustomerSupport let:setIsPopupOpen={setIsPopupOpen}>
       <img on:click={() => handleLogoClick(setIsPopupOpen)}
         src="trueoutput-square-nobg.png" 
@@ -87,12 +87,29 @@
       </div>
     </div>
 
-    <span on:click={() => goto(`/${$user.uid}/camera`)} class="material-symbols-outlined mika-hover" class:blue-icon={currentMode === 'Dashboard'} style="margin-right: 32px; font-size: 30px; cursor: pointer;">
-      photo_camera
+    <GrandTreeTodoPopupButton
+      on:new-root-task={(e) => createNewRootTask(e.detail)}
+      on:task-unscheduled={(e) => putTaskToThisWeekTodo(e)}
+      on:task-click={(e) => openDetailedCard(e.detail)}
+      on:subtask-create={(e) => createSubtask(e.detail)}
+      on:task-dragged={(e) => changeTaskDeadline(e.detail)}
+      on:task-checkbox-change={(e) => updateTaskNode({ id: e.detail.id, keyValueChanges: { isDone: e.detail.isDone }})}
+    > 
+      <GrandTreeTodo 
+        {allTasks}
+        on:new-root-task={(e) => createNewRootTask(e.detail)}
+        on:subtask-create={(e) => createSubtask(e.detail)}
+        on:task-click={(e) => openDetailedCard(e.detail)}
+        on:drop={(e) => unscheduleTask(e)}
+      />
+    </GrandTreeTodoPopupButton>
+
+    <span on:click={() => currentMode === 'Dashboard' ? currentMode = 'Week' : currentMode = 'Dashboard'}  class="material-symbols-outlined mika-hover" class:blue-icon={currentMode === 'Dashboard'} style="margin-left: 32px; margin-right: 32px; font-size: 32px; cursor: pointer;">
+      signal_cellular_alt
     </span>
 
-    <span on:click={() => currentMode === 'Dashboard' ? currentMode = 'Week' : currentMode = 'Dashboard'}  class="material-symbols-outlined mika-hover" class:blue-icon={currentMode === 'Dashboard'} style="font-size: 32px; cursor: pointer;">
-      signal_cellular_alt
+    <span on:click={() => goto(`/${$user.uid}/camera`)} class="material-symbols-outlined mika-hover" class:blue-icon={currentMode === 'Dashboard'} style="font-size: 30px; cursor: pointer;">
+      photo_camera
     </span>
   </div>
 
@@ -137,31 +154,17 @@
       <!-- WEEK MODE -->
       {:else if (currentMode === 'Week')}
         <!-- 1st flex child -->
-        <TodoThisWeek
-          on:new-root-task={(e) => createNewRootTask(e.detail)}
-          on:task-unscheduled={(e) => putTaskToThisWeekTodo(e)}
-          on:subtask-create={(e) => createSubtask(e.detail)}
-          on:task-click={(e) => openDetailedCard(e.detail)}
-          on:task-checkbox-change={(e) => updateTaskNode({ id: e.detail.id, keyValueChanges: { isDone: e.detail.isDone }})} 
-        > 
-          <GrandTreeTodoPopupButton
+        <div class="todo-container">
+          <NewThisWeekTodo
             on:new-root-task={(e) => createNewRootTask(e.detail)}
             on:task-unscheduled={(e) => putTaskToThisWeekTodo(e)}
             on:task-click={(e) => openDetailedCard(e.detail)}
             on:subtask-create={(e) => createSubtask(e.detail)}
             on:task-dragged={(e) => changeTaskDeadline(e.detail)}
             on:task-checkbox-change={(e) => updateTaskNode({ id: e.detail.id, keyValueChanges: { isDone: e.detail.isDone }})}
-          > 
-            <GrandTreeTodo 
-              {allTasks}
-              on:new-root-task={(e) => createNewRootTask(e.detail)}
-              on:subtask-create={(e) => createSubtask(e.detail)}
-              on:task-click={(e) => openDetailedCard(e.detail)}
-              on:drop={(e) => unscheduleTask(e)}
-            />
-          </GrandTreeTodoPopupButton>
-        </TodoThisWeek>
-
+          />
+        </div>
+        
         <!-- 2nd flex child -->
         <div class="calendar-section-flex-child"> 
           {#if allTasks}    
@@ -222,7 +225,6 @@
   import BedtimePopupMaplestoryMusic from '$lib/BedtimePopupMaplestoryMusic.svelte'
   import TheSnackbar from '$lib/TheSnackbar.svelte'
   import CalendarThisWeek from '$lib/CalendarThisWeek.svelte'
-  import TodoThisWeek from '$lib/TodoThisWeek.svelte'
   import FutureOverview from '$lib/FutureOverview.svelte'
   import BackgroundRainScene from '$lib/BackgroundRainScene.svelte'
   import LifeDashboard from '$lib/LifeDashboard.svelte'
@@ -241,6 +243,7 @@
   import db from '/src/db.js'
   import { doc, collection, getFirestore, updateDoc, arrayUnion, onSnapshot, arrayRemove, increment } from 'firebase/firestore'
   import { setFirestoreDoc, updateFirestoreDoc, deleteFirestoreDoc, getFirestoreCollection } from '/src/crud.js'
+  import NewThisWeekTodo from '$lib/NewThisWeekTodo.svelte'
   import { garbageCollectInvalidTasks } from '/src/scripts.js'
 
   let currentMode = 'Week' // weekMode hourMode monthMode
@@ -620,6 +623,19 @@
 </script>
 
 <style>  
+  .todo-container {
+    min-width: 400px; 
+    background-color: var(--todo-list-bg-color);
+    padding-left: 1vw; 
+    padding-right: 1vw;
+    padding-top: 16px;
+    padding-top: calc(36px - 16px);
+    /* the week todo already has a 16px padding, so it just needs 20px to be 36px from the top
+     */
+    font-size: 2em;
+    overflow-y: auto;
+  }
+
   .future-overview-parent {
     min-width: 332px;
     padding-top: 36px; padding-left: 3vw; padding-right: 3vw;

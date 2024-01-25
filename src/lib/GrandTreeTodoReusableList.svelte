@@ -8,84 +8,86 @@
 
   </slot>
 
+  <!-- Yes every indented <div> is necessary, trust me for now, to make the 
+    Month todo layout work horizontally with flexbox
+    and the week todo layout work vertically  
+  -->
   <div>
-    <div style="display: flex; align-items: center; margin-bottom: 10px;">
-      <div style="height: 24px; align-items: center; display: flex;">
-        <div style="font-weight: 500; font-size: 16px;">
-          {listTitle}
-        </div> 
+    <div>
+      <div style="display: flex; align-items: center; margin-bottom: 12px;">
+        <div style="height: 24px; align-items: center; display: flex;">
+          <div style="font-weight: 500; font-size: 18px;">
+            {listTitle} 
+          </div> 
+        </div>
+
+        <span on:click={() => isTypingNewRootTask = true} 
+          class="new-task-icon material-icons" 
+          style="margin-left: 10px; margin-bottom: 10px"
+        >
+          +
+        </span>
       </div>
 
-      <span on:click={() => isTypingNewRootTask = true} 
-        class="new-task-icon material-icons" 
-        style="margin-left: 6px;"
-      >
-        add
-      </span>
+      <slot name="below-list-title">
+
+      </slot>
     </div>
 
-    <slot name="below-list-title">
+    <div style="outline: 0px solid blue; margin-top: 12px;">
+      {#each tasksToDisplay as taskObj, i}
+        <div style="margin-top: 16px;"></div>
+        <RecursiveTaskElement 
+          {taskObj}
+          depth={0}
+          ancestorRoomIDs={['']}
+          doNotShowScheduledTasks={false}
+          doNotShowCompletedTasks={true}
+          on:task-click
+          on:task-checkbox-change
+          on:task-node-update
+          on:subtask-create
+        > 
+          <div slot="dropzone-above-task-name">
+            {#if tasksToDisplay.length > 2}
+              <ReusableHelperDropzone
+                ancestorRoomIDs={['']}
+                roomsInThisLevel={tasksToDisplay}
+                idxInThisLevel={i}
+                parentID={''}
+                parentObj={{ subtreeDeadlineInMsElapsed: convertDDMMYYYYToDateClassObject(defaultDeadline).getTime() }}
+                colorForDebugging="purple"
+              />
+            {/if}
+          </div>
+        </RecursiveTaskElement>
+      {/each}
 
-    </slot>
-  </div>
+      {#if tasksToDisplay.length > 2}
+        <!-- NOTE: BECAUSE WE DON'T DISPLAY TASKS THAT ARE COMPLETED,
+          WE HAVE A DEVIATION BETWEEN STATE AND UI
+          IN THE FUTURE IF THERE ARE UNEXPECTED BUGS, THIS IS THE LIKELY CAUSE
+        -->
+        <!-- {tasksToDisplay.length} -->
+        <ReusableHelperDropzone
+          ancestorRoomIDs={['']}
+          roomsInThisLevel={tasksToDisplay}
+          idxInThisLevel={tasksToDisplay.length}
+          parentID={''}
+          parentObj={{ subtreeDeadlineInMsElapsed: convertDDMMYYYYToDateClassObject(defaultDeadline).getTime() }}
+          colorForDebugging="blue"
+        />
+      {/if}
 
-  <div style="outline: 0px solid blue; margin-top: 12px; padding-left: {cheatToAddPadding ? '12px' : ''}">
-    <slot name="alternative-title" openNewTaskInput={() => isTypingNewRootTask = true}>
-
-    </slot>
-
-    {#each tasksToDisplay as taskObj, i}
-      <RecursiveTaskElement 
-        {taskObj}
-        depth={0}
-        ancestorRoomIDs={['']}
-        doNotShowScheduledTasks={false}
-        doNotShowCompletedTasks={true}
-        on:task-click
-        on:task-checkbox-change
-        on:task-node-update
-        on:subtask-create
-      > 
-        <div slot="dropzone-above-task-name">
-          {#if tasksToDisplay.length > 2}
-            <ReusableHelperDropzone
-              ancestorRoomIDs={['']}
-              roomsInThisLevel={tasksToDisplay}
-              idxInThisLevel={i}
-              parentID={''}
-              parentObj={{ subtreeDeadlineInMsElapsed: convertDDMMYYYYToDateClassObject(defaultDeadline).getTime() }}
-              colorForDebugging="purple"
-            />
-          {/if}
-        </div>
-      </RecursiveTaskElement>
-      <div style="margin-bottom: 24px;"></div>
-    {/each}
-
-    {#if tasksToDisplay.length > 2}
-      <!-- NOTE: BECAUSE WE DON'T DISPLAY TASKS THAT ARE COMPLETED,
-        WE HAVE A DEVIATION BETWEEN STATE AND UI
-        IN THE FUTURE IF THERE ARE UNEXPECTED BUGS, THIS IS THE LIKELY CAUSE
-      -->
-      <!-- {tasksToDisplay.length} -->
-      <ReusableHelperDropzone
-        ancestorRoomIDs={['']}
-        roomsInThisLevel={tasksToDisplay}
-        idxInThisLevel={tasksToDisplay.length}
-        parentID={''}
-        parentObj={{ subtreeDeadlineInMsElapsed: convertDDMMYYYYToDateClassObject(defaultDeadline).getTime() }}
-        colorForDebugging="blue"
-      />
-    {/if}
-
-    {#if isTypingNewRootTask}
-      <input 
-        bind:this={NewRootTaskInput}
-        bind:value={newRootTaskStringValue} 
-        on:keydown={(e) => handleKeyDown(e)}
-        placeholder="Type task here..."
-      >
-    {/if}
+      {#if isTypingNewRootTask}
+        <input 
+          bind:this={NewRootTaskInput}
+          bind:value={newRootTaskStringValue} 
+          on:keydown={(e) => handleKeyDown(e)}
+          placeholder="Type task here..."
+        >
+      {/if}
+    </div>
   </div>
 </div>
 
@@ -187,6 +189,11 @@
       deadlineTimeHHMM: '23:59',
       taskID: droppedTaskID
     })
+
+    // also unschedule it (this was an old API, but we can just add it here via composition : ) lazy work
+    dispatch('task-unscheduled', {
+      id: e.dataTransfer.getData('text/plain')
+    })
   }
 
   function dragover_handler (e) {
@@ -205,12 +212,9 @@
 
 <style>
   .todo-list-container {
-    height: 100%;
     width: 100%;
     background-color: var(--todo-list-bg-color);
-    border-radius: 12px;
     padding: 16px;
     font-size: 2em;
-    overflow-y: auto;
   }
 </style>

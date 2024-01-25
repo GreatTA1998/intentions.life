@@ -1,4 +1,4 @@
-<span on:click={() => setIsPopupOpen({ newVal: true })} class="material-symbols-outlined my-float" style="font-size: 42px; color: rgb(20, 20, 20); cursor: pointer; margin-left: -4px;">
+<span on:click={() => setIsPopupOpen({ newVal: true })} class="material-symbols-outlined my-float" style="font-size: 32px; color: rgb(20, 20, 20); cursor: pointer; margin-left: -4px;">
   summarize
 </span>
 
@@ -10,62 +10,38 @@
       <div style="overflow: auto; height: 100%; width: 100%;">
         <div style="
           display: flex; 
+          justify-content: space-between;
           height: 100%;
-          justify-content: space-between; 
           align-items: start;
           flex-wrap: nowrap;
           "
         >
           <div style="width: 70%; height: 100%; overflow-y: auto; overflow-x: auto;" class="round-scrollbar">
             <GrandTreeTodoReusableList
-              style="display: flex; justify-content: space-between; background-color: hsl(100deg 66.53% 95.74%); border-radius: 24px; width: 100%;"
-              listTitle=""
+              style="
+                display: flex; 
+                justify-content: space-evenly; 
+                background-color: hsl(100deg 66.53% 95.74%); 
+                border-radius: 24px; 
+                width: 100%;
+              "
+              listTitle="THIS MONTH"
               allTasksDue={$allTasksDueThisMonth}
               dueInHowManyDays={30}
-              cheatToAddPadding={true}
               on:new-root-task
               on:task-unscheduled
               on:subtask-create
               on:task-click
               on:task-dragged
             >
-              <div slot="alternative-title" let:openNewTaskInput={openNewTaskInput}
-                style="display: flex; align-items: center; font-size: 20px; font-weight: 500;"
-              >
-                THIS MONTH
-
-                <span on:click={openNewTaskInput} class="material-icons" style="margin-left: 6px; cursor: pointer;">
-                  add
-                </span>
-              </div>
-
               <div slot="above-list-title">
-                <GrandTreeTodoReusableList
-                  listTitle="THIS WEEK"
-                  allTasksDue={$allTasksDueThisWeek}
-                  dueInHowManyDays={7}
-                  style="background-color: var(--todo-list-bg-color); width: 300px; border-radius: 24px;"
+                <NewThisWeekTodo
                   on:new-root-task
                   on:task-unscheduled
                   on:subtask-create
                   on:task-click
                   on:task-dragged
-                > 
-                  <div slot="below-list-title">
-                    <GrandTreeTodoReusableList
-                      listTitle="TODAY"
-                      allTasksDue={$allTasksDueToday}
-                      dueInHowManyDays={1}
-                      style="background-color: #4d6c4d; color: white; width: 260px; height: fit-content;"
-                      on:new-root-task
-                      on:task-unscheduled
-                      on:subtask-create
-                      on:task-click
-                      on:task-dragged
-                      on:task-checkbox-change
-                    />  
-                  </div>
-                </GrandTreeTodoReusableList>
+                />
               </div>
             </GrandTreeTodoReusableList>  
           </div>
@@ -86,6 +62,7 @@
   import _ from 'lodash'
   import GrandTreeTodoReusableList from '$lib/GrandTreeTodoReusableList.svelte'
   import { allTasksDueToday, allTasksDueThisWeek, allTasksDueThisMonth } from '/src/store.js'
+  import NewThisWeekTodo from '$lib/NewThisWeekTodo.svelte'
 
   const dispatch = createEventDispatcher()
 
@@ -112,11 +89,6 @@
 </script>
 
 <style>
-.todo-column-title {
-  font-size: 20px; 
-  font-weight: 500;
-}
-
 .my-popup {
   position: fixed;
   top: 50%;
@@ -128,7 +100,7 @@
   /* z-index 3 because the base calendar uses z-index 0, 1, 2 */
   z-index: 3;
   min-width: 300px;
-  width: 96%;
+  width: 100%;
   height: 90%;
 
   /* 12px (todo list radius) + 12px (padding) for concentric border radii */

@@ -1,6 +1,6 @@
 <!-- background-color:#F4F4F4; -->
 <div 
-  class="todo-container" 
+  class="life-container" 
   on:drop
   on:dragover={(e) => dragover_handler(e)}
   style="font-size: 36px;"
@@ -10,7 +10,7 @@
     on:mouseenter={() => isMouseHoveringOnTaskName = true}
     on:mouseleave={() => isMouseHoveringOnTaskName = false}
   >
-    <div style="margin-left: 8px; color: rgb(10, 10, 10); font-weight: 500">
+    <div style="margin-left: 8px; font-weight: 500; font-size: 18px;">
       THIS LIFE
     </div> 
 
@@ -112,14 +112,14 @@
 </script>
 
 <style>
-  .todo-container {
+  .life-container {
     overflow-y: auto;
     overflow-x: auto;
     box-sizing: border-box;
     width: 100%;
     height: 100%;
 
-    padding-top: 24px; padding-left: 6px; padding-right: 12px; 
+    padding-top: 0px; padding-left: 12px; padding-right: 12px; 
     background-color: white;
     border-radius: 24px;
   }
