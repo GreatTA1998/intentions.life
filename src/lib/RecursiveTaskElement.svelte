@@ -45,7 +45,6 @@
         min-width and height to make it easy to delete legacy tasks with no titles
     -->
     <div 
-      on:click={() => dispatch('task-click', { task: taskObj })}
       style="
         min-width: 30px; 
         max-width: 320px;
@@ -66,16 +65,19 @@
           />
         </div>
       {/if}
-      <div class="truncate-to-one-line" class:cross-out-todo={taskObj.isDone} style="margin-top: -1px; margin-left: 4px; cursor: pointer;">
+
+      <div on:click={() => dispatch('task-click', { task: taskObj })} 
+        class="truncate-to-one-line" 
+        class:cross-out-todo={taskObj.isDone} 
+        style="margin-top: -1px; margin-left: 4px; cursor: pointer;"
+      >
         {taskObj.name}
       </div>
     </div>
 
-    <span class="new-task-icon material-icons" style="font-size: 1.2rem; margin-left: 12px;"
-      on:click={() => isTypingNewSubtask = true}
-    >
-      add
-    </span>
+    <div on:click={() => isTypingNewSubtask = true} class="new-task-icon" style="margin-bottom: 6px;">
+      +
+    </div>
   </div>
 
   <!-- the 6px compensates for the fact there is only 1 dropzone for the first child but 2 dropzones (reorder + sub-reorder) for the 2nd child onwards -->

@@ -1,5 +1,5 @@
 <!-- i.e. the user is fully hydrated, with properties like `journal` already initialized -->
-{#if $user.allTasks}
+{#if $user.uid}
   <MainPage/>
 {/if}
 

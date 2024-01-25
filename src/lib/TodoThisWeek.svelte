@@ -13,12 +13,12 @@
       </div>
     </div>
 
-    <span on:click={() => isTypingNewRootTask = true} 
+    <div on:click={() => isTypingNewRootTask = true} 
       class="material-icons new-task-icon" 
-      style="margin-left: 6px;"
+      style="margin-bottom: 10px; margin-left: 12px;"
     >
-      add
-    </span>
+      +
+    </div>
   </div>
 
   <div style="margin-bottom: 36px;"></div>
