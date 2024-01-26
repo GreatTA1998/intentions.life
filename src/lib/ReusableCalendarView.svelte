@@ -175,10 +175,6 @@
   let OverallContainer
   let CurrentTimeIndicator
 
-  function p (...args) {
-    console.log(...args)    
-  }
-
   const dispatch = createEventDispatcher()
   
   let isDirectlyCreatingTask = false
@@ -192,8 +188,6 @@
   $: resultantDateClassObject = getResultantDateClassObject(yPosition)
 
   onMount(async () => {
-    updateCurrentTime()
-
     if (CurrentTimeIndicator) {
       console.log('current time indicator exists at mount')
       setTimeout(() => {
@@ -210,6 +204,10 @@
   onDestroy(() => {
 
   })
+
+  function p (...args) {
+    console.log(...args)    
+  }
 
   function handleEnterKey (e) {
     if (taskTemplateSearchResults.length === 1) {
@@ -276,27 +274,7 @@
     return offset
   }
 
-  const getDate = getDateOfToday
-
   let highlightedMinute = null 
-
-  let calendarStartTime = '07:00'
-  // let currentTimeInHHMM = ''
-
-  const one_sec = 1000 // milliseconds
-  setInterval(updateCurrentTime, 60 * one_sec)
-
-  function updateCurrentTime () {
-    const today = new Date()
-    let hh = today.getHours()
-    hh = `${hh < 10 ? '0' : ''}` + hh
-
-    let mm = today.getMinutes()
-    mm = `${mm < 10 ? '0' : ''}` + mm
-    
-    let result = hh + ':' + mm
-    // currentTimeInHHMM = result
-  }
 
   function dragover_handler (e) {
     e.preventDefault()

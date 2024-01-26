@@ -167,7 +167,7 @@
         
         <!-- 2nd flex child -->
         <div class="calendar-section-flex-child"> 
-          {#if allTasks}    
+          {#if allTasks.length > 0}    
             <CalendarThisWeek
               {allTasks}
               {calStartDateClassObj}
