@@ -189,11 +189,8 @@
 
   onMount(async () => {
     if (CurrentTimeIndicator) {
-      console.log('current time indicator exists at mount')
       setTimeout(() => {
-        console.log('setTimeout()')
         if (CurrentTimeIndicator && !$hasInitialScrolled) {
-          console.log('scroll triggering')
           CurrentTimeIndicator.scrollIntoView({ behavior: 'smooth', block: 'center'})
           hasInitialScrolled.set(true)
         }
