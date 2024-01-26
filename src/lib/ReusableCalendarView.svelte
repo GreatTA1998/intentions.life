@@ -130,7 +130,7 @@
 
     <!-- A red line that indicates the current time -->
     <!-- `willShowTimestamps` is a quick-fix to identify today's calendar -->
-    {#if currentTimeInHHMM && calendarBeginningDateClassObject.getDate() === new Date().getDate()}
+    {#if calendarBeginningDateClassObject.getDate() === new Date().getDate()}
       <div class="current-time-indicator-container" style="
           top: {computeOffsetGeneral({ 
             d1: calendarBeginningDateClassObject, 
@@ -192,12 +192,19 @@
   $: resultantDateClassObject = getResultantDateClassObject(yPosition)
 
   onMount(async () => {
-    setTimeout(() => {
-      if (CurrentTimeIndicator && !$hasInitialScrolled) {
-        CurrentTimeIndicator.scrollIntoView({ behavior: 'smooth', block: 'center'})
-        hasInitialScrolled.set(true)
-      }
-    }, 500) // quickfix for now
+    updateCurrentTime()
+
+    if (CurrentTimeIndicator) {
+      console.log('current time indicator exists at mount')
+      setTimeout(() => {
+        console.log('setTimeout()')
+        if (CurrentTimeIndicator && !$hasInitialScrolled) {
+          console.log('scroll triggering')
+          CurrentTimeIndicator.scrollIntoView({ behavior: 'smooth', block: 'center'})
+          hasInitialScrolled.set(true)
+        }
+      }, 0) 
+    }
   })
 
   onDestroy(() => {
@@ -232,7 +239,6 @@
   }
 
   async function createNewInstanceOfReusableTask (taskObj) {
-    console.log('taskObj =', taskObj)
     const copy = {...taskObj}
     copy.id = getRandomID()
     copy.reusableTemplateID = taskObj.id
@@ -275,10 +281,9 @@
   let highlightedMinute = null 
 
   let calendarStartTime = '07:00'
-  let currentTimeInHHMM = ''
+  // let currentTimeInHHMM = ''
 
   const one_sec = 1000 // milliseconds
-  updateCurrentTime()
   setInterval(updateCurrentTime, 60 * one_sec)
 
   function updateCurrentTime () {
@@ -290,7 +295,7 @@
     mm = `${mm < 10 ? '0' : ''}` + mm
     
     let result = hh + ':' + mm
-    currentTimeInHHMM = result
+    // currentTimeInHHMM = result
   }
 
   function dragover_handler (e) {
