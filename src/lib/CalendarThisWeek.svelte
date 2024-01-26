@@ -145,7 +145,7 @@
     dateClassObjects = []
     let d = dateClassObj
     // dateClassObjects.push(d)
-    for (let i = -1; i < 14; i++) {
+    for (let i = 0; i < 14; i++) {
       const independentCopy = new Date()
       independentCopy.setDate(d.getDate() + i) // quickfix: for some reason we're off by 1-index, will investigate
       // no longer start from 7 am, or else there will be missing hours
