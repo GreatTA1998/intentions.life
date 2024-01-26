@@ -89,7 +89,7 @@
 
     <GrandTreeTodoPopupButton
       on:new-root-task={(e) => createNewRootTask(e.detail)}
-      on:task-unscheduled={(e) => putTaskToThisWeekTodo(e)}
+      on:task-unscheduled={(e) => unscheduleTask(e)}
       on:task-click={(e) => openDetailedCard(e.detail)}
       on:subtask-create={(e) => createSubtask(e.detail)}
       on:task-dragged={(e) => changeTaskDeadline(e.detail)}
@@ -100,7 +100,7 @@
         on:new-root-task={(e) => createNewRootTask(e.detail)}
         on:subtask-create={(e) => createSubtask(e.detail)}
         on:task-click={(e) => openDetailedCard(e.detail)}
-        on:drop={(e) => unscheduleTask(e)}
+        on:drop={(e) => transformToLifeTask(e)}
       />
     </GrandTreeTodoPopupButton>
 
@@ -554,7 +554,7 @@
 
   // TO-DO: also refactor this
   // unscheduling back to grand to-do
-  function unscheduleTask (e) {
+  function transformToLifeTask (e) {
     e.preventDefault()
     // for backwards compatibility
     let id
@@ -569,6 +569,23 @@
       deadlineDate: '',
       deadlineTime: '',
       parentID: '', // this is a quickfix, in the future handle data in This Life Todo properly
+      isDone: false
+    }})
+  }
+
+  // for tasks dragged into a todo-list
+  function unscheduleTask (e) {
+    e.preventDefault()
+    // for backwards compatibility
+    let id
+    if (e.detail.id) {
+      id = e.detail.id
+    } else {
+      id = e.dataTransfer.getData('text/plain')
+    }
+    updateTaskNode({ id, keyValueChanges: {
+      startTime: '',
+      startDate: '',
       isDone: false
     }})
   }
@@ -669,18 +686,6 @@
     display: flex;
   }
 
-  .circular-icon-button {
-    cursor: pointer;
-    margin-left: 48px;
-    z-index: 1; 
-    display: flex; align-items: center; 
-    justify-content: center;
-    width: 44px;
-    height: 44px;
-    border-radius: 22px;
-    text-align: center;
-  }
-
   .calendar-section-flex-child {
 
     /* take up full height of parent flexbox */
@@ -755,97 +760,7 @@
     color: white;
   } 
 
-  /* Small Devices, Tablets and bigger devices */
-  @media only screen and (min-width : 480px) {
-    #background-image-holder {
-      height: 100vh;
-      box-sizing: border-box;
-    }
-    .calendar-section-container {
-      background: transparent; 
-      width: 45vw;
-      height: 50vh;
-      border: none; 
-      border-left: none;
-      border-top: none;
-      border-bottom: none;
-    }
-  }
-
-  @media only screen and (max-width : 480px) {
-    .flex-container {
-      width: 200%
-    }
-    .calendar-section-container {
-      width: 800px;
-      height: 100%;
-    }
-  }
-
-  .calendar-section-container {
-    height: 100vh;
-    display: flex; 
-    margin-left: 20px;
-    justify-content: space-evenly;  
-    /*    background-color: white;  */
-    box-sizing: border-box;
-    padding-top: 40px;
-  }
-
-  .flex-container {
-    height: 100vh;
-    display: flex; 
-    padding-top: 0px;
-    background: transparent; 
-  }
-
-  #background-image-holder {
-    /* 0.91 is perfect, literally perfect. The background literally is one-with the white */
-    /* linear-gradient is used to make background image more transparent
-      NOTE: blur effect is defined in .blur {}
-    */
-    /* background-image: linear-gradient(rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.91)), 
-    url('https://64.media.tumblr.com/e3c4ae5e8aa3f64b1652bfda70448cc7/tumblr_ptdfkwN1hC1utvtoj_500.jpg'); */
-    background-repeat: no-repeat;
-    background-size: 100% 100%;
-  }
-
-
-  .plus {
-    display:inline-block;
-    width:35px;
-    height:35px;
-    background:
-      linear-gradient(#fff 0 0),
-      linear-gradient(#fff 0 0),
-      #000;
-    background-position:center;
-    background-size: 50% 2px,2px 50%; /*thickness = 2px, length = 50% (25px)*/
-    background-repeat:no-repeat;
-  }
-
-  .alt {
-    background:
-      linear-gradient(#000 0 0),
-      linear-gradient(#000 0 0);
-    background-position:center;
-    background-size: 50% 2px,2px 50%; /*thickness = 2px, length = 50% (25px)*/
-    background-repeat:no-repeat;
-  }
-
-  .float {
-    position:absolute;
-    width: 50px;
-    height: 50px;
-    top: 6px;
-    background-color: transparent;  
-    border-radius:50px;
-    text-align:center;
-   /* border: 1px solid #0085FF;*/
-  }
-
   .mika-hover {
-    /* color: #0085FF; */
     transition: all 0s ease-out;
   }
 
@@ -860,19 +775,6 @@
     color: #0085FF;
   }
 
-  .blue-focus {
-    /* color: #ffffff; */
-    /* color: darkgreen; */
-    /* border: 1px solid #0085FF; */
-    /* background-color: #0085FF; */
-    /*  border: 1px solid #0085FF;*/
-    transition: all 0.2s ease-out;
-  }
-
-  .blur {
-    /* backdrop-filter: blur(0px);
-    height: 100vh; */
-  }
   /* #radio-player-with-art {
     background-image: url('../maplestory-watercolor.jpg')
   } */

@@ -105,7 +105,6 @@
   export let dueInHowManyDays = null // AF(null) means it's a life todo, otherwise it should be a number
   export let allTasksDue = []
   export let listTitle
-  export let cheatToAddPadding = false
 
   let defaultDeadline
 

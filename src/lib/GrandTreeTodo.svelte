@@ -5,7 +5,6 @@
   on:dragover={(e) => dragover_handler(e)}
   style="font-size: 36px;"
 >
-
   <div style="height: 24px; font-size: 16px; align-items: center; display: flex;"
     on:mouseenter={() => isMouseHoveringOnTaskName = true}
     on:mouseleave={() => isMouseHoveringOnTaskName = false}

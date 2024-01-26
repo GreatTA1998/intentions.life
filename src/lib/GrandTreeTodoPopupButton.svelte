@@ -33,6 +33,7 @@
               on:subtask-create
               on:task-click
               on:task-dragged
+              on:task-checkbox-change
             >
               <div slot="above-list-title">
                 <NewThisWeekTodo
@@ -41,6 +42,7 @@
                   on:subtask-create
                   on:task-click
                   on:task-dragged
+                  on:task-checkbox-change
                 />
               </div>
             </GrandTreeTodoReusableList>  

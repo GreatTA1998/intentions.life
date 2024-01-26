@@ -109,7 +109,7 @@
     <!-- This is the section where you show everything regardless of whether it is scheduled or not -->
     {#if taskObject.children.length > 0}
       <div style="font-size: 1rem; margin-top: 36px; margin-bottom: 12px; font-weight: 400;">
-        Full task history
+        Full task tree
       </div>
 
       <div style="max-height: 500px; overflow-y: auto;">
