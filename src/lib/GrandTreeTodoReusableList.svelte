@@ -42,7 +42,7 @@
           depth={0}
           ancestorRoomIDs={['']}
           doNotShowScheduledTasks={false}
-          doNotShowCompletedTasks={true}
+          doNotShowCompletedTasks={false}
           on:task-click
           on:task-checkbox-change
           on:task-node-update
@@ -141,7 +141,8 @@
   }
 
   function computeTasksToDisplay () {
-    tasksToDisplay = sortByUnscheduledThenByOrderValue(allTasksDue)
+    const temp = sortByUnscheduledThenByOrderValue(allTasksDue)
+    tasksToDisplay = temp.filter(task => !task.isDone)
   }
 
   function handleKeyDown (e) {
