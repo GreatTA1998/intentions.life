@@ -197,7 +197,7 @@
         CurrentTimeIndicator.scrollIntoView({ behavior: 'smooth', block: 'center'})
         hasInitialScrolled.set(true)
       }
-    }, 0)
+    }, 500) // quickfix for now
   })
 
   onDestroy(() => {
