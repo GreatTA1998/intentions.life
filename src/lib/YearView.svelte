@@ -38,11 +38,12 @@
             {task.name}
           </div>
 
-          <div class="new-task-icon" style="margin-bottom: 6px;">
-            +
-          </div>
+          <ReusableNewSubtaskComponent
+            parentID={task.id}
+            on:subtask-create
+          />
         </div>
-
+    
         <div style="border-left: 1px solid rgb(200, 200, 200); height: {computeOffset(task)}px; margin-left: 48px; position: relative;">
           {#each task.children as child}
             <div style="font-size: 12px; position: absolute; top: {computeOffset(child)}px; right: 48px; width: 100%; outline: 0px solid red;">
@@ -86,9 +87,13 @@
     computeDayDifference
   } from '/src/helpers.js'
   import { createEventDispatcher } from 'svelte'
-  import { getRandomID } from '/src/helpers.js'
+  import { 
+    getRandomID,
+    getDateInDDMMYYYY, 
+    getTimeInHHMM
+  } from '/src/helpers.js'
   import UXFormField from '$lib/UXFormField.svelte'
-
+  import ReusableNewSubtaskComponent from '$lib/ReusableNewSubtaskComponent.svelte'
 
   let isCreatingRootTask = false
   let newRootTaskName = ''
@@ -110,21 +115,50 @@
     return offset
   }
 
-  // create a component that handles its own focus() cycle and unfocus cycle
-  // perhaps use
-
-
   // give it the #1 task's deadline, so won't appear in the back
   function createNewLongHorizonTask (e) {
-    const longestHorizonTask = $longHorizonTasks[0]
-
-    const newRootTaskObj = {
-      id: getRandomID(), 
-      deadlineDate: longestHorizonTask.deadlineDate,
-      deadlineTime: longestHorizonTask.deadlineTime,
-      // name: '', // create a simple input
-      parentID: '',
+    if (newRootTaskName === '') {
+      isCreatingRootTask = false 
     }
+
+    else {
+      const rootTaskID = getRandomID()
+      const d = new Date()
+      d.setFullYear(d.getFullYear() + 1)
+
+      const newRootTaskObj = {
+        deadlineTime: getTimeInHHMM({ dateClassObj: d }),
+        deadlineDate: getDateInDDMMYYYY(d),
+        id: rootTaskID, 
+        name: newRootTaskName,
+        parentID: '',
+      }
+
+      createDefaultSubtask(rootTaskID)
+
+      dispatch('new-root-task', newRootTaskObj)
+      isCreatingRootTask = false 
+      newRootTaskName = ''
+    }
+  }
+
+  function createDefaultSubtask (rootTaskID) {
+    const defaultSubtask = {
+      parentID: rootTaskID,
+      name: 'Edit this default milestone',
+      id: getRandomID()
+    }
+
+    const d = new Date()
+    d.setMonth(d.getMonth() + 1)
+    defaultSubtask.deadlineDate = getDateInDDMMYYYY(d)
+    defaultSubtask.deadlineTime = getTimeInHHMM({ dateClassObj: d })
+
+    dispatch('subtask-create', {
+      id: defaultSubtask.id,
+      parentID: rootTaskID,
+      newTaskObj: defaultSubtask
+    })
   }
 </script>
 

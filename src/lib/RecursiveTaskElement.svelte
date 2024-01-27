@@ -260,8 +260,4 @@
   .cross-out-todo {
     text-decoration: line-through;
   }
-
-  .hide-subtree {
-    display: none;
-  }
 </style>

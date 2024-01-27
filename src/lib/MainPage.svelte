@@ -196,7 +196,11 @@
       <!-- END OF WEEK MODE SECTION -->
       
       {:else if currentMode === 'Year'}
-        <YearView on:task-click={(e) => openDetailedCard(e.detail)}/>
+        <YearView 
+          on:task-click={(e) => openDetailedCard(e.detail)}
+          on:new-root-task={(e) => createNewRootTask(e.detail)}
+          on:subtask-create={(e) => createSubtask(e.detail)}
+        />
       {/if}
   </div>
 </NavbarAndContentWrapper>

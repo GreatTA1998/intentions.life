@@ -198,6 +198,8 @@ function handleCheckboxChange (e) {
     id: taskObject.id,
     isDone: e.target.checked
   })
+
+  dispatch('card-close')
 }
 
 const debouncedSaveTitle = _.debounce(saveTitle, 800)

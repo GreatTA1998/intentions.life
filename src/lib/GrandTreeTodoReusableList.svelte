@@ -140,7 +140,6 @@
   function handleKeyDown (e) {
     if (newRootTaskStringValue === '') {
       isTypingNewRootTask = false
-      newRootTaskStringValue = ''
     }
     // nice side-effect of this: double-tap ENTER to be done
     else  {
