@@ -19,123 +19,125 @@
 
     Directly add tasks to the calendar, the `allTasks` array should have length 1000 instead of 3 over the years.
 -->
-<div 
-  class:hide-subtree={
-    (taskObj.startDate && doNotShowScheduledTasks)
-    ||
-    (taskObj.isDone && doNotShowCompletedTasks)
-  }
-  style=" 
-    width: 100%;
-    font-weight: {depthAdjustedFontWeight};
-  "
->
-  <slot name="dropzone-above-task-name">
-
-  </slot>
+{#if !(doNotShowScheduledTasks && taskObj.startDate) && !(doNotShowCompletedTasks && taskObj.isDone)}
   <div 
-    draggable="true"
-    on:dragstart|self={(e) => dragstart_handler(e, taskObj.id)}
-    style="
-    display: flex; 
-    align-items: center; 
-    opacity: {taskObj.isDone ? '0.6' : '1'};
-  ">
-    <!--  no more fixed width: width: calc(100% - 30px); 
-        min-width and height to make it easy to delete legacy tasks with no titles
-    -->
-    <div 
-      style="
-        min-width: 30px; 
-        max-width: 320px;
-        font-size: {depthAdjustedFontSize};
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        color: {taskObj.startDate && taskObj.startTime ? 'rgb(160, 160, 160)' : ''};
-        display: flex;
-        align-items: center;
-      "
-    >   
-      {#if willShowCheckbox}
-        <div style="margin-left: 2px;">
-          <ReusableCheckbox 
-            value={taskObj.isDone}
-            on:change={(e) => handleCheckboxChange(e)}
-          />
-        </div>
-      {/if}
+    style=" 
+      width: 100%;
+      font-weight: {depthAdjustedFontWeight};
+    "
+  >
+    <slot name="dropzone-above-task-name">
 
-      <div on:click={() => dispatch('task-click', { task: taskObj })} 
-        class="truncate-to-one-line" 
-        class:cross-out-todo={taskObj.isDone} 
-        style="margin-top: -1px; margin-left: 4px; cursor: pointer;"
-      >
-        {taskObj.name}
+    </slot>
+    <div 
+      draggable="true"
+      on:dragstart|self={(e) => dragstart_handler(e, taskObj.id)}
+      style="
+      display: flex; 
+      align-items: center; 
+      opacity: {taskObj.isDone ? '0.6' : '1'};
+    ">
+      <!--  no more fixed width: width: calc(100% - 30px); 
+          min-width and height to make it easy to delete legacy tasks with no titles
+      -->
+      <div 
+        style="
+          min-width: 30px; 
+          max-width: 320px;
+          font-size: {depthAdjustedFontSize};
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          color: {taskObj.startDate && taskObj.startTime ? 'rgb(160, 160, 160)' : ''};
+          display: flex;
+          align-items: center;
+        "
+      >   
+        {#if willShowCheckbox}
+          <div style="margin-left: 2px;">
+            <ReusableCheckbox 
+              value={taskObj.isDone}
+              on:change={(e) => handleCheckboxChange(e)}
+            />
+          </div>
+        {/if}
+
+        <div on:click={() => dispatch('task-click', { task: taskObj })} 
+          class="truncate-to-one-line" 
+          class:cross-out-todo={taskObj.isDone} 
+          style="margin-top: -1px; margin-left: 4px; cursor: pointer;"
+        >
+          {taskObj.name}
+        </div>
+      </div>
+
+      <div on:click={() => isTypingNewSubtask = true} class="new-task-icon" style="margin-bottom: 6px;">
+        +
       </div>
     </div>
 
-    <div on:click={() => isTypingNewSubtask = true} class="new-task-icon" style="margin-bottom: 6px;">
-      +
+    <!-- the 6px compensates for the fact there is only 1 dropzone for the first child but 2 dropzones (reorder + sub-reorder) for the 2nd child onwards -->
+    <div style="margin-left: 32px; padding-top: 6px;">
+      {#each taskObj.children as subtaskObj, i}
+        <RecursiveTaskElement 
+          taskObj={subtaskObj}
+          depth={depth+1}
+          {doNotShowScheduledTasks}
+          {doNotShowCompletedTasks}
+          {willShowCheckbox}
+          ancestorRoomIDs={[taskObj.id, ...ancestorRoomIDs]}
+          subtreeDeadlineInMsElapsed={updateSubtreeDeadlineInMsElapsed(taskObj, subtreeDeadlineInMsElapsed)}
+          on:task-click
+          on:subtask-create
+          on:task-checkbox-change
+        > 
+          <div slot="dropzone-above-task-name"> 
+            {#if taskObj.children.length > 0}
+              <ReusableHelperDropzone
+                ancestorRoomIDs={[taskObj.id, ...ancestorRoomIDs]}
+                roomsInThisLevel={taskObj.children}
+                idxInThisLevel={i}
+                parentID={taskObj.id}
+                parentObj={taskObj}
+                {colorForDebugging}
+              /> 
+            {/if}
+          </div>
+        </RecursiveTaskElement>
+      {/each}
+      
+      <ReusableHelperDropzone
+        ancestorRoomIDs={[taskObj.id, ...ancestorRoomIDs]}
+        roomsInThisLevel={taskObj.children}
+        idxInThisLevel={taskObj.children.length}
+        parentID={taskObj.id}
+        parentObj={taskObj}
+        {colorForDebugging}
+      /> 
+      
+      <!-- 
+        If this task level has a deadline, new sub-tasks should also be 
+        initialized with the same deadline
+      -->
+      {#if isTypingNewSubtask}
+        <UXFormField
+          fieldLabel="Task Name"
+          value={newSubtaskStringValue}
+          on:input={(e) => newSubtaskStringValue = e.detail.value}
+          on:focus-out={() => {
+            if (newSubtaskStringValue === '') {
+              isTypingNewSubtask = false
+            }
+          }}
+          on:task-entered={(e) => onEnter(e)}
+        />
+      {/if}
     </div>
   </div>
-
-  <!-- the 6px compensates for the fact there is only 1 dropzone for the first child but 2 dropzones (reorder + sub-reorder) for the 2nd child onwards -->
-  <div style="margin-left: 32px; padding-top: 6px;">
-    {#each taskObj.children as subtaskObj, i}
-      <RecursiveTaskElement 
-        taskObj={subtaskObj}
-        depth={depth+1}
-        {doNotShowScheduledTasks}
-        {doNotShowCompletedTasks}
-        {willShowCheckbox}
-        ancestorRoomIDs={[taskObj.id, ...ancestorRoomIDs]}
-        subtreeDeadlineInMsElapsed={updateSubtreeDeadlineInMsElapsed(taskObj, subtreeDeadlineInMsElapsed)}
-        on:task-click
-        on:subtask-create
-        on:task-checkbox-change
-      > 
-        <div slot="dropzone-above-task-name"> 
-          {#if taskObj.children.length > 0}
-            <ReusableHelperDropzone
-              ancestorRoomIDs={[taskObj.id, ...ancestorRoomIDs]}
-              roomsInThisLevel={taskObj.children}
-              idxInThisLevel={i}
-              parentID={taskObj.id}
-              parentObj={taskObj}
-              {colorForDebugging}
-            /> 
-          {/if}
-        </div>
-      </RecursiveTaskElement>
-    {/each}
-    
-    <ReusableHelperDropzone
-      ancestorRoomIDs={[taskObj.id, ...ancestorRoomIDs]}
-      roomsInThisLevel={taskObj.children}
-      idxInThisLevel={taskObj.children.length}
-      parentID={taskObj.id}
-      parentObj={taskObj}
-      {colorForDebugging}
-    /> 
-    
-    <!-- 
-      If this task level has a deadline, new sub-tasks should also be 
-      initialized with the same deadline
-    -->
-    {#if isTypingNewSubtask}
-      <input 
-        bind:this={NewSubtaskInput}
-        placeholder="Type sub-task" 
-        bind:value={newSubtaskStringValue}
-        on:keypress={(e) => handleKeypress(e)} 
-        style="width: 100%; margin-left: 5px; z-index: 1"
-      />
-    {/if}
-  </div>
-</div>
+{/if}
 
 <script>
+  import UXFormField from '$lib/UXFormField.svelte'
   import RecursiveTaskElement from '$lib/RecursiveTaskElement.svelte'
   import ReusableCheckbox from '$lib/ReusableCheckbox.svelte'
   import ReusableHelperDropzone from '$lib/ReusableHelperDropzone.svelte'
@@ -167,7 +169,6 @@
   export let colorForDebugging = getRandomColor()
   export let subtreeDeadlineInMsElapsed = Infinity
 
-  let NewSubtaskInput
   let newSubtaskStringValue = ''
   let isTypingNewSubtask = false
   let isTaskDueSoonOrOverdue = false
@@ -188,16 +189,6 @@
   
   // depthAdjustedFontSize = 1 * (0.6 ** (depth)
   $: depthAdjustedFontWeight = 400 - (depth * 0) + (200 * Math.max(1 - depth, 0))
-
-  $: {
-    if (isTypingNewSubtask) {
-      tick().then(() => {
-        if (NewSubtaskInput) {// quick-fix {
-          NewSubtaskInput.focus()
-        }
-      })
-    }
-  }
 
   // calculate if a task is 1 day before the deadline / overdue
   $: if (taskObj.deadlineDate && taskObj.deadlineTime) {
@@ -233,15 +224,13 @@
     whatIsBeingDraggedFullObj.set(taskObj)
   }
 
-  function handleKeypress (e) {
-    if (e.key === 'Enter') {
-      if (newSubtaskStringValue === '') {
-        isTypingNewSubtask = false
-      }
-      else {
-        createSubtask(newSubtaskStringValue)
-        newSubtaskStringValue = ''
-      } 
+  function onEnter (e) {
+    if (newSubtaskStringValue === '') {
+      isTypingNewSubtask = false
+    }
+    else {
+      createSubtask(newSubtaskStringValue)
+      newSubtaskStringValue = ''
     } 
   }
 

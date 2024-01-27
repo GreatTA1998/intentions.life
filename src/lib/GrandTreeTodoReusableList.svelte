@@ -80,12 +80,17 @@
       {/if}
 
       {#if isTypingNewRootTask}
-        <input 
-          bind:this={NewRootTaskInput}
-          bind:value={newRootTaskStringValue} 
-          on:keydown={(e) => handleKeyDown(e)}
-          placeholder="Type task here..."
-        >
+        <UXFormField
+          fieldLabel="Task Name"
+          value={newRootTaskStringValue}
+          on:input={(e) => newRootTaskStringValue = e.detail.value}
+          on:focus-out={() => {
+            if (newRootTaskStringValue === '') {
+              isTypingNewRootTask = false
+            }
+          }}
+          on:task-entered={(e) => handleKeyDown(e)}
+        />
       {/if}
     </div>
   </div>
@@ -95,24 +100,22 @@
   import { 
     getDateInDDMMYYYY, 
     getRandomID,
-    sortByUnscheduledThenByOrderValue
+    sortByUnscheduledThenByOrderValue,
+    convertDDMMYYYYToDateClassObject
   } from '/src/helpers.js'
+  import UXFormField from '$lib/UXFormField.svelte'
+  import ReusableHelperDropzone from '$lib/ReusableHelperDropzone.svelte'
   import RecursiveTaskElement from '$lib/RecursiveTaskElement.svelte'
   import { createEventDispatcher, tick } from 'svelte'
-  import ReusableHelperDropzone from '$lib/ReusableHelperDropzone.svelte'
-  import { convertDDMMYYYYToDateClassObject } from '/src/helpers';
 
   export let dueInHowManyDays = null // AF(null) means it's a life todo, otherwise it should be a number
   export let allTasksDue = []
   export let listTitle
 
   let defaultDeadline
-
   let tasksToDisplay = []
-
   let isTypingNewRootTask = false
   let newRootTaskStringValue = ''
-  let NewRootTaskInput = ''
   const dispatch = createEventDispatcher()
 
   // COMPUTE DEFAULT DEADLINE 
@@ -129,24 +132,12 @@
     computeTasksToDisplay()
   }
 
-  $: {
-    if (isTypingNewRootTask) {
-      tick().then(() => {
-        if (NewRootTaskInput) {// quick-fix {
-          NewRootTaskInput.focus()
-        }
-      })
-    }
-  }
-
   function computeTasksToDisplay () {
     const temp = sortByUnscheduledThenByOrderValue(allTasksDue)
     tasksToDisplay = temp.filter(task => !task.isDone)
   }
 
   function handleKeyDown (e) {
-    if (e.key !== 'Enter') return
-
     if (newRootTaskStringValue === '') {
       isTypingNewRootTask = false
       newRootTaskStringValue = ''

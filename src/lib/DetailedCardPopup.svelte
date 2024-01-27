@@ -22,18 +22,18 @@
       style="display: flex; align-items: center; justify-content: space-between; margin-top: 24px; font-size: 1.2em; "
     >
       <div style="display: flex; align-items: center;">
-        <div style="width: 134px;">
+        <div style="max-width: 240px;">
           <UXFormField
-            fieldLabel="Scheduled for"
+            fieldLabel="Scheduled for (MM/DD hh:mm)"
             value={taskObject.startDate + ' ' + taskObject.startTime}
             on:input={(e) => handleTaskStartInput(e)}
             placeholder="MM/DD hh:mm"
           />
         </div>
 
-        <div style="margin-left: 24px; margin-right: 6px; width: 80px;">
+        <div style="margin-left: 24px; margin-right: 6px; max-width: 140px;">
           <UXFormField
-            fieldLabel="Minutes"
+            fieldLabel="Minutes duration"
             value={taskObject.duration}
             on:input={(e) => debouncedSaveDuration(e)}
           >
@@ -64,12 +64,12 @@
 
       <!-- 178px is the min. width that fully contains the placeholder text -->
       <div class:half-invisible={!hasDeadline(taskObject)} 
-        style="font-size: 1.2em; display: flex; align-items: center; width: 178px;"
+        style="font-size: 1.2em; display: flex; align-items: center; max-width: 280px;"
       >
         <UXFormField
-          fieldLabel="Deadline"
+          fieldLabel="Deadline (DD/MM/YYYY hh:mm)"
           value={currentDeadlineValue}
-          placeholder="dd/mm/yyyy hh:mm"
+          placeholder="31/12/2024 16:30"
           on:input={(e) => handleDeadlineInput(e)}
         >
           <span slot="icon" class="material-symbols-outlined" style="margin-right: 4px; font-size: 18px; color: {hasDeadline(taskObject) ? 'red' : ''};">
@@ -232,7 +232,7 @@ function saveTaskEnd () {
 function saveDeadline (DDMMYYYY, HHMM) {
   const d1 = convertDDMMYYYYToDateClassObject(DDMMYYYY, HHMM)
   if (d1.getTime() > taskObject.subtreeDeadlineInMsElapsed) {
-    alert("Invalid deadline: a subtask's can't be due later than the overall task")
+    alert(`Invalid deadline: a subtask's can't be due later than the overall task, which is due at ${new Date(taskObject.subtreeDeadlineInMsElapsed)}`)
     return
   }
 

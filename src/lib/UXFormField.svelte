@@ -9,9 +9,7 @@
   class:blue-border={isFocused}
 >
   <div class="ux-field-label">
-    <slot name="icon">
-
-    </slot>
+    <slot name="icon"> </slot>
     {fieldLabel}
   </div>
 
@@ -89,5 +87,15 @@
   /* remove default input styling */
   input {
     all: unset;
+
+    /* 
+      Prevents extremely strange bug where <input> is rendered WAY BELOW where it should be, 
+      unexplainable by any hidden margins, inline styles, etc.
+
+      vertical-align: baseline is the default value, setting it to `top` works around the bug,
+      but I don't fully understand why.
+      https://bard.google.com/chat/1219adb246100687 
+    */
+    vertical-align: top;
   }
 </style>

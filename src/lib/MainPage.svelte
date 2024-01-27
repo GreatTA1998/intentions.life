@@ -196,7 +196,7 @@
       <!-- END OF WEEK MODE SECTION -->
       
       {:else if currentMode === 'Year'}
-          <YearView/>
+        <YearView on:task-click={(e) => openDetailedCard(e.detail)}/>
       {/if}
   </div>
 </NavbarAndContentWrapper>
@@ -212,13 +212,15 @@
     checkTaskObjSchema,
     convertToISO8061
   } from '/src/helpers.js'
+  import { computeYearViewTimelines } from '/src/helpers/dataStructures.js'
   import { 
     mostRecentlyCompletedTaskID, 
     user, 
     showSnackbar, 
     allTasksDueToday,
     allTasksDueThisWeek,
-    allTasksDueThisMonth
+    allTasksDueThisMonth,
+    longHorizonTasks
   } from '/src/store.js'
   import JournalPopup from '$lib/JournalPopup.svelte'
   import FinancePopup from '$lib/FinancePopup.svelte'
@@ -293,11 +295,17 @@
   }
 
   function computeDataStructuresFromAllTasks (allTasks) {
-    collectFutureScheduledTasksToArray() // NOTE: this will not include REPEATING tasks
+    // future overview
+    collectFutureScheduledTasksToArray()
+
+    // grand tree todo
     const todoMemoryTrees = computeTodoMemoryTrees(allTasks)
     allTasksDueToday.set(todoMemoryTrees[0])
     allTasksDueThisWeek.set(todoMemoryTrees[1])
     allTasksDueThisMonth.set(todoMemoryTrees[2])
+
+    // year timeline view
+    longHorizonTasks.set(computeYearViewTimelines(allTasks))
   }
 
   onMount(async () => {
