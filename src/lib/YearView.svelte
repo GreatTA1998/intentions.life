@@ -26,8 +26,8 @@
   </div>
 
   <div style="margin-left: 24px; margin-top: 6px; font-weight: 400; color: rgb(80, 80, 80)">
-    All tasks with deadlined subtasks will be shown below.
-    Drag-and-drop is not yet supported, but you can change task deadlines by clicking its name.
+    A deadline-oriented view for any tasks with 
+    deadlined subtasks. Click any task to update its deadline.
   </div>
 
   <div style="display: flex; flex-wrap: no-wrap; overflow-x: auto; padding-left: 48px; padding-top: 36px; height: 600%">
@@ -56,7 +56,8 @@
 
             <div 
               on:click={() => dispatch('task-click', { task: child })}
-              style="font-size: 12px; position: absolute; top: {computeOffset(child)}px; left: 10px; cursor: pointer;"
+              class="truncate-to-one-line"
+              style="width: 100%; font-size: 12px; position: absolute; top: {computeOffset(child)}px; left: 10px; cursor: pointer;"
             >
               {child.name}
             </div>
@@ -109,7 +110,7 @@
     const d2 = convertDDMMYYYYToDateClassObject(deadlineDate, deadlineTime)
     const dayDiff = computeDayDifference(d1, d2)
 
-    const pixelsPerDay = 6
+    const pixelsPerDay = 2
     const offset = dayDiff * pixelsPerDay
 
     return offset

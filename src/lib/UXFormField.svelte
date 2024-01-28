@@ -13,23 +13,27 @@
     {fieldLabel}
   </div>
 
-  <input 
-    bind:this={InputElem} 
-    value={value}
-    on:input={(e) => dispatch('input', { value: e.target.value })}
-    on:keyup={(e) => {
-      if (e.key === 'Enter') {
-        dispatch('task-entered', { taskName: value })
-      }
-    }}
-    on:focusin={() => isFocused = true}
-    on:focusout={() => {
-      isFocused = false;
-      dispatch('focus-out')
-    }}
-    class="ux-input-text" 
-    placeholder={placeholder}
-  >
+  <div style="display: flex; align-items: center;">
+    <input 
+      bind:this={InputElem} 
+      value={value}
+      on:input={(e) => dispatch('input', { value: e.target.value })}
+      on:keyup={(e) => {
+        if (e.key === 'Enter') {
+          dispatch('task-entered', { taskName: value })
+        }
+      }}
+      on:focusin={() => isFocused = true}
+      on:focusout={() => {
+        isFocused = false;
+        dispatch('focus-out')
+      }}
+      class="ux-input-text" 
+      placeholder={placeholder}
+    >
+
+    <slot name="append"> </slot>
+  </div>
 </div>
 
 <script>

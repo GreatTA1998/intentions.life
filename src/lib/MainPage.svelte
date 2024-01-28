@@ -211,12 +211,11 @@
     getDateOfToday, 
     getDateInDDMMYYYY, 
     generateRepeatedTasks, 
-    reconstructTreeInMemory,
     computeTodoMemoryTrees,
     checkTaskObjSchema,
     convertToISO8061
   } from '/src/helpers.js'
-  import { computeYearViewTimelines } from '/src/helpers/dataStructures.js'
+  import { computeYearViewTimelines, reconstructTreeInMemory } from '/src/helpers/dataStructures.js'
   import { 
     mostRecentlyCompletedTaskID, 
     user, 

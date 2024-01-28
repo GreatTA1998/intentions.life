@@ -2,12 +2,12 @@ import { getFirestoreCollection, updateFirestoreDoc } from '/src/crud.js'
 import { 
   createIndividualFirestoreDocForEachTaskInAllTasks, 
   applyFuncToEveryTreeNode, 
-  reconstructTreeInMemory,
   convertDDMMYYYYToDateClassObject,
   getDateInDDMMYYYY,
   getTimeInHHMM,
   helperFunction
 } from '/src/helpers.js'
+import { reconstructTreeInMemory} from '/src/helpers/dataStructures.js'
 
 // note: legacy tasks that aren't garbage collected can cause problems
 // e.g. deadlineDate === 'NaN NaN NaN'
