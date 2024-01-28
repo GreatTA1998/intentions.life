@@ -242,9 +242,10 @@
       name,
       duration: 1
     }
-    
-    // default deadline is `subtreeDeadline`
-    const d = new Date(taskObj.subtreeDeadlineInMsElapsed)
+
+    // we're creating a sub-task, so the sub-task's deadline
+    // is bounded by this parent task's deadline
+    const d = convertDDMMYYYYToDateClassObject(taskObj.deadlineDate, taskObj.deadlineTime)
     subtaskObj.deadlineDate = getDateInDDMMYYYY(d)
     subtaskObj.deadlineTime = getTimeInHHMM({ dateClassObj: d })
 
