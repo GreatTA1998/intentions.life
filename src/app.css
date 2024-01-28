@@ -22,6 +22,11 @@
   font-family: 'Inter', sans-serif;
 }
 
+.simple-flex {
+  display: flex;
+  align-items: center;
+}
+
 .new-task-icon {  
   font-weight: 100;
   color: var(--task-action-subtle-color);

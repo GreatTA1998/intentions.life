@@ -18,45 +18,34 @@
 
     <!-- In future, display in readable month / day form -->
     <div
-      class:half-invisible={!isScheduled(taskObject)}
-      style="display: flex; align-items: center; justify-content: space-between; margin-top: 24px; font-size: 1.2em; "
+      style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; row-gap: 24px; margin-top: 24px; font-size: 1.2em;"
     >
-      <div style="display: flex; align-items: center;">
-        <div style="width: 134px;">
+      <div style="display: flex; align-items: center;" class:half-invisible={!isScheduled(taskObject)}>
+        <div style="max-width: 230px;">
           <UXFormField
-            fieldLabel="Scheduled for"
+            fieldLabel="Scheduled on (MM/DD hh:mm)"
             value={taskObject.startDate + ' ' + taskObject.startTime}
             on:input={(e) => handleTaskStartInput(e)}
-            placeholder="MM/DD hh:mm"
+            placeholder="MM/dd hh:mm"
           />
         </div>
 
-        <div style="margin-left: 24px; margin-right: 6px; width: 80px;">
+        <div style="margin-left: 6px; margin-right: 6px; max-width: 84px;">
           <UXFormField
-            fieldLabel="Minutes"
+            fieldLabel="For"
             value={taskObject.duration}
             on:input={(e) => debouncedSaveDuration(e)}
           >
-
+            <div slot="append" style="font-weight: 300; color: rgb(60, 60, 60); font-size: 12px;">
+              mins.
+            </div>
           </UXFormField>
         </div>
-
-        <!-- <div style="width: 134px;">
-          <UXFormField
-            fieldLabel="End"
-            value={taskObject.startDate + ' ' + taskObject.startTime}
-            on:input={(e) => handleTaskEndInput(e)}
-          />
-        </div> -->
       </div>
 
       {#if isEditingTaskStart}
         <ReusableRoundButton on:click={() => saveTaskStart(newStartMMDD, newStartHHMM)} backgroundColor="rgb(0, 89, 125)" textColor="white">Save changes</ReusableRoundButton>
       {/if}
-
-      <!-- {#if isEditingTaskEnd}
-        <ReusableRoundButton on:click={() => saveTaskEnd(newEndMMDD, newEndHHMM)}>Update task end</ReusableRoundButton>
-      {/if} -->
 
       {#if isEditingDeadline}
         <ReusableRoundButton on:click={() => saveDeadline(newDeadlineDate, newDeadlineTime)} backgroundColor="rgb(0, 89, 125)" textColor="white">Save changes</ReusableRoundButton>
@@ -64,12 +53,12 @@
 
       <!-- 178px is the min. width that fully contains the placeholder text -->
       <div class:half-invisible={!hasDeadline(taskObject)} 
-        style="font-size: 1.2em; display: flex; align-items: center; width: 178px;"
+        style="font-size: 1.2em; display: flex; align-items: center; max-width: 230px;"
       >
         <UXFormField
-          fieldLabel="Deadline"
+          fieldLabel="Due (dd/MM/YYYY hh:mm)"
           value={currentDeadlineValue}
-          placeholder="dd/mm/yyyy hh:mm"
+          placeholder="31/12/2024 16:30"
           on:input={(e) => handleDeadlineInput(e)}
         >
           <span slot="icon" class="material-symbols-outlined" style="margin-right: 4px; font-size: 18px; color: {hasDeadline(taskObject) ? 'red' : ''};">
@@ -198,6 +187,8 @@ function handleCheckboxChange (e) {
     id: taskObject.id,
     isDone: e.target.checked
   })
+
+  dispatch('card-close')
 }
 
 const debouncedSaveTitle = _.debounce(saveTitle, 800)
@@ -232,7 +223,7 @@ function saveTaskEnd () {
 function saveDeadline (DDMMYYYY, HHMM) {
   const d1 = convertDDMMYYYYToDateClassObject(DDMMYYYY, HHMM)
   if (d1.getTime() > taskObject.subtreeDeadlineInMsElapsed) {
-    alert("Invalid deadline: a subtask's can't be due later than the overall task")
+    alert(`Invalid deadline: a subtask's can't be due later than the overall task, which is due at ${new Date(taskObject.subtreeDeadlineInMsElapsed)}`)
     return
   }
 
@@ -296,10 +287,11 @@ function saveTitle (newVal) {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 58%;
     overflow-y: auto;
     z-index: 4;
-    min-width: 360px;
+    min-width: 400px;
+    width: 80%;
+    max-width: 800px;
     
     height: fit-content;
 

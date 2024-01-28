@@ -2,7 +2,7 @@
   <div class="snack-wrap">
     <div class="snackbar" style="display: flex; align-items: center;">
       <slot>
-        <p>Task will be hidden from to-do because it's completed</p>
+        <p>Root task completed.</p>
 
         <div style="margin-right: 2px; margin-left: auto;">
 
@@ -51,7 +51,7 @@ a {
   text-align: center;
   text-decoration: none;
   transition: all 0.2s ease-out;
-   border: 1px solid #000;
+  border: 1px solid #000;
   font-size: 1rem;
   height: 5px;
 }

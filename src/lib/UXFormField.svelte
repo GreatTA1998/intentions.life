@@ -9,29 +9,31 @@
   class:blue-border={isFocused}
 >
   <div class="ux-field-label">
-    <slot name="icon">
-
-    </slot>
+    <slot name="icon"> </slot>
     {fieldLabel}
   </div>
 
-  <input 
-    bind:this={InputElem} 
-    value={value}
-    on:input={(e) => dispatch('input', { value: e.target.value })}
-    on:keyup={(e) => {
-      if (e.key === 'Enter') {
-        dispatch('task-entered', { taskName: value })
-      }
-    }}
-    on:focusin={() => isFocused = true}
-    on:focusout={() => {
-      isFocused = false;
-      dispatch('focus-out')
-    }}
-    class="ux-input-text" 
-    placeholder={placeholder}
-  >
+  <div style="display: flex; align-items: center;">
+    <input 
+      bind:this={InputElem} 
+      value={value}
+      on:input={(e) => dispatch('input', { value: e.target.value })}
+      on:keyup={(e) => {
+        if (e.key === 'Enter') {
+          dispatch('task-entered', { taskName: value })
+        }
+      }}
+      on:focusin={() => isFocused = true}
+      on:focusout={() => {
+        isFocused = false;
+        dispatch('focus-out')
+      }}
+      class="ux-input-text" 
+      placeholder={placeholder}
+    >
+
+    <slot name="append"> </slot>
+  </div>
 </div>
 
 <script>
@@ -89,5 +91,15 @@
   /* remove default input styling */
   input {
     all: unset;
+
+    /* 
+      Prevents extremely strange bug where <input> is rendered WAY BELOW where it should be, 
+      unexplainable by any hidden margins, inline styles, etc.
+
+      vertical-align: baseline is the default value, setting it to `top` works around the bug,
+      but I don't fully understand why.
+      https://bard.google.com/chat/1219adb246100687 
+    */
+    vertical-align: top;
   }
 </style>
