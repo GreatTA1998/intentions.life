@@ -148,8 +148,8 @@
     getRandomID, 
     getRandomColor,
     getTimeInHHMM,
-    updateSubtreeDeadlineInMsElapsed
   } from '/src/helpers'
+  import { updateSubtreeDeadlineInMsElapsed } from '/src/helpers/dataStructures.js'
   import { createEventDispatcher, tick } from 'svelte'
   import { 
     mostRecentlyCompletedTaskID, 
