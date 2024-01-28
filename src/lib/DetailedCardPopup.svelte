@@ -25,6 +25,7 @@
           <UXFormField
             fieldLabel="Scheduled on (MM/DD hh:mm)"
             value={taskObject.startDate + ' ' + taskObject.startTime}
+            willAutofocus={false}
             on:input={(e) => handleTaskStartInput(e)}
             placeholder="MM/dd hh:mm"
           />
@@ -34,6 +35,7 @@
           <UXFormField
             fieldLabel="For"
             value={taskObject.duration}
+            willAutofocus={false}
             on:input={(e) => debouncedSaveDuration(e)}
           >
             <div slot="append" style="font-weight: 300; color: rgb(60, 60, 60); font-size: 12px;">
@@ -59,6 +61,7 @@
           fieldLabel="Due (dd/MM/YYYY hh:mm)"
           value={currentDeadlineValue}
           placeholder="31/12/2024 16:30"
+          willAutofocus={false}
           on:input={(e) => handleDeadlineInput(e)}
         >
           <span slot="icon" class="material-symbols-outlined" style="margin-right: 4px; font-size: 18px; color: {hasDeadline(taskObject) ? 'red' : ''};">
