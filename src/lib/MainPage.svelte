@@ -185,13 +185,13 @@
     
         <!-- 3rd flex child -->
         {#if currentMode === 'Week' && allTasks}
-          <div class="future-overview-parent" style="background-color: var(--future-overview-bg-color)">
+          <!-- <div class="future-overview-parent" style="background-color: var(--future-overview-bg-color)">
             <FutureOverview
               {futureScheduledTasks}
               on:task-duration-adjusted
               on:task-click={(e) => openDetailedCard(e.detail)}
             />
-          </div>
+          </div> -->
         {/if}
       <!-- END OF WEEK MODE SECTION -->
       

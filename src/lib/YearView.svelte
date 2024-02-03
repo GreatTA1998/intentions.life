@@ -1,6 +1,6 @@
 <div>
-  <div style="display: flex; align-items: center; margin-left: 24px; margin-top: 48px;">
-    <div style="min-width: 160px; font-weight: 600; font-size: 24px;">
+  <div style="display: flex; align-items: center; margin-left: 24px; margin-top: 16px;">
+    <div style="min-width: 160px; font-weight: 600; font-size: 20px;">
       Long-horizon tasks
     </div>
 
@@ -25,16 +25,15 @@
     {/if}
   </div>
 
-  <div style="margin-left: 24px; margin-top: 6px; font-weight: 400; color: rgb(80, 80, 80)">
-    A deadline-oriented view for any tasks with 
-    deadlined subtasks. Click any task to update its deadline.
+  <div style="margin-left: 24px; margin-top: 6px; font-weight: 400; color: rgb(80, 80, 80); font-size: 12px;">
+    A deadline-oriented view for deadlined task trees
   </div>
 
-  <div style="display: flex; flex-wrap: no-wrap; overflow-x: auto; padding-left: 48px; padding-top: 36px; height: 600%">
+  <div style="display: flex; flex-wrap: no-wrap; overflow-x: auto; padding-left: 24px; padding-top: 6px; height: fit-content;">
     {#each $longHorizonTasks as task}
-      <div style="min-width: 280px; position: relative; outline: 0px solid red; padding: 12px; margin-right: 48px; overflow-y: hidden; overflow-x: hidden; margin-bottom: 12px;">
+      <div style="width: 240px; position: relative; outline: 0px solid red; padding: 12px; overflow-y: hidden; overflow-x: hidden; margin-bottom: 12px;">
         <div class="simple-flex" style="margin-bottom: 6px;">
-          <div on:click={() => dispatch('task-click', { task })} style="cursor: pointer; font-weight: 600;">
+          <div on:click={() => dispatch('task-click', { task })} class="truncate-to-one-line" style="cursor: pointer; font-weight: 600;">
             {task.name}
           </div>
 
@@ -110,7 +109,7 @@
     const d2 = convertDDMMYYYYToDateClassObject(deadlineDate, deadlineTime)
     const dayDiff = computeDayDifference(d1, d2)
 
-    const pixelsPerDay = 2
+    const pixelsPerDay = 12
     const offset = dayDiff * pixelsPerDay
 
     return offset

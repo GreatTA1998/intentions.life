@@ -41,8 +41,8 @@
           {taskObj}
           depth={0}
           ancestorRoomIDs={['']}
-          doNotShowScheduledTasks={false}
-          doNotShowCompletedTasks={false}
+          doNotShowScheduledTasks={true}
+          doNotShowCompletedTasks={true}
           on:task-click
           on:task-checkbox-change
           on:task-node-update
