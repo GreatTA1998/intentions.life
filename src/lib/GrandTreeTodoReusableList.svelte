@@ -16,7 +16,7 @@
     <div>
       <div style="display: flex; align-items: center; margin-bottom: 12px;">
         <div style="height: 24px; align-items: center; display: flex;">
-          <div style="font-weight: 500; font-size: 18px;">
+          <div style="font-weight: 600; font-size: 18px; margin-left: 2px;">
             {listTitle} 
           </div> 
         </div>
@@ -36,7 +36,6 @@
 
     <div style="outline: 0px solid blue; margin-top: 12px;">
       {#each tasksToDisplay as taskObj, i}
-        <div style="margin-top: 16px;"></div>
         <RecursiveTaskElement 
           {taskObj}
           depth={0}
@@ -204,7 +203,10 @@
   .todo-list-container {
     width: 100%;
     background-color: var(--todo-list-bg-color);
-    padding: 16px;
+    padding-bottom: 16px;
+    padding-left: 2vw; 
+    padding-right: 2vw;
+    padding-top: var(--main-content-top-margin);
     font-size: 2em;
   }
 </style>

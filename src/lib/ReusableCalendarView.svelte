@@ -350,56 +350,56 @@
 </script>
 
 <style lang="scss">
-:root {
-  --calendar-day-section-width: 160px; 
-}
+  :root {
+    --calendar-day-section-width: max(10vw, 120px); 
+  }
 
-.current-time-indicator-container {
-  display: block; 
-  align-items: center;
-  position: absolute; 
-  width: var(--calendar-day-section-width);
-  padding-left: 6px;
-  padding-right: 6px;
-  pointer-events: none;
-}
+  .current-time-indicator-container {
+    display: block; 
+    align-items: center;
+    position: absolute; 
+    width: var(--calendar-day-section-width);
+    padding-left: 6px;
+    padding-right: 6px;
+    pointer-events: none;
+  }
 
-.autocomplete-option {
-  padding-top: 12px; padding-bottom: 12px; padding-left: 12px; padding-right: 12px; font-size: 16px; border-radius: 12px;
-}
+  .autocomplete-option {
+    padding-top: 12px; padding-bottom: 12px; padding-left: 12px; padding-right: 12px; font-size: 16px; border-radius: 12px;
+  }
 
-.option-highlight {
-  background-color: rgb(240, 240, 240);
-}
+  .option-highlight {
+    background-color: rgb(240, 240, 240);
+  }
 
-// background-color: rgb(240, 240, 240);
-.autocomplete-option:hover {
-  @extend .option-highlight
-}
+  // background-color: rgb(240, 240, 240);
+  .autocomplete-option:hover {
+    @extend .option-highlight
+  }
 
-/* DO NOT REMOVE, BREAKS DRAG-AND-DROP AND DURATION ADJUSTMENT */
-.scroll-container {
-  height: fit-content;
-  overflow-y: hidden;
-  overflow-x: hidden; 
-}
+  /* DO NOT REMOVE, BREAKS DRAG-AND-DROP AND DURATION ADJUSTMENT */
+  .scroll-container {
+    height: fit-content;
+    overflow-y: hidden;
+    overflow-x: hidden; 
+  }
 
-.highlighted-background {
-  background: rgb(82, 180, 251);
-}
+  .highlighted-background {
+    background: rgb(82, 180, 251);
+  }
 
-/* 
-  You need the relative scrolling container to be different from `calendar-day-container`,
-  so the absolute positionings will count from the right place (no need to fully understand yet) 
+  /* 
+    You need the relative scrolling container to be different from `calendar-day-container`,
+    so the absolute positionings will count from the right place (no need to fully understand yet) 
 
-  height: 200% is just so it's high enough to contain all the absolute elements
+    height: 200% is just so it's high enough to contain all the absolute elements
 
-  without border-box, the padding on top will add ON TOP OF 100% height  
-*/
+    without border-box, the padding on top will add ON TOP OF 100% height  
+  */
 
-.calendar-day-container {
-  width: 100%;
-}
+  .calendar-day-container {
+    width: 100%;
+  }
 
 
   .green-text {

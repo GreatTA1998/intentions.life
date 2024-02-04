@@ -77,7 +77,7 @@
     </div>
 
     <!-- the 6px compensates for the fact there is only 1 dropzone for the first child but 2 dropzones (reorder + sub-reorder) for the 2nd child onwards -->
-    <div style="margin-left: 32px; padding-top: 6px;">
+    <div style="margin-left: 24px; padding-top: 6px;">
       {#each taskObj.children as subtaskObj, i}
         <RecursiveTaskElement 
           taskObj={subtaskObj}

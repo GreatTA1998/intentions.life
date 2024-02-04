@@ -1,7 +1,7 @@
 <div style="position: relative; background-color: var(--calendar-bg-color);">
     <!-- Absolute element is not in the flex flow -->
     <!-- e.g. DEC 2023 -->
-    <div style="position: absolute; left: var(--calendar-section-left-spacing); top: {36 + 4}px; z-index: 1">
+    <div style="position: absolute; left: var(--calendar-section-left-spacing); top: var(--main-content-top-margin); z-index: 1">
       <div style="display: flex; font-size: 14px;">
         <div style="color: rgb(80, 80, 80); font-weight: 400;">
           {new Date().toLocaleString('en-US', { month: 'short'})}
@@ -43,8 +43,8 @@
     {#each dateClassObjects as dateClassObj, i}
       <!-- To vertically group the date label with the calendar component-->
       <!-- 4px for gap between each calendar so the calendar blocks don't visually merge -->
-      <div style="margin-left: 6px;">
-        <div class="sticky-day-of-week-abbreviation" style="padding-top: 36px; margin-bottom: {spacingBetweenLabelAndCal}px">
+      <div style="margin-left: 0.5vw;">
+        <div class="sticky-day-of-week-abbreviation" style="padding-top: var(--main-content-top-margin); margin-bottom: {spacingBetweenLabelAndCal}px">
           <div>
             <div 
               class="center-flex day-name-label" 
@@ -203,9 +203,6 @@
 </script>
 
 <style>
-  :root {
-    --calendar-section-left-spacing: 24px;
-  }
 
   .x-sticky {
     position: sticky;

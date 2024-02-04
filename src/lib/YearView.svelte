@@ -26,10 +26,16 @@
   </div>
 
   <div style="margin-left: 24px; margin-top: 6px; font-weight: 400; color: rgb(80, 80, 80); font-size: 12px;">
-    A deadline-oriented view for deadlined task trees
+    This page displays every task with deadlined subtasks, from longest horizon to shortest horizon. 
   </div>
 
   <div style="display: flex; flex-wrap: no-wrap; overflow-x: auto; padding-left: 24px; padding-top: 6px; height: fit-content;">
+    <FutureOverview
+      {futureScheduledTasks}
+      on:task-duration-adjusted
+      on:task-click
+    />
+
     {#each $longHorizonTasks as task}
       <div style="width: 240px; position: relative; outline: 0px solid red; padding: 12px; overflow-y: hidden; overflow-x: hidden; margin-bottom: 12px;">
         <div class="simple-flex" style="margin-bottom: 6px;">
@@ -70,14 +76,7 @@
     {/each}
   </div>
 </div>
-<!-- 
-<div>
-  Optional: aggregation for one-off deadlines with no tree branches
-</div>
 
-<div>
-  Optional: aggregation calendar
-</div> -->
 
 <script>
   import { longHorizonTasks } from '/src/store.js'
@@ -94,6 +93,9 @@
   } from '/src/helpers.js'
   import UXFormField from '$lib/UXFormField.svelte'
   import ReusableNewSubtaskComponent from '$lib/ReusableNewSubtaskComponent.svelte'
+  import FutureOverview from '$lib/FutureOverview.svelte'
+
+  export let futureScheduledTasks
 
   let isCreatingRootTask = false
   let newRootTaskName = ''

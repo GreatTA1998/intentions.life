@@ -54,13 +54,29 @@
 {/if}
 
 <NavbarAndContentWrapper>
-  <div slot="navbar" class="top-navbar" class:transparent-glow-navbar={currentMode === 'Day'} style="padding-left: 2vw; padding-right: 2vw;">
-    <PopupCustomerSupport let:setIsPopupOpen={setIsPopupOpen}>
-      <img on:click={() => handleLogoClick(setIsPopupOpen)}
+  <div slot="navbar" class="top-navbar" class:transparent-glow-navbar={currentMode === 'Day'} style="padding-left: 2vw; padding-right: 2vw">
+    <GrandTreeTodoPopupButton let:setIsPopupOpen={setIsPopupOpen}
+      on:new-root-task={(e) => createNewRootTask(e.detail)}
+      on:task-unscheduled={(e) => unscheduleTask(e)}
+      on:task-click={(e) => openDetailedCard(e.detail)}
+      on:subtask-create={(e) => createSubtask(e.detail)}
+      on:task-dragged={(e) => changeTaskDeadline(e.detail)}
+      on:task-checkbox-change={(e) => updateTaskNode({ id: e.detail.id, keyValueChanges: { isDone: e.detail.isDone }})}
+    > 
+      <img slot="button-slot" on:click={() => handleLogoClick(setIsPopupOpen)}
         src="trueoutput-square-nobg.png" 
         style="width: 38px; height: 38px; margin-right: 6px; margin-left: -4px; cursor: pointer;"
       >
-    </PopupCustomerSupport>
+
+      <!-- This uses the default slot -->
+      <GrandTreeTodo 
+        {allTasks}
+        on:new-root-task={(e) => createNewRootTask(e.detail)}
+        on:subtask-create={(e) => createSubtask(e.detail)}
+        on:task-click={(e) => openDetailedCard(e.detail)}
+        on:drop={(e) => transformToLifeTask(e)}
+      />
+    </GrandTreeTodoPopupButton>
 
     <div class="day-week-toggle-segment">
       <div on:click={() => currentMode = 'Day'}
@@ -87,28 +103,17 @@
       </div>
     </div>
 
-    <GrandTreeTodoPopupButton
-      on:new-root-task={(e) => createNewRootTask(e.detail)}
-      on:task-unscheduled={(e) => unscheduleTask(e)}
-      on:task-click={(e) => openDetailedCard(e.detail)}
-      on:subtask-create={(e) => createSubtask(e.detail)}
-      on:task-dragged={(e) => changeTaskDeadline(e.detail)}
-      on:task-checkbox-change={(e) => updateTaskNode({ id: e.detail.id, keyValueChanges: { isDone: e.detail.isDone }})}
-    > 
-      <GrandTreeTodo 
-        {allTasks}
-        on:new-root-task={(e) => createNewRootTask(e.detail)}
-        on:subtask-create={(e) => createSubtask(e.detail)}
-        on:task-click={(e) => openDetailedCard(e.detail)}
-        on:drop={(e) => transformToLifeTask(e)}
-      />
-    </GrandTreeTodoPopupButton>
-
     <span on:click={() => currentMode === 'Dashboard' ? currentMode = 'Week' : currentMode = 'Dashboard'}  class="material-symbols-outlined mika-hover" class:blue-icon={currentMode === 'Dashboard'} style="margin-left: 32px; margin-right: 32px; font-size: 32px; cursor: pointer;">
       signal_cellular_alt
     </span>
 
-    <span on:click={() => goto(`/${$user.uid}/camera`)} class="material-symbols-outlined mika-hover" class:blue-icon={currentMode === 'Dashboard'} style="font-size: 30px; cursor: pointer;">
+    <PopupCustomerSupport let:setIsPopupOpen={setIsPopupOpen}>
+      <span on:click={() => setIsPopupOpen({ newVal: true })}  class="material-symbols-outlined mika-hover" style="margin-right: 32px; font-size: 32px; cursor: pointer;">
+        support_agent
+      </span>
+    </PopupCustomerSupport>
+
+    <span on:click={() => goto(`/${$user.uid}/camera`)} class="material-symbols-outlined mika-hover" style="font-size: 30px; cursor: pointer;">
       photo_camera
     </span>
   </div>
@@ -182,21 +187,11 @@
             /> 
           {/if}
         </div>
-    
-        <!-- 3rd flex child -->
-        {#if currentMode === 'Week' && allTasks}
-          <!-- <div class="future-overview-parent" style="background-color: var(--future-overview-bg-color)">
-            <FutureOverview
-              {futureScheduledTasks}
-              on:task-duration-adjusted
-              on:task-click={(e) => openDetailedCard(e.detail)}
-            />
-          </div> -->
-        {/if}
       <!-- END OF WEEK MODE SECTION -->
       
       {:else if currentMode === 'Year'}
         <YearView 
+          {futureScheduledTasks}
           on:task-click={(e) => openDetailedCard(e.detail)}
           on:new-root-task={(e) => createNewRootTask(e.detail)}
           on:subtask-create={(e) => createSubtask(e.detail)}
@@ -230,7 +225,6 @@
   import BedtimePopupMaplestoryMusic from '$lib/BedtimePopupMaplestoryMusic.svelte'
   import TheSnackbar from '$lib/TheSnackbar.svelte'
   import CalendarThisWeek from '$lib/CalendarThisWeek.svelte'
-  import FutureOverview from '$lib/FutureOverview.svelte'
   import BackgroundRainScene from '$lib/BackgroundRainScene.svelte'
   import LifeDashboard from '$lib/LifeDashboard.svelte'
   import GrandTreeTodoPopupButton from '$lib/GrandTreeTodoPopupButton.svelte'
@@ -652,28 +646,21 @@
 
 <style>  
   .todo-container {
-    min-width: 400px; 
+    min-width: 360px; 
     background-color: var(--todo-list-bg-color);
-    padding-left: 1vw; 
-    padding-right: 1vw;
-    padding-top: 16px;
-    padding-top: calc(36px - 16px);
-    /* the week todo already has a 16px padding, so it just needs 20px to be 36px from the top
-     */
     font-size: 2em;
     overflow-y: auto;
   }
 
-  .future-overview-parent {
-    min-width: 332px;
-    padding-top: 36px; padding-left: 3vw; padding-right: 3vw;
+  @media (max-width: 1279.99px) {
+    .todo-container {
+      min-width: 280px;
+    }
   }
 
-  @media (max-width: 1279.99px) {
-    .future-overview-parent {
-      min-width: 120px;
-      padding-left: 12px; 
-      padding-right: 12px;
+  @media (max-width: 767.99px) {
+    .todo-container {
+      min-width: 200px;
     }
   }
 

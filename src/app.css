@@ -15,6 +15,10 @@
   --location-indicator-color: #b34f1b;
 
   --task-action-subtle-color: rgb(120, 120, 120);
+
+  --main-content-top-margin: min(4vh, 36px);
+
+  --calendar-section-left-spacing: 2vw;
 }
 
 * {

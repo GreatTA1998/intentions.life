@@ -1,6 +1,8 @@
-<span on:click={() => setIsPopupOpen({ newVal: true })} class="material-symbols-outlined my-float" style="font-size: 32px; color: rgb(20, 20, 20); cursor: pointer; margin-left: -4px;">
-  summarize
-</span>
+<slot name="button-slot" setIsPopupOpen={setIsPopupOpen}>
+  <span on:click={() => setIsPopupOpen({ newVal: true })} class="material-symbols-outlined my-float" style="font-size: 32px; color: rgb(20, 20, 20); cursor: pointer; margin-left: -4px;">
+    summarize
+  </span>
+</slot>
 
 {#if isPopupOpen}
   <div class="fullscreen-invisible-modular-popup-layer" on:click|self={handleClickOutside}>

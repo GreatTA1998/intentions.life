@@ -32,7 +32,7 @@ export function getTrueY (e) {
   return e.clientY + ScrollContainer.scrollTop - ScrollContainer.getBoundingClientRect().top - ScrollContainer.style.paddingTop
 }
 
-export const MIKA_PIXELS_PER_HOUR = 100
+export const MIKA_PIXELS_PER_HOUR = 80
 export const MIKA_PIXELS_PER_MINUTE = MIKA_PIXELS_PER_HOUR / 60
 
 export const PIXELS_PER_HOUR = 600

@@ -1,5 +1,5 @@
 <GrandTreeTodoReusableList
-  listTitle="THIS WEEK"
+  listTitle="TO-DO"
   allTasksDue={$allTasksDueThisWeek}
   dueInHowManyDays={7}
   style="background-color: var(--todo-list-bg-color); border-radius: 16px; outline: 0px solid red;"
@@ -11,7 +11,7 @@
   on:task-checkbox-change
 > 
   <div slot="below-list-title">
-    <GrandTreeTodoReusableList
+    <!-- <GrandTreeTodoReusableList
       listTitle="TODAY" 
       allTasksDue={$allTasksDueToday}
       dueInHowManyDays={1}
@@ -22,7 +22,7 @@
       on:task-click
       on:task-dragged
       on:task-checkbox-change
-    />  
+    />   -->
   </div>
 </GrandTreeTodoReusableList>
 
