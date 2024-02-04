@@ -8,7 +8,7 @@
       display: flex; 
       align-items: center;
     ">
-      <div style="font-weight: 500; color: rgb(10, 10, 10)">
+      <div style="font-weight: 600; font-size: 20px; color: rgb(10, 10, 10)">
         UPCOMING SCHEDULE
       </div>
     </div>
@@ -129,8 +129,10 @@ const minimumContainerHeight = 20
   }
 
   .future-overview-parent {
-    min-width: 332px;
-    padding-top: 36px; padding-left: 3vw; padding-right: 3vw;
+    width: 332px;
+    padding-top: 3vh; 
+    padding-left: 1.5vw; 
+    padding-right: 1.5vw;
   }
 
   @media (max-width: 1279.99px) {
