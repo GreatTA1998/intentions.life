@@ -13,8 +13,9 @@ export function checkTaskObjSchema (task, userDoc) {
 // how far, INCLUDING SCROLL, the actual position on the calendar is
 // // containerDistanceFromTopOfPage should be fixed, and not be affected by scrolling
 // so it's the e.clientY + initialOffset + scrollOffset 
-
 // e.clientY := coordinates relative to VIEWPORT, so doesn't matter if root page is scrolled
+
+
 export function round (value, precision) {
   var multiplier = Math.pow(10, precision || 0);
   return Math.round(value * multiplier) / multiplier;
@@ -187,7 +188,7 @@ export function getRandomID () {
 export function computeDayDifference (dateClassObject1, dateClassObject2) {
   const msPerDay = 1000 * 60 * 60 * 24
   const msDiff = computeMillisecsDifference(dateClassObject1, dateClassObject2)
-  return Math.floor(msDiff / msPerDay)
+  return msDiff / msPerDay
 }
 
 // return d2 - d1
@@ -434,11 +435,16 @@ export function computeTodoMemoryTrees (allTasks) {
       }
     }
     else {
+      // set d1 to 00:00 time https://stackoverflow.com/a/3894087
+      const d1 = new Date() 
+      d1.setHours(0, 0, 0, 0)
+
       const dueInHowManyDays = computeDayDifference(
-        new Date(),
+        d1,
         convertDDMMYYYYToDateClassObject(node.deadlineDate)
       )
-      if (dueInHowManyDays <= 1 && dueInHowManyDays >= -Infinity) { // quickfix for now
+
+      if (dueInHowManyDays <= 1) { 
         if (parentCategory === 'DAY' && parentObjReference !== null) {
           parentObjReference.children.push(shallowCopy)
         }
@@ -448,7 +454,7 @@ export function computeTodoMemoryTrees (allTasks) {
           helper({ node: child, parentCategory: 'DAY', parentObjReference: shallowCopy})
         }
       } 
-      else if (dueInHowManyDays <= 7 && dueInHowManyDays >= 0) {
+      else if (dueInHowManyDays <= 7) {
         if (parentCategory === 'WEEK' && parentObjReference !== null) {
           parentObjReference.children.push(shallowCopy)
         }
@@ -460,7 +466,7 @@ export function computeTodoMemoryTrees (allTasks) {
           helper({ node: child, parentCategory: 'WEEK', parentObjReference: shallowCopy})
         }
       }
-      else if (dueInHowManyDays <= 31 && dueInHowManyDays >= 0) {
+      else if (dueInHowManyDays <= 31) {
         if (parentCategory === 'MONTH' && parentObjReference !== null) {
           parentObjReference.children.push(shallowCopy)
         } 
@@ -470,7 +476,7 @@ export function computeTodoMemoryTrees (allTasks) {
           helper({ node: child, parentCategory: 'MONTH', parentObjReference: shallowCopy})
         }
       }
-      else if (dueInHowManyDays <= 365 && dueInHowManyDays >= 0) {
+      else {
         if (parentCategory === 'YEAR' && parentObjReference !== null) {
           parentObjReference.children.push(shallowCopy)
         }
@@ -482,7 +488,6 @@ export function computeTodoMemoryTrees (allTasks) {
       } 
     }
   }
-
 
   // console.log('# of recursion should be at most the total number of tasks', i)
   return [allTasksDueToday, allTasksDueThisWeek, allTasksDueThisMonth]

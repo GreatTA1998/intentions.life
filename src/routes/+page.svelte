@@ -41,7 +41,6 @@
               <LoginGoogle/>
             </div>
           </div>
-
     
           <div style="display: flex; justify-content: center; margin-top: 48px;">
             <div class="demo-video-container">
@@ -51,16 +50,6 @@
         </div>
       </div>
     </NavbarAndContentWrapper>
-    
-    
-
-    
-      <!-- <div style="display: flex; align-items: center; margin-left: 60px; margin-right: 60px;">
-        {#if isSigningIn}
-          <PhoneLogin canTakeInternationalNumbers/>  
-        {/if}
-      </div> -->
-  <!-- </div> -->
 {/if}
 
 <script>
@@ -103,101 +92,101 @@
     border-bottom: none;
   }
 
-.highlighted-words {
-  font-weight: 600; display: inline;
-}
+  .highlighted-words {
+    font-weight: 600; display: inline;
+  }
 
-#background-image-holder {
-  background-repeat: no-repeat;
-  background-size: 100% 100%;
-  background-color: rgb(235, 235, 235)
-  /* background-image: linear-gradient(rgba(255, 255, 255, 0.91), rgba(255, 255, 255, 0.5)), 
-    url('https://i.imgur.com/ShnqIpJ.jpeg'); */
+  #background-image-holder {
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    background-color: rgb(235, 235, 235)
+    /* background-image: linear-gradient(rgba(255, 255, 255, 0.91), rgba(255, 255, 255, 0.5)), 
+      url('https://i.imgur.com/ShnqIpJ.jpeg'); */
 
-  /* background-image: url('maplestory-orange.jpg'); */
-  /* background-image: url('https://i.imgur.com/ShnqIpJ.jpeg'); */
-}
+    /* background-image: url('maplestory-orange.jpg'); */
+    /* background-image: url('https://i.imgur.com/ShnqIpJ.jpeg'); */
+  }
 
-a {
-  flex: 1;
-  background-color: #333;
-  color: #fff;
-  border: 1px solid;
-  padding: 0.5rem;
-  text-align: center;
-  text-decoration: none;
-  transition: all 0.5s ease-out;
-}
+  a {
+    flex: 1;
+    background-color: #333;
+    color: #fff;
+    border: 1px solid;
+    padding: 0.5rem;
+    text-align: center;
+    text-decoration: none;
+    transition: all 0.5s ease-out;
+  }
 
-a:hover,
-a:focus {
-  background-color: #fff;
-  color: #333;
-}
+  a:hover,
+  a:focus {
+    background-color: #fff;
+    color: #333;
+  }
 
-.secondary-description {
-  font-weight: 500; display: inline; color: rgb(100, 100, 100);
-}
-
-.hero-title {
-  color: var(--base-color); 
-  font-size: 4rem; 
-  font-weight: 600;
-}
-
-.demo-video-container {
-  height: 80vh; width: 90vw
-}
-
-// note there will be a 1px boundary condition that causes an error, however, 
-// Kevin Powell's inequality syntax doesn't work for now https://youtube.com/shorts/mrzA2B5gUmI?si=J4yAzq1EQO-BwlN9
-
-
-// less than or equal to 768px
-@media (max-width: 1279.99px) {
   .secondary-description {
-    width: 90vw;
+    font-weight: 500; display: inline; color: rgb(100, 100, 100);
   }
 
   .hero-title {
-    font-size: 7vw;
-  }
-
-  .action-buttons {
-    margin-top: 24px;
-  }
-}
-
-@media (max-width: 767.99px) {
-  .hero-title {
-    margin-top: 12px;
-    font-size: 10vw;
+    color: var(--base-color); 
+    font-size: 4rem; 
+    font-weight: 600;
   }
 
   .demo-video-container {
-    width: 100vw; 
-    height: calc(100vw * 3/4);
-    margin-left: -4%; 
-    margin-right: -4%;
-  }
-}
-
-
-// greater than or equal to 768px;
-@media (min-width: 1280px) {
-  .hero-title {
-    margin-left: -6px;
-    font-size: 80px;
+    height: 80vh; width: 90vw
   }
 
-  .secondary-description {
-    width: 54vw; 
-    font-size: 20px;
+  // note there will be a 1px boundary condition that causes an error, however, 
+  // Kevin Powell's inequality syntax doesn't work for now https://youtube.com/shorts/mrzA2B5gUmI?si=J4yAzq1EQO-BwlN9
+
+
+  // less than or equal to 768px
+  @media (max-width: 1279.99px) {
+    .secondary-description {
+      width: 90vw;
+    }
+
+    .hero-title {
+      font-size: 7vw;
+    }
+
+    .action-buttons {
+      margin-top: 24px;
+    }
   }
 
-  .action-buttons {
-    width: 30vw; 
+  @media (max-width: 767.99px) {
+    .hero-title {
+      margin-top: 12px;
+      font-size: 10vw;
+    }
+
+    .demo-video-container {
+      width: 100vw; 
+      height: calc(100vw * 3/4);
+      margin-left: -4%; 
+      margin-right: -4%;
+    }
   }
-}
+
+
+  // greater than or equal to 768px;
+  @media (min-width: 1280px) {
+    .hero-title {
+      margin-left: -6px;
+      font-size: 80px;
+    }
+
+    .secondary-description {
+      width: 54vw; 
+      font-size: 20px;
+    }
+
+    .action-buttons {
+      width: 30vw; 
+    }
+  }
 
 </style>
