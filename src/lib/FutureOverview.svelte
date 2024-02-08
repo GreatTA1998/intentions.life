@@ -22,8 +22,8 @@
           </div>
 
           {#each datesToTasks[date] as task}
+            <!-- on:click={() => dispatch('task-click', { task })}  -->
             <div
-              on:click={() => dispatch('task-click', { task })} 
               style="display: flex; align-items: center; flex-wrap: nowrap; padding: 2px;"
             >
               <div 

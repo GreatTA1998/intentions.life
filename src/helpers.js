@@ -412,6 +412,9 @@ export function sortByOrderValue(array) {
   return array;
 }
 
+// TO-DO: 
+//   - Introduce a "weekTodoDisjointTree" and "weekTodoInclusiveTree" for the separate todo lists
+
 export function computeTodoMemoryTrees (allTasks) {
   const allTasksDueToday = []
   const allTasksDueThisWeek = []
@@ -419,20 +422,23 @@ export function computeTodoMemoryTrees (allTasks) {
   const allTasksDueThisYear = []
 
   for (const parentlessTask of allTasks) {
-    helper({ node: parentlessTask })
+    helper({ node: parentlessTask, rootAncestor: parentlessTask })
   }
 
   // use VS code's collpase feature
   // this is so the function can access the arrays we define above
-  function helper ({ node, parentCategory = '', parentObjReference = null }) {
+  function helper ({ node, parentCategory = '', parentObjReference = null, rootAncestor }) {
     const shallowCopy = {...node}
     shallowCopy.children = []
+    shallowCopy.rootAncestor = rootAncestor
+    
     if (!node.deadlineDate) {
       // continue scanning for a todo's top-level task
       for (const child of node.children) {
-        helper({ node: child })
+        helper({ node: child, rootAncestor }) // NOTE: the `rootAncestor` is not based on deadlines
       }
     }
+
     else {
       const dueInHowManyDays = computeDayDifference(
         new Date(),
@@ -442,10 +448,10 @@ export function computeTodoMemoryTrees (allTasks) {
         if (parentCategory === 'DAY' && parentObjReference !== null) {
           parentObjReference.children.push(shallowCopy)
         }
-        else allTasksDueToday.push(node)
+        else allTasksDueToday.push(shallowCopy) // any reason we use node here instead of `shallowCopy`? 
         
         for (const child of node.children) {
-          helper({ node: child, parentCategory: 'DAY', parentObjReference: shallowCopy})
+          helper({ node: child, parentCategory: 'DAY', parentObjReference: shallowCopy, rootAncestor })
         }
       } 
       else if (dueInHowManyDays <= 7 && dueInHowManyDays >= 0) {
@@ -457,7 +463,7 @@ export function computeTodoMemoryTrees (allTasks) {
         // notice we iterate on the original tree that still has a `.children` array preserved
         for (const child of node.children) {
           i += 1
-          helper({ node: child, parentCategory: 'WEEK', parentObjReference: shallowCopy})
+          helper({ node: child, parentCategory: 'WEEK', parentObjReference: shallowCopy, rootAncestor })
         }
       }
       else if (dueInHowManyDays <= 31 && dueInHowManyDays >= 0) {
@@ -467,7 +473,7 @@ export function computeTodoMemoryTrees (allTasks) {
         else allTasksDueThisMonth.push(shallowCopy)
   
         for (const child of node.children) {
-          helper({ node: child, parentCategory: 'MONTH', parentObjReference: shallowCopy})
+          helper({ node: child, parentCategory: 'MONTH', parentObjReference: shallowCopy, rootAncestor })
         }
       }
       else if (dueInHowManyDays <= 365 && dueInHowManyDays >= 0) {
@@ -477,7 +483,7 @@ export function computeTodoMemoryTrees (allTasks) {
         else allTasksDueThisYear.push(shallowCopy)
   
         for (const child of node.children) {
-          helper({ node: child, parentCategory: 'YEAR', parentObjReference: shallowCopy})
+          helper({ node: child, parentCategory: 'YEAR', parentObjReference: shallowCopy, rootAncestor })
         }
       } 
     }

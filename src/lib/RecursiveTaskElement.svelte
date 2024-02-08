@@ -62,7 +62,7 @@
           </div>
         {/if}
 
-        <div on:click={() => dispatch('task-click', { task: taskObj })} 
+        <div on:click={() => dispatch('task-click', { task: taskObj })}
           class="truncate-to-one-line" 
           class:cross-out-todo={taskObj.isDone} 
           style="margin-top: -1px; margin-left: 4px; cursor: pointer;"

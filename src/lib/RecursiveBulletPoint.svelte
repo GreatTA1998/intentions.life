@@ -1,11 +1,23 @@
 <div 
-  on:click={() => dispatch('task-click', { task: taskObject })}
   class:completed-task={taskObject.isDone}
   style="margin-bottom: 2px; font-size: 12px;"
 >
-  <div style="display: flex; align-items: center;" class:accented-branch={taskObject.id === originalPopupTask.id}>
+  <div 
+    style="display: flex; align-items: center;" 
+    class:accented-branch={taskObject.id === originalPopupTask.id}
+  >
     <ReusableCheckbox value={taskObject.isDone} zoom={0.5}/>
-    <div style="margin-left: 4px; margin-right: 4px;" class="truncate-to-one-line">
+    
+    <!-- Yes, to-do list task nodes already have `rootAncestor` properties.
+      BUT once we open the popup <RecursiveBulletPoint/> is rendered on the `rootAncestor` tree, whose nodes
+      DO NOT have `rootAncestor` (see picture in OneNote)
+    -->
+    <div 
+      on:click={() => {
+        dispatch('task-click', { task: { rootAncestor, ...taskObject }})
+      }}
+      style="cursor: pointer; margin-left: 4px; margin-right: 4px;" class="truncate-to-one-line"
+    >
       {taskObject.name}
     </div>
     
@@ -23,7 +35,10 @@
   
   {#each taskObject.children as child}
     <div style="margin-left: 12px;">
-      <RecursiveBulletPoint taskObject={child} {originalPopupTask}/>
+      <RecursiveBulletPoint 
+        on:task-click
+        taskObject={child} {originalPopupTask} {rootAncestor}
+      />
     </div>
   {/each}
 </div>
@@ -35,6 +50,7 @@
 
   export let taskObject 
   export let originalPopupTask
+  export let rootAncestor
 
   const dispatch = createEventDispatcher()
 </script>
@@ -47,5 +63,6 @@
 
   .accented-branch {
     color: var(--logo-twig-color);
+    font-weight: 600;
   }
 </style>

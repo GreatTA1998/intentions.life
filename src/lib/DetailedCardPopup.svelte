@@ -98,26 +98,20 @@
       </div>
     </div>
 
-    <!-- This is the section where you show everything regardless of whether it is scheduled or not -->
-    {#if fullTaskTree.children.length > 0}
       <div style="font-size: 1rem; margin-top: 36px; margin-bottom: 12px; font-weight: 400;">
         Full task tree
       </div>
 
       <div style="max-height: 500px; overflow-y: auto;">
-        {#each fullTaskTree.children as child}
-          <div style="margin-left: 12px;">
-          <RecursiveBulletPoint 
-            originalPopupTask={taskObject}
-            taskObject={child}
-            on:task-click
-          >
-          
-          </RecursiveBulletPoint>
-          </div>
-        {/each}
+        <RecursiveBulletPoint
+          taskObject={taskObject.rootAncestor}
+          originalPopupTask={taskObject}
+          rootAncestor={taskObject.rootAncestor}
+          on:task-click
+        >
+
+        </RecursiveBulletPoint>
       </div>
-    {/if}
   </div>
 </div>
 
@@ -148,8 +142,6 @@ let newStartHHMM
 let isEditingDeadline = false
 
 $: currentDeadlineValue = (taskObject.deadlineDate || '') + (taskObject.deadlineDate && taskObject.deadlineTime ? " " : "") + (taskObject.deadlineTime || '')
-
-let fullTaskTree = taskObject.rootAncestor ? taskObject.rootAncestor : taskObject
 
 const dispatch = createEventDispatcher()
 
@@ -212,10 +204,6 @@ function saveTaskStart (MMDD, HHMM) {
     startTime: HHMM
   }})
   isEditingTaskStart = false
-}
-
-function saveTaskEnd () {
-
 }
 
 function saveDeadline (DDMMYYYY, HHMM) {
@@ -312,10 +300,6 @@ function saveTitle (newVal) {
     /* padding: 10px 0px; */
     padding-left: 0px;
     padding-bottom: 6px;
-  }
-
-  .selected {
-    background-color: indianred;
   }
 
 
