@@ -105,3 +105,29 @@ export function computeYearViewTimelines (allTasks) {
 
   return output
 }
+
+
+// theoretically slightly faster (by a factor 'k' where k is the # of days shown on calendar)
+// more importantly, it allows us to inject a reference to `rootAncestor`
+// in practice, it's slightly slower than having each calendar component 
+// filter for its own scheduled tasks, for some reason...
+export function computeDateToTasksDict (taskTrees) {
+  const tasksScheduledOn = {}
+  for (const root of taskTrees) {
+    myHelper({ node: root, rootAncestor: root, tasksScheduledOn })
+  }
+  return tasksScheduledOn 
+}
+
+function myHelper ({ node, rootAncestor, tasksScheduledOn }) {
+  if (node.startDate) {
+    const [MM, dd] = node.startDate.split('/')
+    const simpleISO = dd + '-' + MM + '-' + node.startYYYY
+    if (!tasksScheduledOn[simpleISO]) tasksScheduledOn[simpleISO] = []
+    tasksScheduledOn[simpleISO].push({ rootAncestor, ...node })
+  }
+
+  for (const child of node.children) {
+    myHelper({ node: child, rootAncestor, tasksScheduledOn })
+  }
+}

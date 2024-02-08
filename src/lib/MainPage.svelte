@@ -174,7 +174,6 @@
         <div class="calendar-section-flex-child"> 
           {#if allTasks.length > 0}    
             <CalendarThisWeek
-              {allTasks}
               {calStartDateClassObj}
               on:calendar-shifted={(e) => incrementDateClassObj({ days: e.detail.days})}
               on:new-root-task={(e) => createNewRootTask(e.detail)}
@@ -210,7 +209,11 @@
     checkTaskObjSchema,
     convertToISO8061
   } from '/src/helpers.js'
-  import { computeYearViewTimelines, reconstructTreeInMemory } from '/src/helpers/dataStructures.js'
+  import { 
+    computeYearViewTimelines, 
+    reconstructTreeInMemory,
+    computeDateToTasksDict
+  } from '/src/helpers/dataStructures.js'
   import { 
     mostRecentlyCompletedTaskID, 
     user, 
@@ -218,7 +221,8 @@
     allTasksDueToday,
     allTasksDueThisWeek,
     allTasksDueThisMonth,
-    longHorizonTasks
+    longHorizonTasks,
+    tasksScheduledOn
   } from '/src/store.js'
   import JournalPopup from '$lib/JournalPopup.svelte'
   import FinancePopup from '$lib/FinancePopup.svelte'
@@ -314,7 +318,11 @@
       querySnapshot.forEach((doc) => {
         result.push({ id: doc.id, ...doc.data()})
       })
+
       allTasks = reconstructTreeInMemory(result)
+
+      tasksScheduledOn.set(computeDateToTasksDict(allTasks))
+
       // RE-WRITE / INTEGRATE THIS WHEN READY
       if (isInitialFetch) {
         isInitialFetch = false

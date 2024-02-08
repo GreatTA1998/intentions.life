@@ -27,4 +27,6 @@ export const allTasksDueThisMonth = writable([])
 
 export const longHorizonTasks = writable([])
 
+export const tasksScheduledOn = writable({})
+
 export const yPosWithinBlock = writable(0)

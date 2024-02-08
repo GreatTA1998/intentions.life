@@ -99,15 +99,16 @@
     </div>
 
     <!-- This is the section where you show everything regardless of whether it is scheduled or not -->
-    {#if taskObject.children.length > 0}
+    {#if fullTaskTree.children.length > 0}
       <div style="font-size: 1rem; margin-top: 36px; margin-bottom: 12px; font-weight: 400;">
         Full task tree
       </div>
 
       <div style="max-height: 500px; overflow-y: auto;">
-        {#each taskObject.children as child}
+        {#each fullTaskTree.children as child}
           <div style="margin-left: 12px;">
           <RecursiveBulletPoint 
+            originalPopupTask={taskObject}
             taskObject={child}
             on:task-click
           >
@@ -117,14 +118,6 @@
         {/each}
       </div>
     {/if}
-
-    <!-- <div class="google-calendar-event-detail" style="margin-top: 12px; margin-left: 16px;">
-      {#if taskObject.daysBeforeRepeating}
-        { taskObject.repeatType || ''}  repeats every {taskObject.daysBeforeRepeating} days, 
-        completed {taskObject.completionCount || 0} times, 
-        missed { taskObject.missedCount || 0} times
-      {/if}
-    </div> -->
   </div>
 </div>
 
@@ -155,6 +148,8 @@ let newStartHHMM
 let isEditingDeadline = false
 
 $: currentDeadlineValue = (taskObject.deadlineDate || '') + (taskObject.deadlineDate && taskObject.deadlineTime ? " " : "") + (taskObject.deadlineTime || '')
+
+let fullTaskTree = taskObject.rootAncestor ? taskObject.rootAncestor : taskObject
 
 const dispatch = createEventDispatcher()
 

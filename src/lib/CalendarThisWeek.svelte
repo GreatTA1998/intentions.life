@@ -95,8 +95,8 @@
   import ReusableCalendarView from '$lib/ReusableCalendarView.svelte'
   import { MIKA_PIXELS_PER_HOUR, getDateInMMDD, getDateInDDMMYYYY } from '/src/helpers'
   import { onMount, createEventDispatcher } from 'svelte'
+  import { tasksScheduledOn } from '/src/store.js'
 
-  export let allTasks
   export let calStartDateClassObj
 
   let allIncompleteTasks = null
@@ -109,37 +109,18 @@
   const totalCalStartTopOffset = 100 + spacingBetweenLabelAndCal; // 100 is the height of the top label, 12 is the margin 
   const spacingBetweenLabelAndCal = 36
 
-  const timeBlockDurationInMinutes = 60
-
   const dispatch = createEventDispatcher()
 
   $: getDateClassObjects(calStartDateClassObj)
 
-  $: if (allTasks) {
+  $: if ($tasksScheduledOn) {
     intForTriggeringRerender += 1
-    allIncompleteTasks = filterIncompleteTasks(allTasks)
   }
 
   onMount(() => {
     // Default start date is today, if left, you shift calStartDateClassObj
     getTimesOfDay()
   })
-
-  function filterIncompleteTasks (tasksArray) {
-    let output = []
-    const copy = [...tasksArray]
-    traverseAndUpdateTree({
-      tree: copy,
-      fulfilsCriteria: (task) => {
-        // make an independent copy
-        const filteredChildren = task.children.filter(t => t.isCompleted === false)
-        task.children = filteredChildren
-      },
-      applyFunc: (task) => output.push(task) // output = [...output, task]
-    })
-    output = copy
-    return output
-  }
 
   function getDateClassObjects (dateClassObj) {
     dateClassObjects = []
@@ -156,30 +137,19 @@
   }
   
   function getScheduledTasks (dateClassObj) {
-    let output = []
-    traverseAndUpdateTree({
-      fulfilsCriteria: (task) => task.startDate === getDateInMMDD(dateClassObj) && task.startTime, 
-      applyFunc: (task) => output.push(task) // output = [...output, task]
-    })
-    return output
+    const simpleISO = getSimpleISOFromDateClassObj(dateClassObj)
+    return $tasksScheduledOn[simpleISO] || [] // `tasksScheduledOn` will only use
   }
 
-  function traverseAndUpdateTree ({ fulfilsCriteria, applyFunc, tree = allTasks }) {
-    const artificialRootNode = {
-      name: 'root',
-      children: tree
-    }
-    helperFunction({ node: artificialRootNode, fulfilsCriteria, applyFunc })
-  }
+  // dd-mm-yyyy format
+  function getSimpleISOFromDateClassObj (d) {
+    let dd = d.getDate()
+    let mm = d.getMonth() + 1
+    let yyyy = d.getFullYear()
 
-  // useful helper function for task update operations
-  function helperFunction ({ node, fulfilsCriteria, applyFunc }) {
-    if (fulfilsCriteria(node)) {
-      applyFunc(node)
-    } 
-    for (const child of node.children) {
-      helperFunction({ node: child, fulfilsCriteria, applyFunc })
-    }
+    if (dd < 10) dd = '0' + dd
+    if (mm < 10) mm = '0' + mm
+    return dd + '-' + mm + '-' + yyyy;
   }
 
   function getTimesOfDay () {

@@ -3,9 +3,11 @@
   class:completed-task={taskObject.isDone}
   style="margin-bottom: 2px; font-size: 12px;"
 >
-  <div style="display: flex; align-items: center;">
+  <div style="display: flex; align-items: center;" class:accented-branch={taskObject.id === originalPopupTask.id}>
     <ReusableCheckbox value={taskObject.isDone} zoom={0.5}/>
-    <div style="margin-left: 4px; margin-right: 4px;" class="truncate-to-one-line">{taskObject.name}</div>
+    <div style="margin-left: 4px; margin-right: 4px;" class="truncate-to-one-line">
+      {taskObject.name}
+    </div>
     
     {#if taskObject.startDate && taskObject.startTime}
       ({taskObject.startDate} {taskObject.startTime})
@@ -21,7 +23,7 @@
   
   {#each taskObject.children as child}
     <div style="margin-left: 12px;">
-      <RecursiveBulletPoint taskObject={child}/>
+      <RecursiveBulletPoint taskObject={child} {originalPopupTask}/>
     </div>
   {/each}
 </div>
@@ -32,6 +34,7 @@
   import { createEventDispatcher } from 'svelte'
 
   export let taskObject 
+  export let originalPopupTask
 
   const dispatch = createEventDispatcher()
 </script>
@@ -40,5 +43,9 @@
   .completed-task {
     text-decoration: line-through;
     color: rgb(180, 180, 180);
+  }
+
+  .accented-branch {
+    color: var(--logo-twig-color);
   }
 </style>
