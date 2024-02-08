@@ -4,9 +4,9 @@
   on:drop|stopPropagation={(e) => handleDroppedTask(e)}
   on:dragover={(e) => dragover_handler(e)}
 >
-  <slot name="above-list-title">
+  <!-- <slot name="above-list-title">
 
-  </slot>
+  </slot> -->
 
   <!-- Yes every indented <div> is necessary, trust me for now, to make the 
     Month todo layout work horizontally with flexbox
@@ -93,6 +93,10 @@
       {/if}
     </div>
   </div>
+
+  <slot name="above-list-title">
+
+  </slot>
 </div>
 
 <script>

@@ -1,7 +1,7 @@
 <div class="fullscreen-invisible-modular-popup-layer" style="z-index: 10;">
   <div class="detailed-card-popup" bind:this={elem} use:clickOutside on:click_outside={handleClickOutside}>
     <div style="display: flex; align-items: center;">
-      <ReusableCheckbox 
+      <ReusableCheckbox
         value={taskObject.isDone}
         on:change={(e) => handleCheckboxChange(e)}
         zoom={1.2}

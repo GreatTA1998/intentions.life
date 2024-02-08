@@ -204,14 +204,15 @@
     getDateOfToday, 
     getDateInDDMMYYYY, 
     generateRepeatedTasks, 
-    computeTodoMemoryTrees,
     checkTaskObjSchema,
     convertToISO8061
   } from '/src/helpers.js'
   import { 
     computeYearViewTimelines, 
     reconstructTreeInMemory,
-    computeDateToTasksDict
+    computeDateToTasksDict,
+    computeTodoMemoryTrees,
+    computeInclusiveWeekTodo
   } from '/src/helpers/dataStructures.js'
   import { 
     mostRecentlyCompletedTaskID, 
@@ -221,7 +222,8 @@
     allTasksDueThisWeek,
     allTasksDueThisMonth,
     longHorizonTasks,
-    tasksScheduledOn
+    tasksScheduledOn,
+    inclusiveWeekTodo
   } from '/src/store.js'
   import JournalPopup from '$lib/JournalPopup.svelte'
   import FinancePopup from '$lib/FinancePopup.svelte'
@@ -303,6 +305,9 @@
     allTasksDueToday.set(todoMemoryTrees[0])
     allTasksDueThisWeek.set(todoMemoryTrees[1])
     allTasksDueThisMonth.set(todoMemoryTrees[2])
+
+    // simple week todo
+    inclusiveWeekTodo.set(computeInclusiveWeekTodo(allTasks))
 
     // year timeline view
     longHorizonTasks.set(computeYearViewTimelines(allTasks))

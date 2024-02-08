@@ -1,5 +1,4 @@
 <div 
-  class:completed-task={taskObject.isDone}
   style="margin-bottom: 2px; font-size: 12px;"
 >
   <div 
@@ -16,6 +15,7 @@
       on:click={() => {
         dispatch('task-click', { task: { rootAncestor, ...taskObject }})
       }}
+      class:completed-task={taskObject.isDone}
       style="cursor: pointer; margin-left: 4px; margin-right: 4px;" class="truncate-to-one-line"
     >
       {taskObject.name}

@@ -25,6 +25,8 @@ export const allTasksDueToday = writable([])
 export const allTasksDueThisWeek = writable([])
 export const allTasksDueThisMonth = writable([])
 
+export const inclusiveWeekTodo = writable([])
+
 export const longHorizonTasks = writable([])
 
 export const tasksScheduledOn = writable({})
