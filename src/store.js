@@ -24,6 +24,8 @@ export const whatIsBeingDraggedFullObj = writable("")
 export const allTasksDueToday = writable([])
 export const allTasksDueThisWeek = writable([])
 export const allTasksDueThisMonth = writable([])
+export const allTasksDueThisYear = writable([])
+export const allTasksDueThisLife = writable([])
 
 export const inclusiveWeekTodo = writable([])
 

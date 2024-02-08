@@ -28,13 +28,13 @@
           +
         </span>
       </div>
-
-      <slot name="below-list-title">
-
-      </slot>
     </div>
 
-    <div style="outline: 0px solid blue; margin-top: 12px;">
+
+    <!-- giving a maximum width for to-do lists prevents complicated
+      nested flexbox calculations
+    -->
+    <div style="margin-top: 12px; max-width: 22vw;">
       {#each tasksToDisplay as taskObj, i}
         <RecursiveTaskElement 
           {taskObj}
@@ -94,7 +94,7 @@
     </div>
   </div>
 
-  <slot name="above-list-title">
+  <slot>
 
   </slot>
 </div>
@@ -210,7 +210,6 @@
     padding-bottom: 16px;
     padding-left: 2vw; 
     padding-right: 2vw;
-    padding-top: var(--main-content-top-margin);
     font-size: 2em;
   }
 </style>

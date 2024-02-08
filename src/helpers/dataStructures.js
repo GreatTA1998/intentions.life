@@ -139,7 +139,8 @@ export function computeTodoMemoryTrees (allTasks) {
   const allTasksDueToday = []
   const allTasksDueThisWeek = [] // this is disjoint
   const allTasksDueThisMonth = []
-  const allTasksDueThisYear = []
+  const allTasksDueThisYear = [] // up to infinite deadline
+  const allTasksDueThisLife = [] // no deadline defined
 
   for (const parentlessTask of allTasks) {
     helper({ node: parentlessTask, rootAncestor: parentlessTask })
@@ -153,9 +154,14 @@ export function computeTodoMemoryTrees (allTasks) {
     shallowCopy.rootAncestor = rootAncestor
     
     if (!node.deadlineDate) {
+      if (parentCategory === 'LIFE' && parentObjReference !== null) {
+        parentObjReference.children.push(shallowCopy)
+      }
+      else allTasksDueThisLife.push(shallowCopy)
+
       // continue scanning for a todo's top-level task
       for (const child of node.children) {
-        helper({ node: child, rootAncestor }) // NOTE: the `rootAncestor` is not based on deadlines
+        helper({ node: child, parentCategory: 'LIFE', parentObjReference: shallowCopy, rootAncestor }) // NOTE: the `rootAncestor` is not based on deadlines
       }
     }
 
@@ -212,7 +218,7 @@ export function computeTodoMemoryTrees (allTasks) {
   console.log('disjointWeekTodo =', allTasksDueThisWeek)
 
   // console.log('# of recursion should be at most the total number of tasks', i)
-  return [allTasksDueToday, allTasksDueThisWeek, allTasksDueThisMonth]
+  return [allTasksDueToday, allTasksDueThisWeek, allTasksDueThisMonth, allTasksDueThisYear, allTasksDueThisLife]
 }
 
 // parent category is 'DAY', 'WEEK', 'MONTH', 'YEAR'

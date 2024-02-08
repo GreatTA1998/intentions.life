@@ -221,6 +221,8 @@
     allTasksDueToday,
     allTasksDueThisWeek,
     allTasksDueThisMonth,
+    allTasksDueThisYear,
+    allTasksDueThisLife,
     longHorizonTasks,
     tasksScheduledOn,
     inclusiveWeekTodo
@@ -305,6 +307,8 @@
     allTasksDueToday.set(todoMemoryTrees[0])
     allTasksDueThisWeek.set(todoMemoryTrees[1])
     allTasksDueThisMonth.set(todoMemoryTrees[2])
+    allTasksDueThisYear.set(todoMemoryTrees[3])
+    allTasksDueThisLife.set(todoMemoryTrees[4])
 
     // simple week todo
     inclusiveWeekTodo.set(computeInclusiveWeekTodo(allTasks))
