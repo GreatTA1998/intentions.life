@@ -177,7 +177,6 @@
               {calStartDateClassObj}
               on:calendar-shifted={(e) => incrementDateClassObj({ days: e.detail.days})}
               on:new-root-task={(e) => createNewRootTask(e.detail)}
-              on:task-node-update={(e) => updateNode({ id: e.detail.id, newDeepValue: e.detail.newDeepValue })}
               on:task-click={(e) => openDetailedCard(e.detail)}
               on:task-update={(e) => updateTaskNode({ id: e.detail.id, keyValueChanges: e.detail.keyValueChanges })}
               on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
@@ -349,7 +348,6 @@
   function updateTaskNode ({ id, keyValueChanges }) {
     updateFirestoreDoc(tasksPath + id, keyValueChanges)
     // very useful for debugging
-    // console.log('id, keyValueChanges =', id, keyValueChanges)
   }
 
   // THIS IS STILL NOT WORKING: THE ADOPTION IS NOT WORKING, RIGHT NOW ALL THE 

@@ -76,7 +76,6 @@
               timestamps={timesOfDay}
               pixelsPerHour={MIKA_PIXELS_PER_HOUR}
               timeBlockDurationInMinutes={60}
-              subdivisionsPerBlock={60}
               on:new-root-task
               on:task-update
               on:task-click
