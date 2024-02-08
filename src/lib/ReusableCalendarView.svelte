@@ -19,20 +19,11 @@
     "
     on:drop={(e) => drop_handler(e)}
     on:dragover={(e) => dragover_handler(e)}
+    on:click|self={(e) => {
+      isDirectlyCreatingTask = true
+      yPosition = copyGetTrueY(e)
+    }}
   >
-    {#if willShowTimestamps}
-      {#each timestamps as timestamp, i}
-        <div 
-          class="timestamp-number" 
-          style="
-            top: {-6 + 6 + (pixelsPerMinute * timeBlockDurationInMinutes * i)}px; 
-          "
-        >
-          {timestamp.substring(0, 5)}
-        </div>
-      {/each}
-    {/if}
-
     {#each scheduledTasks as task, i}
       <div
         style="
@@ -45,7 +36,7 @@
             ),
             pixelsPerMinute
           })}px;
-          left: {willShowTimestamps ? 36 : 0}px;
+          left: 0px;
           width: 100%;
         "
       >
@@ -63,21 +54,6 @@
       
     <!-- This offsets the fact that the timestamp needs a -6 margin to not be cut off from the top edge of the container -->
     <div style="margin-top: 6px;"></div>
-
-    <!-- Again, because we're using absolute positioning for above elements, their positionings are independent from each other -->
-    <!-- old width is 82% -->
-    <!-- class:visible-line={(i % subdivisionsPerBlock) === 0} -->
-    {#each {length: subdivisionsPerBlock * timestamps.length} as _, i}
-      <div 
-        style="height: { (timeBlockDurationInMinutes * pixelsPerMinute) / subdivisionsPerBlock  }px; box-sizing: border-box; margin-right: 0; margin-left: auto; width: 100%; outline: 0px solid red;"
-        class:highlighted-background={highlightedMinute === i}
-        on:click|self={(e) => {
-          isDirectlyCreatingTask = true
-          yPosition = copyGetTrueY(e)
-        }}
-      >
-      </div>
-    {/each}
 
     {#if isDirectlyCreatingTask}
       <div 
@@ -129,7 +105,6 @@
     -->
 
     <!-- A red line that indicates the current time -->
-    <!-- `willShowTimestamps` is a quick-fix to identify today's calendar -->
     {#if calendarBeginningDateClassObject.getDate() === new Date().getDate()}
       <div class="current-time-indicator-container" style="
           top: {computeOffsetGeneral({ 
@@ -166,9 +141,6 @@
   export let pixelsPerHour 
   export let timeBlockDurationInMinutes 
   export let calendarBeginningDateClassObject
-  export let subdivisionsPerBlock 
-
-  export let willShowTimestamps = true
 
   let overallContainerHeight 
 

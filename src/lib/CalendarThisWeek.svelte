@@ -74,7 +74,6 @@
               calendarBeginningDateClassObject={dateClassObj}
               scheduledTasks={getScheduledTasks(dateClassObj)}
               timestamps={timesOfDay}
-              willShowTimestamps={false}
               pixelsPerHour={MIKA_PIXELS_PER_HOUR}
               timeBlockDurationInMinutes={60}
               subdivisionsPerBlock={60}
