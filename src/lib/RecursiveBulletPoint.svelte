@@ -69,8 +69,6 @@
       isDone: e.target.checked
     })
   }
-
-  
 </script>
 
 <style>

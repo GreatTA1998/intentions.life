@@ -202,7 +202,8 @@ function saveDuration (e) {
 function saveTaskStart (MMDD, HHMM) {
   dispatch('task-update', { id: taskObject.id, keyValueChanges: {
     startDate: MMDD,
-    startTime: HHMM
+    startTime: HHMM,
+    startYYYY: new Date().getFullYear()
   }})
   isEditingTaskStart = false
 }
@@ -229,6 +230,11 @@ function handleTaskStartInput (e) {
   const newVal = e.detail.value
   newStartMMDD = newVal.split(" ")[0]
   newStartHHMM = newVal.split(" ")[1]
+
+  // quickfix for space bar causing time to be ignored (I ran into it as well, not just dad)
+  if (newVal[0] === ' ') {
+    alert('Empty space detected at the start _12/31 15:00, please delete.')
+  }
 }
 
 function handleDeadlineInput (e) {
