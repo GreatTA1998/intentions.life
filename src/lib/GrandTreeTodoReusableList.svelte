@@ -34,7 +34,7 @@
     <!-- giving a maximum width for to-do lists prevents complicated
       nested flexbox calculations
     -->
-    <div style="margin-top: 12px; max-width: 22vw; max-height: 66vh; overflow-y: auto;">
+    <div class:enable-scrolling={enableScrolling} style="margin-top: 12px; max-width: 22vw;">
       {#each tasksToDisplay as taskObj, i (taskObj.id)}
         <RecursiveTaskElement 
           {taskObj}
@@ -114,6 +114,7 @@
   export let dueInHowManyDays = null // AF(null) means it's a life todo, otherwise it should be a number
   export let allTasksDue = []
   export let listTitle
+  export let enableScrolling = false
 
   let defaultDeadline
   let tasksToDisplay = []
@@ -211,5 +212,10 @@
     padding-left: 2vw; 
     padding-right: 2vw;
     font-size: 2em;
+  }
+
+  .enable-scrolling {
+    height: 68vh;
+    overflow-y: auto;
   }
 </style>
