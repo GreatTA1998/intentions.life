@@ -34,7 +34,7 @@
     <!-- giving a maximum width for to-do lists prevents complicated
       nested flexbox calculations
     -->
-    <div style="margin-top: 12px; max-width: 22vw;">
+    <div style="margin-top: 12px; max-width: 22vw; max-height: 66vh; overflow-y: auto;">
       {#each tasksToDisplay as taskObj, i}
         <RecursiveTaskElement 
           {taskObj}

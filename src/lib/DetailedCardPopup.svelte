@@ -108,6 +108,7 @@
           originalPopupTask={taskObject}
           rootAncestor={taskObject.rootAncestor}
           on:task-click
+          on:task-checkbox-change
         >
 
         </RecursiveBulletPoint>

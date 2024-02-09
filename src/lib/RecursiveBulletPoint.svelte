@@ -5,7 +5,11 @@
     style="display: flex; align-items: center;" 
     class:accented-branch={taskObject.id === originalPopupTask.id}
   >
-    <ReusableCheckbox value={taskObject.isDone} zoom={0.5}/>
+    <ReusableCheckbox 
+      value={taskObject.isDone} 
+      on:change={(e) => handleCheckboxChange(e)}
+      zoom={0.5}
+    />
     
     <!-- Yes, to-do list task nodes already have `rootAncestor` properties.
       BUT once we open the popup <RecursiveBulletPoint/> is rendered on the `rootAncestor` tree, whose nodes
@@ -37,6 +41,7 @@
     <div style="margin-left: 12px;">
       <RecursiveBulletPoint 
         on:task-click
+        on:task-checkbox-change
         taskObject={child} {originalPopupTask} {rootAncestor}
       />
     </div>
@@ -47,12 +52,25 @@
   import RecursiveBulletPoint from './RecursiveBulletPoint.svelte'
   import ReusableCheckbox from '$lib/ReusableCheckbox.svelte'
   import { createEventDispatcher } from 'svelte'
+  import { mostRecentlyCompletedTaskID } from '/src/store.js'
 
   export let taskObject 
   export let originalPopupTask
   export let rootAncestor
 
   const dispatch = createEventDispatcher()
+
+  // copied from <RecursiveTask/>
+  function handleCheckboxChange (e) {
+    // mostRecentlyCompletedTaskID.set(taskObj.id)
+
+    dispatch('task-checkbox-change', {
+      id: taskObject.id,
+      isDone: e.target.checked
+    })
+  }
+
+  
 </script>
 
 <style>

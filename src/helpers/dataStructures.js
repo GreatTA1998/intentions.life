@@ -215,8 +215,6 @@ export function computeTodoMemoryTrees (allTasks) {
     }
   }
 
-  console.log('disjointWeekTodo =', allTasksDueThisWeek)
-
   // console.log('# of recursion should be at most the total number of tasks', i)
   return [allTasksDueToday, allTasksDueThisWeek, allTasksDueThisMonth, allTasksDueThisYear, allTasksDueThisLife]
 }

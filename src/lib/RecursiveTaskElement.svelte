@@ -245,9 +245,23 @@
 
     // we're creating a sub-task, so the sub-task's deadline
     // is bounded by this parent task's deadline
-    const d = convertDDMMYYYYToDateClassObject(taskObj.deadlineDate, taskObj.deadlineTime)
-    subtaskObj.deadlineDate = getDateInDDMMYYYY(d)
-    subtaskObj.deadlineTime = getTimeInHHMM({ dateClassObj: d })
+
+    // QUICKFIX: life's tasks have no deadlines, but consider setting it to `Infinity` 
+    // to simplify computations
+    if (taskObj.deadlineDate && taskObj.deadlineTime) {
+      const d = convertDDMMYYYYToDateClassObject(taskObj.deadlineDate, taskObj.deadlineTime)
+      subtaskObj.deadlineDate = getDateInDDMMYYYY(d)
+      subtaskObj.deadlineTime = getTimeInHHMM({ dateClassObj: d })
+
+      // careful that "NaN/NaN" still counts as having a deadline, which silently makes the tasks disappear
+      // as it is not categorized into a day, week or year todo bucket.
+    }
+
+    console.log('new subtask =', {
+      id: newTaskID,
+      parentID: taskObj.id,
+      newTaskObj: subtaskObj
+    })
 
     dispatch('subtask-create', {
       id: newTaskID,

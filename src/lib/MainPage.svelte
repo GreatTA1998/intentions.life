@@ -67,15 +67,6 @@
         src="trueoutput-square-nobg.png" 
         style="width: 38px; height: 38px; margin-right: 6px; margin-left: -4px; cursor: pointer;"
       >
-
-      <!-- This uses the default slot -->
-      <GrandTreeTodo 
-        {allTasks}
-        on:new-root-task={(e) => createNewRootTask(e.detail)}
-        on:subtask-create={(e) => createSubtask(e.detail)}
-        on:task-click={(e) => openDetailedCard(e.detail)}
-        on:drop={(e) => transformToLifeTask(e)}
-      />
     </GrandTreeTodoPopupButton>
 
     <div class="day-week-toggle-segment">
@@ -235,7 +226,6 @@
   import BackgroundRainScene from '$lib/BackgroundRainScene.svelte'
   import LifeDashboard from '$lib/LifeDashboard.svelte'
   import GrandTreeTodoPopupButton from '$lib/GrandTreeTodoPopupButton.svelte'
-  import GrandTreeTodo from '$lib/GrandTreeTodo.svelte'
   import PopupCustomerSupport from '$lib/PopupCustomerSupport.svelte'
   import NavbarAndContentWrapper from '$lib/NavbarAndContentWrapper.svelte'
   import DetailedCardPopup from '$lib/DetailedCardPopup.svelte'

@@ -135,7 +135,7 @@
   /* 12px (todo list radius) + 12px (padding) for concentric border radii */
   padding: 16px;
   padding-top: 12px;
-  padding-bottom: 12px; 
+  padding-bottom: 0px; 
   padding-left: 8px;
   padding-right: 0px;
   border-radius: 30px;
