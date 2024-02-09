@@ -84,7 +84,7 @@
 
         <!-- Display reusable task templates here -->
         {#key taskTemplateSearchResults}
-          {#if $user && newTaskName.length >= 2}
+          {#if $user && newTaskName.length >= 1}
             <div class="core-shadow cast-shadow" style="background-color: white; padding: 6px; border-radius: 12px">   
               {#each taskTemplateSearchResults as taskTemplate}
                 <div class="autocomplete-option" 
@@ -189,11 +189,9 @@
   function searchTaskTemplates () {
     const uniqueSet = new Set()
     const searchQuery = newTaskName
-    for (const searchTerm of searchQuery.split(' ')) {
-      for (const taskTemplate of $user.reusableTaskTemplates) {
-        if (taskTemplate.name.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1) {
-          uniqueSet.add(taskTemplate)
-        }
+    for (const taskTemplate of $user.reusableTaskTemplates) {
+      if (taskTemplate.name.toLowerCase().includes(searchQuery.toLowerCase())) {
+        uniqueSet.add(taskTemplate)
       }
     }
     const result = [...uniqueSet]
