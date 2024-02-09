@@ -35,7 +35,7 @@
       nested flexbox calculations
     -->
     <div style="margin-top: 12px; max-width: 22vw; max-height: 66vh; overflow-y: auto;">
-      {#each tasksToDisplay as taskObj, i}
+      {#each tasksToDisplay as taskObj, i (taskObj.id)}
         <RecursiveTaskElement 
           {taskObj}
           depth={0}

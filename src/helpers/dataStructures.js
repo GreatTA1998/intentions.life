@@ -249,8 +249,11 @@ export function computeInclusiveWeekTodo (allTasks) {
     
     // if (node.isDone) return
     // don't do optimizations with node.isDone, or the checkbox behavior becomes buggy
-
-    if (!node.deadlineDate) {
+    
+    // if you process node.isDone as a node, basically, if the parent is completed,
+    // it will be hidden by the todo list, and 
+    // its children will be hidden even though they should be top level nodes
+    if (!node.deadlineDate || node.isDone) {
       // continue scanning for a todo's top-level task
       for (const child of node.children) {
         helper({ node: child, rootAncestor }) // NOTE: the `rootAncestor` is not based on deadlines
