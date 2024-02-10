@@ -168,11 +168,9 @@
   // INTERFACE DIFFERENCE #2
   function createRootTaskWithDeadline (taskName) {
     const d = new Date()
-    for (let i = 0; i < dueInHowManyDays; i++) {
-      d.setDate(d.getDate() + 1)
-    }
+    d.setDate(d.getDate() + dueInHowManyDays - 1)
     const newRootTaskObj = {
-      deadlineDate: defaultDeadline, // getDateInDDMMYYYY(d),
+      deadlineDate: getDateInDDMMYYYY(d),
       deadlineTime: '23:59',
       id: getRandomID(),
       name: taskName,
