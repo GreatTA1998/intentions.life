@@ -166,11 +166,13 @@ export function computeTodoMemoryTrees (allTasks) {
     }
 
     else {
+      const d = new Date()
+      d.setHours(0, 0, 0)
       const dueInHowManyDays = computeDayDifference(
-        new Date(),
-        convertDDMMYYYYToDateClassObject(node.deadlineDate)
+        d,
+        convertDDMMYYYYToDateClassObject(node.deadlineDate, node.deadlineTime)
       )
-      if (dueInHowManyDays <= 1 && dueInHowManyDays >= -Infinity) { // quickfix for now
+      if (dueInHowManyDays <= 1) { // quickfix for now
         if (parentCategory === 'DAY' && parentObjReference !== null) {
           parentObjReference.children.push(shallowCopy)
         }
@@ -180,7 +182,7 @@ export function computeTodoMemoryTrees (allTasks) {
           helper({ node: child, parentCategory: 'DAY', parentObjReference: shallowCopy, rootAncestor })
         }
       } 
-      else if (dueInHowManyDays <= 7 && dueInHowManyDays >= 0) {
+      else if (dueInHowManyDays <= 7) {
         if (parentCategory === 'WEEK' && parentObjReference !== null) {
           parentObjReference.children.push(shallowCopy)
         }
@@ -192,7 +194,7 @@ export function computeTodoMemoryTrees (allTasks) {
           helper({ node: child, parentCategory: 'WEEK', parentObjReference: shallowCopy, rootAncestor })
         }
       }
-      else if (dueInHowManyDays <= 31 && dueInHowManyDays >= 0) {
+      else if (dueInHowManyDays <= 31) {
         if (parentCategory === 'MONTH' && parentObjReference !== null) {
           parentObjReference.children.push(shallowCopy)
         } 
@@ -202,7 +204,7 @@ export function computeTodoMemoryTrees (allTasks) {
           helper({ node: child, parentCategory: 'MONTH', parentObjReference: shallowCopy, rootAncestor })
         }
       }
-      else if (dueInHowManyDays <= 365 && dueInHowManyDays >= 0) {
+      else {
         if (parentCategory === 'YEAR' && parentObjReference !== null) {
           parentObjReference.children.push(shallowCopy)
         }

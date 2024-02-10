@@ -43,7 +43,8 @@ export function correctDeadlineIfNecessary ({ node, todoListUpperBound, parentOb
     else {
       const d = new Date() 
       d.setHours(0, 0, 0) 
-      d.setDate(d.getDate() + todoListUpperBound)
+      // notice the -1 because, for example, today's todo is on the same day, but with time set to '11:59'
+      d.setDate(d.getDate() + todoListUpperBound - 1) 
       const ddmmyyyy = getDateInDDMMYYYY(d)
       shallowCopy.deadlineDate = ddmmyyyy
       shallowCopy.deadlineTime = '11:59'
