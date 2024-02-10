@@ -1,49 +1,45 @@
-<div id="future-overview-scroll-parent" style="width: 100%; height: 100%;">
-  <!-- color: #6D6D6D; -->
-  <div style="
-    white-space: nowrap; 
-    margin-bottom: 40px; 
-    font-size: 16px;
-    display: flex; 
-    align-items: center;
-  ">
-    <div style="font-weight: 500; color: rgb(10, 10, 10)">
-      UPCOMING
+<div class="future-overview-parent" style="background-color: var(--future-overview-bg-color)">
+  <div id="future-overview-scroll-parent" style="width: 100%; height: 100%;">
+    <!-- color: #6D6D6D; -->
+    <div style="
+      white-space: nowrap; 
+      margin-bottom: 40px; 
+      font-size: 16px;
+      display: flex; 
+      align-items: center;
+    ">
+      <div style="font-weight: 600; font-size: 20px; color: rgb(10, 10, 10)">
+        UPCOMING SCHEDULE
+      </div>
     </div>
-    <div style="color: rgb(80, 80, 80); margin-left: 6px; font-weight: 300;">
-      EVENTS
-    </div>
-    <!-- <span class="material-symbols-outlined" style="font-size: 32px; margin-left: 4px;">
-      event
-    </span>  -->
-  </div>
-  <div class="future-overview-scroll-container">
-    {#each Object.keys(datesToTasks) as date}
-      <div style="margin-top: 20px; margin-bottom: 20px;">
-        <div>
-          <div style="font-size: 14px; margin-bottom: 2px; color: rgb(80, 80, 80); font-weight: 300;">    
-            {convertMMDDToReadableMonthDayForm(date)} {getDayOfWeek(date).toUpperCase()}
-          </div>
-        </div>
-
-        {#each datesToTasks[date] as task}
-          <div
-            on:click={() => dispatch('task-click', { task })} 
-            style="display: flex; align-items: center; flex-wrap: nowrap; padding: 2px;"
-          >
-            <div 
-              style="font-size: 14px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"
-              class:grey-text={task.daysBeforeRepeating}
-              class:purple-text={!task.daysBeforeRepeating}
-            >
-              <span style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: rgb(10, 10, 10); font-weight: 400;">
-                {' ' + task.name + ' '}
-              </span>({task.startTime})
+    <div class="future-overview-scroll-container">
+      {#each Object.keys(datesToTasks) as date}
+        <div style="margin-top: 20px; margin-bottom: 20px;">
+          <div>
+            <div style="font-size: 14px; margin-bottom: 2px; color: rgb(10, 10, 10); font-weight: 600;">    
+              {convertMMDDToReadableMonthDayForm(date)} {getDayOfWeek(date).toUpperCase()}
             </div>
           </div>
-        {/each}
-      </div>
-    {/each}
+
+          {#each datesToTasks[date] as task}
+            <!-- on:click={() => dispatch('task-click', { task })}  -->
+            <div
+              style="display: flex; align-items: center; flex-wrap: nowrap; padding: 2px;"
+            >
+              <div 
+                style="font-size: 16px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"
+                class:grey-text={task.daysBeforeRepeating}
+                class:purple-text={!task.daysBeforeRepeating}
+              > 
+                <span style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: rgb(40, 40, 40); font-weight: 400; display: flex;">
+                  - <div style="color: rgb(90, 90, 90); font-weight: 300; margin-right: 4px;">{task.startTime}</div> {' ' + task.name + ' '}
+                </span>
+              </div>
+            </div>
+          {/each}
+        </div>
+      {/each}
+    </div>
   </div>
 </div>
 
@@ -132,32 +128,22 @@ const minimumContainerHeight = 20
     height: 80vh;
   }
 
-  .black-text {
-    color: #6D6D6D;
+  .future-overview-parent {
+    width: 332px;
+    padding-top: 3vh; 
+    padding-left: 1.5vw; 
+    padding-right: 1.5vw;
+  }
+
+  @media (max-width: 1279.99px) {
+    .future-overview-parent {
+      min-width: 120px;
+      padding-left: 12px; 
+      padding-right: 12px;
+    }
   }
 
   .purple-text {
     color: #6D6D6D;
-  }
-
-  .scheduled-task {
-    display: inline;
-    position: absolute;
-    margin-left: 2px;
-    border-left: 2px solid grey;
-    padding-left: 2px;
-    font-size: 0.8rem;
-    width: 100%;
-  }
-
-  .broken-axis {
-    display: inline;
-    height: 20px;
-    /* position: absolute; */
-    margin-left: 2px;
-    border-left: 2px dashed black;
-    padding-left: 2px;
-    font-size: 0.8rem;
-    width: 100%;
   }
 </style>

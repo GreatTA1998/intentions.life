@@ -62,11 +62,12 @@
           </div>
         {/if}
 
-        <div on:click={() => dispatch('task-click', { task: taskObj })} 
+        <div on:click={() => dispatch('task-click', { task: taskObj })}
           class="truncate-to-one-line" 
           class:cross-out-todo={taskObj.isDone} 
           style="margin-top: -1px; margin-left: 4px; cursor: pointer;"
         >
+          <!-- {taskObj.orderValue}  -->
           {taskObj.name}
         </div>
       </div>
@@ -77,7 +78,7 @@
     </div>
 
     <!-- the 6px compensates for the fact there is only 1 dropzone for the first child but 2 dropzones (reorder + sub-reorder) for the 2nd child onwards -->
-    <div style="margin-left: 32px; padding-top: 6px;">
+    <div style="margin-left: 24px; padding-top: 6px;">
       {#each taskObj.children as subtaskObj, i}
         <RecursiveTaskElement 
           taskObj={subtaskObj}
@@ -87,6 +88,7 @@
           {willShowCheckbox}
           ancestorRoomIDs={[taskObj.id, ...ancestorRoomIDs]}
           subtreeDeadlineInMsElapsed={updateSubtreeDeadlineInMsElapsed(taskObj, subtreeDeadlineInMsElapsed)}
+          {dueInHowManyDays}
           on:task-click
           on:subtask-create
           on:task-checkbox-change
@@ -100,6 +102,7 @@
                 parentID={taskObj.id}
                 parentObj={taskObj}
                 {colorForDebugging}
+                {dueInHowManyDays}
               /> 
             {/if}
           </div>
@@ -113,6 +116,7 @@
         parentID={taskObj.id}
         parentObj={taskObj}
         {colorForDebugging}
+        {dueInHowManyDays}
       /> 
       
       <!-- 
@@ -168,6 +172,7 @@
   export let ancestorRoomIDs
   export let colorForDebugging = getRandomColor()
   export let subtreeDeadlineInMsElapsed = Infinity
+  export let dueInHowManyDays // very relevant for todo list tasks
 
   let newSubtaskStringValue = ''
   let isTypingNewSubtask = false
@@ -245,9 +250,23 @@
 
     // we're creating a sub-task, so the sub-task's deadline
     // is bounded by this parent task's deadline
-    const d = convertDDMMYYYYToDateClassObject(taskObj.deadlineDate, taskObj.deadlineTime)
-    subtaskObj.deadlineDate = getDateInDDMMYYYY(d)
-    subtaskObj.deadlineTime = getTimeInHHMM({ dateClassObj: d })
+
+    // QUICKFIX: life's tasks have no deadlines, but consider setting it to `Infinity` 
+    // to simplify computations
+    if (taskObj.deadlineDate && taskObj.deadlineTime) {
+      const d = convertDDMMYYYYToDateClassObject(taskObj.deadlineDate, taskObj.deadlineTime)
+      subtaskObj.deadlineDate = getDateInDDMMYYYY(d)
+      subtaskObj.deadlineTime = getTimeInHHMM({ dateClassObj: d })
+
+      // careful that "NaN/NaN" still counts as having a deadline, which silently makes the tasks disappear
+      // as it is not categorized into a day, week or year todo bucket.
+    }
+
+    console.log('new subtask =', {
+      id: newTaskID,
+      parentID: taskObj.id,
+      newTaskObj: subtaskObj
+    })
 
     dispatch('subtask-create', {
       id: newTaskID,

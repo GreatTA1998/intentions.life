@@ -71,7 +71,7 @@
       imageDownloadURL,
       startTime: getTimeInHHMM({ dateClassObj }),
       startDate: getDateInMMDD(dateClassObj), // MMDD is a legacy function so doesn't use destructuring
-      duration: 60
+      duration: 120
     }
     newTaskObj = checkTaskObjSchema(newTaskObj, $user)
     console.log('newTaskObj =', newTaskObj)

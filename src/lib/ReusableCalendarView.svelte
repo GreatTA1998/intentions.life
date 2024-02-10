@@ -19,20 +19,11 @@
     "
     on:drop={(e) => drop_handler(e)}
     on:dragover={(e) => dragover_handler(e)}
+    on:click|self={(e) => {
+      isDirectlyCreatingTask = true
+      yPosition = copyGetTrueY(e)
+    }}
   >
-    {#if willShowTimestamps}
-      {#each timestamps as timestamp, i}
-        <div 
-          class="timestamp-number" 
-          style="
-            top: {-6 + 6 + (pixelsPerMinute * timeBlockDurationInMinutes * i)}px; 
-          "
-        >
-          {timestamp.substring(0, 5)}
-        </div>
-      {/each}
-    {/if}
-
     {#each scheduledTasks as task, i}
       <div
         style="
@@ -45,7 +36,7 @@
             ),
             pixelsPerMinute
           })}px;
-          left: {willShowTimestamps ? 36 : 0}px;
+          left: 0px;
           width: 100%;
         "
       >
@@ -63,21 +54,6 @@
       
     <!-- This offsets the fact that the timestamp needs a -6 margin to not be cut off from the top edge of the container -->
     <div style="margin-top: 6px;"></div>
-
-    <!-- Again, because we're using absolute positioning for above elements, their positionings are independent from each other -->
-    <!-- old width is 82% -->
-    <!-- class:visible-line={(i % subdivisionsPerBlock) === 0} -->
-    {#each {length: subdivisionsPerBlock * timestamps.length} as _, i}
-      <div 
-        style="height: { (timeBlockDurationInMinutes * pixelsPerMinute) / subdivisionsPerBlock  }px; box-sizing: border-box; margin-right: 0; margin-left: auto; width: 100%; outline: 0px solid red;"
-        class:highlighted-background={highlightedMinute === i}
-        on:click|self={(e) => {
-          isDirectlyCreatingTask = true
-          yPosition = copyGetTrueY(e)
-        }}
-      >
-      </div>
-    {/each}
 
     {#if isDirectlyCreatingTask}
       <div 
@@ -108,7 +84,7 @@
 
         <!-- Display reusable task templates here -->
         {#key taskTemplateSearchResults}
-          {#if $user && newTaskName.length >= 2}
+          {#if $user && newTaskName.length >= 1}
             <div class="core-shadow cast-shadow" style="background-color: white; padding: 6px; border-radius: 12px">   
               {#each taskTemplateSearchResults as taskTemplate}
                 <div class="autocomplete-option" 
@@ -129,7 +105,6 @@
     -->
 
     <!-- A red line that indicates the current time -->
-    <!-- `willShowTimestamps` is a quick-fix to identify today's calendar -->
     {#if calendarBeginningDateClassObject.getDate() === new Date().getDate()}
       <div class="current-time-indicator-container" style="
           top: {computeOffsetGeneral({ 
@@ -166,9 +141,6 @@
   export let pixelsPerHour 
   export let timeBlockDurationInMinutes 
   export let calendarBeginningDateClassObject
-  export let subdivisionsPerBlock 
-
-  export let willShowTimestamps = true
 
   let overallContainerHeight 
 
@@ -217,11 +189,9 @@
   function searchTaskTemplates () {
     const uniqueSet = new Set()
     const searchQuery = newTaskName
-    for (const searchTerm of searchQuery.split(' ')) {
-      for (const taskTemplate of $user.reusableTaskTemplates) {
-        if (taskTemplate.name.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1) {
-          uniqueSet.add(taskTemplate)
-        }
+    for (const taskTemplate of $user.reusableTaskTemplates) {
+      if (taskTemplate.name.toLowerCase().includes(searchQuery.toLowerCase())) {
+        uniqueSet.add(taskTemplate)
       }
     }
     const result = [...uniqueSet]
@@ -350,56 +320,56 @@
 </script>
 
 <style lang="scss">
-:root {
-  --calendar-day-section-width: 160px; 
-}
+  :root {
+    --calendar-day-section-width: max(10vw, 120px); 
+  }
 
-.current-time-indicator-container {
-  display: block; 
-  align-items: center;
-  position: absolute; 
-  width: var(--calendar-day-section-width);
-  padding-left: 6px;
-  padding-right: 6px;
-  pointer-events: none;
-}
+  .current-time-indicator-container {
+    display: block; 
+    align-items: center;
+    position: absolute; 
+    width: var(--calendar-day-section-width);
+    padding-left: 6px;
+    padding-right: 6px;
+    pointer-events: none;
+  }
 
-.autocomplete-option {
-  padding-top: 12px; padding-bottom: 12px; padding-left: 12px; padding-right: 12px; font-size: 16px; border-radius: 12px;
-}
+  .autocomplete-option {
+    padding-top: 12px; padding-bottom: 12px; padding-left: 12px; padding-right: 12px; font-size: 16px; border-radius: 12px;
+  }
 
-.option-highlight {
-  background-color: rgb(240, 240, 240);
-}
+  .option-highlight {
+    background-color: rgb(240, 240, 240);
+  }
 
-// background-color: rgb(240, 240, 240);
-.autocomplete-option:hover {
-  @extend .option-highlight
-}
+  // background-color: rgb(240, 240, 240);
+  .autocomplete-option:hover {
+    @extend .option-highlight
+  }
 
-/* DO NOT REMOVE, BREAKS DRAG-AND-DROP AND DURATION ADJUSTMENT */
-.scroll-container {
-  height: fit-content;
-  overflow-y: hidden;
-  overflow-x: hidden; 
-}
+  /* DO NOT REMOVE, BREAKS DRAG-AND-DROP AND DURATION ADJUSTMENT */
+  .scroll-container {
+    height: fit-content;
+    overflow-y: hidden;
+    overflow-x: hidden; 
+  }
 
-.highlighted-background {
-  background: rgb(82, 180, 251);
-}
+  .highlighted-background {
+    background: rgb(82, 180, 251);
+  }
 
-/* 
-  You need the relative scrolling container to be different from `calendar-day-container`,
-  so the absolute positionings will count from the right place (no need to fully understand yet) 
+  /* 
+    You need the relative scrolling container to be different from `calendar-day-container`,
+    so the absolute positionings will count from the right place (no need to fully understand yet) 
 
-  height: 200% is just so it's high enough to contain all the absolute elements
+    height: 200% is just so it's high enough to contain all the absolute elements
 
-  without border-box, the padding on top will add ON TOP OF 100% height  
-*/
+    without border-box, the padding on top will add ON TOP OF 100% height  
+  */
 
-.calendar-day-container {
-  width: 100%;
-}
+  .calendar-day-container {
+    width: 100%;
+  }
 
 
   .green-text {

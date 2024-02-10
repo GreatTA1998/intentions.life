@@ -33,7 +33,7 @@ export function getTrueY (e) {
   return e.clientY + ScrollContainer.scrollTop - ScrollContainer.getBoundingClientRect().top - ScrollContainer.style.paddingTop
 }
 
-export const MIKA_PIXELS_PER_HOUR = 100
+export const MIKA_PIXELS_PER_HOUR = 80
 export const MIKA_PIXELS_PER_MINUTE = MIKA_PIXELS_PER_HOUR / 60
 
 export const PIXELS_PER_HOUR = 600
@@ -412,91 +412,4 @@ export function sortByOrderValue(array) {
   });
   return array;
 }
-
-export function computeTodoMemoryTrees (allTasks) {
-  const allTasksDueToday = []
-  const allTasksDueThisWeek = []
-  const allTasksDueThisMonth = []
-  const allTasksDueThisYear = []
-
-  for (const parentlessTask of allTasks) {
-    helper({ node: parentlessTask })
-  }
-
-  // use VS code's collpase feature
-  // this is so the function can access the arrays we define above
-  function helper ({ node, parentCategory = '', parentObjReference = null }) {
-    const shallowCopy = {...node}
-    shallowCopy.children = []
-    if (!node.deadlineDate) {
-      // continue scanning for a todo's top-level task
-      for (const child of node.children) {
-        helper({ node: child })
-      }
-    }
-    else {
-      // set d1 to 00:00 time https://stackoverflow.com/a/3894087
-      const d1 = new Date() 
-      d1.setHours(0, 0, 0, 0)
-
-      const dueInHowManyDays = computeDayDifference(
-        d1,
-        convertDDMMYYYYToDateClassObject(node.deadlineDate)
-      )
-
-      if (dueInHowManyDays <= 1) { 
-        if (parentCategory === 'DAY' && parentObjReference !== null) {
-          parentObjReference.children.push(shallowCopy)
-        }
-        else allTasksDueToday.push(node)
-        
-        for (const child of node.children) {
-          helper({ node: child, parentCategory: 'DAY', parentObjReference: shallowCopy})
-        }
-      } 
-      else if (dueInHowManyDays <= 7) {
-        if (parentCategory === 'WEEK' && parentObjReference !== null) {
-          parentObjReference.children.push(shallowCopy)
-        }
-        else allTasksDueThisWeek.push(shallowCopy)
-  
-        // notice we iterate on the original tree that still has a `.children` array preserved
-        for (const child of node.children) {
-          i += 1
-          helper({ node: child, parentCategory: 'WEEK', parentObjReference: shallowCopy})
-        }
-      }
-      else if (dueInHowManyDays <= 31) {
-        if (parentCategory === 'MONTH' && parentObjReference !== null) {
-          parentObjReference.children.push(shallowCopy)
-        } 
-        else allTasksDueThisMonth.push(shallowCopy)
-  
-        for (const child of node.children) {
-          helper({ node: child, parentCategory: 'MONTH', parentObjReference: shallowCopy})
-        }
-      }
-      else {
-        if (parentCategory === 'YEAR' && parentObjReference !== null) {
-          parentObjReference.children.push(shallowCopy)
-        }
-        else allTasksDueThisYear.push(shallowCopy)
-  
-        for (const child of node.children) {
-          helper({ node: child, parentCategory: 'YEAR', parentObjReference: shallowCopy})
-        }
-      } 
-    }
-  }
-
-  // console.log('# of recursion should be at most the total number of tasks', i)
-  return [allTasksDueToday, allTasksDueThisWeek, allTasksDueThisMonth]
-}
-
-// parent category is 'DAY', 'WEEK', 'MONTH', 'YEAR'
-// recursively scan the ORIGINAL tree, so we separate the scanning tree from the editing tree
-//   - node is for scanning 
-//   - node is for mutating
-let i = 0
-
 

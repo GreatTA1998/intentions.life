@@ -1,59 +1,91 @@
-<span on:click={() => setIsPopupOpen({ newVal: true })} class="material-symbols-outlined my-float" style="font-size: 32px; color: rgb(20, 20, 20); cursor: pointer; margin-left: -4px;">
-  summarize
-</span>
+<slot name="button-slot" setIsPopupOpen={setIsPopupOpen}>
+  <span on:click={() => setIsPopupOpen({ newVal: true })} class="material-symbols-outlined my-float" style="font-size: 32px; color: rgb(20, 20, 20); cursor: pointer; margin-left: -4px;">
+    summarize
+  </span>
+</slot>
 
 {#if isPopupOpen}
   <div class="fullscreen-invisible-modular-popup-layer" on:click|self={handleClickOutside}>
-    <div class="my-popup" 
-      bind:this={elem} 
-    >    
-      <div style="overflow: auto; height: 100%; width: 100%;">
-        <div style="
+    <div class="grand-tree-todo-popup" bind:this={elem}>
+      <div style="display: flex; width: 100vw; max-width: 100vw; height: 100%; overflow-y: auto; overflow-x: auto;" class="round-scrollbar">
+        <!-- To-DO: this must include tasks that EXPLICITLY does not have a deadline -->
+        <GrandTreeTodoReusableList style="
+          flex-grow: 1;
+          background-color: white;
           display: flex; 
-          justify-content: space-between;
-          height: 100%;
-          align-items: start;
-          flex-wrap: nowrap;
-          "
+          gap: 12px;
+          justify-content: space-evenly; 
+          border-radius: 24px; 
+          width: fit-content;
+          padding-top: 16px;
+          padding-left: 16px;
+          padding-right: 0px;
+          height: fit-content;
+        "
+          listTitle="THIS LIFE"
+          allTasksDue={[...$allTasksDueThisLife, ...$allTasksDueThisYear]}
+          dueInHowManyDays={365}
+          enableScrolling
+          on:new-root-task
+          on:task-unscheduled
+          on:subtask-create
+          on:task-click
+          on:task-dragged
+          on:task-checkbox-change
         >
-          <div style="width: 70%; height: 100%; overflow-y: auto; overflow-x: auto;" class="round-scrollbar">
+          <GrandTreeTodoReusableList
+            style="
+              background-color: hsl(100deg 66.53% 95.74%); 
+              flex-grow: 1;
+              display: flex; 
+              gap: 12px;
+              justify-content: space-evenly; 
+              border-radius: 24px; 
+              padding-top: 16px;
+              padding-left: 16px;
+              padding-right: 0px;
+              height: fit-content;
+            "
+            listTitle="THIS MONTH"
+            allTasksDue={$allTasksDueThisMonth}
+            dueInHowManyDays={30}
+            enableScrolling
+            on:new-root-task
+            on:task-unscheduled
+            on:subtask-create
+            on:task-click
+            on:task-dragged
+            on:task-checkbox-change
+          >
             <GrandTreeTodoReusableList
-              style="
-                display: flex; 
-                justify-content: space-evenly; 
-                background-color: hsl(100deg 66.53% 95.74%); 
-                border-radius: 24px; 
-                width: 100%;
-              "
-              listTitle="THIS MONTH"
-              allTasksDue={$allTasksDueThisMonth}
-              dueInHowManyDays={30}
+              listTitle="THIS WEEK"
+              allTasksDue={$allTasksDueThisWeek}
+              dueInHowManyDays={7}
+              style="flex-grow: 1; padding-top: 16px; padding-left: 16px; padding-right: 0px; background-color: var(--todo-list-bg-color); border-radius: 16px; display: flex; gap: 12px; justify-content: space-evenly; height: fit-content;"
+              enableScrolling
               on:new-root-task
               on:task-unscheduled
               on:subtask-create
               on:task-click
               on:task-dragged
               on:task-checkbox-change
-            >
-              <div slot="above-list-title">
-                <NewThisWeekTodo
-                  on:new-root-task
-                  on:task-unscheduled
-                  on:subtask-create
-                  on:task-click
-                  on:task-dragged
-                  on:task-checkbox-change
-                />
-              </div>
-            </GrandTreeTodoReusableList>  
-          </div>
-
-          <div style="width: 30%; height: 100%; overflow-x: auto; opacity: 0.8;">
-            <slot>
-              <!-- GrandTreeTodo will be injected via the parent,, so no interface will need to be changed -->
-            </slot>
-          </div>
-        </div>
+            > 
+              <GrandTreeTodoReusableList
+                listTitle="TODAY" 
+                allTasksDue={$allTasksDueToday}
+                dueInHowManyDays={1}
+                style="flex-grow: 1; padding-top: 16px; padding-left: 16px; padding-right: 0px; background-color: #4d6c4d; color: white; height: fit-content; border-radius: 12px; gap: 12px; flex-grow: 1; height: fit-content;"
+                enableScrolling
+                on:new-root-task
+                on:task-unscheduled
+                on:subtask-create
+                on:task-click
+                on:task-dragged
+                on:task-checkbox-change
+              />  
+            </GrandTreeTodoReusableList>
+          </GrandTreeTodoReusableList>  
+        </GrandTreeTodoReusableList>
       </div>
     </div>
   </div>
@@ -63,8 +95,7 @@
   import { createEventDispatcher, onMount, onDestroy, tick } from 'svelte'
   import _ from 'lodash'
   import GrandTreeTodoReusableList from '$lib/GrandTreeTodoReusableList.svelte'
-  import { allTasksDueToday, allTasksDueThisWeek, allTasksDueThisMonth } from '/src/store.js'
-  import NewThisWeekTodo from '$lib/NewThisWeekTodo.svelte'
+  import { allTasksDueToday, allTasksDueThisWeek, allTasksDueThisMonth, allTasksDueThisYear, allTasksDueThisLife } from '/src/store.js'
 
   const dispatch = createEventDispatcher()
 
@@ -91,7 +122,7 @@
 </script>
 
 <style>
-.my-popup {
+.grand-tree-todo-popup {
   position: fixed;
   top: 50%;
   left: 50%;
@@ -103,11 +134,15 @@
   z-index: 3;
   min-width: 300px;
   width: 100%;
-  height: 90%;
+  height: 80%;
 
   /* 12px (todo list radius) + 12px (padding) for concentric border radii */
-  padding: 16px; 
-  border-radius: 40px;
+  padding: 16px;
+  padding-top: 12px;
+  padding-bottom: 0px; 
+  padding-left: 8px;
+  padding-right: 0px;
+  border-radius: 30px;
   background-color: white;
 
 /*    border: 1px solid #000; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);*/

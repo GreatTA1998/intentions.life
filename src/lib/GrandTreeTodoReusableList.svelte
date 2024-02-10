@@ -4,9 +4,9 @@
   on:drop|stopPropagation={(e) => handleDroppedTask(e)}
   on:dragover={(e) => dragover_handler(e)}
 >
-  <slot name="above-list-title">
+  <!-- <slot name="above-list-title">
 
-  </slot>
+  </slot> -->
 
   <!-- Yes every indented <div> is necessary, trust me for now, to make the 
     Month todo layout work horizontally with flexbox
@@ -16,7 +16,7 @@
     <div>
       <div style="display: flex; align-items: center; margin-bottom: 12px;">
         <div style="height: 24px; align-items: center; display: flex;">
-          <div style="font-weight: 500; font-size: 18px;">
+          <div style="font-weight: 600; font-size: 18px; margin-left: 2px;">
             {listTitle} 
           </div> 
         </div>
@@ -28,21 +28,21 @@
           +
         </span>
       </div>
-
-      <slot name="below-list-title">
-
-      </slot>
     </div>
 
-    <div style="outline: 0px solid blue; margin-top: 12px;">
-      {#each tasksToDisplay as taskObj, i}
-        <div style="margin-top: 16px;"></div>
+
+    <!-- giving a maximum width for to-do lists prevents complicated
+      nested flexbox calculations
+    -->
+    <div class:enable-scrolling={enableScrolling} style="margin-top: 12px; max-width: 22vw;">
+      {#each tasksToDisplay as taskObj, i (taskObj.id)}
         <RecursiveTaskElement 
           {taskObj}
           depth={0}
           ancestorRoomIDs={['']}
-          doNotShowScheduledTasks={false}
-          doNotShowCompletedTasks={false}
+          doNotShowScheduledTasks={true}
+          doNotShowCompletedTasks={true}
+          {dueInHowManyDays}
           on:task-click
           on:task-checkbox-change
           on:task-node-update
@@ -57,6 +57,7 @@
                 parentID={''}
                 parentObj={{ subtreeDeadlineInMsElapsed: convertDDMMYYYYToDateClassObject(defaultDeadline).getTime() }}
                 colorForDebugging="purple"
+                {dueInHowManyDays}
               />
             {/if}
           </div>
@@ -76,6 +77,7 @@
           parentID={''}
           parentObj={{ subtreeDeadlineInMsElapsed: convertDDMMYYYYToDateClassObject(defaultDeadline).getTime() }}
           colorForDebugging="blue"
+          {dueInHowManyDays}
         />
       {/if}
 
@@ -94,6 +96,10 @@
       {/if}
     </div>
   </div>
+
+  <slot>
+
+  </slot>
 </div>
 
 <script>
@@ -107,16 +113,26 @@
   import ReusableHelperDropzone from '$lib/ReusableHelperDropzone.svelte'
   import RecursiveTaskElement from '$lib/RecursiveTaskElement.svelte'
   import { createEventDispatcher, tick } from 'svelte'
+  import {
+    breakParentRelationIfNecessary,
+    maintainValidSubtreeDeadlines,
+    correctDeadlineIfNecessary
+  } from '/src/helpers/subtreeDragDrop.js'
+  import { user, whatIsBeingDraggedFullObj, whatIsBeingDragged, whatIsBeingDraggedID } from '/src/store.js'
+  import { getFirestore, writeBatch, doc, increment } from 'firebase/firestore'
 
   export let dueInHowManyDays = null // AF(null) means it's a life todo, otherwise it should be a number
   export let allTasksDue = []
   export let listTitle
+  export let enableScrolling = false
 
   let defaultDeadline
   let tasksToDisplay = []
   let isTypingNewRootTask = false
   let newRootTaskStringValue = ''
   const dispatch = createEventDispatcher()
+  const db = getFirestore()
+  let batch = writeBatch(db)
 
   // COMPUTE DEFAULT DEADLINE 
   $: {
@@ -166,24 +182,66 @@
     // use same API as legacy code
   }
 
-  // HANDLING DROP, WE HAVE TO HANDLE ALL THE CASES CORRECTLY
-  // WHEN IT'S COMING FROM THE CALENDAR (ALTHOUGH WE'RE NOT USING IT THEN, WE HAVE TO UNSCHEDULE IT)
-  // WHAT'S THE EXACT, PRECISE BEHAVIOR THAT WE WANT
   function handleDroppedTask (e) {
     e.preventDefault()
 
-    const droppedTaskID = e.dataTransfer.getData('text/plain')
+    // to be consistent with the API of <ReusableHelperDropzone {parentObj}/>
+    const parentObj = { subtreeDeadlineInMsElapsed: Infinity }
 
-    dispatchNewDeadline({
-      deadlineDateDDMMYYYY: defaultDeadline,
-      deadlineTimeHHMM: '23:59',
-      taskID: droppedTaskID
+    const initialNumericalDifference = 3
+    let newVal = $user.maxOrderValue || initialNumericalDifference
+    batch.update(
+      doc(db, `/users/${$user.uid}/`), {
+        maxOrderValue: increment(initialNumericalDifference)
+      }
+    )
+
+    // 1. ORDER VALUE (and startTime)
+    // only applies to the subtree's root
+    const { deadlineDate, deadlineTime, id, subtreeDeadlineInMsElapsed } = $whatIsBeingDraggedFullObj
+
+    let updateObj = {
+      orderValue: newVal,
+      deadlineDate,
+      deadlineTime,
+      id,
+      subtreeDeadlineInMsElapsed
+    }
+    
+    // 2. UNSCHEDULE: when you drag to the to-do list, it always unschedules it from the calendar
+    updateObj.startTime = '' 
+    updateObj.startDate = ''
+    updateObj.startYYYY = ''
+
+    // 3. DEADLINE
+    updateObj = correctDeadlineIfNecessary({ 
+      node: updateObj, 
+      todoListUpperBound: dueInHowManyDays, 
+      parentObj,
+      batch,
+      userDoc: $user
     })
 
-    // also unschedule it (this was an old API, but we can just add it here via composition : ) lazy work
-    dispatch('task-unscheduled', {
-      id: e.dataTransfer.getData('text/plain')
+    // 4. PARENTID
+    updateObj = breakParentRelationIfNecessary(updateObj)
+
+    // 2. HANDLE SUBTREE DEADLINES
+    maintainValidSubtreeDeadlines({ 
+      node: $whatIsBeingDraggedFullObj, 
+      todoListUpperBound: dueInHowManyDays, 
+      parentObj,
+      batch,
+      userDoc: $user
     })
+
+    batch.update(
+      doc(db, `users/${$user.uid}/tasks/${$whatIsBeingDraggedID}`),
+      updateObj
+    )
+
+    batch.commit()
+
+    batch = writeBatch(db)
   }
 
   function dragover_handler (e) {
@@ -204,7 +262,14 @@
   .todo-list-container {
     width: 100%;
     background-color: var(--todo-list-bg-color);
-    padding: 16px;
+    padding-bottom: 16px;
+    padding-left: 2vw; 
+    padding-right: 2vw;
     font-size: 2em;
+  }
+
+  .enable-scrolling {
+    height: 68vh;
+    overflow-y: auto;
   }
 </style>

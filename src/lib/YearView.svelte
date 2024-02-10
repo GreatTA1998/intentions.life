@@ -1,6 +1,6 @@
 <div>
-  <div style="display: flex; align-items: center; margin-left: 24px; margin-top: 48px;">
-    <div style="min-width: 160px; font-weight: 600; font-size: 24px;">
+  <div style="display: flex; align-items: center; margin-left: 24px; margin-top: 16px;">
+    <div style="min-width: 160px; font-weight: 600; font-size: 20px;">
       Long-horizon tasks
     </div>
 
@@ -25,27 +25,32 @@
     {/if}
   </div>
 
-  <div style="margin-left: 24px; margin-top: 6px; font-weight: 400; color: rgb(80, 80, 80)">
-    A deadline-oriented view for any tasks with 
-    deadlined subtasks. Click any task to update its deadline.
+  <div style="margin-left: 24px; margin-top: 6px; font-weight: 400; color: rgb(80, 80, 80); font-size: 12px;">
+    This page displays every task with deadlined subtasks, from longest horizon to shortest horizon. 
   </div>
 
-  <div style="display: flex; flex-wrap: no-wrap; overflow-x: auto; padding-left: 48px; padding-top: 36px; height: 600%">
-    {#each $longHorizonTasks as task}
-      <div style="min-width: 280px; position: relative; outline: 0px solid red; padding: 12px; margin-right: 48px; overflow-y: hidden; overflow-x: hidden; margin-bottom: 12px;">
+  <div style="display: flex; flex-wrap: no-wrap; overflow-x: auto; padding-left: 24px; padding-top: 6px; height: fit-content;">
+    <FutureOverview
+      {futureScheduledTasks}
+      on:task-duration-adjusted
+      on:task-click
+    />
+
+    {#each $longHorizonTasks as longHorizonTask}
+      <div style="width: 240px; position: relative; outline: 0px solid red; padding: 12px; overflow-y: hidden; overflow-x: hidden; margin-bottom: 12px;">
         <div class="simple-flex" style="margin-bottom: 6px;">
-          <div on:click={() => dispatch('task-click', { task })} style="cursor: pointer; font-weight: 600;">
-            {task.name}
+          <div on:click={() => dispatch('task-click', { task: { rootAncestor: longHorizonTask, ...longHorizonTask } })} class="truncate-to-one-line" style="cursor: pointer; font-weight: 600;">
+            {longHorizonTask.name}
           </div>
 
           <ReusableNewSubtaskComponent
-            parentID={task.id}
+            parentID={longHorizonTask.id}
             on:subtask-create
           />
         </div>
     
-        <div style="border-left: 1px solid rgb(200, 200, 200); height: {computeOffset(task)}px; margin-left: 48px; position: relative;">
-          {#each task.children as child}
+        <div style="border-left: 1px solid rgb(200, 200, 200); height: {computeOffset(longHorizonTask)}px; margin-left: 48px; position: relative;">
+          {#each longHorizonTask.children as child}
             <div style="font-size: 12px; position: absolute; top: {computeOffset(child)}px; right: 48px; width: 100%; outline: 0px solid red;">
               {readable(child.deadlineDate)}
             </div>
@@ -55,7 +60,7 @@
             </div>
 
             <div 
-              on:click={() => dispatch('task-click', { task: child })}
+              on:click={() => dispatch('task-click', { task: { rootAncestor: longHorizonTask, ...child } })}
               class="truncate-to-one-line"
               style="width: 100%; font-size: 12px; position: absolute; top: {computeOffset(child)}px; left: 10px; cursor: pointer;"
             >
@@ -65,20 +70,13 @@
         </div>
 
         <div style="font-size: 12px; right: 48px; width: 100%; outline: 0px solid red;">
-          {readable(task.deadlineDate)}
+          {readable(longHorizonTask.deadlineDate)}
         </div>
       </div>
     {/each}
   </div>
 </div>
-<!-- 
-<div>
-  Optional: aggregation for one-off deadlines with no tree branches
-</div>
 
-<div>
-  Optional: aggregation calendar
-</div> -->
 
 <script>
   import { longHorizonTasks } from '/src/store.js'
@@ -95,6 +93,9 @@
   } from '/src/helpers.js'
   import UXFormField from '$lib/UXFormField.svelte'
   import ReusableNewSubtaskComponent from '$lib/ReusableNewSubtaskComponent.svelte'
+  import FutureOverview from '$lib/FutureOverview.svelte'
+
+  export let futureScheduledTasks
 
   let isCreatingRootTask = false
   let newRootTaskName = ''
@@ -110,7 +111,7 @@
     const d2 = convertDDMMYYYYToDateClassObject(deadlineDate, deadlineTime)
     const dayDiff = computeDayDifference(d1, d2)
 
-    const pixelsPerDay = 2
+    const pixelsPerDay = 12
     const offset = dayDiff * pixelsPerDay
 
     return offset

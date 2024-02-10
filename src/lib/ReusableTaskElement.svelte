@@ -77,9 +77,11 @@
     <!-- 
       `1vw`: if it's too wide, it overlaps with the task name for short duration tasks 
     -->
+    <!-- on:drop preventDefault so that the calendar doesn't think we're scheduling a task -->
     <div draggable="true"
       on:dragstart={(e) => startAdjustingDuration(e)}
       on:dragend={(e) => adjustDuration(e, task)}
+      on:drop|preventDefault
       style="
         cursor: ns-resize;
         position: absolute;

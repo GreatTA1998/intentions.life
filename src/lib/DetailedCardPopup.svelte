@@ -1,7 +1,7 @@
 <div class="fullscreen-invisible-modular-popup-layer" style="z-index: 10;">
   <div class="detailed-card-popup" bind:this={elem} use:clickOutside on:click_outside={handleClickOutside}>
     <div style="display: flex; align-items: center;">
-      <ReusableCheckbox 
+      <ReusableCheckbox
         value={taskObject.isDone}
         on:change={(e) => handleCheckboxChange(e)}
         zoom={1.2}
@@ -98,33 +98,21 @@
       </div>
     </div>
 
-    <!-- This is the section where you show everything regardless of whether it is scheduled or not -->
-    {#if taskObject.children.length > 0}
       <div style="font-size: 1rem; margin-top: 36px; margin-bottom: 12px; font-weight: 400;">
         Full task tree
       </div>
 
       <div style="max-height: 500px; overflow-y: auto;">
-        {#each taskObject.children as child}
-          <div style="margin-left: 12px;">
-          <RecursiveBulletPoint 
-            taskObject={child}
-            on:task-click
-          >
-          
-          </RecursiveBulletPoint>
-          </div>
-        {/each}
-      </div>
-    {/if}
+        <RecursiveBulletPoint
+          taskObject={taskObject.rootAncestor}
+          originalPopupTask={taskObject}
+          rootAncestor={taskObject.rootAncestor}
+          on:task-click
+          on:task-checkbox-change
+        >
 
-    <!-- <div class="google-calendar-event-detail" style="margin-top: 12px; margin-left: 16px;">
-      {#if taskObject.daysBeforeRepeating}
-        { taskObject.repeatType || ''}  repeats every {taskObject.daysBeforeRepeating} days, 
-        completed {taskObject.completionCount || 0} times, 
-        missed { taskObject.missedCount || 0} times
-      {/if}
-    </div> -->
+        </RecursiveBulletPoint>
+      </div>
   </div>
 </div>
 
@@ -214,13 +202,10 @@ function saveDuration (e) {
 function saveTaskStart (MMDD, HHMM) {
   dispatch('task-update', { id: taskObject.id, keyValueChanges: {
     startDate: MMDD,
-    startTime: HHMM
+    startTime: HHMM,
+    startYYYY: new Date().getFullYear()
   }})
   isEditingTaskStart = false
-}
-
-function saveTaskEnd () {
-
 }
 
 function saveDeadline (DDMMYYYY, HHMM) {
@@ -245,6 +230,11 @@ function handleTaskStartInput (e) {
   const newVal = e.detail.value
   newStartMMDD = newVal.split(" ")[0]
   newStartHHMM = newVal.split(" ")[1]
+
+  // quickfix for space bar causing time to be ignored (I ran into it as well, not just dad)
+  if (newVal[0] === ' ') {
+    alert('Empty space detected at the start _12/31 15:00, please delete.')
+  }
 }
 
 function handleDeadlineInput (e) {
@@ -317,10 +307,6 @@ function saveTitle (newVal) {
     /* padding: 10px 0px; */
     padding-left: 0px;
     padding-bottom: 6px;
-  }
-
-  .selected {
-    background-color: indianred;
   }
 
 
