@@ -13,8 +13,9 @@ export function checkTaskObjSchema (task, userDoc) {
 // how far, INCLUDING SCROLL, the actual position on the calendar is
 // // containerDistanceFromTopOfPage should be fixed, and not be affected by scrolling
 // so it's the e.clientY + initialOffset + scrollOffset 
-
 // e.clientY := coordinates relative to VIEWPORT, so doesn't matter if root page is scrolled
+
+
 export function round (value, precision) {
   var multiplier = Math.pow(10, precision || 0);
   return Math.round(value * multiplier) / multiplier;
@@ -187,7 +188,7 @@ export function getRandomID () {
 export function computeDayDifference (dateClassObject1, dateClassObject2) {
   const msPerDay = 1000 * 60 * 60 * 24
   const msDiff = computeMillisecsDifference(dateClassObject1, dateClassObject2)
-  return Math.floor(msDiff / msPerDay)
+  return msDiff / msPerDay
 }
 
 // return d2 - d1
@@ -411,5 +412,4 @@ export function sortByOrderValue(array) {
   });
   return array;
 }
-
 
