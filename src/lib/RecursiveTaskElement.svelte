@@ -67,6 +67,7 @@
           class:cross-out-todo={taskObj.isDone} 
           style="margin-top: -1px; margin-left: 4px; cursor: pointer;"
         >
+          <!-- {taskObj.orderValue}  -->
           {taskObj.name}
         </div>
       </div>
@@ -87,6 +88,7 @@
           {willShowCheckbox}
           ancestorRoomIDs={[taskObj.id, ...ancestorRoomIDs]}
           subtreeDeadlineInMsElapsed={updateSubtreeDeadlineInMsElapsed(taskObj, subtreeDeadlineInMsElapsed)}
+          {dueInHowManyDays}
           on:task-click
           on:subtask-create
           on:task-checkbox-change
@@ -100,6 +102,7 @@
                 parentID={taskObj.id}
                 parentObj={taskObj}
                 {colorForDebugging}
+                {dueInHowManyDays}
               /> 
             {/if}
           </div>
@@ -113,6 +116,7 @@
         parentID={taskObj.id}
         parentObj={taskObj}
         {colorForDebugging}
+        {dueInHowManyDays}
       /> 
       
       <!-- 
@@ -168,6 +172,7 @@
   export let ancestorRoomIDs
   export let colorForDebugging = getRandomColor()
   export let subtreeDeadlineInMsElapsed = Infinity
+  export let dueInHowManyDays // very relevant for todo list tasks
 
   let newSubtaskStringValue = ''
   let isTypingNewSubtask = false

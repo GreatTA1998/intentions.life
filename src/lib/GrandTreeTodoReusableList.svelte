@@ -42,6 +42,7 @@
           ancestorRoomIDs={['']}
           doNotShowScheduledTasks={true}
           doNotShowCompletedTasks={true}
+          {dueInHowManyDays}
           on:task-click
           on:task-checkbox-change
           on:task-node-update
@@ -56,6 +57,7 @@
                 parentID={''}
                 parentObj={{ subtreeDeadlineInMsElapsed: convertDDMMYYYYToDateClassObject(defaultDeadline).getTime() }}
                 colorForDebugging="purple"
+                {dueInHowManyDays}
               />
             {/if}
           </div>
@@ -75,6 +77,7 @@
           parentID={''}
           parentObj={{ subtreeDeadlineInMsElapsed: convertDDMMYYYYToDateClassObject(defaultDeadline).getTime() }}
           colorForDebugging="blue"
+          {dueInHowManyDays}
         />
       {/if}
 
