@@ -99,7 +99,7 @@
   // Assumes `task` is hydrated
   import { createEventDispatcher } from 'svelte'
   import { getTrueY } from '/src/helpers.js'
-  import { yPosWithinBlock, whatIsBeingDragged, whatIsBeingDraggedID } from '/src/store.js'
+  import { yPosWithinBlock, whatIsBeingDragged, whatIsBeingDraggedID, whatIsBeingDraggedFullObj } from '/src/store.js'
   import ReusableCheckbox from '$lib/ReusableCheckbox.svelte'
 
   export let task = null
@@ -123,6 +123,7 @@
 
     whatIsBeingDraggedID.set(id)
     whatIsBeingDragged.set('room')
+    whatIsBeingDraggedFullObj.set(task)
 
     yPosWithinBlock.set(y)
   }
