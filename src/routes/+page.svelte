@@ -27,7 +27,7 @@
             </div>
             
             <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 12px 0px;" class="action-buttons">
-              <div
+              <!-- <div
                 on:click={createTemporaryDemoAccount}
                 style="cursor: pointer; border-radius: 24px; background-color: rgb(160, 160, 160); display: flex; align-items: center; justify-content: center; height: 40px; color: white; padding: 6px 24px; margin-right: 12px;">
                 <span class="material-symbols-outlined" style="margin-right: 4px;">
@@ -36,7 +36,7 @@
                   <div>
                     Try demo
                   </div>
-              </div>
+              </div> -->
     
               <LoginGoogle/>
             </div>
