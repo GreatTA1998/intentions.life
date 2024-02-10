@@ -119,7 +119,7 @@
     correctDeadlineIfNecessary
   } from '/src/helpers/subtreeDragDrop.js'
   import { user, whatIsBeingDraggedFullObj, whatIsBeingDragged, whatIsBeingDraggedID } from '/src/store.js'
-  import { getFirestore, writeBatch, doc } from 'firebase/firestore'
+  import { getFirestore, writeBatch, doc, increment } from 'firebase/firestore'
 
   export let dueInHowManyDays = null // AF(null) means it's a life todo, otherwise it should be a number
   export let allTasksDue = []
@@ -182,24 +182,30 @@
     // use same API as legacy code
   }
 
-  // HANDLING DROP, WE HAVE TO HANDLE ALL THE CASES CORRECTLY
-  // WHEN IT'S COMING FROM THE CALENDAR (ALTHOUGH WE'RE NOT USING IT THEN, WE HAVE TO UNSCHEDULE IT)
-  // WHAT'S THE EXACT, PRECISE BEHAVIOR THAT WE WANT
   function handleDroppedTask (e) {
     e.preventDefault()
 
+    // to be consistent with the API of <ReusableHelperDropzone {parentObj}/>
     const parentObj = { subtreeDeadlineInMsElapsed: Infinity }
-    let newVal = $user.maxOrderValue || 3
+
+    const initialNumericalDifference = 3
+    let newVal = $user.maxOrderValue || initialNumericalDifference
+    batch.update(
+      doc(db, `/users/${$user.uid}/`), {
+        maxOrderValue: increment(initialNumericalDifference)
+      }
+    )
 
     // 1. ORDER VALUE (and startTime)
     // only applies to the subtree's root
-    const { deadlineDate, deadlineTime, id } = $whatIsBeingDraggedFullObj
+    const { deadlineDate, deadlineTime, id, subtreeDeadlineInMsElapsed } = $whatIsBeingDraggedFullObj
 
     let updateObj = {
       orderValue: newVal,
       deadlineDate,
       deadlineTime,
-      id
+      id,
+      subtreeDeadlineInMsElapsed
     }
     
     // 2. UNSCHEDULE: when you drag to the to-do list, it always unschedules it from the calendar

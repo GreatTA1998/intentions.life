@@ -109,13 +109,14 @@
 
     // 1. ORDER VALUE (and startTime)
     // only applies to the subtree's root
-    const { deadlineDate, deadlineTime, id } = $whatIsBeingDraggedFullObj
+    const { deadlineDate, deadlineTime, id, subtreeDeadlineInMsElapsed } = $whatIsBeingDraggedFullObj
 
     let updateObj = {
       orderValue: newVal,
       deadlineDate,
       deadlineTime,
-      id
+      id,
+      subtreeDeadlineInMsElapsed
     }
     
     // 2. UNSCHEDULE: when you drag to the to-do list, it always unschedules it from the calendar

@@ -12,7 +12,7 @@ const db = getFirestore()
 // break the parent relation only if necessary, so that the task can validly belong in the new todo list
 // `updateObj` is what the dropped task is about to be updated to Firestore
 export function breakParentRelationIfNecessary (updateObj) {
-  const d1 = convertDDMMYYYYToDateClassObject(updateObj.startDate, updateObj.startTime)
+  const d1 = convertDDMMYYYYToDateClassObject(updateObj.deadlineDate, updateObj.deadlineTime)
   if (d1.getTime() > updateObj.subtreeDeadlineInMsElapsed) {
     updateObj.parentID = ''
   }
