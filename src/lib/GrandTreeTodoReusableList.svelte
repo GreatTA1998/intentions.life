@@ -113,6 +113,13 @@
   import ReusableHelperDropzone from '$lib/ReusableHelperDropzone.svelte'
   import RecursiveTaskElement from '$lib/RecursiveTaskElement.svelte'
   import { createEventDispatcher, tick } from 'svelte'
+  import {
+    breakParentRelationIfNecessary,
+    maintainValidSubtreeDeadlines,
+    correctDeadlineIfNecessary
+  } from '/src/helpers/subtreeDragDrop.js'
+  import { user, whatIsBeingDraggedFullObj, whatIsBeingDragged, whatIsBeingDraggedID } from '/src/store.js'
+  import { getFirestore, writeBatch, doc } from 'firebase/firestore'
 
   export let dueInHowManyDays = null // AF(null) means it's a life todo, otherwise it should be a number
   export let allTasksDue = []
@@ -124,6 +131,8 @@
   let isTypingNewRootTask = false
   let newRootTaskStringValue = ''
   const dispatch = createEventDispatcher()
+  const db = getFirestore()
+  let batch = writeBatch(db)
 
   // COMPUTE DEFAULT DEADLINE 
   $: {
@@ -179,18 +188,54 @@
   function handleDroppedTask (e) {
     e.preventDefault()
 
-    const droppedTaskID = e.dataTransfer.getData('text/plain')
+    const parentObj = { subtreeDeadlineInMsElapsed: Infinity }
+    let newVal = $user.maxOrderValue || 3
 
-    dispatchNewDeadline({
-      deadlineDateDDMMYYYY: defaultDeadline,
-      deadlineTimeHHMM: '23:59',
-      taskID: droppedTaskID
+    // 1. ORDER VALUE (and startTime)
+    // only applies to the subtree's root
+    const { deadlineDate, deadlineTime, id } = $whatIsBeingDraggedFullObj
+
+    let updateObj = {
+      orderValue: newVal,
+      deadlineDate,
+      deadlineTime,
+      id
+    }
+    
+    // 2. UNSCHEDULE: when you drag to the to-do list, it always unschedules it from the calendar
+    updateObj.startTime = '' 
+    updateObj.startDate = ''
+    updateObj.startYYYY = ''
+
+    // 3. DEADLINE
+    updateObj = correctDeadlineIfNecessary({ 
+      node: updateObj, 
+      todoListUpperBound: dueInHowManyDays, 
+      parentObj,
+      batch,
+      userDoc: $user
     })
 
-    // also unschedule it (this was an old API, but we can just add it here via composition : ) lazy work
-    dispatch('task-unscheduled', {
-      id: e.dataTransfer.getData('text/plain')
+    // 4. PARENTID
+    updateObj = breakParentRelationIfNecessary(updateObj)
+
+    // 2. HANDLE SUBTREE DEADLINES
+    maintainValidSubtreeDeadlines({ 
+      node: $whatIsBeingDraggedFullObj, 
+      todoListUpperBound: dueInHowManyDays, 
+      parentObj,
+      batch,
+      userDoc: $user
     })
+
+    batch.update(
+      doc(db, `users/${$user.uid}/tasks/${$whatIsBeingDraggedID}`),
+      updateObj
+    )
+
+    batch.commit()
+
+    batch = writeBatch(db)
   }
 
   function dragover_handler (e) {
