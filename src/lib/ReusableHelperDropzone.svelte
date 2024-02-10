@@ -47,10 +47,12 @@
 
   function dragover_handler (e) {
     e.preventDefault()
+    e.stopPropagation()
   }
 
   async function onReorderDrop (e) {
     e.preventDefault()
+    e.stopPropagation()
     if (isInvalidReorderDrop()) return
     ReorderDropzone.style.background = ''
 
