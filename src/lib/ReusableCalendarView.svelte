@@ -266,6 +266,9 @@
   //   1. Do origin + new difference to get the date object
   //   2. use the new date object to generate `startTime` and `startDate`
   function drop_handler (e) {
+    const id = e.dataTransfer.getData('text/plain')
+    if (!id) return // it means we're adjusting the duration but it triggers a drop event, and a dragend event must be followed by a drop event
+
     e.preventDefault()
     e.stopPropagation()
     highlightedMinute = null
@@ -288,7 +291,7 @@
 
 
     dispatch('task-scheduled', {
-      id: e.dataTransfer.getData('text/plain'),
+      id,
       timeOfDay: hhmm,
       dateScheduled: mmdd
     })

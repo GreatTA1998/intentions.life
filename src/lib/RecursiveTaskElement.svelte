@@ -261,13 +261,7 @@
       // careful that "NaN/NaN" still counts as having a deadline, which silently makes the tasks disappear
       // as it is not categorized into a day, week or year todo bucket.
     }
-
-    console.log('new subtask =', {
-      id: newTaskID,
-      parentID: taskObj.id,
-      newTaskObj: subtaskObj
-    })
-
+    
     dispatch('subtask-create', {
       id: newTaskID,
       parentID: taskObj.id,

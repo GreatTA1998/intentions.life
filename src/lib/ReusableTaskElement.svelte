@@ -81,7 +81,6 @@
     <div draggable="true"
       on:dragstart={(e) => startAdjustingDuration(e)}
       on:dragend={(e) => adjustDuration(e, task)}
-      on:drop|preventDefault
       style="
         cursor: ns-resize;
         position: absolute;
