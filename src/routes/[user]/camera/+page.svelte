@@ -1,6 +1,6 @@
-<div style="padding: 6px; background-color: var(--navbar-bg-color); display: flex; align-items: center; justify-content: center; height: 100vh">
+<div style="padding: 6px; background-color: white; display: flex; align-items: center; justify-content: center; height: 100vh">
   <div>
-    <div style="height: 360px; width: 360px; display: flex; align-items: center; justify-content: center; background-color: var(--todo-list-bg-color); border-radius: 180px; margin-bottom: 24px;">
+    <div style="height: 360px; width: 360px; display: flex; align-items: center; justify-content: center; background-color: var(--navbar-bg-color); border-radius: 180px; margin-bottom: 16px;">
       <span on:click={openCameraInput} class="material-symbols-outlined" style="font-size: 300px; font-weight: 200; cursor: pointer; color: var(--logo-twig-color)">
         photo_camera
       </span>
@@ -16,14 +16,11 @@
 
     <div style="display: flex; justify-content: space-between;">
       <div style="display: flex; justify-content: center;">
-        <ReusableRoundButton on:click={openFolderInput} backgroundColor="var(--todo-list-bg-color)" textColor="rgb(80, 80, 80)">
-          <span class="material-symbols-outlined" style="font-size: 18px; cursor: pointer; margin-right: 4px; color: rgb(80, 80, 80);">
-            folder
+        <div on:click={openFolderInput} class="circular-icon-button">
+          <span class="material-symbols-outlined" style="font-size: 34px; cursor: pointer; color: rgb(20, 20, 20);">
+            photo_library
           </span>
-          <div style="font-size: 12px;">
-            Upload photos
-          </div>
-        </ReusableRoundButton>
+        </div>
 
         <input style="display: none;" 
           bind:this={FolderInput}
@@ -34,15 +31,11 @@
         >
       </div>
 
-      <div style="display: flex; justify-content: center;">
-        <ReusableRoundButton on:click={() => goto(`/${$user.uid}`)} backgroundColor="var(--todo-list-bg-color)" textColor="rgb(80, 80, 80)">
-          <span class="material-symbols-outlined" style="font-size: 18px; cursor: pointer; margin-right: 4px; color: rgb(80, 80, 80);">
-            calendar_month
-          </span>
-          <div style="font-size: 12px;">
-            Back to calendar
-          </div>
-        </ReusableRoundButton>
+
+      <div class="circular-icon-button" style="background-color: transparent;" on:click={() => goto(`/${$user.uid}`)}>
+        <span class="material-symbols-outlined" style="font-size: 34px; cursor: pointer; color: rgb(120, 120, 120);">
+          undo
+        </span>
       </div>
     </div>
   </div>
@@ -55,10 +48,8 @@
   import { user } from '/src/store.js'
   import { goto } from '$app/navigation'
   import { onMount } from 'svelte'
-  import ReusableRoundButton from '$lib/ReusableRoundButton.svelte'
 
   const storage = getStorage()
-  const id = getRandomID()
 
   let CameraInput
   let FolderInput
@@ -76,16 +67,22 @@
   }
 
   async function handleFileChange (e) {
+    const promises = []
     for (const imageBlobFile of e.target.files) {
       if (imageBlobFile) {
-        console.log("imageBlobFile =", imageBlobFile)
-        const resultSnapshot = await uploadImageBlobToFirebase(imageBlobFile)
-        await createNewScheduledTaskContainingImage(resultSnapshot, imageBlobFile)
+        const id = getRandomID()
+        promises.push(
+          uploadImageBlobToFirebase(imageBlobFile, id).then(resultSnapshot => {
+            createNewScheduledTaskContainingImage(resultSnapshot, imageBlobFile, id)
+          })
+        )
       }
     }
+    await Promise.all(promises)
+    alert('Photos successfully uploaded.')
   }
 
-  async function uploadImageBlobToFirebase (blobFile) {
+  async function uploadImageBlobToFirebase (blobFile, id) {
     return new Promise(async (resolve) => {
       const storageRef = ref(storage, `images/${id}`)
       const snapshot = await uploadBytes(storageRef, blobFile)
@@ -94,7 +91,7 @@
     })
   }
 
-  async function createNewScheduledTaskContainingImage (resultSnapshot, imageBlobFile) {
+  async function createNewScheduledTaskContainingImage (resultSnapshot, imageBlobFile, id) {
     console.log('resultSnapshot =', resultSnapshot)
 
     const { metadata } = resultSnapshot 
@@ -115,7 +112,7 @@
       imageFullPath: fullPath, // for easy garbage collection
       startTime: getTimeInHHMM({ dateClassObj }),
       startDate: getDateInMMDD(dateClassObj), // MMDD is a legacy function so doesn't use destructuring
-      startYYYY: dateClassObj.getFullYear(),
+      startYYYY: `${dateClassObj.getFullYear()}`, // year needs to be a string for some reason
       duration: 120
     }
     newTaskObj = checkTaskObjSchema(newTaskObj, $user)
@@ -129,5 +126,14 @@
 </script>
 
 <style>
+  .circular-icon-button {
+    background-color: var(--navbar-bg-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 30px;
+    width: 60px;
+    height: 60px;
+  }
 
 </style>
