@@ -56,7 +56,6 @@
     padding-left: 9px;
     padding-right: 9px;
     border-radius: 4px;
-    background-color: white;
   }
 
   .ux-field-label {

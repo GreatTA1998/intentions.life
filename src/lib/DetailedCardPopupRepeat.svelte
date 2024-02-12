@@ -1,7 +1,7 @@
 <div style="display: flex; align-items: center;">
   <div class:half-transparent={!taskObject.willRepeatOnWeekDayNumber}>
     <span class="material-symbols-outlined" style="font-size: 28px; margin-top: 4px; color: rgb(0, 0, 0);">
-      refresh
+      event_repeat
     </span>
   </div>
 
@@ -13,7 +13,8 @@
   <!-- doesn't repeat, setting it to repeat -->
   <div 
     class:half-transparent={!taskObject.willRepeatOnWeekDayNumber && !isChoosingRepeatDays}
-    style="display: flex; padding-left: 12px;" on:click={() => {
+    style="display: flex; padding-left: 12px;"
+    on:click={() => {
       if (isScheduled(taskObject) || hasDeadline(taskObject)) {
         isChoosingRepeatDays = true
       } else {

@@ -6,6 +6,10 @@
       </span>
     </div>
 
+    <div style="font-size: 14px; margin-bottom: 12px; text-align: center;">
+      Tip: add this page to your phone's homescreen
+    </div>
+
     <input style="display: none;" 
       bind:this={CameraInput}
       on:change={(e) =>  handleFileChange(e)} 

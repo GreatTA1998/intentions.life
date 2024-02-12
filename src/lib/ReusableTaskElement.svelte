@@ -18,7 +18,8 @@
     outline: 0px solid red;
     background-color: {isBulletPoint ? '' : 'hsla(210, 20%, 36%, 1)'};
     background-image: {task.imageDownloadURL ? `url(${task.imageDownloadURL})` : ''};
-    background-size: cover;
+    background-size: contain;
+    background-repeat: no-repeat;
     padding-left: {isBulletPoint ? '0px' : 'var(--left-padding)'};
     padding-right: var(--left-padding);
 

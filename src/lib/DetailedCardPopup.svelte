@@ -1,5 +1,16 @@
-<div class="fullscreen-invisible-modular-popup-layer" style="z-index: 10;">
-  <div class="detailed-card-popup" bind:this={elem} use:clickOutside on:click_outside={handleClickOutside}>
+<div class="fullscreen-invisible-modular-popup-layer" on:click|self={handleClickOutside} style="z-index: 10;">
+  <div class="detailed-card-popup" bind:this={PopupElem}>
+    {#if taskObject.imageDownloadURL}
+      <img 
+        bind:this={TaskImageElem}
+        on:click|self={() => isViewingPhoto ? isViewingPhoto = false : ''}
+        src={taskObject.imageDownloadURL}
+        class:blurred-image={!isViewingPhoto}
+        class:clear-image={isViewingPhoto}
+        style="position: absolute; inset: 0px; width: 100%; height: 100%;"
+      >
+    {/if}
+
     <div style="display: flex; align-items: center;">
       <ReusableCheckbox
         value={taskObject.isDone}
@@ -86,13 +97,18 @@
       />
 
       <div style="display: flex; align-items: center;">
-        <a style="height: 36px; max-width: 240px;"
+        <span class="material-symbols-outlined"  on:click={() => isViewingPhoto = !isViewingPhoto} style="cursor: pointer; margin-left: 6px; border: 1px solid grey; border-radius: 24px; padding: 4px;">
+          image_search
+        </span>
+
+        <span class="material-symbols-outlined" style="cursor: pointer; margin-left: 12px; border: 1px solid grey; border-radius: 24px; padding: 4px;" 
           on:click={() => {dispatch('task-reusable'); alert('Success, when you click on the calendar and type a task, matching reusable tasks will appear. You can track how much time you spend on this task by visiting the time spent dashboard on the top right.')}}
         >
-          Create reusable template
-        </a>
+          token
+        </span>
 
-        <span class="material-symbols-outlined"  on:click={confirmDelete} style="cursor: pointer; margin-left: 6px; border: 1px solid grey; border-radius: 24px; padding: 4px;">
+
+        <span class="material-symbols-outlined" on:click|stopPropagation={confirmDelete} style="cursor: pointer; margin-left: 12px; border: 1px solid grey; border-radius: 24px; padding: 4px;">
           delete
         </span>
       </div>
@@ -142,6 +158,9 @@ let newStartHHMM
 
 let isEditingDeadline = false
 
+let TaskImageElem
+let PopupElem
+
 $: currentDeadlineValue = (taskObject.deadlineDate || '') + (taskObject.deadlineDate && taskObject.deadlineTime ? " " : "") + (taskObject.deadlineTime || '')
 
 const dispatch = createEventDispatcher()
@@ -149,7 +168,7 @@ const dispatch = createEventDispatcher()
 // don't delete yet, as these might be needed for input element bindings
 let notesAboutTask = taskObject.notes || ''
 let titleOfTask = taskObject.name || ''
-let elem
+let isViewingPhoto = false
 
 function isScheduled (taskObj) {
   return taskObj.startDate && taskObj.startTime && taskObj.startYYYY
@@ -160,7 +179,12 @@ function hasDeadline (taskObj) {
 }
 
 onMount(() => {
-
+  if (taskObject.imageDownloadURL) {
+    TaskImageElem.onload = () => {
+      PopupElem.style.width = `${TaskImageElem.naturalWidth / 6}px` 
+      PopupElem.style.height = `${TaskImageElem.naturalHeight / 6}px`
+    }
+  }
 })
 
 onDestroy(() => {
@@ -270,6 +294,13 @@ function saveTitle (newVal) {
 </script>
 
 <style>
+  .blurred-image {
+    filter: blur(6px) brightness(1.0) contrast(1.0) saturate(1.0);  z-index: -1;
+  }
+  .clear-image {
+    z-index: 1;
+  }
+
   .half-invisible {
     opacity: 0.5;
   }
@@ -284,7 +315,6 @@ function saveTitle (newVal) {
     z-index: 4;
     min-width: 400px;
     width: 80%;
-    max-width: 800px;
     
     height: fit-content;
 
