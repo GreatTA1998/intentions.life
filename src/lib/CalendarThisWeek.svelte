@@ -236,7 +236,7 @@
 
   .sticky-day-of-week-abbreviation {
     font-size: 1.4em;
-    /* background-color: var(--calendar-bg-color); */
+    background-color: var(--calendar-bg-color);
     color: #6D6D6D;
     height: 100px;
     

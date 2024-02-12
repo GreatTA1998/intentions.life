@@ -114,11 +114,11 @@
           })}px;
         "
       > 
-       <div style="font-size: 12px; color: var(--location-indicator-color); font-weight: 600;">
-        {getTimeInHHMM({ dateClassObj: new Date() })}
+        <div style="font-size: 12px; color: var(--location-indicator-color); font-weight: 600;">
+          {getTimeInHHMM({ dateClassObj: new Date() })}
         </div>
         <hr 
-          style="width: 11vw; border: 2px solid var(--location-indicator-color); border-radius: 5px; width: 100%; margin-top: 2px;"
+          style="border: 2px solid var(--location-indicator-color); border-radius: 5px; width: 100%; margin-top: 2px;"
           bind:this={CurrentTimeIndicator}
         > 
       </div>
@@ -332,8 +332,6 @@
     align-items: center;
     position: absolute; 
     width: var(--calendar-day-section-width);
-    padding-left: 6px;
-    padding-right: 6px;
     pointer-events: none;
   }
 
