@@ -54,7 +54,7 @@
 {/if}
 
 <NavbarAndContentWrapper>
-  <div slot="navbar" class="top-navbar" class:transparent-glow-navbar={currentMode === 'Day'} style="padding-left: 2vw; padding-right: 2vw; overflow-x: auto;">
+  <div slot="navbar" class="top-navbar" class:transparent-glow-navbar={currentMode === 'Day'} style="padding-left: 2vw; padding-right: 2vw;">
     <GrandTreeTodoPopupButton let:setIsPopupOpen={setIsPopupOpen}
       on:new-root-task={(e) => createNewRootTask(e.detail)}
       on:task-unscheduled={(e) => unscheduleTask(e)}
