@@ -123,7 +123,7 @@
   function getDateClassObjects (dateClassObj) {
     dateClassObjects = []
     let d = dateClassObj
-    for (let i = -1; i < 14; i++) {
+    for (let i = -7; i < 8; i++) {
       const offset = i * (24*60*60*1000)
       const copy = new Date()
       copy.setTime(d.getTime() + offset)
