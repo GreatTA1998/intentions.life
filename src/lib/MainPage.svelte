@@ -105,7 +105,7 @@
     </PopupCustomerSupport>
 
     <span on:click={() => goto(`/${$user.uid}/camera`)} class="material-symbols-outlined mika-hover" style="font-size: 30px; cursor: pointer;">
-      photo_camera
+      photo
     </span>
   </div>
 
@@ -241,6 +241,7 @@
   import { setFirestoreDoc, updateFirestoreDoc, deleteFirestoreDoc, getFirestoreCollection } from '/src/crud.js'
   import NewThisWeekTodo from '$lib/NewThisWeekTodo.svelte'
   import { garbageCollectInvalidTasks } from '/src/scripts.js'
+  import { deleteObject, getStorage, ref } from 'firebase/storage'
 
   let currentMode = 'Week' // weekMode hourMode monthMode
   const userDocPath = `users/${$user.uid}`
@@ -351,7 +352,7 @@
 
   // THIS IS STILL NOT WORKING: THE ADOPTION IS NOT WORKING, RIGHT NOW ALL THE 
   // SUBTREE WILL BE GONE FOR SOME REASON
-  function deleteTaskNode ({ id, parentID, childrenIDs, imageDownloadURL = "" }) {
+  function deleteTaskNode ({ id, parentID, childrenIDs, imageDownloadURL = '', imageFullPath = ''}) {
     if (parentID !== "") {
       updateFirestoreDoc(tasksPath + parentID, {
         childrenIDs: arrayRemove(id)
@@ -375,9 +376,10 @@
     }
 
     // TO-DO: handle pointerless images
-    // if (imageDownloadURL) {
-
-    // }
+    if (imageFullPath) {
+      const storage = getStorage()
+      deleteObject(ref(storage, imageFullPath))
+    }
 
     // now safely delete itself
     deleteFirestoreDoc(tasksPath + id)

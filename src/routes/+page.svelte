@@ -17,13 +17,14 @@
       <div slot="content" style="display: flex; flex-grow: 1; height: 100%; padding: 4%;">
         <div style="background: transparent; width: 90vw; min-width: 200px; height: 80vh; border-radius: 10px;">
           <div class="hero-title">
-            Combine your todo-list with your calendar.
+            What do you want to do in your life?
           </div>
     
           <div style="display: flex; margin-top: 24px; flex-wrap: wrap;">
             <div class="secondary-description">
-              Create lots of sub-tasks on your to-do list, and drag-and-drop them to the calendar freely.
-              Price is $5/month, <div class="highlighted-words" style="color: var(--base-color)">no need for payment info</div>, so that you don't have to worry about cancelling if you don't end up using it.
+              Use the hierarhical-todo and calendar to execute tasks efficiently and without misses. 
+              Get consistent focus on long-term milestones with the timeline view. 
+              $5/month, <div class="highlighted-words" style="color: var(--base-color)">no payment info needed</div>. 
             </div>
             
             <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 12px 0px;" class="action-buttons">
