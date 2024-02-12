@@ -90,7 +90,7 @@
       />
     </div>
 
-    <div style="margin-top: 0px; display: flex; align-items: center; justify-content: space-between;">
+    <div style="margin-top: 0px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
       <DetailedCardPopupRepeat 
         {taskObject}
         on:repeating-tasks-generate
