@@ -34,7 +34,7 @@
     <!-- giving a maximum width for to-do lists prevents complicated
       nested flexbox calculations
     -->
-    <div class:enable-scrolling={enableScrolling} style="margin-top: 12px; max-width: 22vw;">
+    <div class:enable-scrolling={enableScrolling} class:has-max-width={hasMaxWidth} style="margin-top: 12px;">
       {#each tasksToDisplay as taskObj, i (taskObj.id)}
         <RecursiveTaskElement 
           {taskObj}
@@ -125,6 +125,7 @@
   export let allTasksDue = []
   export let listTitle
   export let enableScrolling = false
+  export let hasMaxWidth = false // quickfix to prevent complicated flexbox layout ordering issues
 
   let defaultDeadline
   let tasksToDisplay = []
@@ -269,5 +270,9 @@
   .enable-scrolling {
     height: 68vh;
     overflow-y: auto;
+  }
+
+  .has-max-width {
+    max-width: 22vw; 
   }
 </style>

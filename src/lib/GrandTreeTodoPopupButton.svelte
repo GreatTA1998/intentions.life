@@ -26,6 +26,7 @@
           allTasksDue={[...$allTasksDueThisLife, ...$allTasksDueThisYear]}
           dueInHowManyDays={365}
           enableScrolling
+          hasMaxWidth
           on:new-root-task
           on:task-unscheduled
           on:subtask-create
@@ -50,6 +51,7 @@
             allTasksDue={$allTasksDueThisMonth}
             dueInHowManyDays={30}
             enableScrolling
+            hasMaxWidth
             on:new-root-task
             on:task-unscheduled
             on:subtask-create
@@ -63,6 +65,7 @@
               dueInHowManyDays={7}
               style="flex-grow: 1; padding-top: 16px; padding-left: 16px; padding-right: 0px; background-color: var(--todo-list-bg-color); border-radius: 16px; display: flex; gap: 12px; justify-content: space-evenly; height: fit-content;"
               enableScrolling
+              hasMaxWidth
               on:new-root-task
               on:task-unscheduled
               on:subtask-create
@@ -76,6 +79,7 @@
                 dueInHowManyDays={1}
                 style="flex-grow: 1; padding-top: 16px; padding-left: 16px; padding-right: 0px; background-color: #4d6c4d; color: white; height: fit-content; border-radius: 12px; gap: 12px; flex-grow: 1; height: fit-content;"
                 enableScrolling
+                hasMaxWidth
                 on:new-root-task
                 on:task-unscheduled
                 on:subtask-create
