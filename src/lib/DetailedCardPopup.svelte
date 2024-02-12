@@ -314,6 +314,7 @@ function saveTitle (newVal) {
     overflow-y: auto;
     z-index: 4;
     min-width: 400px;
+    min-height: 400px;
     width: 80%;
     
     height: fit-content;

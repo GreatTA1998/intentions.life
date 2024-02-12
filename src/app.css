@@ -61,6 +61,14 @@
   resize: none; /*remove the resize handle on the bottom right*/
 }
 
+.unselectable {
+  -moz-user-select: -moz-none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+
 .top-navbar {
   height: var(--navbar-height);
   display: flex; 

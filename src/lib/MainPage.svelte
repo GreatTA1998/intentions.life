@@ -406,8 +406,10 @@
   }   
 
   function incrementDateClassObj ({ days }) {
-    calStartDateClassObj.setDate(calStartDateClassObj.getDate() + days)
-    calStartDateClassObj = calStartDateClassObj // to manually trigger reactivity
+    const d = calStartDateClassObj 
+    const offset = days * (24*60*60*1000)
+    d.setTime(d.getTime() + offset)
+    calStartDateClassObj = d // to manually trigger reactivity
   }
 
   // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getDay
@@ -703,8 +705,7 @@
 
     /* user agent style sheet already implicitly applies overflow-y: auto, but it's clearer to be explicit */
     overflow-y: auto;
-
-    background-color: rgb(250, 250, 250);
+    background-color: var(--calendar-bg-color);
   }
 
   .day-week-toggle-segment {

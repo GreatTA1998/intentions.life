@@ -1,26 +1,26 @@
 <div style="position: relative; background-color: var(--calendar-bg-color);">
     <!-- Absolute element is not in the flex flow -->
     <!-- e.g. DEC 2023 -->
-    <div style="position: absolute; left: var(--calendar-section-left-spacing); top: var(--main-content-top-margin); z-index: 1">
+    <div style="position: absolute; left: var(--calendar-section-left-spacing); top: var(--main-content-top-margin); z-index: 3">
       <div style="display: flex; font-size: 14px;">
         <div style="color: rgb(80, 80, 80); font-weight: 400;">
-          {new Date().toLocaleString('en-US', { month: 'short'})}
+          {calStartDateClassObj.toLocaleString('en-US', { month: 'short'})}
         </div>
         <div style="margin-left: 6px; font-weight: 300; color: rgb(80, 80, 80)">
-          {new Date().toLocaleString('en-US', { year: 'numeric'})}
+          {calStartDateClassObj.toLocaleString('en-US', { year: 'numeric'})}
         </div>
       </div>
 
       <!-- TO-DO: figure out a scroll-only solution -->
       <div style="display: flex; margin-top: 4px;">
         <div>
-          <span on:click={() => dispatch('calendar-shifted', { days: -1 })} class="material-icons shift-calendar-arrow">
+          <span on:click={() => dispatch('calendar-shifted', { days: -7 })} class="material-icons shift-calendar-arrow">
             arrow_left
           </span>
         </div>
 
         <div>
-          <span on:click={() => dispatch('calendar-shifted', { days: 1 })} class="material-icons shift-calendar-arrow">
+          <span on:click={() => dispatch('calendar-shifted', { days: 7 })} class="material-icons shift-calendar-arrow">
             arrow_right
           </span>
         </div>
@@ -40,10 +40,10 @@
       {/each}
     </div>
 
-    {#each dateClassObjects as dateClassObj, i}
+    {#each dateClassObjects as dateClassObj, i (dateClassObj.getTime())}
       <!-- To vertically group the date label with the calendar component-->
       <!-- 4px for gap between each calendar so the calendar blocks don't visually merge -->
-      <div style="margin-left: 0.5vw;">
+      <div style="margin-left: 0.5vw;" class="unselectable">
         <div class="sticky-day-of-week-abbreviation" style="padding-top: var(--main-content-top-margin); margin-bottom: {spacingBetweenLabelAndCal}px">
           <div>
             <div 
@@ -123,13 +123,13 @@
   function getDateClassObjects (dateClassObj) {
     dateClassObjects = []
     let d = dateClassObj
-    // dateClassObjects.push(d)
     for (let i = -1; i < 14; i++) {
-      const independentCopy = new Date()
-      independentCopy.setDate(d.getDate() + i) // quickfix: for some reason we're off by 1-index, will investigate
+      const offset = i * (24*60*60*1000)
+      const copy = new Date()
+      copy.setTime(d.getTime() + offset)
       // no longer start from 7 am, or else there will be missing hours
-      independentCopy.setHours(0, 0, 0) // hours, minutes, seconds, note it's ZERO-indexed, 0-23, 0-59
-      dateClassObjects.push(independentCopy)
+      copy.setHours(0, 0, 0) // hours, minutes, seconds, note it's ZERO-indexed, 0-23, 0-59
+      dateClassObjects.push(copy)
     }
     dateClassObjects = dateClassObjects // manually trigger reactivity)
   }
