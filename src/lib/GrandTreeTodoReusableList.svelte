@@ -30,7 +30,6 @@
       </div>
     </div>
 
-
     <!-- giving a maximum width for to-do lists prevents complicated
       nested flexbox calculations
     -->
