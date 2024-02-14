@@ -97,9 +97,11 @@
       />
 
       <div style="display: flex; align-items: center;">
-        <span class="material-symbols-outlined"  on:click={() => isViewingPhoto = !isViewingPhoto} style="cursor: pointer; margin-left: 6px; border: 1px solid grey; border-radius: 24px; padding: 4px;">
-          image_search
-        </span>
+        {#if taskObject.imageDownloadURL}
+          <span class="material-symbols-outlined"  on:click={() => isViewingPhoto = !isViewingPhoto} style="cursor: pointer; margin-left: 6px; border: 1px solid grey; border-radius: 24px; padding: 4px;">
+            image_search
+          </span>
+        {/if}
 
         <span class="material-symbols-outlined" style="cursor: pointer; margin-left: 12px; border: 1px solid grey; border-radius: 24px; padding: 4px;" 
           on:click={() => {dispatch('task-reusable'); alert('Success, when you click on the calendar and type a task, matching reusable tasks will appear. You can track how much time you spend on this task by visiting the time spent dashboard on the top right.')}}

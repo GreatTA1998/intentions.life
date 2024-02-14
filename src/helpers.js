@@ -3,7 +3,7 @@ import { setFirestoreDoc } from '/src/crud.js'
 export function checkTaskObjSchema (task, userDoc) {
   const output = {...task}
   if (!task.startYYYY) output.startYYYY = ''
-  if (!task.duration) output.duration = 1
+  if (!task.duration) output.duration = 30
   if (!task.parentID) output.parentID = ""
   if (!task.childrenIDs) output.childrenIDs = []
   if (!task.orderValue) output.orderValue = (userDoc.maxOrderValue || 0) + 3

@@ -117,10 +117,9 @@
       startTime: getTimeInHHMM({ dateClassObj }),
       startDate: getDateInMMDD(dateClassObj), // MMDD is a legacy function so doesn't use destructuring
       startYYYY: `${dateClassObj.getFullYear()}`, // year needs to be a string for some reason
-      duration: 120
+      duration: 60
     }
     newTaskObj = checkTaskObjSchema(newTaskObj, $user)
-    console.log('newTaskObj =', newTaskObj)
 
     await setFirestoreDoc(
       `users/${$user.uid}/tasks/${id}`, 
