@@ -71,7 +71,7 @@
 
     <div class="day-week-toggle-segment">
       <div on:click={() => currentMode = 'Day'}
-        class="ux-tab-item" 
+        class="ux-tab-item hide-for-mobile" 
         class:transparent-glow-tab={currentMode === 'Day'} 
       >
         Day
@@ -94,7 +94,7 @@
       </div>
     </div>
 
-    <span on:click={() => currentMode === 'Dashboard' ? currentMode = 'Week' : currentMode = 'Dashboard'}  class="material-symbols-outlined mika-hover" class:blue-icon={currentMode === 'Dashboard'} style="margin-left: 32px; margin-right: 32px; font-size: 32px; cursor: pointer;">
+    <span on:click={() => currentMode === 'Dashboard' ? currentMode = 'Week' : currentMode = 'Dashboard'}  class="material-symbols-outlined mika-hover" class:blue-icon={currentMode === 'Dashboard'} style="margin-right: 32px; font-size: 32px; cursor: pointer;">
       signal_cellular_alt
     </span>
 
@@ -671,6 +671,10 @@
     .todo-container {
       min-width: 200px;
     }
+
+    .hide-for-mobile {
+      display: none;
+    };
   }
 
   .rounded-card {
