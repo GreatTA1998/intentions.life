@@ -674,7 +674,7 @@
 
     .hide-for-mobile {
       display: none;
-    };
+    }
   }
 
   .rounded-card {
