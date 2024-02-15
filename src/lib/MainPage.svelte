@@ -661,22 +661,6 @@
     overflow-y: auto;
   }
 
-  @media (max-width: 1279.99px) {
-    .todo-container {
-      min-width: 280px;
-    }
-  }
-
-  @media (max-width: 767.99px) {
-    .todo-container {
-      min-width: 200px;
-    }
-
-    .hide-for-mobile {
-      display: none;
-    }
-  }
-
   .rounded-card {
     /* border-radius: 36px; */
     padding: 24px;
@@ -788,4 +772,20 @@
   /* #radio-player-with-art {
     background-image: url('../maplestory-watercolor.jpg')
   } */
+  
+  @media (max-width: 1279.99px) {
+    .todo-container {
+      min-width: 280px;
+    }
+  }
+
+  @media (max-width: 767.99px) {
+    .todo-container {
+      min-width: 200px;
+    }
+
+    .hide-for-mobile {
+      display: none;
+    }
+  }
 </style>
