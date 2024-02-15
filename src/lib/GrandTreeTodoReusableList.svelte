@@ -3,37 +3,26 @@
   style={$$props.style}
   on:drop|stopPropagation={(e) => handleDroppedTask(e)}
   on:dragover={(e) => dragover_handler(e)}
->
-  <!-- <slot name="above-list-title">
-
-  </slot> -->
-
-  <!-- Yes every indented <div> is necessary, trust me for now, to make the 
-    Month todo layout work horizontally with flexbox
-    and the week todo layout work vertically  
-  -->
-  <div>
-    <div>
-      <div style="display: flex; align-items: center; margin-bottom: 12px;">
-        <div style="height: 24px; align-items: center; display: flex;">
-          <div style="font-weight: 600; font-size: 18px; margin-left: 2px;">
-            {listTitle} 
-          </div> 
-        </div>
-
-        <span on:click={() => isTypingNewRootTask = true} 
-          class="new-task-icon material-icons" 
-          style="margin-left: 10px; margin-bottom: 10px"
-        >
-          +
-        </span>
-      </div>
+> 
+  <div class="first-column" style="height: 100%; display: flex; flex-direction: column;">
+    <div style="display: flex; align-items: center; margin-bottom: 12px;">
+      <div style="font-weight: 600; font-size: 18px; margin-left: 2px;">
+        {listTitle} 
+      </div> 
+      
+      <span on:click={() => isTypingNewRootTask = true} 
+        class="new-task-icon material-icons" 
+        style="margin-left: 10px; margin-bottom: 10px"
+      >
+        +
+      </span>
     </div>
 
-    <!-- giving a maximum width for to-do lists prevents complicated
-      nested flexbox calculations
-    -->
-    <div class:enable-scrolling={enableScrolling} class:has-max-width={hasMaxWidth} style="margin-top: 12px;">
+    <div 
+      style="flex-grow: 1;"
+      class:has-max-width={hasMaxWidth}
+      class:enable-scrolling={enableScrolling} 
+    >
       {#each tasksToDisplay as taskObj, i (taskObj.id)}
         <RecursiveTaskElement 
           {taskObj}
@@ -258,7 +247,8 @@
 
 <style>
   .todo-list-container {
-    width: 100%;
+    /* width: 100%; will cause the strange shifting out of screen bug*/
+    height: 100%;
     background-color: var(--todo-list-bg-color);
     padding-bottom: 16px;
     padding-left: 2vw; 
@@ -267,11 +257,17 @@
   }
 
   .enable-scrolling {
-    height: 68vh;
     overflow-y: auto;
   }
 
+  /* This saves a lot of pain, trust me. I have no idea why the flexboxes don't shrink with flex-basis, flex-shrink etc. and upon further research it looks like 
+    it can get extremely complicated, and that CSS grid could be a better solution.
+  */
   .has-max-width {
-    max-width: 22vw; 
+    max-width: 21.2vw; 
+  }
+
+  .first-column {
+    flex-basis: 100%; 
   }
 </style>
