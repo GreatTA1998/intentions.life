@@ -24,7 +24,7 @@
             <div class="secondary-description">
               Use the hierarhical-todo and calendar to execute tasks efficiently and without misses. 
               Get consistent focus on long-term milestones with the timeline view. 
-              $5/month, <div class="highlighted-words" style="color: var(--base-color)">no payment info needed</div>. 
+              $10/month, <div class="highlighted-words" style="color: var(--base-color)">no payment info needed</div>. 
             </div>
             
             <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 12px 0px;" class="action-buttons">
