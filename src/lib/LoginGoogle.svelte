@@ -15,7 +15,7 @@
 "
   on:click={signInWithGoogle}
 >
-  Create account
+  Try it
   <span class="material-symbols-outlined" style="font-size: 32px; margin-left: 4px;">
     arrow_right_alt
   </span>
