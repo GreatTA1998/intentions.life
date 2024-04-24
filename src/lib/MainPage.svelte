@@ -94,6 +94,10 @@
       </div>
     </div>
 
+    <span on:click={() => currentMode === 'ManageRepeats' ? currentMode = 'Week' : currentMode = 'ManageRepeats'}  class="material-symbols-outlined mika-hover" class:blue-icon={currentMode === 'Dashboard'} style="margin-right: 32px; font-size: 32px; cursor: pointer;">
+      restart_alt
+    </span>
+
     <span on:click={() => currentMode === 'Dashboard' ? currentMode = 'Week' : currentMode = 'Dashboard'}  class="material-symbols-outlined mika-hover" class:blue-icon={currentMode === 'Dashboard'} style="margin-right: 32px; font-size: 32px; cursor: pointer;">
       signal_cellular_alt
     </span>
@@ -111,7 +115,9 @@
 
   <!-- position: relative; -->
   <div slot="content" style="display: flex; flex-grow: 1; height: 100%;">
-      {#if currentMode === 'Dashboard'}
+      {#if currentMode === 'ManageRepeats'}
+        <ManageRepeatingTasks/>
+      {:else if currentMode === 'Dashboard'}
         <LifeDashboard {allTasks}/>  
       {:else if currentMode === 'Day'}
         <!-- Show daytime art from 5 am - 7 pm, note `.getHours()` is 0-indexed from 0 to 23 -->
@@ -232,6 +238,7 @@
   import YearView from '$lib/YearView.svelte'
   import ZenJournal from '$lib/ZenJournal.svelte'
   import ZenJournalLeftNavigation from '$lib/ZenJournaLeftNavigation.svelte'
+  import ManageRepeatingTasks from '$lib/ManageRepeatingTasks.svelte'
 
   import { onDestroy, onMount } from 'svelte'
   import { goto } from '$app/navigation';

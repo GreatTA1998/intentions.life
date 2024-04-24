@@ -17,7 +17,7 @@
       <div slot="content" style="display: flex; flex-grow: 1; height: 100%; padding: 4%; background: #193b19;">
         <div style="width: 90vw; min-width: 200px; height: 80vh; border-radius: 10px;">
           <div class="hero-title">
-            Todo-list and calendar combined
+            Modern todo-list and calendar
           </div>
     
           <div style="display: flex; margin-top: 24px; flex-wrap: wrap;">
