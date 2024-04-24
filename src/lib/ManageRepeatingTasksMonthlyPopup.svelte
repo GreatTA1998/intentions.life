@@ -1,78 +1,57 @@
-<div style="padding: 16px;">
-  <div style="font-size: 32px;">
-    Configure repeating tasks
-  </div>
+<slot {setIsPopupOpen}>
 
-  <div style="margin-bottom: 48px;"></div>
+</slot>
 
-  <div style="font-size: 24px;">
-    Weekly
-  </div>
 
-  <!-- How do you add repeating tasks -->
-  <!-- TO-DO:
-    - Copy existing algorithm for weekly repeats
-    - Can be time-specific vs time-flexible
-  -->
+{#if isPopupOpen}
+  <div class="fullscreen-invisible-modular-popup-layer">
+    <div class="detailed-card-popup" use:clickOutside on:click_outside={() => isPopupOpen = false}>
 
-  <div style="display: flex;">
-    {#each Array(7) as _, i} 
-      <div class="day-of-week-circle"></div>
-    {/each}
-  </div>
-
-  
-  <div style="margin-bottom: 48px;"></div>
-
-  <div style="display: flex; align-items: center;">
-    <div style="font-size: 24px;">
-      Monthly
-    </div>
-
-    <ManageRepeatingTasksMonthlyPopup  let:setIsPopupOpen={setIsPopupOpen}>
-      <span on:click={() => setIsPopupOpen({ newVal: true })} style="font-size: 26px; margin-left: 8px;">
-        +
-      </span>
-    </ManageRepeatingTasksMonthlyPopup>
-  </div>
-
-  <div class="monthly-periodicity-task" style="margin-top: 12px;">
-    <div style="display: flex; align-items: center;">
-      <div style="display: flex;">
+      <div style="display: flex; margin-top: 24px;">
         {#each Array(27) as _, i}
-        <div 
-          on:click={() => repeatOnDayOfMonth[i] = !repeatOnDayOfMonth[i]} 
-          class="day-of-month-square"
-          style="width: 3px; height: 16px; border: 0px solid black;"
-          class:highlighted={repeatOnDayOfMonth[i]}
-        >
-
-        </div>
+          <div 
+            on:click={() => repeatOnDayOfMonth[i] = !repeatOnDayOfMonth[i]} 
+            class="day-of-month-square"
+            class:highlighted={repeatOnDayOfMonth[i]}
+          >
+            {i + 1}
+          </div>
         {/each}
 
         <div 
           on:click={() => willRepeatOnLastDay = !willRepeatOnLastDay} 
-          class="day-of-month-square"
-          style="width: 3px; height: 16px; border: 0px solid black;"
+          class="day-of-month-square" 
           class:highlighted={willRepeatOnLastDay}
+          style="width: fit-content;"
         >
-
-        </div>
+          Last day
       </div>
 
-      <div style="margin-left: 12px;">
-        Customer update
       </div>
+      <div>
+        Repeat at 19:00 vs flexible time
+      </div>
+
+
+      <button on:click={() => createNewInstancesOfMonthlyRepeatingTasks({ numOfMonthsInAdvance: 2, repeatOnDayOfMonth, willRepeatOnLastDay: true })}>
+        Save and generate tasks
+      </button>
     </div>
   </div>
-</div>
+{/if}
 
 <script>
-  import ManageRepeatingTasksMonthlyPopup from '$lib/ManageRepeatingTasksMonthlyPopup.svelte'
+  import { clickOutside } from '/src/helpers.js'
+
+  let isPopupOpen = false
 
   let repeatOnDayOfMonth = Array(27).fill(0)
   let willRepeatOnLastDay = false
-  let isShowingPopup = false
+  
+
+  function setIsPopupOpen ({ newVal }) {
+    isPopupOpen = newVal
+  }
 
   // repeatOnDaysOfMonth: [0, 0, 0, 1, ... 0, 1]
   function createNewInstancesOfMonthlyRepeatingTasks ({numOfMonthsInAdvance = 2, repeatOnDayOfMonth, willRepeatOnLastDay}) {
@@ -115,6 +94,7 @@
   function generateNewTask (dayOfMonth) {
     console.log('generate new task for =', dayOfMonth)
   }
+  
 </script>
 
 <style>
@@ -142,4 +122,25 @@
   .highlighted {
     background-color: orange;
   }
+  .detailed-card-popup {
+    position: fixed;
+    font-size: 14px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 58%;
+    overflow-y: auto;
+    z-index: 3;
+    min-width: 360px;
+    
+    height: fit-content;
+
+    padding: 24px;
+    border-radius: 24px;
+    background-color: white;
+ 
+  /*    border: 1px solid #000; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);*/
+    -webkit-box-shadow:  0px 0px 0px 9999px rgba(0, 0, 0, 0.5);
+  }
+
 </style>
