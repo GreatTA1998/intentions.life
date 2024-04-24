@@ -9,19 +9,12 @@
     Weekly
   </div>
 
-  <!-- How do you add repeating tasks -->
-  <!-- TO-DO:
-    - Copy existing algorithm for weekly repeats
-    - Can be time-specific vs time-flexible
-  -->
-
   <div style="display: flex;">
     {#each Array(7) as _, i} 
       <div class="day-of-week-circle"></div>
     {/each}
   </div>
 
-  
   <div style="margin-bottom: 48px;"></div>
 
   <div style="display: flex; align-items: center;">
@@ -36,43 +29,68 @@
     </ManageRepeatingTasksMonthlyPopup>
   </div>
 
-  <div class="monthly-periodicity-task" style="margin-top: 12px;">
-    <div style="display: flex; align-items: center;">
-      <div style="display: flex;">
-        {#each Array(27) as _, i}
-        <div 
-          on:click={() => repeatOnDayOfMonth[i] = !repeatOnDayOfMonth[i]} 
-          class="day-of-month-square"
-          style="width: 3px; height: 16px; border: 0px solid black;"
-          class:highlighted={repeatOnDayOfMonth[i]}
-        >
+  {#if periodicTasks}
+    {#each periodicTasks as periodicTask}
+      <div class="monthly-periodicity-task" style="margin-top: 12px;">
+        <div style="display: flex; align-items: center; position: relative;">
+          <!-- start of visual representation -->
+          <div style="position: relative; width: 95px; border: 0px solid purple; height: 20px; display: flex; align-items: center;">
+            <!-- background interval -->
+            <div style="position: relative; width: 95px; height: 2px; background-color: #ccc; display: flex; align-items: center;">
+              <span class="tick start"></span>
+              <span class="tick end"></span>
+            </div>
 
-        </div>
-        {/each}
+            <!-- orange circle dots -->
+            <div style="position: absolute; display: flex; width: 90px; outline: 0px solid red; height: 20px; align-items: center;">
+              {#each Array(27) as _, i}
+                {#if periodicTask.repeatOnDayOfMonth[i]}
+                  <div style="width: 8px; height: 8px; border: 0px solid black; border-radius: 8px;
+                      position: absolute; left: {3 * i}px
+                    "
+                    class="highlighted"
+                  >
+                  </div>
+                {/if}
+              {/each}
+              
+              {#if periodicTask.willRepeatOnLastDay}
+                <div 
+                  style="width: 8px; height: 8px; border: 0px solid black; border-radius: 8px;
+                    position: absolute; left: {3 * 30}px
+                  "
+                  class="highlighted"
+                >
+                </div>
+              {/if}
+            </div>
+          </div>
+          <!-- end of visual representation -->
 
-        <div 
-          on:click={() => willRepeatOnLastDay = !willRepeatOnLastDay} 
-          class="day-of-month-square"
-          style="width: 3px; height: 16px; border: 0px solid black;"
-          class:highlighted={willRepeatOnLastDay}
-        >
-
+          <div style="margin-left: 12px;">
+            {periodicTask.name}
+          </div>
         </div>
       </div>
-
-      <div style="margin-left: 12px;">
-        Customer update
-      </div>
-    </div>
-  </div>
+    {/each}
+  {/if}
 </div>
 
 <script>
   import ManageRepeatingTasksMonthlyPopup from '$lib/ManageRepeatingTasksMonthlyPopup.svelte'
+  import { getFirestoreCollection } from '/src/crud.js'
+  import { onMount } from 'svelte'
+  import { user } from '/src/store.js'
 
   let repeatOnDayOfMonth = Array(27).fill(0)
   let willRepeatOnLastDay = false
   let isShowingPopup = false
+  let periodicTasks = null
+
+  onMount(async () => {
+    const temp = await getFirestoreCollection(`/users/${$user.uid}/periodicTasks`)
+    periodicTasks = temp
+  })
 
   // repeatOnDaysOfMonth: [0, 0, 0, 1, ... 0, 1]
   function createNewInstancesOfMonthlyRepeatingTasks ({numOfMonthsInAdvance = 2, repeatOnDayOfMonth, willRepeatOnLastDay}) {
@@ -141,5 +159,21 @@
 
   .highlighted {
     background-color: orange;
+  }
+
+  .tick {
+    position: absolute;
+    width: 2px; /* Adjust the tick width */
+    height: 10px; /* Adjust the tick height */
+    background-color: #c6c6c6; /* Set the tick color */
+    margin-bottom: -12pxpx;
+  }
+
+  .start {
+    left: 0; /* Position the start tick at the beginning */
+  }
+
+  .end {
+    right: 0; /* Position the end tick at the end */
   }
 </style>

@@ -6,6 +6,7 @@
 {#if isPopupOpen}
   <div class="fullscreen-invisible-modular-popup-layer">
     <div class="detailed-card-popup" use:clickOutside on:click_outside={() => isPopupOpen = false}>
+      <input bind:value={newTaskName}>
 
       <div style="display: flex; margin-top: 24px;">
         {#each Array(27) as _, i}
@@ -28,29 +29,51 @@
       </div>
 
       </div>
+
       <div>
         Repeat at 19:00 vs flexible time
       </div>
 
 
-      <button on:click={() => createNewInstancesOfMonthlyRepeatingTasks({ numOfMonthsInAdvance: 2, repeatOnDayOfMonth, willRepeatOnLastDay: true })}>
-        Save and generate tasks
+      <button on:click={() => createTemplateAndGenerateTasks({ numOfMonthsInAdvance: 2, repeatOnDayOfMonth, willRepeatOnLastDay: true })}>
+        Create repeat template and generate tasks
       </button>
     </div>
   </div>
 {/if}
 
 <script>
-  import { clickOutside } from '/src/helpers.js'
+  import { clickOutside, getRandomID } from '/src/helpers.js'
+  import { setFirestoreDoc, getFirestoreCollection  } from '/src/crud.js'
+  import { user } from '/src/store.js'
+  import { onMount } from 'svelte'
 
   let isPopupOpen = false
 
   let repeatOnDayOfMonth = Array(27).fill(0)
   let willRepeatOnLastDay = false
-  
+  let newTaskName = ''
+  let periodicTasks = null
+
+  onMount(async () => {
+    const temp = await getFirestoreCollection(`/users/${$user.uid}/periodicTasks`)
+    periodicTasks = temp
+  })
 
   function setIsPopupOpen ({ newVal }) {
     isPopupOpen = newVal
+  }
+
+  function createTemplateAndGenerateTasks ({ numOfMonthsInAdvance = 2, repeatOnDayOfMonth, willRepeatOnLastDay }) {
+    // create template
+    const id = getRandomID()
+    setFirestoreDoc(`/users/${$user.uid}/periodicTasks/${id}`, {
+      name: newTaskName,
+      repeatOnDayOfMonth,
+      willRepeatOnLastDay,
+      repeatGroupID: id
+    })
+    createNewInstancesOfMonthlyRepeatingTasks({ numOfMonthsInAdvance: 2, repeatOnDayOfMonth, willRepeatOnLastDay: true })
   }
 
   // repeatOnDaysOfMonth: [0, 0, 0, 1, ... 0, 1]
@@ -93,19 +116,12 @@
 
   function generateNewTask (dayOfMonth) {
     console.log('generate new task for =', dayOfMonth)
+    console.log('new task name =', newTaskName)
   }
   
 </script>
 
 <style>
-  .day-of-week-circle {
-    border-radius: 16px;
-    width: 20px; 
-    height: 20px;
-    border: 2px solid black;
-    margin: 4px;
-  }
-
   .day-of-month-square {
     width: 24px; 
     height: 24px; 
