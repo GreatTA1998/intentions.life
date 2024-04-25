@@ -123,12 +123,7 @@
   }
 
   function generateNewTask (dayOfMonth, zeroIndexedMonthNumber) {
-    // console.log('generate new task for =', dayOfMonth)
-    // console.log('new task name =', newTaskName)
-    // console.log('zeroIndexedMonthNumber =', zeroIndexedMonthNumber)
     // BUG: NOT CORRECT
-    console.log('dayOfMonth, zeroIndexedMonthNumber =', dayOfMonth, zeroIndexedMonthNumber)
-
     const d = new Date()
     d.setMonth(zeroIndexedMonthNumber) // MUST set month first, otherwise it thinks the 31st day doesn't exist on the month yet
     d.setDate(dayOfMonth)
