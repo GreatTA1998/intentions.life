@@ -66,7 +66,7 @@
 
 <script>
   import { getRandomID, checkTaskObjSchema, getDateInMMDD, convertMMDDToDateClassObject, computeDayDifference } from '/src/helpers.js'
-  import { setFirestoreDoc, getFirestoreCollection, createFirestoreQuery, getFirestoreQuery, updateFirestoreDoc } from '/src/crud.js'
+  import { setFirestoreDoc, deleteFirestoreDoc, getFirestoreCollection, createFirestoreQuery, getFirestoreQuery, updateFirestoreDoc } from '/src/crud.js'
   import { user } from '/src/store.js'
   import { onMount } from 'svelte'
   import UXFormField from '$lib/UXFormField.svelte'
@@ -122,8 +122,7 @@
 
     // delete all of them, use a Firestore batch
     for (const instance of currAndFutureInstances) {
-      console.log("about to delete instance =", instance)
-      // deleteFirestoreDoc(`/users/${$user.uid}/tasks/${instance.id}`)
+      deleteFirestoreDoc(`/users/${$user.uid}/tasks/${instance.id}`)
     }
 
     // with a clean slate, generate new ones
