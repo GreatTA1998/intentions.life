@@ -62,12 +62,13 @@
 {/if}
 
 <script>
-  import { clickOutside, getRandomID } from '/src/helpers.js'
-  import { setFirestoreDoc, getFirestoreCollection  } from '/src/crud.js'
+  import { clickOutside, getRandomID, convertMMDDToDateClassObject } from '/src/helpers.js'
+  import { setFirestoreDoc, getFirestoreCollection, getFirestoreQuery, createFirestoreQuery, deleteFirestoreDoc  } from '/src/crud.js'
   import { user } from '/src/store.js'
   import { onMount } from 'svelte'
   import UXFormField from '$lib/UXFormField.svelte'
   import UXToggleSwitch from '$lib/UXToggleSwitch.svelte'
+  import { createNewInstancesOfMonthlyRepeatingTasks } from '/src/helpers/periodicRepeat.js'
 
   // TODO: rename to `periodicTaskTemplate`
   export let taskObject
@@ -84,15 +85,35 @@
   }
 
   // effectively a delete + create
-  function editExistingInstances () {
+  async function editExistingInstances () {
     // find all the repeat groups scheduled from today's date (don't care about the past)
-  
-    // query
-    // repeatGroupID === repeatGroupID
 
-    // delete all of them with .delete(), or batch with Firestore batch
+    const q = createFirestoreQuery({
+      collectionPath: `/users/${$user.uid}/tasks`,
+      criteriaTerms: ['repeatGroupID', '==', taskObject.repeatGroupID] // TO-DO: rename `taskObject`
+    })
 
-    // regenerate the tasks (using the original function written in the other popup)
+    const allRepeatInstances = await getFirestoreQuery(q)
+    const currAndFutureInstances = allRepeatInstances.filter(instance => {
+      const d1 = new Date()
+      const d2 = convertMMDDToDateClassObject(instance.startDate, instance.startYYYY)
+      const dayDiff = computeDayDifference(d1, d2) // dayDiff := d2 - d1 
+      return dayDiff >= 0
+    })
+
+    // delete all of them, use a Firestore batch
+    for (const instance of currAndFutureInstances) {
+      console.log("about to delete instance =", instance)
+      // deleteFirestoreDoc(`/users/${$user.uid}/tasks/${instance.id}`)
+    }
+
+    // with a clean slate, generate new ones
+    createNewInstancesOfMonthlyRepeatingTasks({
+      repeatGroupID: taskObject.repeatGroupID, // TODO: rename `taskObject`
+      numOfMonthsInAdvance: 2,
+      repeatOnDayOfMonth,
+      willRepeatOnLastDay 
+    }, $user)
   }  
 </script>
 

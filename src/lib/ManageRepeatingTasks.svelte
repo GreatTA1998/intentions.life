@@ -22,18 +22,12 @@
       Monthly
     </div>
 
-    <ManageRepeatingTasksMonthlyPopup  let:setIsPopupOpen={setIsPopupOpen}>
+    <ManageRepeatingTasksUnifiedMonthlyPopup  let:setIsPopupOpen={setIsPopupOpen}>
       <span on:click={() => setIsPopupOpen({ newVal: true })} style="font-size: 26px; margin-left: 8px;">
         +
       </span>
-    </ManageRepeatingTasksMonthlyPopup>
+    </ManageRepeatingTasksUnifiedMonthlyPopup>
   </div>
-
-  {#if currentlyEditingTaskObj}
-    <ManageRepeatingTasksMonthlyEditPopup 
-      taskObject={currentlyEditingTaskObj}
-    />
-  {/if}
 
   {#if periodicTasks}
     {#each periodicTasks as periodicTask}
@@ -73,11 +67,11 @@
           </div>
           <!-- end of visual representation -->
 
-          <ManageRepeatingTasksMonthlyEditPopup let:setIsPopupOpen={setIsPopupOpen} taskObject={periodicTask}>
+          <ManageRepeatingTasksUnifiedMonthlyPopup let:setIsPopupOpen={setIsPopupOpen} isEditVersion={true} monthlyPeriodicTemplate={periodicTask}>
             <div on:click={() => setIsPopupOpen({ newVal: true })}  style="margin-left: 12px; cursor: pointer;">
               {periodicTask.name}
             </div>
-          </ManageRepeatingTasksMonthlyEditPopup>
+          </ManageRepeatingTasksUnifiedMonthlyPopup>
         </div>
       </div>
     {/each}
@@ -85,8 +79,7 @@
 </div>
 
 <script>
-  import ManageRepeatingTasksMonthlyPopup from '$lib/ManageRepeatingTasksMonthlyPopup.svelte'
-  import ManageRepeatingTasksMonthlyEditPopup from '$lib/ManageRepeatingTasksMonthlyEditPopup.svelte'
+  import ManageRepeatingTasksUnifiedMonthlyPopup from '$lib/ManageRepeatingTasksUnifiedMonthlyPopup.svelte'
   import { getFirestoreCollection } from '/src/crud.js'
   import { onMount } from 'svelte'
   import { user } from '/src/store.js'

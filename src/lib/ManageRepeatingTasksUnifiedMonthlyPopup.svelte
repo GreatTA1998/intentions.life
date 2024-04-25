@@ -2,10 +2,9 @@
 
 </slot>
 
-
 {#if isPopupOpen}
-  <div class="fullscreen-invisible-modular-popup-layer">
-    <div class="detailed-card-popup" use:clickOutside on:click_outside={() => isPopupOpen = false}>
+  <div class="fullscreen-invisible-modular-popup-layer" on:click|self={() => isPopupOpen = false}>
+    <div class="detailed-card-popup">
       <input bind:value={newTaskName}>
 
       <div style="display: flex; margin-top: 24px;">
@@ -26,44 +25,115 @@
           style="width: fit-content;"
         >
           Last day
+        </div>
       </div>
 
+      
+      <div style="display: flex; align-items: center; padding-top: 8px;">
+        <div style="margin: 8px;">
+          Designated time
+        </div>
+
+        <div style="margin-top: 0px;">
+          <UXToggleSwitch on:new-checked-state={(e) => hasSpecificTime = e.detail.isChecked}/>
+        </div>
+
+        {#if hasSpecificTime}
+          <div style="max-width: 120px; margin-left: 8px;">
+            <UXFormField
+              fieldLabel="Time (hh:mm)"
+              value={''}
+              willAutofocus={false}
+              on:input={(e) => handleTaskStartInput(e)}
+              placeholder="17:30"
+            />
+          </div>
+        {/if}
       </div>
 
-      <div>
-        Repeat at 19:00 vs flexible time
-      </div>
-
-
-      <button on:click={() => createTemplateAndGenerateTasks({ numOfMonthsInAdvance: 2, repeatOnDayOfMonth, willRepeatOnLastDay: true })}>
-        Create repeat template and generate tasks
-      </button>
+      {#if !isEditVersion}
+        <button on:click={() => createTemplateAndGenerateTasks({ numOfMonthsInAdvance: 2, repeatOnDayOfMonth, willRepeatOnLastDay: true })}>
+          Create repeat template and generate tasks
+        </button>
+      {:else}
+        <button on:click={editExistingInstances}>
+          Modify existing tasks
+        </button>
+      {/if}
     </div>
   </div>
 {/if}
 
 <script>
-  import { clickOutside, getRandomID, checkTaskObjSchema, getDateInMMDD } from '/src/helpers.js'
-  import { setFirestoreDoc, getFirestoreCollection  } from '/src/crud.js'
+  import { getRandomID, checkTaskObjSchema, getDateInMMDD, convertMMDDToDateClassObject, computeDayDifference } from '/src/helpers.js'
+  import { setFirestoreDoc, getFirestoreCollection, createFirestoreQuery, getFirestoreQuery, updateFirestoreDoc } from '/src/crud.js'
   import { user } from '/src/store.js'
   import { onMount } from 'svelte'
+  import UXFormField from '$lib/UXFormField.svelte'
+  import UXToggleSwitch from '$lib/UXToggleSwitch.svelte'
+
+  export let isEditVersion = false
+  export let monthlyPeriodicTemplate = {
+    name: '',
+    repeatOnDayOfMonth: Array(27).fill(0),
+    willRepeatOnLastDay: false,
+    repeatGroupID: ''
+  }
 
   let isPopupOpen = false
 
-  let repeatOnDayOfMonth = Array(27).fill(0)
-  let willRepeatOnLastDay = false
-  let newTaskName = ''
-  let periodicTasks = null
-  let repeatGroupID = ''
+  // TO-DO: refactor 
+  let repeatOnDayOfMonth = monthlyPeriodicTemplate.repeatOnDayOfMonth
+  let willRepeatOnLastDay = monthlyPeriodicTemplate.willRepeatOnLastDay
+  let repeatGroupID = monthlyPeriodicTemplate.repeatGroupID
+  let newTaskName = monthlyPeriodicTemplate.name
+
+  let hasSpecificTime = false
 
   onMount(async () => {
-    const temp = await getFirestoreCollection(`/users/${$user.uid}/periodicTasks`)
-    periodicTasks = temp
   })
 
   function setIsPopupOpen ({ newVal }) {
     isPopupOpen = newVal
   }
+
+  // effectively a delete + create
+  async function editExistingInstances () {
+    // update the template itself
+    updateFirestoreDoc(`/users/${$user.uid}/periodicTasks/${monthlyPeriodicTemplate.id}`, {
+      repeatOnDayOfMonth,
+      willRepeatOnLastDay,
+      name: newTaskName
+    })
+    // find all the repeat groups scheduled from today's date (don't care about the past)
+
+    const q = createFirestoreQuery({
+      collectionPath: `/users/${$user.uid}/tasks`,
+      criteriaTerms: ['repeatGroupID', '==', monthlyPeriodicTemplate.repeatGroupID]
+    })
+
+    const allRepeatInstances = await getFirestoreQuery(q)
+    const currAndFutureInstances = allRepeatInstances.filter(instance => {
+      const d1 = new Date()
+      const d2 = convertMMDDToDateClassObject(instance.startDate, instance.startYYYY)
+      const dayDiff = computeDayDifference(d1, d2) // dayDiff := d2 - d1 
+      return dayDiff >= 0
+    })
+
+    // delete all of them, use a Firestore batch
+    for (const instance of currAndFutureInstances) {
+      console.log("about to delete instance =", instance)
+      // deleteFirestoreDoc(`/users/${$user.uid}/tasks/${instance.id}`)
+    }
+
+    // with a clean slate, generate new ones
+    createNewInstancesOfMonthlyRepeatingTasks({
+      repeatGroupID: monthlyPeriodicTemplate.repeatGroupID,
+      numOfMonthsInAdvance: 2,
+      repeatOnDayOfMonth,
+      willRepeatOnLastDay 
+    })
+  }  
 
   function createTemplateAndGenerateTasks ({ numOfMonthsInAdvance = 2, repeatOnDayOfMonth, willRepeatOnLastDay }) {
     // create template
@@ -185,5 +255,4 @@
   /*    border: 1px solid #000; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);*/
     -webkit-box-shadow:  0px 0px 0px 9999px rgba(0, 0, 0, 0.5);
   }
-
 </style>
