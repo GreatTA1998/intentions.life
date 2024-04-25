@@ -55,7 +55,7 @@
 
             <div 
               class="center-flex" 
-              style="font-size: 12px; font-weight: 300" 
+              style="font-size: 16px; font-weight: 300" 
             >
               <div class="center-flex" 
                 style="padding: 8px; width: 48px; height: 36px;" 

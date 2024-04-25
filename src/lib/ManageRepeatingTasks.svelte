@@ -29,23 +29,29 @@
     </ManageRepeatingTasksMonthlyPopup>
   </div>
 
+  {#if currentlyEditingTaskObj}
+    <ManageRepeatingTasksMonthlyEditPopup 
+      taskObject={currentlyEditingTaskObj}
+    />
+  {/if}
+
   {#if periodicTasks}
     {#each periodicTasks as periodicTask}
       <div class="monthly-periodicity-task" style="margin-top: 12px;">
         <div style="display: flex; align-items: center; position: relative;">
           <!-- start of visual representation -->
-          <div style="position: relative; width: 95px; border: 0px solid purple; height: 20px; display: flex; align-items: center;">
+          <div style="position: relative; width: 94px; border: 0px solid purple; height: 20px; display: flex; align-items: center;">
             <!-- background interval -->
-            <div style="position: relative; width: 95px; height: 2px; background-color: #ccc; display: flex; align-items: center;">
+            <div style="position: relative; width: 94px; height: 1px; background-color: #ccc; display: flex; align-items: center;">
               <span class="tick start"></span>
               <span class="tick end"></span>
             </div>
 
             <!-- orange circle dots -->
-            <div style="position: absolute; display: flex; width: 90px; outline: 0px solid red; height: 20px; align-items: center;">
+            <div style="position: absolute; display: flex; width: 90px; outline: 0px solid red; align-items: center;">
               {#each Array(27) as _, i}
                 {#if periodicTask.repeatOnDayOfMonth[i]}
-                  <div style="width: 8px; height: 8px; border: 0px solid black; border-radius: 8px;
+                  <div style="width: 6px; height: 6px; border: 0px solid black; border-radius: 8px;
                       position: absolute; left: {3 * i}px
                     "
                     class="highlighted"
@@ -56,7 +62,7 @@
               
               {#if periodicTask.willRepeatOnLastDay}
                 <div 
-                  style="width: 8px; height: 8px; border: 0px solid black; border-radius: 8px;
+                  style="width: 6px; height: 6px; border: 0px solid black; border-radius: 8px;
                     position: absolute; left: {3 * 30}px
                   "
                   class="highlighted"
@@ -67,9 +73,11 @@
           </div>
           <!-- end of visual representation -->
 
-          <div style="margin-left: 12px;">
-            {periodicTask.name}
-          </div>
+          <ManageRepeatingTasksMonthlyEditPopup let:setIsPopupOpen={setIsPopupOpen} taskObject={periodicTask}>
+            <div on:click={() => setIsPopupOpen({ newVal: true })}  style="margin-left: 12px; cursor: pointer;">
+              {periodicTask.name}
+            </div>
+          </ManageRepeatingTasksMonthlyEditPopup>
         </div>
       </div>
     {/each}
@@ -78,14 +86,13 @@
 
 <script>
   import ManageRepeatingTasksMonthlyPopup from '$lib/ManageRepeatingTasksMonthlyPopup.svelte'
+  import ManageRepeatingTasksMonthlyEditPopup from '$lib/ManageRepeatingTasksMonthlyEditPopup.svelte'
   import { getFirestoreCollection } from '/src/crud.js'
   import { onMount } from 'svelte'
   import { user } from '/src/store.js'
 
-  let repeatOnDayOfMonth = Array(27).fill(0)
-  let willRepeatOnLastDay = false
-  let isShowingPopup = false
   let periodicTasks = null
+  let currentlyEditingTaskObj = null
 
   onMount(async () => {
     const temp = await getFirestoreCollection(`/users/${$user.uid}/periodicTasks`)
@@ -163,7 +170,7 @@
 
   .tick {
     position: absolute;
-    width: 2px; /* Adjust the tick width */
+    width: 2px; /* 1px looks nicer, but is inconsistently rendered by the browser */
     height: 10px; /* Adjust the tick height */
     background-color: #c6c6c6; /* Set the tick color */
     margin-bottom: -12pxpx;

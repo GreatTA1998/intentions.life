@@ -43,7 +43,7 @@
 {/if}
 
 <script>
-  import { clickOutside, getRandomID } from '/src/helpers.js'
+  import { clickOutside, getRandomID, checkTaskObjSchema, getDateInMMDD } from '/src/helpers.js'
   import { setFirestoreDoc, getFirestoreCollection  } from '/src/crud.js'
   import { user } from '/src/store.js'
   import { onMount } from 'svelte'
@@ -54,6 +54,7 @@
   let willRepeatOnLastDay = false
   let newTaskName = ''
   let periodicTasks = null
+  let repeatGroupID = ''
 
   onMount(async () => {
     const temp = await getFirestoreCollection(`/users/${$user.uid}/periodicTasks`)
@@ -67,17 +68,24 @@
   function createTemplateAndGenerateTasks ({ numOfMonthsInAdvance = 2, repeatOnDayOfMonth, willRepeatOnLastDay }) {
     // create template
     const id = getRandomID()
+    repeatGroupID = id
     setFirestoreDoc(`/users/${$user.uid}/periodicTasks/${id}`, {
       name: newTaskName,
       repeatOnDayOfMonth,
       willRepeatOnLastDay,
       repeatGroupID: id
     })
-    createNewInstancesOfMonthlyRepeatingTasks({ numOfMonthsInAdvance: 2, repeatOnDayOfMonth, willRepeatOnLastDay: true })
+
+    createNewInstancesOfMonthlyRepeatingTasks({ 
+      repeatGroupID: id,
+      numOfMonthsInAdvance: 2, 
+      repeatOnDayOfMonth, 
+      willRepeatOnLastDay
+    })
   }
 
   // repeatOnDaysOfMonth: [0, 0, 0, 1, ... 0, 1]
-  function createNewInstancesOfMonthlyRepeatingTasks ({numOfMonthsInAdvance = 2, repeatOnDayOfMonth, willRepeatOnLastDay}) {
+  function createNewInstancesOfMonthlyRepeatingTasks ({numOfMonthsInAdvance = 2, repeatOnDayOfMonth, willRepeatOnLastDay }) {
     const d = new Date() // base case: no need to start from beginning of month
     for (let i = 0; i < numOfMonthsInAdvance; i++) {
       generateRepeatingTasksForSpecificMonth(d, repeatOnDayOfMonth, willRepeatOnLastDay)
@@ -94,7 +102,7 @@
     // general case: first 28 days
     while (d.getDate() < 28) {
       if (repeatOnDayOfMonth[d.getDate() - 1]) { // getDate() is 1-indexed but `repeatOnDayOfMonth` is 0-indexed
-        generateNewTask(d.getDate())
+        generateNewTask(d.getDate(), d.getMonth())
       }
       d.setDate(d.getDate() + 1)
     }
@@ -102,7 +110,7 @@
     // edge case: last day (i.e. 28, 29, 30, 31 treated the same)
     if (willRepeatOnLastDay) {
       const lastDay = getLastDayOfMonth(d.getMonth()) // note `getMonth` is zero-indexed
-      generateNewTask(lastDay)
+      generateNewTask(lastDay, d.getMonth())
     }
   }
 
@@ -114,9 +122,34 @@
     return lastDay
   }
 
-  function generateNewTask (dayOfMonth) {
-    console.log('generate new task for =', dayOfMonth)
-    console.log('new task name =', newTaskName)
+  function generateNewTask (dayOfMonth, zeroIndexedMonthNumber) {
+    // console.log('generate new task for =', dayOfMonth)
+    // console.log('new task name =', newTaskName)
+    // console.log('zeroIndexedMonthNumber =', zeroIndexedMonthNumber)
+    // BUG: NOT CORRECT
+    console.log('dayOfMonth, zeroIndexedMonthNumber =', dayOfMonth, zeroIndexedMonthNumber)
+
+    const d = new Date()
+    d.setMonth(zeroIndexedMonthNumber) // MUST set month first, otherwise it thinks the 31st day doesn't exist on the month yet
+    d.setDate(dayOfMonth)
+
+    const individualID = getRandomID()
+
+    let newObj = {
+      repeatGroupID,
+      id: individualID,
+      name: newTaskName,
+      startTime: '',
+      startDate: getDateInMMDD(d), //, MMDD
+      startYYYY: new Date().getFullYear()
+    } 
+
+    newObj = checkTaskObjSchema(newObj, $user)
+
+    setFirestoreDoc(
+      `/users/${$user.uid}/tasks/${individualID}`, 
+      newObj
+    )
   }
   
 </script>
