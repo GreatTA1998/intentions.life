@@ -5,15 +5,38 @@
 
   <div style="margin-bottom: 48px;"></div>
 
-  <div style="font-size: 24px;">
+  <div style="font-size: 24px; margin-bottom: 12px;">
     Weekly
+
+    <ManageRepeatingTasksUnifiedWeeklyPopup  
+      let:setIsPopupOpen={setIsPopupOpen}
+    >
+      <span on:click={() => setIsPopupOpen({ newVal: true })} style="font-size: 26px; margin-left: 8px;">
+        +
+      </span>
+    </ManageRepeatingTasksUnifiedWeeklyPopup>
   </div>
 
-  <div style="display: flex;">
-    {#each Array(7) as _, i} 
-      <div class="day-of-week-circle"></div>
-    {/each}
-  </div>
+  {#each sortedWeeklyTasks as weeklyTask, i}
+    <div style="display: flex; align-items: center;">
+      <!-- left-side visual -->
+      <div style="display: flex;">
+        {#each Array(7) as _, i} 
+          <div class="day-of-week-circle" class:highlighted={weeklyTask.repeatOnDayOfWeek[i]}></div>
+        {/each}
+      </div>
+
+      <ManageRepeatingTasksUnifiedWeeklyPopup 
+        let:setIsPopupOpen={setIsPopupOpen} 
+        isEditVersion={true} 
+        weeklyPeriodicTemplate={weeklyTask}
+      >
+        <div on:click={() => setIsPopupOpen({ newVal: true })} style="margin-left: 8px;">
+          {weeklyTask.name}
+        </div>
+      </ManageRepeatingTasksUnifiedWeeklyPopup>
+    </div>
+  {/each}
 
   <div style="margin-bottom: 48px;"></div>
 
@@ -33,7 +56,7 @@
       </ManageRepeatingTasksUnifiedMonthlyPopup>
     </div>
 
-    {#each sortedPeriodicTasks as periodicTask, i}
+    {#each sortedMonthlyTasks as periodicTask, i}
       {#if i === 0}
         <ReusableSimpleDropzone on:new-order-value={(e) => updateOrderOfDraggedTemplate(e.detail)} aboveOrder={0} belowOrder={periodicTasks[0].orderValue} />
       <!-- general case drop-zone: must be between 2 tasks-->
@@ -102,6 +125,7 @@
 
 <script>
   import ManageRepeatingTasksUnifiedMonthlyPopup from '$lib/ManageRepeatingTasksUnifiedMonthlyPopup.svelte'
+  import ManageRepeatingTasksUnifiedWeeklyPopup from '$lib/ManageRepeatingTasksUnifiedWeeklyPopup.svelte'
   import ReusableSimpleDropzone from '$lib/ReusableSimpleDropzone.svelte'
   import { getFirestoreCollection, updateFirestoreDoc } from '/src/crud.js'
   import { onMount, onDestroy } from 'svelte'
@@ -113,9 +137,13 @@
   let unsub = null 
   let draggedTemplate = null
   let sortedPeriodicTasks= []
+  let sortedMonthlyTasks = [] 
+  let sortedWeeklyTasks = [] 
 
   $: if (periodicTasks) {
     sortedPeriodicTasks = periodicTasks.sort((a, b) => a.orderValue - b.orderValue)
+    sortedWeeklyTasks = sortedPeriodicTasks.filter(task => task.repeatOnDayOfWeek)
+    sortedMonthlyTasks = sortedPeriodicTasks.filter(task => task.repeatOnDayOfMonth)
   }
 
   onMount(async () => {
@@ -192,9 +220,9 @@
 <style>
   .day-of-week-circle {
     border-radius: 16px;
-    width: 20px; 
-    height: 20px;
-    border: 2px solid black;
+    width: 16px; 
+    height: 16px;
+    border: 1px solid rgb(111, 111, 111);
     margin: 4px;
   }
 

@@ -67,13 +67,16 @@
             </div>
           </div>  
 
-          <!-- make it drag-and-droppable -->
-          {#each getScheduledTasks(dateClassObj).filter(task => !task.startTime) as flexibleDayTask}
-            <div style="font-size: 12px; display: flex; gap: 4px; margin-top: 4px;">
-              <ReusableCheckbox/>
-              {flexibleDayTask.name}
-            </div>
-          {/each}
+          <!-- quickfix for reactivity, don't know why it fixes -->
+          {#key intForTriggeringRerender}
+            <!-- make it drag-and-droppable -->
+            {#each getScheduledTasks(dateClassObj).filter(task => !task.startTime) as flexibleDayTask}
+              <div on:click={() => dispatch('task-click', { task: flexibleDayTask })} style="font-size: 12px; display: flex; gap: 4px; margin-top: 4px;">
+                <ReusableCheckbox/>
+                {flexibleDayTask.name}
+              </div>
+            {/each}
+          {/key}
         </div>
 
         {#key intForTriggeringRerender}
