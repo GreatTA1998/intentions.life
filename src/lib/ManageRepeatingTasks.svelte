@@ -31,8 +31,10 @@
       <div style="display: flex; align-items: center;">
         <!-- left-side visual -->
         <div style="display: flex;">
-          {#each Array(7) as _, i} 
-            <div class="day-of-week-circle" class:highlighted={weeklyTask.repeatOnDayOfWeek[i]}></div>
+          {#each dayOfWeekSymbol as symbol, i} 
+            <div class="day-of-week-circle" class:highlighted={weeklyTask.repeatOnDayOfWeek[i]}>
+              {symbol}
+            </div>
           {/each}
         </div>
 
@@ -46,7 +48,7 @@
             draggable="true"
             on:dragstart|self={(e) => dragstart_handler(e, weeklyTask)}  
           >
-            {weeklyTask.name} ({ weeklyTask.orderValue })
+            {weeklyTask.name}
           </div>
         </ManageRepeatingTasksUnifiedWeeklyPopup>
       </div>
@@ -128,7 +130,7 @@
               draggable="true"
               on:dragstart|self={(e) => dragstart_handler(e, periodicTask)}
             >
-              {periodicTask.name} ({ periodicTask.orderValue })
+              {periodicTask.name}
             </div>
           </ManageRepeatingTasksUnifiedMonthlyPopup>
         </div>
@@ -157,6 +159,7 @@
   let sortedPeriodicTasks= []
   let sortedMonthlyTasks = [] 
   let sortedWeeklyTasks = [] 
+  let dayOfWeekSymbol = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
 
   $: if (periodicTasks) {
     sortedPeriodicTasks = periodicTasks.sort((a, b) => a.orderValue - b.orderValue)
@@ -244,8 +247,13 @@
     border-radius: 16px;
     width: 16px; 
     height: 16px;
-    border: 1px solid rgb(111, 111, 111);
     margin: 4px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: 1px solid rgb(111, 111, 111);
+    /* border: 1px solid rgb(111, 111, 111); */
   }
 
   .day-of-month-square {
