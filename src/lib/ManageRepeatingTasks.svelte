@@ -81,16 +81,32 @@
 <script>
   import ManageRepeatingTasksUnifiedMonthlyPopup from '$lib/ManageRepeatingTasksUnifiedMonthlyPopup.svelte'
   import { getFirestoreCollection } from '/src/crud.js'
-  import { onMount } from 'svelte'
+  import { onMount, onDestroy } from 'svelte'
   import { user } from '/src/store.js'
+  import { collection, onSnapshot } from 'firebase/firestore'
+  import db from '/src/db.js'
 
   let periodicTasks = null
-  let currentlyEditingTaskObj = null
+  let unsub = null 
 
   onMount(async () => {
-    const temp = await getFirestoreCollection(`/users/${$user.uid}/periodicTasks`)
-    periodicTasks = temp
+    const ref = collection(db, `/users/${$user.uid}/periodicTasks`)
+    unsub = onSnapshot(ref, (collectionSnap) => {
+      const temp = []
+      collectionSnap.forEach((doc) => {
+        temp.push({ 
+          id: doc.id,
+          ...doc.data()
+        })
+      })
+      periodicTasks = temp
+    })
   })
+
+  onDestroy(() => {
+    if (unsub) unsub()
+  })
+
 
   // repeatOnDaysOfMonth: [0, 0, 0, 1, ... 0, 1]
   function createNewInstancesOfMonthlyRepeatingTasks ({numOfMonthsInAdvance = 2, repeatOnDayOfMonth, willRepeatOnLastDay}) {
