@@ -66,6 +66,14 @@
           Modify existing tasks
         </button>
       {/if}
+
+      <button on:click={() => { 
+        dispatch('delete');
+        isPopupOpen = false 
+      }}
+      >
+        Delete
+      </button>
     </div>
   </div>
 {/if}
@@ -85,6 +93,7 @@
   import { onMount } from 'svelte'
   import UXFormField from '$lib/UXFormField.svelte'
   import UXToggleSwitch from '$lib/UXToggleSwitch.svelte'
+  import { createEventDispatcher } from 'svelte'
 
   export let isEditVersion = false
   export let weeklyPeriodicTemplate = {
@@ -92,6 +101,9 @@
     repeatOnDayOfWeek: Array(7).fill(0),
     repeatGroupID: ''
   }
+  export let defaultOrderValue = 1
+
+  const dispatch = createEventDispatcher()
 
   let dayOfWeekSymbol = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
   let isPopupOpen = false
@@ -104,7 +116,6 @@
   let numOfWeeksInAdvance = 2
   let hasSpecificTime = false
 
-  let defaultOrderValue = 1
 
   onMount(async () => {
   })

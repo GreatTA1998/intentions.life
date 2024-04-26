@@ -5,42 +5,59 @@
 
   <div style="margin-bottom: 48px;"></div>
 
+  {#if periodicTasks}
   <div style="font-size: 24px; margin-bottom: 12px;">
     Weekly
 
     <ManageRepeatingTasksUnifiedWeeklyPopup  
       let:setIsPopupOpen={setIsPopupOpen}
+      defaultOrderValue={sortedWeeklyTasks.length}
     >
       <span on:click={() => setIsPopupOpen({ newVal: true })} style="font-size: 26px; margin-left: 8px;">
         +
       </span>
     </ManageRepeatingTasksUnifiedWeeklyPopup>
   </div>
+  
+  <!-- at least requires `periodicTasks` to be an `[]` i.e. loading finished, instead of null -->
+    {#each sortedWeeklyTasks as weeklyTask, i}
+      {#if i === 0}
+        <ReusableSimpleDropzone on:new-order-value={(e) => updateOrderOfDraggedTemplate(e.detail)} aboveOrder={0} belowOrder={sortedWeeklyTasks[0].orderValue} />
+      <!-- general case drop-zone: must be between 2 tasks-->
+      {:else if i > 0 && i < periodicTasks.length}
+        <ReusableSimpleDropzone on:new-order-value={(e) => updateOrderOfDraggedTemplate(e.detail)} aboveOrder={sortedWeeklyTasks[i-1].orderValue} belowOrder={sortedWeeklyTasks[i].orderValue} />
+      {/if}
 
-  {#each sortedWeeklyTasks as weeklyTask, i}
-    <div style="display: flex; align-items: center;">
-      <!-- left-side visual -->
-      <div style="display: flex;">
-        {#each Array(7) as _, i} 
-          <div class="day-of-week-circle" class:highlighted={weeklyTask.repeatOnDayOfWeek[i]}></div>
-        {/each}
+      <div style="display: flex; align-items: center;">
+        <!-- left-side visual -->
+        <div style="display: flex;">
+          {#each Array(7) as _, i} 
+            <div class="day-of-week-circle" class:highlighted={weeklyTask.repeatOnDayOfWeek[i]}></div>
+          {/each}
+        </div>
+
+        <ManageRepeatingTasksUnifiedWeeklyPopup 
+          let:setIsPopupOpen={setIsPopupOpen} 
+          isEditVersion={true} 
+          weeklyPeriodicTemplate={weeklyTask}
+          on:delete={() => deleteTemplate(weeklyTask)}
+        >
+          <div on:click={() => setIsPopupOpen({ newVal: true })} style="margin-left: 8px;"
+            draggable="true"
+            on:dragstart|self={(e) => dragstart_handler(e, weeklyTask)}  
+          >
+            {weeklyTask.name} ({ weeklyTask.orderValue })
+          </div>
+        </ManageRepeatingTasksUnifiedWeeklyPopup>
       </div>
 
-      <ManageRepeatingTasksUnifiedWeeklyPopup 
-        let:setIsPopupOpen={setIsPopupOpen} 
-        isEditVersion={true} 
-        weeklyPeriodicTemplate={weeklyTask}
-      >
-        <div on:click={() => setIsPopupOpen({ newVal: true })} style="margin-left: 8px;">
-          {weeklyTask.name}
-        </div>
-      </ManageRepeatingTasksUnifiedWeeklyPopup>
-    </div>
-  {/each}
+      {#if i === sortedWeeklyTasks.length - 1}
+        <ReusableSimpleDropzone on:new-order-value={(e) => updateOrderOfDraggedTemplate(e.detail)} aboveOrder={sortedWeeklyTasks[i].orderValue} belowOrder={sortedWeeklyTasks[i].orderValue + 1}/>
+      {/if}
+    {/each}
+
 
   <div style="margin-bottom: 48px;"></div>
-
-  {#if periodicTasks}
     <div style="display: flex; align-items: center;">
       <div style="font-size: 24px;">
         Monthly
@@ -48,7 +65,7 @@
 
       <ManageRepeatingTasksUnifiedMonthlyPopup  
         let:setIsPopupOpen={setIsPopupOpen}
-        defaultOrderValue={periodicTasks.length}
+        defaultOrderValue={sortedMonthlyTasks.length}
       >
         <span on:click={() => setIsPopupOpen({ newVal: true })} style="font-size: 26px; margin-left: 8px;">
           +
@@ -104,13 +121,14 @@
             let:setIsPopupOpen={setIsPopupOpen} 
             isEditVersion={true} 
             monthlyPeriodicTemplate={periodicTask}
+            on:delete={() => deleteTemplate(periodicTask)}
           >
             <div
               on:click={() => setIsPopupOpen({ newVal: true })}  style="margin-left: 12px; cursor: pointer;"
               draggable="true"
               on:dragstart|self={(e) => dragstart_handler(e, periodicTask)}
             >
-              {periodicTask.name}
+              {periodicTask.name} ({ periodicTask.orderValue })
             </div>
           </ManageRepeatingTasksUnifiedMonthlyPopup>
         </div>
@@ -127,7 +145,7 @@
   import ManageRepeatingTasksUnifiedMonthlyPopup from '$lib/ManageRepeatingTasksUnifiedMonthlyPopup.svelte'
   import ManageRepeatingTasksUnifiedWeeklyPopup from '$lib/ManageRepeatingTasksUnifiedWeeklyPopup.svelte'
   import ReusableSimpleDropzone from '$lib/ReusableSimpleDropzone.svelte'
-  import { getFirestoreCollection, updateFirestoreDoc } from '/src/crud.js'
+  import { getFirestoreCollection, updateFirestoreDoc, deleteFirestoreDoc } from '/src/crud.js'
   import { onMount, onDestroy } from 'svelte'
   import { user } from '/src/store.js'
   import { collection, onSnapshot } from 'firebase/firestore'
@@ -163,6 +181,10 @@
   onDestroy(() => {
     if (unsub) unsub()
   })
+
+  function deleteTemplate ({ id }) {
+    deleteFirestoreDoc(`/users/${$user.uid}/periodicTasks/${id}`)
+  }
 
   function dragstart_handler (e, monthlyPeriodicTemplate) {
     draggedTemplate = monthlyPeriodicTemplate
