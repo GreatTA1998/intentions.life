@@ -65,14 +65,22 @@
                 {dateClassObj.getDate()}
               </div>
             </div>
-          </div>
+          </div>  
+
+          <!-- make it drag-and-droppable -->
+          {#each getScheduledTasks(dateClassObj).filter(task => !task.startTime) as flexibleDayTask}
+            <div style="font-size: 12px; display: flex; gap: 4px; margin-top: 4px;">
+              <ReusableCheckbox/>
+              {flexibleDayTask.name}
+            </div>
+          {/each}
         </div>
 
         {#key intForTriggeringRerender}
           {#if timesOfDay.length !== 0}
             <ReusableCalendarView
               calendarBeginningDateClassObject={dateClassObj}
-              scheduledTasks={getScheduledTasks(dateClassObj)}
+              scheduledTasks={getScheduledTasks(dateClassObj).filter(task => task.startTime)}
               timestamps={timesOfDay}
               pixelsPerHour={MIKA_PIXELS_PER_HOUR}
               timeBlockDurationInMinutes={60}
@@ -94,6 +102,7 @@
   import { MIKA_PIXELS_PER_HOUR, getDateInMMDD, getDateInDDMMYYYY } from '/src/helpers'
   import { onMount, createEventDispatcher } from 'svelte'
   import { tasksScheduledOn } from '/src/store.js'
+  import ReusableCheckbox from '$lib/ReusableCheckbox.svelte'
 
   export let calStartDateClassObj
 
