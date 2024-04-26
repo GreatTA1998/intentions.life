@@ -90,6 +90,8 @@
 
   let hasSpecificTime = false
 
+  let defaultOrderValue = 1
+
   onMount(async () => {
   })
 
@@ -142,7 +144,8 @@
       name: newTaskName,
       repeatOnDayOfMonth,
       willRepeatOnLastDay,
-      repeatGroupID: id
+      repeatGroupID: id,
+      orderValue: defaultOrderValue
     })
 
     createNewInstancesOfMonthlyRepeatingTasks({ 
