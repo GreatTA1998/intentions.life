@@ -16,7 +16,7 @@
     font-size: {fontSize}rem;
     opacity: {task.isDone ? '0.6' : '1'};
     outline: 0px solid red;
-    background-color: {isBulletPoint ? '' : 'hsla(210, 20%, 36%, 1)'};
+    background-color: {isBulletPoint ? '' : 'hsla(210, 20%, 36%, 0.6)'};
     background-image: {task.imageDownloadURL ? `url(${task.imageDownloadURL})` : ''};
     background-size: contain;
     background-repeat: no-repeat;
