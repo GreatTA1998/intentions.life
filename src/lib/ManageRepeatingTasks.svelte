@@ -147,7 +147,7 @@
   import ManageRepeatingTasksUnifiedMonthlyPopup from '$lib/ManageRepeatingTasksUnifiedMonthlyPopup.svelte'
   import ManageRepeatingTasksUnifiedWeeklyPopup from '$lib/ManageRepeatingTasksUnifiedWeeklyPopup.svelte'
   import ReusableSimpleDropzone from '$lib/ReusableSimpleDropzone.svelte'
-  import { getFirestoreCollection, updateFirestoreDoc, deleteFirestoreDoc } from '/src/crud.js'
+  import { updateFirestoreDoc, deleteFirestoreDoc } from '/src/crud.js'
   import { onMount, onDestroy } from 'svelte'
   import { user } from '/src/store.js'
   import { collection, onSnapshot } from 'firebase/firestore'
