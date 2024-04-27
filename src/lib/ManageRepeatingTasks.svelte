@@ -1,5 +1,5 @@
 <div style="padding: 16px;">
-  <div style="font-size: 32px;">
+  <div style="font-size: 32px; margin-top: 24px;">
     Configure repeating tasks
   </div>
 
