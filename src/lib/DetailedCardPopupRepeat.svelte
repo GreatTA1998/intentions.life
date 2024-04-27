@@ -132,5 +132,4 @@
   .highlighted {
     background: orange;
   }
-
 </style>

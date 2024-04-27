@@ -70,28 +70,47 @@
     </GrandTreeTodoPopupButton>
 
     <div class="day-week-toggle-segment">
-      <div on:click={() => currentMode = 'Day'}
-        class="ux-tab-item hide-for-mobile" 
-        class:transparent-glow-tab={currentMode === 'Day'} 
-      >
-        Day
-      </div>
-
       <div on:click={() => currentMode = 'Week'}
         class="ux-tab-item" 
         class:active-ux-tab={currentMode === 'Week'} 
         class:transparent-inactive-tab={currentMode === 'Day'}
       >
-        Week
+       <span class="material-symbols-outlined" style="font-size: 28px;">
+        house
+        </span>
       </div>
+
+      <div on:click={() => currentMode = 'ManageRepeats'}
+        class="ux-tab-item" 
+        class:active-ux-tab={currentMode === 'ManageRepeats'} 
+        class:transparent-inactive-tab={currentMode === 'Day'}
+      >
+        <span class="material-symbols-outlined" class:blue-icon={currentMode === 'Dashboard'} style="font-size: 28px;">
+          restart_alt
+        </span>
+      </div>
+      
 
       <div on:click={() => currentMode = 'Year'}
         class="ux-tab-item" 
         class:active-ux-tab={currentMode === 'Year'} 
-        class:transparent-inactive-tab={currentMode === 'Year'}
+        class:transparent-inactive-tab={currentMode === 'Day'}
       >
-        Year
+        <span class="material-icons" style="font-size: 28px;">signpost</span>
       </div>
+    </div>
+
+
+    <div on:click={() => currentMode = 'Day'}
+      class="ux-tab-item hide-for-mobile" 
+      class:transparent-glow-tab={currentMode === 'Day'} 
+      style="margin-right: 8px;"
+    >
+      <span on:click={() => currentMode === 'Day' ? currentMode = 'Week' : currentMode = 'Day'} class="material-symbols-outlined"
+        style="font-size: 30px; margin-top: 4px; color: black;"  
+      >
+        menu_book
+      </span>
     </div>
 
     <span on:click={() => currentMode === 'Dashboard' ? currentMode = 'Week' : currentMode = 'Dashboard'}  class="material-symbols-outlined mika-hover" class:blue-icon={currentMode === 'Dashboard'} style="margin-right: 32px; font-size: 32px; cursor: pointer;">
@@ -111,7 +130,9 @@
 
   <!-- position: relative; -->
   <div slot="content" style="display: flex; flex-grow: 1; height: 100%;">
-      {#if currentMode === 'Dashboard'}
+      {#if currentMode === 'ManageRepeats'}
+        <ManageRepeatingTasks/>
+      {:else if currentMode === 'Dashboard'}
         <LifeDashboard {allTasks}/>  
       {:else if currentMode === 'Day'}
         <!-- Show daytime art from 5 am - 7 pm, note `.getHours()` is 0-indexed from 0 to 23 -->
@@ -232,6 +253,7 @@
   import YearView from '$lib/YearView.svelte'
   import ZenJournal from '$lib/ZenJournal.svelte'
   import ZenJournalLeftNavigation from '$lib/ZenJournaLeftNavigation.svelte'
+  import ManageRepeatingTasks from '$lib/ManageRepeatingTasks.svelte'
 
   import { onDestroy, onMount } from 'svelte'
   import { goto } from '$app/navigation';

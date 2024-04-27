@@ -14,17 +14,17 @@
         </PopupLogin>
       </div>
       
-      <div slot="content" style="display: flex; flex-grow: 1; height: 100%; padding: 4%;">
-        <div style="background: transparent; width: 90vw; min-width: 200px; height: 80vh; border-radius: 10px;">
+      <div slot="content" style="display: flex; flex-grow: 1; height: 100%; padding: 4%; background: #193b19;">
+        <div style="width: 90vw; min-width: 200px; height: 80vh; border-radius: 10px;">
           <div class="hero-title">
-            What do you want to do in your life?
+            A modern calendar with branching todo-lists
           </div>
     
           <div style="display: flex; margin-top: 24px; flex-wrap: wrap;">
             <div class="secondary-description">
-              Use the hierarhical-todo and calendar to execute tasks efficiently and without misses. 
-              Get consistent focus on long-term milestones with the timeline view. 
-              $10/month, <div class="highlighted-words" style="color: var(--base-color)">no payment info needed</div>. 
+              See your todo-list and calendar side-by-side.
+              Achieve complex, uncertain milestones by keeping track of everything you tried but failed.
+              Cultivate your habits with flexible repeats.
             </div>
             
             <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 12px 0px;" class="action-buttons">
@@ -43,11 +43,50 @@
             </div>
           </div>
     
-          <div style="display: flex; justify-content: center; margin-top: 48px;">
+          <div style="display: flex; justify-content: space-between; margin-top: 56px;">
+            
+            <div style="position: relative; justify-content: center;">
+              <div class="silent-video">
+
+              </div>
+
+              <div class="ability-icons">
+                <div class="ability-icon" on:click={() => currentIdx = 0}>
+                  
+                </div>
+
+                <div class="ability-icon" on:click={() => currentIdx = 1}>
+                  
+                </div>
+
+                <div class="ability-icon" on:click={() => currentIdx = 2}>
+                  
+                </div>
+
+                <div class="ability-icon" on:click={() => currentIdx = 3}>
+                  
+                </div>
+              </div>
+            </div>
+
+            <div class="explanatory-card">
+              <div class="card-title">
+                {fourAbilities[currentIdx].title}
+              </div>
+
+              <div class="card-description">
+                {fourAbilities[currentIdx].description}
+              </div>
+            </div>
+          </div>
+
+          <!-- <div style="display: flex; justify-content: center; margin-top: 48px;">
             <div class="demo-video-container">
               <div style="position: relative; padding-bottom: 56.25%; height: 0;"><iframe src="https://www.loom.com/embed/5d5b7edd67534940a26268d0331d9671?sid=293776fa-384c-4e96-946a-2db2caabb412" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe></div>
             </div>
-          </div>
+          </div> -->
+
+
         </div>
       </div>
     </NavbarAndContentWrapper>
@@ -67,6 +106,55 @@
   onMount(() => {
 
   })
+
+  let currentIdx = 0
+
+  let fourAbilities = [
+    {
+      videoSrc: '',
+      title: 'Todo-calendar view',
+      description: `The todo-calendar view is the default view, because it shows you everything you need to actually do (for the week).
+
+                    Drag tasks from the todo-list to the calendar. Tasks will only show up in either the todo or the calendar. 
+
+                    If one todo-list isn't enough, you can expand it and see multiple todo-lists all at once.
+                   `
+    },
+    {
+      videoSrc: '',
+      title: 'Visual timelines',
+      description: `Many tasks involve many unforeseen steps and difficulties. If you're blocked on a task because you're awaiting others, it will be put to the side and de-emphasized.
+      
+      But if you don't hear back within the expected follow-up time, the task will be re-emphasized, and also copied onto the relevant calendar day.
+      `
+    },
+    {
+      videoSrc: '',
+      title: 'Design habits and routines',
+      description: `
+        There's a place where you can configure all your repeating tasks. Habits can repeat on specific days, without needing a specific time. 
+
+        The reason the repeats are "flexible", is because you can even schedule a weekly habit that doesn't have a pre-designated day. Just drag it to the calendar when good timing emerges.
+        (1-minute duration is also supported.)
+        
+        In general, repeating tasks will appear as expected on the calendar.
+        `
+    },
+    {
+      videoSrc: '',
+      title: 'Photo, journaling and statistics',
+      description: `Beyond the expectations of a calendar app, there are some unconventional features.
+
+        Calendar-centric photos allows you to display your favorite photos in context, giving you a delightful, visual history of your week.
+
+        The journal has a better atmosphere than a stale white page. 
+        
+        Statistics summarizes how much time you spent on tasks.
+        `
+    }
+  ]
+
+
 
   function createTemporaryDemoAccount () {
     const auth = getAuth();
@@ -88,6 +176,65 @@
 </script>
 
 <style lang="scss">
+  .silent-video {
+    // outline: 2px solid red; 
+    width: 800px; 
+    height: 500px;
+    background-color: grey;
+    // border-top-left-radius: 16px;
+  }
+
+  .ability-icons {
+    position: absolute; 
+    
+    // https://stackoverflow.com/a/37413510/7812829
+    // center horizontally
+    left: 0;
+    right: 0;
+    margin-left: auto;
+    margin-right: auto;
+
+    top: auto;
+    outline: 2px solid purple;
+    width: 400px;
+    height: 100px;
+    bottom: -80px;
+
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+  }
+
+  .ability-icon {
+    outline: 2px solid green;
+    width: 80px;
+    height: 80px;
+    cursor: pointer;
+  }
+
+  .explanatory-card {
+    width: 620px;
+    height: 400px;
+    background-color: var(--calendar-bg-color);
+    padding: 16px;
+    // border-top-right-radius: 16px;
+    // border-bottom-right-radius: 16px;
+  }
+
+
+  .card-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: black;
+  }
+
+  .card-description {
+    margin-top: 12px;
+    white-space: pre-line;
+    color: black;
+  }
+
+
   .transparent-glow-navbar {
     background-color: rgba(150, 150, 150, 0.1);
     border-bottom: none;
@@ -126,12 +273,14 @@
   }
 
   .secondary-description {
-    font-weight: 500; display: inline; color: rgb(100, 100, 100);
+    font-weight: 500; 
+    display: inline; 
+    color: white;
   }
 
   .hero-title {
-    color: var(--base-color); 
-    font-size: 4rem; 
+    color: white;
+    font-size: 3rem; 
     font-weight: 600;
   }
 
