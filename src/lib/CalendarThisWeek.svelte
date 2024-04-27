@@ -44,7 +44,15 @@
       <!-- To vertically group the date label with the calendar component-->
       <!-- 4px for gap between each calendar so the calendar blocks don't visually merge -->
       <div style="margin-left: 0.5vw;" class="unselectable">
-        <div class="sticky-day-of-week-abbreviation" style="padding-top: var(--main-content-top-margin); margin-bottom: {spacingBetweenLabelAndCal}px">
+        <div class="sticky-day-of-week-abbreviation" 
+          style="
+            height: {dockingAreaHeight + calHeaderHeight + topMarginEqualizer}px; 
+            padding-top: var(--main-content-top-margin); 
+            margin-bottom: {spacingBetweenLabelAndCal}px
+          "
+          on:dragover={(e) => dragover_handler(e)}
+          on:drop={(e) => drop_handler(e, dateClassObj)}
+        >
           <div>
             <div 
               class="center-flex day-name-label" 
@@ -71,9 +79,14 @@
           {#key intForTriggeringRerender}
             <!-- make it drag-and-droppable -->
             {#each getScheduledTasks(dateClassObj).filter(task => !task.startTime) as flexibleDayTask}
-              <div on:click={() => dispatch('task-click', { task: flexibleDayTask })} style="font-size: 12px; display: flex; gap: 4px; margin-top: 4px;">
-                <ReusableCheckbox/>
-                {flexibleDayTask.name}
+              <div on:click={() => dispatch('task-click', { task: flexibleDayTask })} 
+                style="width: var(--calendar-day-section-width); font-size: 12px; display: flex; gap: 4px; margin-top: 8px; margin-left: 4px; margin-right: 4px;"
+              >
+                <ReusableFlexibleDayTask task={flexibleDayTask}
+                  on:task-click
+                  on:task-update
+                  on:task-checkbox-change
+                />
               </div>
             {/each}
           {/key}
@@ -106,6 +119,7 @@
   import { onMount, createEventDispatcher } from 'svelte'
   import { tasksScheduledOn } from '/src/store.js'
   import ReusableCheckbox from '$lib/ReusableCheckbox.svelte'
+  import ReusableFlexibleDayTask from '$lib/ReusableFlexibleDayTask.svelte'
 
   export let calStartDateClassObj
 
@@ -116,12 +130,21 @@
   let dateClassObjects = []
   let intForTriggeringRerender = 0
 
-  const totalCalStartTopOffset = 100 + spacingBetweenLabelAndCal; // 100 is the height of the top label, 12 is the margin 
+  let calHeaderHeight = 48
+  let dockingAreaHeight = 100
+  const epsilon = 5
+  $: totalCalStartTopOffset = dockingAreaHeight + spacingBetweenLabelAndCal + topMarginEqualizer+ epsilon; // 100 is the height of the top label, 12 is the margin 
   const spacingBetweenLabelAndCal = 36
+  const topMarginEqualizer = 24;
 
   const dispatch = createEventDispatcher()
 
-  $: getDateClassObjects(calStartDateClassObj)
+  $: {
+    getDateClassObjects(calStartDateClassObj)
+    if (dateClassObjects.length > 0) {
+      dockingAreaHeight = computeMaxHeightOfDockingArea()
+    }
+  }
 
   $: if ($tasksScheduledOn) {
     intForTriggeringRerender += 1
@@ -132,8 +155,43 @@
     getTimesOfDay()
   })
 
+  function dragover_handler (e) {
+    e.preventDefault()
+    e.stopPropagation()
+    e.dataTransfer.dropEffect = "move"
+  }
+
+  function drop_handler (e, dateClassObj) {
+    const id = e.dataTransfer.getData('text/plain')
+    if (!id) return // it means we're adjusting the duration but it triggers a drop event, and a dragend event must be followed by a drop event
+
+    e.preventDefault()
+    e.stopPropagation()
+    
+    const mmdd = getDateInMMDD(dateClassObj)
+
+    dispatch('task-scheduled', {
+      id,
+      timeOfDay: '',
+      dateScheduled: mmdd
+    })
+  }
+
+  // note: this is horrific code, but at least it's all encapsulated within this function
+  function computeMaxHeightOfDockingArea () {
+    let scores = []
+    for (const dateClassObj of dateClassObjects) {
+      const flexibleTasks = getScheduledTasks(dateClassObj).filter(task => !task.startTime) 
+      scores.push(flexibleTasks.length)
+    }
+    const maxItems = Math.max(...scores)
+    const pixelHeightPerItem = 34
+    return maxItems * pixelHeightPerItem
+  }
+
+
   function getDateClassObjects (dateClassObj) {
-    dateClassObjects = []
+    const temp = []
     let d = dateClassObj
     for (let i = -2; i < 8; i++) {
       const offset = i * (24*60*60*1000)
@@ -141,9 +199,9 @@
       copy.setTime(d.getTime() + offset)
       // no longer start from 7 am, or else there will be missing hours
       copy.setHours(0, 0, 0) // hours, minutes, seconds, note it's ZERO-indexed, 0-23, 0-59
-      dateClassObjects.push(copy)
+      temp.push(copy)
     }
-    dateClassObjects = dateClassObjects // manually trigger reactivity)
+    dateClassObjects = [...temp] // manually trigger reactivity)
   }
   
   function getScheduledTasks (dateClassObj) {
@@ -250,7 +308,6 @@
     font-size: 1.4em;
     background-color: var(--calendar-bg-color);
     color: #6D6D6D;
-    height: 100px;
     
     position: sticky; 
 
