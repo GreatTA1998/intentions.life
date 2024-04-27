@@ -70,33 +70,48 @@
     </GrandTreeTodoPopupButton>
 
     <div class="day-week-toggle-segment">
-      <div on:click={() => currentMode = 'Day'}
-        class="ux-tab-item hide-for-mobile" 
-        class:transparent-glow-tab={currentMode === 'Day'} 
-      >
-        Day
-      </div>
-
       <div on:click={() => currentMode = 'Week'}
         class="ux-tab-item" 
         class:active-ux-tab={currentMode === 'Week'} 
         class:transparent-inactive-tab={currentMode === 'Day'}
       >
-        Week
+       <span class="material-symbols-outlined" style="font-size: 28px;">
+        house
+        </span>
       </div>
+
+      <div on:click={() => currentMode = 'ManageRepeats'}
+        class="ux-tab-item" 
+        class:active-ux-tab={currentMode === 'ManageRepeats'} 
+        class:transparent-inactive-tab={currentMode === 'Day'}
+      >
+        <span class="material-symbols-outlined" class:blue-icon={currentMode === 'Dashboard'} style="font-size: 28px;">
+          restart_alt
+        </span>
+      </div>
+      
 
       <div on:click={() => currentMode = 'Year'}
         class="ux-tab-item" 
         class:active-ux-tab={currentMode === 'Year'} 
-        class:transparent-inactive-tab={currentMode === 'Year'}
+        class:transparent-inactive-tab={currentMode === 'Day'}
       >
-        Year
+        <span class="material-icons" style="font-size: 28px;">signpost</span>
       </div>
     </div>
 
-    <span on:click={() => currentMode === 'ManageRepeats' ? currentMode = 'Week' : currentMode = 'ManageRepeats'}  class="material-symbols-outlined mika-hover" class:blue-icon={currentMode === 'Dashboard'} style="margin-right: 32px; font-size: 32px; cursor: pointer;">
-      restart_alt
-    </span>
+
+    <div on:click={() => currentMode = 'Day'}
+      class="ux-tab-item hide-for-mobile" 
+      class:transparent-glow-tab={currentMode === 'Day'} 
+      style="margin-right: 8px;"
+    >
+      <span on:click={() => currentMode === 'Day' ? currentMode = 'Week' : currentMode = 'Day'} class="material-symbols-outlined"
+        style="font-size: 30px; margin-top: 4px; color: black;"  
+      >
+        menu_book
+      </span>
+    </div>
 
     <span on:click={() => currentMode === 'Dashboard' ? currentMode = 'Week' : currentMode = 'Dashboard'}  class="material-symbols-outlined mika-hover" class:blue-icon={currentMode === 'Dashboard'} style="margin-right: 32px; font-size: 32px; cursor: pointer;">
       signal_cellular_alt
