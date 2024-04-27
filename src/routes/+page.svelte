@@ -17,7 +17,7 @@
       <div slot="content" style="display: flex; flex-grow: 1; height: 100%; padding: 4%; background: #193b19;">
         <div style="width: 90vw; min-width: 200px; height: 80vh; border-radius: 10px;">
           <div class="hero-title">
-            Modern todo-list and calendar
+            Multilevel todo-list + modern calendar 
           </div>
     
           <div style="display: flex; margin-top: 24px; flex-wrap: wrap;">
@@ -280,7 +280,7 @@
 
   .hero-title {
     color: white;
-    font-size: 4rem; 
+    font-size: 3.6rem; 
     font-weight: 600;
   }
 
