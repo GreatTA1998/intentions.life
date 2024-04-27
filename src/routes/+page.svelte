@@ -17,14 +17,14 @@
       <div slot="content" style="display: flex; flex-grow: 1; height: 100%; padding: 4%; background: #193b19;">
         <div style="width: 90vw; min-width: 200px; height: 80vh; border-radius: 10px;">
           <div class="hero-title">
-            Multilevel todo-list + modern calendar 
+            A modern calendar with branching todo-lists
           </div>
     
           <div style="display: flex; margin-top: 24px; flex-wrap: wrap;">
             <div class="secondary-description">
-              Use your todo-list and calendar side-by-side. 
-              Track long-term milestones with visual timelines.
-              Design small habits with flexible repeats.
+              See your todo-list and calendar side-by-side.
+              Achieve complex, uncertain milestones by keeping track of everything you tried but failed.
+              Cultivate your habits with flexible repeats.
             </div>
             
             <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 12px 0px;" class="action-buttons">
@@ -280,7 +280,7 @@
 
   .hero-title {
     color: white;
-    font-size: 3.6rem; 
+    font-size: 3rem; 
     font-weight: 600;
   }
 
