@@ -25,7 +25,8 @@ export function maintainValidSubtreeDeadlines ({ node, todoListUpperBound, paren
 }
 
 export function helper ({ node, todoListUpperBound, parentObj, batch, userDoc }) {
-  correctDeadlineIfNecessary({ node, todoListUpperBound, parentObj, batch, userDoc })
+  // DEPRECATE THIS COMPLICATED FEATURE
+  // correctDeadlineIfNecessary({ node, todoListUpperBound, parentObj, batch, userDoc })
   for (const child of node.children) {
     helper({ node: child, todoListUpperBound, parentObj, batch, userDoc })
   }
@@ -64,6 +65,11 @@ export function correctDeadlineIfNecessary ({ node, todoListUpperBound, parentOb
 }
 
 export function isWithinTodoInterval ({ node, todoListUpperBound }) {
+  // quick-fix: to make this function usable with milestone page
+  if (todoListUpperBound === Infinity) {
+    return true
+  }
+
   const d1 = new Date()
   d1.setHours(0, 0, 0)
   const d2 = convertDDMMYYYYToDateClassObject(node.deadlineDate, node.deadlineTime)

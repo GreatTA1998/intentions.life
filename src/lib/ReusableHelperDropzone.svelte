@@ -34,6 +34,7 @@
   export let parentObj
   export let colorForDebugging = "red"
   export let dueInHowManyDays // tells us which todo-list we're in
+  export let isMilestoneMode = false
 
   let ReorderDropzone
   const db = getFirestore()
@@ -55,6 +56,8 @@
     e.stopPropagation()
     if (isInvalidReorderDrop()) return
     ReorderDropzone.style.background = ''
+
+    batch = writeBatch(db)
 
     const data = e.dataTransfer.getData('text/plain')
     const keyValuePairs = data.split(']')
@@ -115,8 +118,8 @@
 
     let updateObj = {
       orderValue: newVal,
-      deadlineDate,
-      deadlineTime,
+      deadlineDate: deadlineDate || '', // read below
+      deadlineTime: deadlineTime || '', // the '' optionality makes this usable for milestones
       id,
       subtreeDeadlineInMsElapsed
     }
@@ -126,14 +129,14 @@
     updateObj.startDate = ''
     updateObj.startYYYY = ''
 
-    // 3. DEADLINE
-    updateObj = correctDeadlineIfNecessary({ 
-      node: updateObj, 
-      todoListUpperBound: dueInHowManyDays, 
-      parentObj,
-      batch,
-      userDoc: $user
-    })
+    // 3. DEADLINE DEPRECATE
+    // updateObj = correctDeadlineIfNecessary({ 
+    //   node: updateObj, 
+    //   todoListUpperBound: dueInHowManyDays, 
+    //   parentObj,
+    //   batch,
+    //   userDoc: $user
+    // })
 
     // 4. PARENTID
     if ($whatIsBeingDragged === 'top-level-task-within-this-todo-list' && ancestorRoomIDs.length === 1) {
@@ -152,13 +155,16 @@
       userDoc: $user
     })
 
-    batch.update(
-      doc(db, `users/${$user.uid}/tasks/${$whatIsBeingDraggedID}`),
-      updateObj
-    )
+    // to make it reusable with milestones
+    let ref = null
+    if (isMilestoneMode) {
+      ref = doc(db, `users/${$user.uid}/milestones/${$whatIsBeingDraggedID}`)
+    } else {
+      ref = doc(db, `users/${$user.uid}/tasks/${$whatIsBeingDraggedID}`)
+    }
+
+    batch.update(ref, updateObj)
 
     batch.commit()
-
-    batch = writeBatch(db)
   }
 </script>

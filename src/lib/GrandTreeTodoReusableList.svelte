@@ -57,7 +57,6 @@
           WE HAVE A DEVIATION BETWEEN STATE AND UI
           IN THE FUTURE IF THERE ARE UNEXPECTED BUGS, THIS IS THE LIKELY CAUSE
         -->
-        <!-- {tasksToDisplay.length} -->
         <ReusableHelperDropzone
           ancestorRoomIDs={['']}
           roomsInThisLevel={tasksToDisplay}
