@@ -350,7 +350,8 @@
       // RE-WRITE / INTEGRATE THIS WHEN READY
       if (isInitialFetch) {
         isInitialFetch = false
-        maintainOneWeekPreviewWindowForRepeatingTasks(allTasks)
+        // TO-DO: properly DEPRECATE
+        // maintainOneWeekPreviewWindowForRepeatingTasks(allTasks)
       }
     })
     // can't use `return` in reactive expression https://github.com/sveltejs/svelte/issues/2828  
