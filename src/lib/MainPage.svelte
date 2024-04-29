@@ -200,12 +200,14 @@
       <!-- END OF WEEK MODE SECTION -->
       
       {:else if currentMode === 'Year'}
-        <YearView 
+        <UncertainMilestones/>
+
+        <!-- <YearView 
           {futureScheduledTasks}
           on:task-click={(e) => openDetailedCard(e.detail)}
           on:new-root-task={(e) => createNewRootTask(e.detail)}
           on:subtask-create={(e) => createSubtask(e.detail)}
-        />
+        /> -->
       {/if}
   </div>
 </NavbarAndContentWrapper>
@@ -254,6 +256,7 @@
   import ZenJournal from '$lib/ZenJournal.svelte'
   import ZenJournalLeftNavigation from '$lib/ZenJournaLeftNavigation.svelte'
   import ManageRepeatingTasks from '$lib/ManageRepeatingTasks.svelte'
+  import UncertainMilestones from '$lib/UncertainMilestones.svelte'
 
   import { onDestroy, onMount } from 'svelte'
   import { goto } from '$app/navigation';
@@ -347,7 +350,8 @@
       // RE-WRITE / INTEGRATE THIS WHEN READY
       if (isInitialFetch) {
         isInitialFetch = false
-        maintainOneWeekPreviewWindowForRepeatingTasks(allTasks)
+        // TO-DO: properly DEPRECATE
+        // maintainOneWeekPreviewWindowForRepeatingTasks(allTasks)
       }
     })
     // can't use `return` in reactive expression https://github.com/sveltejs/svelte/issues/2828  

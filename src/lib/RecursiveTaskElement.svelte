@@ -89,6 +89,7 @@
           ancestorRoomIDs={[taskObj.id, ...ancestorRoomIDs]}
           subtreeDeadlineInMsElapsed={updateSubtreeDeadlineInMsElapsed(taskObj, subtreeDeadlineInMsElapsed)}
           {dueInHowManyDays}
+          {isMilestoneMode}
           on:task-click
           on:subtask-create
           on:task-checkbox-change
@@ -103,6 +104,7 @@
                 parentObj={taskObj}
                 {colorForDebugging}
                 {dueInHowManyDays}
+                {isMilestoneMode}
               /> 
             {/if}
           </div>
@@ -117,6 +119,7 @@
         parentObj={taskObj}
         {colorForDebugging}
         {dueInHowManyDays}
+        {isMilestoneMode}
       /> 
       
       <!-- 
@@ -173,6 +176,7 @@
   export let colorForDebugging = getRandomColor()
   export let subtreeDeadlineInMsElapsed = Infinity
   export let dueInHowManyDays // very relevant for todo list tasks
+  export let isMilestoneMode = false
 
   let newSubtaskStringValue = ''
   let isTypingNewSubtask = false

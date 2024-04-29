@@ -1,4 +1,4 @@
-import { getFirestoreCollection, updateFirestoreDoc } from '/src/crud.js'
+import { getFirestoreCollection, setFirestoreDoc, updateFirestoreDoc } from '/src/crud.js'
 import { 
   createIndividualFirestoreDocForEachTaskInAllTasks, 
   applyFuncToEveryTreeNode, 
@@ -8,6 +8,36 @@ import {
   helperFunction
 } from '/src/helpers.js'
 import { reconstructTreeInMemory} from '/src/helpers/dataStructures.js'
+
+
+export async function migrateUserDataToGoogleAccount (currentUID, googleUID) {
+  console.log('ran script')
+  const newAccountPath = `/users/${googleUID}/`
+  // copy the tasks
+  // const allTasks = await getFirestoreCollection(`/users/${currentUID}/tasks`)
+  // for (const taskDoc of allTasks) {
+  //   setFirestoreDoc(newAccountPath + `tasks/${taskDoc.id}`, taskDoc)
+  //   await delayTime(10)
+  //   console.log('copied task')
+  // }
+
+  // copy milestones
+  const allMilestones = await getFirestoreCollection(`/users/${currentUID}/milestones`)
+  for (const milestoneDoc of allMilestones) {
+    setFirestoreDoc(newAccountPath + `milestones/${milestoneDoc.id}`, milestoneDoc)
+    await delayTime(10)
+    console.log('done milestone')
+  }
+
+  // copy the periodic tasks (implement when needed)
+  const allPeriodicTasks = await getFirestoreCollection(`/users/${currentUID}/periodicTasks`)
+  for (const periodicTaskDoc of allPeriodicTasks) {
+    setFirestoreDoc(newAccountPath + `periodicTasks/${periodicTaskDoc.id}`, periodicTaskDoc)
+    await delayTime(10)
+    console.log('done periodic')
+  }
+}
+
 
 // note: legacy tasks that aren't garbage collected can cause problems
 // e.g. deadlineDate === 'NaN NaN NaN'

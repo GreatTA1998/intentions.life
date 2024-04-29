@@ -120,17 +120,19 @@
         Full task tree
       </div>
 
-      <div style="max-height: 500px; overflow-y: auto;">
-        <RecursiveBulletPoint
-          taskObject={taskObject.rootAncestor}
-          originalPopupTask={taskObject}
-          rootAncestor={taskObject.rootAncestor}
-          on:task-click
-          on:task-checkbox-change
-        >
+      {#if taskObject.rootAncestor}
+        <div style="max-height: 500px; overflow-y: auto;">
+          <RecursiveBulletPoint
+            taskObject={taskObject.rootAncestor}
+            originalPopupTask={taskObject}
+            rootAncestor={taskObject.rootAncestor}
+            on:task-click
+            on:task-checkbox-change
+          >
 
-        </RecursiveBulletPoint>
-      </div>
+          </RecursiveBulletPoint>
+        </div>
+      {/if}
   </div>
 </div>
 
