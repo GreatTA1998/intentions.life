@@ -1,7 +1,16 @@
 <div style="padding: 24px;">
   Uncertain milestones
-
-  Dead-ends, awaiting, following-up, consistent effort, uncertain outcomes
+  <ul>
+    <li>
+      What it's good for: complex, long-term, pre-planned, multi-step milestones (without cluttering the to-do list)
+    </li>
+    <li>
+     Status badges: Uncertain outcomes that requires trying dead-ends, awaiting, following-up and consistent effort
+    </li>
+    <li>
+      Wholistic visualization: drag-and-drop entire branches anywhere, forging rich "tree histories" of everything you did
+    </li>
+  </ul>
 
   <button on:click={() => createMilestoneNode({ 
     id: getRandomID(), 
