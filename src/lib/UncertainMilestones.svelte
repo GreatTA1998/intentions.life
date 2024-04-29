@@ -4,7 +4,7 @@
   Dead-ends, awaiting, following-up, consistent effort, uncertain outcomes
 
   <button on:click={() => createMilestoneNode({ 
-    id: '234', 
+    id: getRandomID(), 
     newMilestoneObj: { name: 'Test milestone' }
   })}
   >
@@ -95,7 +95,7 @@
     arrayUnion,
     arrayRemove 
   } from 'firebase/firestore'
-  import { checkTaskObjSchema } from '/src/helpers.js'
+  import { checkTaskObjSchema, getRandomID } from '/src/helpers.js'
   import { reconstructTreeInMemory } from "/src/helpers/dataStructures.js"
   import RecursiveTaskElement from '$lib/RecursiveTaskElement.svelte'
   import ReusableHelperDropzone from '$lib/ReusableHelperDropzone.svelte'
