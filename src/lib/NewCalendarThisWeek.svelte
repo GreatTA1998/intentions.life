@@ -50,6 +50,15 @@
 
           {#if isShowingDockingArea}
             <div style="overflow: hidden;">
+
+              {#if doodleIcons}
+                <div style="display: flex;">
+                  {#each doodleIcons as doodleIcon}
+                    <img src={doodleIcon.dataURL} style="width: 32px; height: 32px;">
+                  {/each}
+                </div>
+              {/if}
+
               {#key intForTriggeringRerender}
                 {#each getScheduledTasks(dateClassObj).filter(task => !task.startTime) as flexibleDayTask}
                   <div on:click={() => dispatch('task-click', { task: flexibleDayTask })} 
@@ -112,9 +121,11 @@ import { onMount, createEventDispatcher } from 'svelte'
 import { tasksScheduledOn } from '/src/store.js'
 import ReusableCheckbox from '$lib/ReusableCheckbox.svelte'
 import ReusableFlexibleDayTask from '$lib/ReusableFlexibleDayTask.svelte'
+import { getFirestoreCollection } from '/src/crud.js'
 
 export let calStartDateClassObj
 
+let doodleIcons = null
 // NOTE: timesOfDay should start from 00:00, so dateClassObjects also need to start from 00:00 military time
 let timesOfDay = [] 
 let numOfHourBlocksDisplayed = 24
@@ -133,9 +144,6 @@ const dispatch = createEventDispatcher()
 
 $: {
   getDateClassObjects(calStartDateClassObj)
-  if (dateClassObjects.length > 0) {
-    initializeDockingArea() // note the inner parameters are not exposed to the reactive statement, so it won't trigger unexpectedly
-  }
 }
 
 $: if ($tasksScheduledOn) {
@@ -145,22 +153,17 @@ $: if ($tasksScheduledOn) {
 onMount(() => {
   // Default start date is today, if left, you shift calStartDateClassObj
   getTimesOfDay()
+
+  fetchDoodleIcons()
 })
 
-function initializeDockingArea () {
-  dockingAreaHeight = computeMaxHeightOfDockingArea()
-  maxDockingAreaHeight = dockingAreaHeight
+async function fetchDoodleIcons () {
+  const temp = await getFirestoreCollection('/doodleIcons')
+  doodleIcons = temp
 }
 
 function toggleDockingArea () {
   isShowingDockingArea = !isShowingDockingArea
-
-  if (dockingAreaHeight === maxDockingAreaHeight) {
-    dockingAreaHeight = 1
-  } 
-  else {
-    dockingAreaHeight = maxDockingAreaHeight
-  }
 }
 
 function dragover_handler (e) {
@@ -185,26 +188,10 @@ function drop_handler (e, dateClassObj) {
   })
 }
 
-// note: this is horrific code, but at least it's all encapsulated within this function
-function computeMaxHeightOfDockingArea () {
-  let scores = []
-  for (const dateClassObj of dateClassObjects) {
-    const flexibleTasks = getScheduledTasks(dateClassObj).filter(task => !task.startTime) 
-    scores.push(flexibleTasks.length)
-  }
-  const maxItems = Math.max(...scores)
-  const pixelHeightPerItem = 12
-  const marginPerItem = 4
-  const totalHeightPerItem = 22
-  console.log('maxItems =', maxItems)
-  return maxItems * totalHeightPerItem
-}
-
-
 function getDateClassObjects (dateClassObj) {
   const temp = []
   let d = dateClassObj
-  for (let i = -30; i < 30; i++) {
+  for (let i = -7; i < 7; i++) {
     const offset = i * (24*60*60*1000)
     const copy = new Date()
     copy.setTime(d.getTime() + offset)

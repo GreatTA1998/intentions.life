@@ -1,29 +1,7 @@
 <div style="width: 100vw;">
   <!-- Top section, spans horizontally -->
   <div style="display: flex; padding: 24px; width: 100vw;">
-    <!-- <div class="rounded-card" style="margin-right: 24px; width: 50vw; height: 440px;">
-      <div style="color: rgb(40, 40, 40); display: flex; align-items: center">
-        <span class="material-symbols-outlined" style="margin-right: 6px">
-          work
-        </span>
-        REVENUE EARNED THIS MONTH
-      </div>
-
-      <div style="display: flex; height: 200px; align-items: start;">
-        <div style="display: flex; align-items: center; margin-top: 12px; margin-right: 24px;">
-          <div style="font-size: 20px; color: red;">$</div>
-          <div style="font-size: 72px; color: red;">
-            0
-          </div>
-        </div>
-
-        <MRRLineGraph/>
-      </div>
-    </div> -->
-
-    <!-- <div style="width: 40vw;" class="rounded-card">
-      <FinancePopupNoPopup/>
-    </div> -->
+    <ExperimentalCanvas></ExperimentalCanvas>
 
     <div style="background-color: transparent; width: 100%; display: flex; justify-content: left; padding: 24px;">
       <!-- Loved Ones Dashboard in future updates -->
@@ -72,8 +50,7 @@
   import { applyFuncToEveryTreeNode, round } from '/src/helpers.js'
   import _ from 'lodash'
   import { updateFirestoreDoc } from '/src/crud.js'
-  import MRRLineGraph from '$lib/MRRLineGraph.svelte'
-  import FinancePopupNoPopup from '$lib/FinancePopupNoPopup.svelte'
+  import ExperimentalCanvas from '$lib/ExperimentalCanvas.svelte'
 
   export let allTasks 
   
@@ -94,6 +71,8 @@
 
   // write a function that loops through each reusableTaskTemplate
   function summarizeReusedTasks () {
+    if (!$user.reusableTaskTemplates) return
+    
     for (const taskTemplate of $user.reusableTaskTemplates) {
       // you need a way to traverse through the entire tree
       const taskInstances = collectTaskInstances({ reusableTemplateID: taskTemplate.id })
