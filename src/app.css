@@ -12,13 +12,15 @@
   --future-overview-bg-color: hsl(98, 40%, 94%);
   --navbar-bg-color: hsla(98, 30%, 94%);
 
-  --location-indicator-color: #b34f1b;
+  --location-indicator-color: var(--logo-twig-color);
 
   --task-action-subtle-color: rgb(120, 120, 120);
 
   --main-content-top-margin: min(4vh, 36px);
 
   --calendar-section-left-spacing: 2vw;
+
+  --calendar-day-section-width: max(10vw, 120px); 
 }
 
 * {

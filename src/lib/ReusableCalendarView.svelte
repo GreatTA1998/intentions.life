@@ -36,8 +36,11 @@
             ),
             pixelsPerMinute
           })}px;
-          left: 0px;
-          width: 100%;
+          left: 0;
+          right: 0;
+          margin-left: auto;
+          margin-right: auto;
+          width: 94%;
         "
       >
         <ReusableTaskElement
@@ -323,10 +326,6 @@
 </script>
 
 <style lang="scss">
-  :root {
-    --calendar-day-section-width: max(10vw, 120px); 
-  }
-
   .current-time-indicator-container {
     display: block; 
     align-items: center;
