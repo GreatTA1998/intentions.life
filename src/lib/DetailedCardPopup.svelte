@@ -186,15 +186,13 @@ onMount(() => {
   if (taskObject.imageDownloadURL) {
     TaskImageElem.onload = () => {
       const { naturalWidth, naturalHeight } = TaskImageElem
-    
-      // 400px is the min width/height of the popup (given the current CSS)
-      const minDimension = 400
+      const minDimension = 400 // (given the current CSS for this popup)
       if (naturalWidth < naturalHeight) {
         PopupElem.style.width = minDimension + 'px'
-        PopupElem.style.height = PopupElem.style.width * (naturalHeight / naturalWidth) + 'px'
+        PopupElem.style.height = minDimension * (naturalHeight / naturalWidth) + 'px'
       } else {
         PopupElem.style.height = minDimension + 'px'
-        PopupElem.style.width = PopupElem.style.height * (naturalWidth / naturalHeight) + 'px'
+        PopupElem.style.width = minDimension * (naturalWidth / naturalHeight) + 'px'
       }
     }
   }
