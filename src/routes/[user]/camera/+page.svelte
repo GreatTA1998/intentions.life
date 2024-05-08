@@ -101,8 +101,21 @@
     const { metadata } = resultSnapshot 
     const { fullPath, timeCreated } = metadata
 
+    // STEP 0: parallel process to retrieve width & height
+    let durationForFullDisplay
+    const p1 = createImageBitmap(imageBlobFile).then(bitmap => {
+      const { width, height } = bitmap 
+      // these durations will display fully the portrait / landscape iPhone photos on an iPad Air 1180x820
+      if (width > height) durationForFullDisplay = 68
+      else durationForFullDisplay = 120
+      console.log("durationForFullDisplay =", durationForFullDisplay)
+    })
+
     // STEP 1: getDownloadURL()
-    const imageDownloadURL = await getDownloadURL(ref(storage, fullPath))
+    let imageDownloadURL 
+    const p2 = getDownloadURL(ref(storage, fullPath)).then(url => imageDownloadURL = url)
+    
+    await Promise.all([p1, p2])
 
     // STEP 2: create a task scheduled at the same time the photo is taken
     let dateClassObj 
@@ -117,7 +130,7 @@
       startTime: getTimeInHHMM({ dateClassObj }),
       startDate: getDateInMMDD(dateClassObj), // MMDD is a legacy function so doesn't use destructuring
       startYYYY: `${dateClassObj.getFullYear()}`, // year needs to be a string for some reason
-      duration: 60
+      duration: durationForFullDisplay
     }
     newTaskObj = checkTaskObjSchema(newTaskObj, $user)
 

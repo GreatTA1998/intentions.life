@@ -14,9 +14,9 @@
     height: {height}px; 
     min-height: 12px;
     font-size: {fontSize}rem;
-    opacity: {task.isDone ? '0.6' : '1'};
+    opacity: {task.isDone ? '0.5' : '0.9'};
     outline: 0px solid red;
-    background-color: {isBulletPoint ? '' : 'hsla(210, 20%, 36%, 0.6)'};
+    background-color: {isBulletPoint ? '' : 'var(--experimental-black)'};
     background-image: {task.imageDownloadURL ? `url(${task.imageDownloadURL})` : ''};
     background-size: contain;
     background-repeat: no-repeat;
@@ -157,6 +157,11 @@
 <style>
   :root {
     --left-padding: 6px;
+    --default-task-color: hsla(210, 20%, 36%, 0.6);
+
+    --experimental-black: hsla(0, 100%, 0%, 0.6);
+    --experimental-purple: hsla(248, 53%, 58%, 0.6);
+    --experimental-red: hsla(0, 100%, 50%, 0.6);
   }
 
   .calendar-block {

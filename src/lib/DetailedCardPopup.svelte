@@ -185,8 +185,17 @@ function hasDeadline (taskObj) {
 onMount(() => {
   if (taskObject.imageDownloadURL) {
     TaskImageElem.onload = () => {
-      PopupElem.style.width = `${TaskImageElem.naturalWidth / 6}px` 
-      PopupElem.style.height = `${TaskImageElem.naturalHeight / 6}px`
+      const { naturalWidth, naturalHeight } = TaskImageElem
+    
+      // 400px is the min width/height of the popup (given the current CSS)
+      const minDimension = 400
+      if (naturalWidth < naturalHeight) {
+        PopupElem.style.width = minDimension + 'px'
+        PopupElem.style.height = PopupElem.style.width * (naturalHeight / naturalWidth) + 'px'
+      } else {
+        PopupElem.style.height = minDimension + 'px'
+        PopupElem.style.width = PopupElem.style.height * (naturalWidth / naturalHeight) + 'px'
+      }
     }
   }
 })
