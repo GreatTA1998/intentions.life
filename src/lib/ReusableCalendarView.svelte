@@ -24,7 +24,7 @@
       yPosition = copyGetTrueY(e)
     }}
   >
-    {#each scheduledTasks as task, i}
+    {#each sortedScheduledTasks as task, i}
       <div
         style="
           position: absolute; 
@@ -162,6 +162,13 @@
   $: pixelsPerMinute = pixelsPerHour / 60
   $: resultantDateClassObject = getResultantDateClassObject(yPosition)
 
+  // Put tasks in ascending order of `startTime`, so newer tasks are above older tasks
+  // this is important because when a big task swallows a small task,
+  // you need to be able to drag the small task out easily (and the small task is BELOW the big task by definition)
+  $: sortedScheduledTasks = scheduledTasks.sort((task1, task2) => {
+    return pureNumericalHourForm(task1.startTime) - pureNumericalHourForm(task2.startTime)
+  })
+
   onMount(async () => {
     if (CurrentTimeIndicator) {
       setTimeout(() => {
@@ -176,6 +183,12 @@
   onDestroy(() => {
 
   })
+
+  function pureNumericalHourForm (startTime) {
+    const hh = startTime.slice(0, 2)
+    const mm = startTime.slice(3, 5)
+    return Number(hh) + (Number(mm) / 60)
+  }
 
   function p (...args) {
     console.log(...args)    
