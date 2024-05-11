@@ -168,7 +168,8 @@
       name: newTaskName,
       repeatOnDayOfWeek,
       repeatGroupID: id,
-      orderValue: defaultOrderValue
+      orderValue: defaultOrderValue,
+      reusableTemplateID: id
     })
 
     createNewInstancesOfWeeklyRepeatingTasks({ 
@@ -209,6 +210,7 @@
     let taskObjCopy = {
       repeatGroupID,
       id: individualID,
+      reusableTemplateID: repeatGroupID,
       name: newTaskName,
       startTime: '',
       startYYYY: new Date().getFullYear()

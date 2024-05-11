@@ -1,11 +1,9 @@
 <div style="width: 100vw;">
   <!-- Top section, spans horizontally -->
   <div style="display: flex; padding: 24px; width: 100vw;">
-    <ExperimentalCanvas></ExperimentalCanvas>
+    <ExperimentalCanvas/>
 
     <div style="background-color: transparent; width: 100%; display: flex; justify-content: left; padding: 24px;">
-      <!-- Loved Ones Dashboard in future updates -->
-
       <div class="rounded-card" style="margin-left: 24px; width: 100%;">
         <div style="display: flex; align-items: center;">
         <div style="text-transform: uppercase; color: rgb(40, 40, 40); display: flex; align-items: center;">
@@ -38,10 +36,8 @@
         {/each}
       </div>
     </div>
-
   </div>
   <!-- End of top section flexbox -->
-
 </div>
 
 <script>
@@ -51,6 +47,7 @@
   import _ from 'lodash'
   import { updateFirestoreDoc } from '/src/crud.js'
   import ExperimentalCanvas from '$lib/ExperimentalCanvas.svelte'
+  import { getFirestoreCollection } from '/src/crud.js'
 
   export let allTasks 
   
@@ -65,16 +62,14 @@
   function updateUserDoc ({ propertyName, newValue }) {
     const updateObj = {}
     updateObj[propertyName] = newValue
-    console.log("updateObj =", updateObj)
     updateFirestoreDoc(`users/${$user.uid}`, updateObj)
   }
 
   // write a function that loops through each reusableTaskTemplate
-  function summarizeReusedTasks () {
-    if (!$user.reusableTaskTemplates) return
+  async function summarizeReusedTasks () {
+    const reusableTaskTemplates = await getFirestoreCollection(`/users/${$user.uid}/periodicTasks`)
     
-    for (const taskTemplate of $user.reusableTaskTemplates) {
-      // you need a way to traverse through the entire tree
+    for (const taskTemplate of reusableTaskTemplates) {
       const taskInstances = collectTaskInstances({ reusableTemplateID: taskTemplate.id })
       const totalMinutesDuration = taskInstances.reduce((accum, currObj) => accum + currObj.duration, 0)
       const hourDuration = totalMinutesDuration / 60
@@ -118,19 +113,5 @@
     height: 100%;
     padding: 24px;
     border: 2px solid grey;
-  }
-
-  .section-title {
-    font-weight: 600;
-    font-size: 20px;
-  }
-
-  .section-description {
-    font-size: 16px;
-    font-weight: 400;
-  }
-
-  input {
-    all: unset;
   }
 </style>

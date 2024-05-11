@@ -91,33 +91,23 @@
     </div>
 
     <div style="margin-top: 0px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
-      <DetailedCardPopupRepeat 
-        {taskObject}
-        on:repeating-tasks-generate
-      />
-
-      <div style="display: flex; align-items: center;">
+      <div style="display: flex; align-items: center; width: 100%;">
         {#if taskObject.imageDownloadURL}
           <span class="material-symbols-outlined"  on:click={() => isViewingPhoto = !isViewingPhoto} style="cursor: pointer; margin-left: 6px; border: 1px solid grey; border-radius: 24px; padding: 4px;">
             image_search
           </span>
         {/if}
 
-        <span class="material-symbols-outlined" style="cursor: pointer; margin-left: 12px; border: 1px solid grey; border-radius: 24px; padding: 4px;" 
-          on:click={() => {dispatch('task-reusable'); alert('Success, when you click on the calendar and type a task, matching reusable tasks will appear. You can track how much time you spend on this task by visiting the time spent dashboard on the top right.')}}
+        <span class="material-symbols-outlined" on:click|stopPropagation={confirmDelete} 
+          style="cursor: pointer; margin-left: auto; right: 0px; border: 1px solid grey; border-radius: 24px; padding: 4px;"
         >
-          token
-        </span>
-
-
-        <span class="material-symbols-outlined" on:click|stopPropagation={confirmDelete} style="cursor: pointer; margin-left: 12px; border: 1px solid grey; border-radius: 24px; padding: 4px;">
           delete
         </span>
       </div>
     </div>
 
-      <div style="font-size: 1rem; margin-top: 36px; margin-bottom: 12px; font-weight: 400;">
-        Full task tree
+      <div style="font-size: 1rem; margin-top: 0px; margin-bottom: 12px; font-weight: 400;">
+        Full ancestral tree
       </div>
 
       {#if taskObject.rootAncestor}
