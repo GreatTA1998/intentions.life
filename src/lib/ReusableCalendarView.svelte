@@ -94,7 +94,13 @@
                   on:click={() => createNewInstanceOfReusableTask(taskTemplate)} 
                   class:option-highlight={taskTemplateSearchResults.length === 1}
                 >
-                  {taskTemplate.name}
+                  {#if taskTemplate.iconDataURL}
+                    <img src={taskTemplate.iconDataURL} style="width: 24px; height: 24px;">
+                  {/if}
+
+                  <div style="margin-left: {taskTemplate.iconDataURL ? '0px' : '12px'}">
+                    {taskTemplate.name}
+                  </div>
                 </div>
               {/each}
             </div>
@@ -130,6 +136,7 @@
 </div>
 
 <script>
+  import { getFirestoreCollection } from '/src/crud.js'
   import { getDateOfToday, getTrueY, computeMillisecsDifference, convertDDMMYYYYToDateClassObject, getTimeInHHMM } from '/src/helpers.js'
   import ReusableTaskElement from '$lib/ReusableTaskElement.svelte'
   import { onMount, beforeUpdate, afterUpdate, tick, createEventDispatcher, onDestroy } from 'svelte'
@@ -157,6 +164,7 @@
   let yPosition
   let newTaskName = ''
 
+  let reusableTaskTemplates = null
   let taskTemplateSearchResults = []
 
   $: pixelsPerMinute = pixelsPerHour / 60
@@ -170,6 +178,7 @@
   })
 
   onMount(async () => {
+    // scrolling
     if (CurrentTimeIndicator) {
       setTimeout(() => {
         if (CurrentTimeIndicator && !$hasInitialScrolled) {
@@ -178,6 +187,10 @@
         }
       }, 0) 
     }
+
+    // task template dropdown
+    const temp = await getFirestoreCollection(`/users/${$user.uid}/periodicTasks`)
+    reusableTaskTemplates = temp
   })
 
   onDestroy(() => {
@@ -203,9 +216,11 @@
   }
 
   function searchTaskTemplates () {
+    if (reusableTaskTemplates === null) return 
+
     const uniqueSet = new Set()
     const searchQuery = newTaskName
-    for (const taskTemplate of $user.reusableTaskTemplates) {
+    for (const taskTemplate of reusableTaskTemplates) {
       if (taskTemplate.name.toLowerCase().includes(searchQuery.toLowerCase())) {
         uniqueSet.add(taskTemplate)
       }
@@ -348,7 +363,15 @@
   }
 
   .autocomplete-option {
-    padding-top: 12px; padding-bottom: 12px; padding-left: 12px; padding-right: 12px; font-size: 16px; border-radius: 12px;
+    padding-top: 12px; 
+    padding-bottom: 12px; 
+    padding-left: 4px; 
+    padding-right: 12px; 
+    font-size: 12px; 
+    border-radius: 12px;
+
+    display: flex; 
+    align-items: center;
   }
 
   .option-highlight {
