@@ -52,17 +52,20 @@
   }
 
   function handleStart(event) {
+    event.preventDefault()
     drawing = true;
     draw(event);
   }
 
-  function handleEnd() {
+  function handleEnd(event) {
+    event.preventDefault()
     drawing = false;
     prevX = 0;
     prevY = 0; // Reset previous position
   }
 
   function handleMove(event) {
+    event.preventDefault()
     if (!drawing) return;
     draw(event);
   }

@@ -43,7 +43,9 @@
       </div>
 
       <div style="display: flex; align-items: center;">
-        Show repeats
+        <div>
+          Show repeats
+        </div>
 
         <div style="width: 40px;">
           <UXFormField
@@ -74,6 +76,16 @@
       >
         Delete
       </button>
+
+      {#if doodleIcons}
+        {#each doodleIcons as doodleIcon}
+          <img 
+            on:click={() => editExistingInstances({ iconDataURL: doodleIcon.dataURL })} 
+            src={doodleIcon.dataURL}
+            style="width: 48px; height: 48px; cursor: pointer;"
+          >
+        {/each}
+      {/if}
     </div>
   </div>
 {/if}
@@ -116,8 +128,11 @@
   let numOfWeeksInAdvance = 2
   let hasSpecificTime = false
 
+  let doodleIcons = null
 
   onMount(async () => {
+    const temp = await getFirestoreCollection(`/doodleIcons`)
+    doodleIcons = temp
   })
 
   function setIsPopupOpen ({ newVal }) {
@@ -125,11 +140,12 @@
   }
 
   // effectively a delete + create
-  async function editExistingInstances () {
+  async function editExistingInstances ({ iconDataURL = '' }) {
     // update the template itself
     updateFirestoreDoc(`/users/${$user.uid}/periodicTasks/${weeklyPeriodicTemplate.id}`, {
       repeatOnDayOfWeek,
-      name: newTaskName
+      name: newTaskName,
+      iconDataURL
     })
     // find all the repeat groups scheduled from today's date (don't care about the past)
 
@@ -155,7 +171,8 @@
     createNewInstancesOfWeeklyRepeatingTasks({
       repeatGroupID: weeklyPeriodicTemplate.repeatGroupID,
       numOfWeeksInAdvance,
-      repeatOnDayOfWeek
+      repeatOnDayOfWeek,
+      iconDataURL
     })
   }  
 
@@ -182,19 +199,21 @@
   let allGeneratedTasksToUpload = [] 
 
   // repeatOnDaysOfMonth: [0, 0, 0, 1, ... 0, 1]
-  function createNewInstancesOfWeeklyRepeatingTasks ({ numOfWeeksInAdvance = 2, repeatOnDayOfWeek, repeatGroupID }) {
+  function createNewInstancesOfWeeklyRepeatingTasks ({ numOfWeeksInAdvance = 2, repeatOnDayOfWeek, repeatGroupID, iconDataURL }) {
     const d = new Date()
     for (let i = 0; i < 7 * numOfWeeksInAdvance; i++) {
       const weekDayNumber = mod(d.getDay() - 1, 7) // for getDay(), Sunday = 0, Monday = 1
       if (repeatOnDayOfWeek[weekDayNumber]) {
         const generatedTask = createRepeatedTask({ 
-          dateClassObj: new Date(d.getTime()), repeatGroupID 
+          dateClassObj: new Date(d.getTime()), 
+          repeatGroupID 
         })
-        allGeneratedTasksToUpload.push(generatedTask)
+        allGeneratedTasksToUpload.push({ iconDataURL, ...generatedTask })
       }
 
       d.setDate(d.getDate() + 1)
     }
+
     console.log('allGeneratedTasksToUpload =', allGeneratedTasksToUpload)
     for (const task of allGeneratedTasksToUpload) {
       setFirestoreDoc(

@@ -50,17 +50,23 @@
 
           {#if isShowingDockingArea}
             <div style="overflow: hidden;">
-
-              {#if doodleIcons}
-                <div style="display: flex;">
-                  {#each doodleIcons as doodleIcon}
-                    <img src={doodleIcon.dataURL} style="width: 32px; height: 32px;">
-                  {/each}
-                </div>
-              {/if}
-
               {#key intForTriggeringRerender}
-                {#each getScheduledTasks(dateClassObj).filter(task => !task.startTime) as flexibleDayTask}
+                {#if doodleIcons}
+                  <div style="display: flex;">
+                    {#each getScheduledTasks(dateClassObj).filter(task => !task.startTime && task.iconDataURL) as iconTask}
+                      <img on:click={() => dispatch('task-click', { task: iconTask })}
+                        src={iconTask.iconDataURL} 
+                        style="width: 32px; height: 32px;"
+                        draggable="true"
+                        on:dragstart|self={(e) => startDragMove(e, iconTask.id)} 
+                      >
+                      <!-- <div style="font-size: 2px;">{iconTask.name}</div>
+                      <div style="font-size: 2px;">{iconTask.repeatGroupID}</div> -->
+                    {/each}
+                  </div>
+                {/if}
+
+                {#each getScheduledTasks(dateClassObj).filter(task => !task.startTime && !task.iconDataURL) as flexibleDayTask}
                   <div on:click={() => dispatch('task-click', { task: flexibleDayTask })} 
                     style="width: var(--calendar-day-section-width); font-size: 12px; display: flex; gap: 4px; margin-top: 8px; margin-left: 4px; margin-right: 4px;"
                   >
@@ -156,6 +162,20 @@ onMount(() => {
 
   fetchDoodleIcons()
 })
+
+function startDragMove (e, id) {
+   e.dataTransfer.setData("text/plain", id)
+
+   // record distance from the top of the element
+   const rect = e.target.getBoundingClientRect()
+   const y = e.clientY - rect.top // y position within el ement
+
+   whatIsBeingDraggedID.set(id)
+   whatIsBeingDragged.set('room')
+   whatIsBeingDraggedFullObj.set(task)
+
+   yPosWithinBlock.set(y)
+ }
 
 async function fetchDoodleIcons () {
   const temp = await getFirestoreCollection('/doodleIcons')

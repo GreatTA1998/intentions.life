@@ -44,10 +44,15 @@
           weeklyPeriodicTemplate={weeklyTask}
           on:delete={() => deleteTemplate(weeklyTask)}
         >
-          <div on:click={() => setIsPopupOpen({ newVal: true })} style="margin-left: 8px;"
+          <div on:click={() => setIsPopupOpen({ newVal: true })} 
+            style="margin-left: 8px; display: flex; align-items: center;"
             draggable="true"
             on:dragstart|self={(e) => dragstart_handler(e, weeklyTask)}  
-          >
+          > 
+            {#if weeklyTask.iconDataURL}
+              <img src={weeklyTask.iconDataURL} style="width: 48px; height: 48px;">
+            {/if}
+
             {weeklyTask.name}
           </div>
         </ManageRepeatingTasksUnifiedWeeklyPopup>
