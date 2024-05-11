@@ -61,9 +61,13 @@
       </div>
     {/if}
 
-    <div class="task-name truncate-to-one-line" style="color: {isBulletPoint ? '' : 'white'}">
-      {task.name}
-    </div>
+    {#if task.iconDataURL}
+      <img src={task.iconDataURL} style="pointer-events: none; width: 32px; height: 32px;">
+    {:else}
+      <div class="task-name truncate-to-one-line" style="color: {isBulletPoint ? '' : 'white'}">
+        {task.name}
+      </div>
+    {/if}
   </div>
   <!-- End of task name flexbox -->
 

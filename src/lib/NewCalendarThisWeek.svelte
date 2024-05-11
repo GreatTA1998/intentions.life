@@ -52,7 +52,7 @@
             <div style="overflow: hidden;">
               {#key intForTriggeringRerender}
                 {#if doodleIcons}
-                  <div style="display: flex;">
+                  <div style="display: flex; flex-wrap: wrap;">
                     {#each getScheduledTasks(dateClassObj).filter(task => !task.startTime && task.iconDataURL) as iconTask}
                       <img on:click={() => dispatch('task-click', { task: iconTask })}
                         src={iconTask.iconDataURL} 
