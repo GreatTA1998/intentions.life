@@ -156,7 +156,8 @@
       repeatOnDayOfMonth,
       willRepeatOnLastDay,
       repeatGroupID: id,
-      orderValue: defaultOrderValue
+      orderValue: defaultOrderValue,
+      reusableTemplateID: id
     })
 
     createNewInstancesOfMonthlyRepeatingTasks({ 
@@ -168,7 +169,7 @@
   }
 
   // repeatOnDaysOfMonth: [0, 0, 0, 1, ... 0, 1]
-  function createNewInstancesOfMonthlyRepeatingTasks ({numOfMonthsInAdvance = 2, repeatOnDayOfMonth, willRepeatOnLastDay }) {
+  function createNewInstancesOfMonthlyRepeatingTasks ({ numOfMonthsInAdvance = 2, repeatOnDayOfMonth, willRepeatOnLastDay }) {
     const d = new Date() // base case: no need to start from beginning of month
     for (let i = 0; i < numOfMonthsInAdvance; i++) {
       generateRepeatingTasksForSpecificMonth(d, repeatOnDayOfMonth, willRepeatOnLastDay)
@@ -216,6 +217,7 @@
     let newObj = {
       repeatGroupID,
       id: individualID,
+      reusableTemplateID: repeatGroupID,
       name: newTaskName,
       startTime: '',
       startDate: getDateInMMDD(d), //, MMDD

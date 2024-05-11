@@ -1,4 +1,4 @@
-import { setFirestoreDoc } from '/src/crud.js'
+import { setFirestoreDoc, updateFirestoreDoc } from '/src/crud.js'
 
 export function checkTaskObjSchema (task, userDoc) {
   const output = {...task}
@@ -6,7 +6,13 @@ export function checkTaskObjSchema (task, userDoc) {
   if (!task.duration) output.duration = 30
   if (!task.parentID) output.parentID = ""
   if (!task.childrenIDs) output.childrenIDs = []
-  if (!task.orderValue) output.orderValue = (userDoc.maxOrderValue || 0) + 3
+  if (!task.orderValue) { 
+    const newVal = (userDoc.maxOrderValue || 0) + 3
+    output.orderValue = newVal
+    updateFirestoreDoc(`/users/${userDoc.uid}`, {
+      maxOrderValue: newVal
+    })
+  }
   return output
 }
 

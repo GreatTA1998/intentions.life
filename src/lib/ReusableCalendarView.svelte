@@ -24,7 +24,7 @@
       yPosition = copyGetTrueY(e)
     }}
   >
-    {#each scheduledTasks as task, i}
+    {#each sortedScheduledTasks as task, i}
       <div
         style="
           position: absolute; 
@@ -36,8 +36,11 @@
             ),
             pixelsPerMinute
           })}px;
-          left: 0px;
-          width: 100%;
+          left: 0;
+          right: 0;
+          margin-left: auto;
+          margin-right: auto;
+          width: 94%;
         "
       >
         <ReusableTaskElement
@@ -91,7 +94,13 @@
                   on:click={() => createNewInstanceOfReusableTask(taskTemplate)} 
                   class:option-highlight={taskTemplateSearchResults.length === 1}
                 >
-                  {taskTemplate.name}
+                  {#if taskTemplate.iconDataURL}
+                    <img src={taskTemplate.iconDataURL} style="width: 24px; height: 24px;">
+                  {/if}
+
+                  <div style="margin-left: {taskTemplate.iconDataURL ? '0px' : '12px'}">
+                    {taskTemplate.name}
+                  </div>
                 </div>
               {/each}
             </div>
@@ -127,6 +136,7 @@
 </div>
 
 <script>
+  import { getFirestoreCollection } from '/src/crud.js'
   import { getDateOfToday, getTrueY, computeMillisecsDifference, convertDDMMYYYYToDateClassObject, getTimeInHHMM } from '/src/helpers.js'
   import ReusableTaskElement from '$lib/ReusableTaskElement.svelte'
   import { onMount, beforeUpdate, afterUpdate, tick, createEventDispatcher, onDestroy } from 'svelte'
@@ -154,12 +164,21 @@
   let yPosition
   let newTaskName = ''
 
+  let reusableTaskTemplates = null
   let taskTemplateSearchResults = []
 
   $: pixelsPerMinute = pixelsPerHour / 60
   $: resultantDateClassObject = getResultantDateClassObject(yPosition)
 
+  // Put tasks in ascending order of `startTime`, so newer tasks are above older tasks
+  // this is important because when a big task swallows a small task,
+  // you need to be able to drag the small task out easily (and the small task is BELOW the big task by definition)
+  $: sortedScheduledTasks = scheduledTasks.sort((task1, task2) => {
+    return pureNumericalHourForm(task1.startTime) - pureNumericalHourForm(task2.startTime)
+  })
+
   onMount(async () => {
+    // scrolling
     if (CurrentTimeIndicator) {
       setTimeout(() => {
         if (CurrentTimeIndicator && !$hasInitialScrolled) {
@@ -168,11 +187,21 @@
         }
       }, 0) 
     }
+
+    // task template dropdown
+    const temp = await getFirestoreCollection(`/users/${$user.uid}/periodicTasks`)
+    reusableTaskTemplates = temp
   })
 
   onDestroy(() => {
 
   })
+
+  function pureNumericalHourForm (startTime) {
+    const hh = startTime.slice(0, 2)
+    const mm = startTime.slice(3, 5)
+    return Number(hh) + (Number(mm) / 60)
+  }
 
   function p (...args) {
     console.log(...args)    
@@ -187,9 +216,11 @@
   }
 
   function searchTaskTemplates () {
+    if (reusableTaskTemplates === null) return 
+
     const uniqueSet = new Set()
     const searchQuery = newTaskName
-    for (const taskTemplate of $user.reusableTaskTemplates) {
+    for (const taskTemplate of reusableTaskTemplates) {
       if (taskTemplate.name.toLowerCase().includes(searchQuery.toLowerCase())) {
         uniqueSet.add(taskTemplate)
       }
@@ -323,10 +354,6 @@
 </script>
 
 <style lang="scss">
-  :root {
-    --calendar-day-section-width: max(10vw, 120px); 
-  }
-
   .current-time-indicator-container {
     display: block; 
     align-items: center;
@@ -336,7 +363,15 @@
   }
 
   .autocomplete-option {
-    padding-top: 12px; padding-bottom: 12px; padding-left: 12px; padding-right: 12px; font-size: 16px; border-radius: 12px;
+    padding-top: 12px; 
+    padding-bottom: 12px; 
+    padding-left: 4px; 
+    padding-right: 12px; 
+    font-size: 12px; 
+    border-radius: 12px;
+
+    display: flex; 
+    align-items: center;
   }
 
   .option-highlight {

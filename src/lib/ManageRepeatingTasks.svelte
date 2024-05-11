@@ -44,10 +44,15 @@
           weeklyPeriodicTemplate={weeklyTask}
           on:delete={() => deleteTemplate(weeklyTask)}
         >
-          <div on:click={() => setIsPopupOpen({ newVal: true })} style="margin-left: 8px;"
+          <div on:click={() => setIsPopupOpen({ newVal: true })} 
+            style="margin-left: 8px; display: flex; align-items: center;"
             draggable="true"
             on:dragstart|self={(e) => dragstart_handler(e, weeklyTask)}  
-          >
+          > 
+            {#if weeklyTask.iconDataURL}
+              <img src={weeklyTask.iconDataURL} style="width: 48px; height: 48px;">
+            {/if}
+
             {weeklyTask.name}
           </div>
         </ManageRepeatingTasksUnifiedWeeklyPopup>
@@ -197,48 +202,6 @@
     updateFirestoreDoc(`users/${$user.uid}/periodicTasks/${draggedTemplate.id}`, {
       orderValue: newVal
     })
-  }
-
-  // repeatOnDaysOfMonth: [0, 0, 0, 1, ... 0, 1]
-  function createNewInstancesOfMonthlyRepeatingTasks ({numOfMonthsInAdvance = 2, repeatOnDayOfMonth, willRepeatOnLastDay}) {
-    const d = new Date() // base case: no need to start from beginning of month
-    for (let i = 0; i < numOfMonthsInAdvance; i++) {
-      generateRepeatingTasksForSpecificMonth(d, repeatOnDayOfMonth, willRepeatOnLastDay)
-
-      // general case: start from beginning of month
-      d.setMonth(d.getMonth() + 1)
-      d.setDate(1) 
-    }
-  }
-
-  function generateRepeatingTasksForSpecificMonth (dateClassObject, repeatOnDayOfMonth, willRepeatOnLastDay) {
-    const d = dateClassObject
-
-    // general case: first 28 days
-    while (d.getDate() < 28) {
-      if (repeatOnDayOfMonth[d.getDate() - 1]) { // getDate() is 1-indexed but `repeatOnDayOfMonth` is 0-indexed
-        generateNewTask(d.getDate())
-      }
-      d.setDate(d.getDate() + 1)
-    }
-
-    // edge case: last day (i.e. 28, 29, 30, 31 treated the same)
-    if (willRepeatOnLastDay) {
-      const lastDay = getLastDayOfMonth(d.getMonth()) // note `getMonth` is zero-indexed
-      generateNewTask(lastDay)
-    }
-  }
-
-  // month is 1-indexed from 1 to 12
-  function getLastDayOfMonth (zeroIndexedMonthNumber) {
-    const d1 = new Date()
-    const d2 = new Date(d1.getFullYear(), zeroIndexedMonthNumber + 1, 0);
-    const lastDay = d2.getDate()
-    return lastDay
-  }
-
-  function generateNewTask (dayOfMonth) {
-    console.log('generate new task for =', dayOfMonth)
   }
 </script>
 

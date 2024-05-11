@@ -1,33 +1,9 @@
 <div style="width: 100vw;">
   <!-- Top section, spans horizontally -->
   <div style="display: flex; padding: 24px; width: 100vw;">
-    <!-- <div class="rounded-card" style="margin-right: 24px; width: 50vw; height: 440px;">
-      <div style="color: rgb(40, 40, 40); display: flex; align-items: center">
-        <span class="material-symbols-outlined" style="margin-right: 6px">
-          work
-        </span>
-        REVENUE EARNED THIS MONTH
-      </div>
-
-      <div style="display: flex; height: 200px; align-items: start;">
-        <div style="display: flex; align-items: center; margin-top: 12px; margin-right: 24px;">
-          <div style="font-size: 20px; color: red;">$</div>
-          <div style="font-size: 72px; color: red;">
-            0
-          </div>
-        </div>
-
-        <MRRLineGraph/>
-      </div>
-    </div> -->
-
-    <!-- <div style="width: 40vw;" class="rounded-card">
-      <FinancePopupNoPopup/>
-    </div> -->
+    <ExperimentalCanvas/>
 
     <div style="background-color: transparent; width: 100%; display: flex; justify-content: left; padding: 24px;">
-      <!-- Loved Ones Dashboard in future updates -->
-
       <div class="rounded-card" style="margin-left: 24px; width: 100%;">
         <div style="display: flex; align-items: center;">
         <div style="text-transform: uppercase; color: rgb(40, 40, 40); display: flex; align-items: center;">
@@ -60,10 +36,8 @@
         {/each}
       </div>
     </div>
-
   </div>
   <!-- End of top section flexbox -->
-
 </div>
 
 <script>
@@ -72,8 +46,8 @@
   import { applyFuncToEveryTreeNode, round } from '/src/helpers.js'
   import _ from 'lodash'
   import { updateFirestoreDoc } from '/src/crud.js'
-  import MRRLineGraph from '$lib/MRRLineGraph.svelte'
-  import FinancePopupNoPopup from '$lib/FinancePopupNoPopup.svelte'
+  import ExperimentalCanvas from '$lib/ExperimentalCanvas.svelte'
+  import { getFirestoreCollection } from '/src/crud.js'
 
   export let allTasks 
   
@@ -88,14 +62,14 @@
   function updateUserDoc ({ propertyName, newValue }) {
     const updateObj = {}
     updateObj[propertyName] = newValue
-    console.log("updateObj =", updateObj)
     updateFirestoreDoc(`users/${$user.uid}`, updateObj)
   }
 
   // write a function that loops through each reusableTaskTemplate
-  function summarizeReusedTasks () {
-    for (const taskTemplate of $user.reusableTaskTemplates) {
-      // you need a way to traverse through the entire tree
+  async function summarizeReusedTasks () {
+    const reusableTaskTemplates = await getFirestoreCollection(`/users/${$user.uid}/periodicTasks`)
+    
+    for (const taskTemplate of reusableTaskTemplates) {
       const taskInstances = collectTaskInstances({ reusableTemplateID: taskTemplate.id })
       const totalMinutesDuration = taskInstances.reduce((accum, currObj) => accum + currObj.duration, 0)
       const hourDuration = totalMinutesDuration / 60
@@ -139,19 +113,5 @@
     height: 100%;
     padding: 24px;
     border: 2px solid grey;
-  }
-
-  .section-title {
-    font-weight: 600;
-    font-size: 20px;
-  }
-
-  .section-description {
-    font-size: 16px;
-    font-weight: 400;
-  }
-
-  input {
-    all: unset;
   }
 </style>

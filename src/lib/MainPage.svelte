@@ -100,7 +100,8 @@
       </div>
     </div>
 
-
+    <!-- 
+      DEPRECATE JOURNAL
     <div on:click={() => currentMode = 'Day'}
       class="ux-tab-item hide-for-mobile" 
       class:transparent-glow-tab={currentMode === 'Day'} 
@@ -111,21 +112,21 @@
       >
         menu_book
       </span>
-    </div>
+    </div> -->
+
+    <span on:click={() => goto(`/${$user.uid}/camera`)} class="material-symbols-outlined mika-hover" style="margin-right: 32px; font-size: 30px; cursor: pointer;">
+      photo
+    </span>
 
     <span on:click={() => currentMode === 'Dashboard' ? currentMode = 'Week' : currentMode = 'Dashboard'}  class="material-symbols-outlined mika-hover" class:blue-icon={currentMode === 'Dashboard'} style="margin-right: 32px; font-size: 32px; cursor: pointer;">
       signal_cellular_alt
     </span>
 
     <PopupCustomerSupport let:setIsPopupOpen={setIsPopupOpen}>
-      <span on:click={() => setIsPopupOpen({ newVal: true })}  class="material-symbols-outlined mika-hover" style="margin-right: 32px; font-size: 32px; cursor: pointer;">
+      <span on:click={() => setIsPopupOpen({ newVal: true })}  class="material-symbols-outlined mika-hover" style="font-size: 32px; cursor: pointer;">
         support_agent
       </span>
     </PopupCustomerSupport>
-
-    <span on:click={() => goto(`/${$user.uid}/camera`)} class="material-symbols-outlined mika-hover" style="font-size: 30px; cursor: pointer;">
-      photo
-    </span>
   </div>
 
   <!-- position: relative; -->
@@ -183,9 +184,9 @@
         </div>
         
         <!-- 2nd flex child -->
-        <div class="calendar-section-flex-child"> 
+        <div class="the-only-scrollable-container calendar-section-flex-child"> 
           {#if allTasks.length > 0}    
-            <CalendarThisWeek
+            <NewCalendarThisWeek
               {calStartDateClassObj}
               on:calendar-shifted={(e) => incrementDateClassObj({ days: e.detail.days})}
               on:new-root-task={(e) => createNewRootTask(e.detail)}
@@ -245,7 +246,7 @@
   import FinancePopup from '$lib/FinancePopup.svelte'
   import BedtimePopupMaplestoryMusic from '$lib/BedtimePopupMaplestoryMusic.svelte'
   import TheSnackbar from '$lib/TheSnackbar.svelte'
-  import CalendarThisWeek from '$lib/CalendarThisWeek.svelte'
+  import NewCalendarThisWeek from '$lib/NewCalendarThisWeek.svelte'
   import BackgroundRainScene from '$lib/BackgroundRainScene.svelte'
   import LifeDashboard from '$lib/LifeDashboard.svelte'
   import GrandTreeTodoPopupButton from '$lib/GrandTreeTodoPopupButton.svelte'
@@ -707,18 +708,12 @@
     display: flex;
   }
 
+  .the-only-scrollable-container {
+    position: relative;
+    overflow: auto; 
+  }
+
   .calendar-section-flex-child {
-
-    /* take up full height of parent flexbox */
-    /* align-self: stretch;  */
-
-    /* take up all remaining horizontal space (after the left & right sidebars) */
-    flex-grow: 1;
-
-    overflow-x: auto;
-
-    /* user agent style sheet already implicitly applies overflow-y: auto, but it's clearer to be explicit */
-    overflow-y: auto;
     background-color: var(--calendar-bg-color);
   }
 
