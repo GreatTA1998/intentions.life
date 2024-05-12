@@ -7,12 +7,6 @@
 />
 
 
-{#if finalDataURL}
-  <div>
-    Output
-  </div>
-  <img src={finalDataURL} style="width: 96px; height: 96px;">
-{/if}
 
 
 <script>

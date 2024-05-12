@@ -1,6 +1,6 @@
-<div style="padding: 16px;">
+<div style="padding: 24px;">
   <div style="font-size: 32px; margin-top: 24px;">
-    Configure repeating tasks
+    Reusable tasks
   </div>
 
   <div style="margin-bottom: 48px;"></div>
@@ -29,15 +29,6 @@
       {/if}
 
       <div style="display: flex; align-items: center;">
-        <!-- left-side visual -->
-        <div style="display: flex;">
-          {#each dayOfWeekSymbol as symbol, i} 
-            <div class="day-of-week-circle" class:highlighted={weeklyTask.repeatOnDayOfWeek[i]}>
-              {symbol}
-            </div>
-          {/each}
-        </div>
-
         <ManageRepeatingTasksUnifiedWeeklyPopup 
           let:setIsPopupOpen={setIsPopupOpen} 
           isEditVersion={true} 
@@ -50,10 +41,38 @@
             on:dragstart|self={(e) => dragstart_handler(e, weeklyTask)}  
           > 
             {#if weeklyTask.iconDataURL}
-              <img src={weeklyTask.iconDataURL} style="width: 48px; height: 48px;">
+              <img src={weeklyTask.iconDataURL} style="width: 60px; height: 60px;">
+            {:else}
+              <div style="width: 60px; height: 60px"></div>
             {/if}
 
-            {weeklyTask.name}
+            <div style="width: 180px;">
+              <div style="font-size: 16px; font-color: rgb(120, 120, 120)">
+                <!-- {weeklyTask.orderValue}  -->
+                {weeklyTask.name}
+              </div>
+
+              <div style="display: flex; margin-top: 4px;">
+                {#each dayOfWeekSymbol as _, i} 
+                  <div class="day-of-week-circle" class:highlighted={weeklyTask.repeatOnDayOfWeek[i]}>
+                  </div>
+                {/each}
+              </div>
+            </div>
+
+            <!-- Time spent statistics -->
+            {#if getStatsFromTaskID[weeklyTask.id]}
+              <div style="margin-left: 8px;">
+                <div style="display: flex; align-items: center; margin-top: 8px; margin-bottom: 0px;">
+                  {#each {length: getStatsFromTaskID[weeklyTask.id].frequency} as _, i}
+                    <div style="background: green; border-radius: 4px; width: {(getStatsFromTaskID[weeklyTask.id].hourDuration/getStatsFromTaskID[weeklyTask.id].frequency) * 48}px; height: 4px; margin-right: 2px;"></div>
+                  {/each}
+                </div>      
+                <div style="font-weight: 400; font-size: 14px;  margin-top: 8px; color: green">
+                  {getStatsFromTaskID[weeklyTask.id].hourDuration} hr
+                </div>
+              </div>
+            {/if}
           </div>
         </ManageRepeatingTasksUnifiedWeeklyPopup>
       </div>
@@ -157,6 +176,9 @@
   import { user } from '/src/store.js'
   import { collection, onSnapshot } from 'firebase/firestore'
   import db from '/src/db.js'
+  import { applyFuncToEveryTreeNode, round } from '/src/helpers.js'
+
+  export let allTasks // needed for TimeSpent dashboard
 
   let periodicTasks = null
   let unsub = null 
@@ -166,10 +188,14 @@
   let sortedWeeklyTasks = [] 
   let dayOfWeekSymbol = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
 
+  let getStatsFromTaskID = {} 
+
   $: if (periodicTasks) {
     sortedPeriodicTasks = periodicTasks.sort((a, b) => a.orderValue - b.orderValue)
     sortedWeeklyTasks = sortedPeriodicTasks.filter(task => task.repeatOnDayOfWeek)
     sortedMonthlyTasks = sortedPeriodicTasks.filter(task => task.repeatOnDayOfMonth)
+
+    summarizeReusedTasks(periodicTasks)
   }
 
   onMount(async () => {
@@ -190,6 +216,36 @@
     if (unsub) unsub()
   })
 
+  async function summarizeReusedTasks (reusableTaskTemplates) {    
+    for (const taskTemplate of reusableTaskTemplates) {
+      const taskInstances = collectTaskInstances({ reusableTemplateID: taskTemplate.id })
+      const totalMinutesDuration = taskInstances.reduce((accum, currObj) => accum + currObj.duration, 0)
+      const hourDuration = totalMinutesDuration / 60
+
+      getStatsFromTaskID[taskTemplate.id] = { 
+        hourDuration: round(hourDuration, 1),
+        frequency: taskInstances.length
+      }
+    }
+  }
+
+  function collectTaskInstances ({ reusableTemplateID }) {
+    const id = reusableTemplateID
+    const allTasksCopy = [...allTasks]
+    const output = [] 
+    applyFuncToEveryTreeNode({ 
+      tree: allTasksCopy,
+      applyFunc: (node) => {
+        if (node.reusableTemplateID === id || node.id === id) {
+          if (node.isDone) {
+            output.push(node)
+          }
+        }
+      }
+    })
+    return output
+  }
+
   function deleteTemplate ({ id }) {
     deleteFirestoreDoc(`/users/${$user.uid}/periodicTasks/${id}`)
   }
@@ -207,33 +263,21 @@
 
 <style>
   .day-of-week-circle {
-    border-radius: 16px;
-    width: 16px; 
-    height: 16px;
+    border-radius: 2px;
+    background-color: rgb(223, 223, 223);
+    width: 4px; 
+    height: 4px;
     margin: 4px;
     font-size: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: 1px solid rgb(111, 111, 111);
-    /* border: 1px solid rgb(111, 111, 111); */
-  }
-
-  .day-of-month-square {
-    width: 24px; 
-    height: 24px; 
-    border: 1px solid black; 
-    margin: 0px;
-    
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    cursor: pointer;
   }
 
   .highlighted {
     background-color: orange;
+    border: none;
   }
 
   .tick {

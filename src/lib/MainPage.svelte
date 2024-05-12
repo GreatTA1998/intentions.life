@@ -132,7 +132,7 @@
   <!-- position: relative; -->
   <div slot="content" style="display: flex; flex-grow: 1; height: 100%;">
       {#if currentMode === 'ManageRepeats'}
-        <ManageReusableTasks/>
+        <ManageReusableTasks {allTasks}/>
       {:else if currentMode === 'Dashboard'}
         <LifeDashboard {allTasks}/>  
       {:else if currentMode === 'Day'}
