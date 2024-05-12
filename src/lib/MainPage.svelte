@@ -75,7 +75,7 @@
         class:active-ux-tab={currentMode === 'Week'} 
         class:transparent-inactive-tab={currentMode === 'Day'}
       >
-       <span class="material-symbols-outlined" style="font-size: 28px;">
+       <span class="material-symbols-outlined" style="font-size: 32px;">
         house
         </span>
       </div>
@@ -85,7 +85,7 @@
         class:active-ux-tab={currentMode === 'ManageRepeats'} 
         class:transparent-inactive-tab={currentMode === 'Day'}
       >
-        <span class="material-symbols-outlined" class:blue-icon={currentMode === 'Dashboard'} style="font-size: 28px;">
+        <span class="material-symbols-outlined" class:blue-icon={currentMode === 'Dashboard'} style="font-size: 32px;">
           restart_alt
         </span>
       </div>
@@ -96,7 +96,9 @@
         class:active-ux-tab={currentMode === 'Year'} 
         class:transparent-inactive-tab={currentMode === 'Day'}
       >
-        <span class="material-icons" style="font-size: 28px;">signpost</span>
+        <span class="material-symbols-outlined" style="font-size: 36px;">
+          sports_score
+          </span>
       </div>
     </div>
 
