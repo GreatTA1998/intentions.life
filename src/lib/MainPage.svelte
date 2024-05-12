@@ -101,7 +101,7 @@
     </div>
 
     <!-- 
-      DEPRECATE JOURNAL
+      KEEP THIS SO YOU CAN MIGRATE THIS TO YOUR JOURNAL APP
     <div on:click={() => currentMode = 'Day'}
       class="ux-tab-item hide-for-mobile" 
       class:transparent-glow-tab={currentMode === 'Day'} 
@@ -118,10 +118,6 @@
       photo
     </span>
 
-    <span on:click={() => currentMode === 'Dashboard' ? currentMode = 'Week' : currentMode = 'Dashboard'}  class="material-symbols-outlined mika-hover" class:blue-icon={currentMode === 'Dashboard'} style="margin-right: 32px; font-size: 32px; cursor: pointer;">
-      signal_cellular_alt
-    </span>
-
     <PopupCustomerSupport let:setIsPopupOpen={setIsPopupOpen}>
       <span on:click={() => setIsPopupOpen({ newVal: true })}  class="material-symbols-outlined mika-hover" style="font-size: 32px; cursor: pointer;">
         support_agent
@@ -133,8 +129,6 @@
   <div slot="content" style="display: flex; flex-grow: 1; height: 100%;">
       {#if currentMode === 'ManageRepeats'}
         <ManageReusableTasks {allTasks}/>
-      {:else if currentMode === 'Dashboard'}
-        <LifeDashboard {allTasks}/>  
       {:else if currentMode === 'Day'}
         <!-- Show daytime art from 5 am - 7 pm, note `.getHours()` is 0-indexed from 0 to 23 -->
         {#if new Date().getHours() > 5 && new Date().getHours() < 18} 
@@ -248,7 +242,6 @@
   import TheSnackbar from '$lib/TheSnackbar.svelte'
   import NewCalendarThisWeek from '$lib/NewCalendarThisWeek.svelte'
   import BackgroundRainScene from '$lib/BackgroundRainScene.svelte'
-  import LifeDashboard from '$lib/LifeDashboard.svelte'
   import GrandTreeTodoPopupButton from '$lib/GrandTreeTodoPopupButton.svelte'
   import PopupCustomerSupport from '$lib/PopupCustomerSupport.svelte'
   import NavbarAndContentWrapper from '$lib/NavbarAndContentWrapper.svelte'
