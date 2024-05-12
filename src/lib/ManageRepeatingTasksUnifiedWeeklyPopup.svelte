@@ -77,15 +77,21 @@
         Delete
       </button>
 
-      {#if doodleIcons}
-        {#each doodleIcons as doodleIcon}
-          <img 
-            on:click={() => editExistingInstances({ iconDataURL: doodleIcon.dataURL })} 
-            src={doodleIcon.dataURL}
-            style="width: 48px; height: 48px; cursor: pointer;"
-          >
-        {/each}
-      {/if}
+      <div style="margin-top: 16px;">
+        {#if doodleIcons}
+          {#each doodleIcons as doodleIcon}
+            <img 
+              on:click={() => editExistingInstances({ iconDataURL: doodleIcon.dataURL })} 
+              src={doodleIcon.dataURL}
+              style="width: 48px; height: 48px; cursor: pointer;"
+            >
+          {/each}
+        {/if}
+      </div>
+
+      <div style="margin-top: 16px; display: flex; justify-content: center">
+        <ExperimentalCanvas/>
+      </div>
     </div>
   </div>
 {/if}
@@ -102,10 +108,13 @@
   } from '/src/helpers.js'
   import { setFirestoreDoc, deleteFirestoreDoc, getFirestoreCollection, createFirestoreQuery, getFirestoreQuery, updateFirestoreDoc } from '/src/crud.js'
   import { user } from '/src/store.js'
-  import { onMount } from 'svelte'
+  import { onMount, onDestroy } from 'svelte'
   import UXFormField from '$lib/UXFormField.svelte'
   import UXToggleSwitch from '$lib/UXToggleSwitch.svelte'
+  import ExperimentalCanvas from '$lib/ExperimentalCanvas.svelte'
   import { createEventDispatcher } from 'svelte'
+  import { onSnapshot, collection } from 'firebase/firestore'
+  import db from '/src/db.js'
 
   export let isEditVersion = false
   export let weeklyPeriodicTemplate = {
@@ -129,11 +138,25 @@
   let hasSpecificTime = false
 
   let doodleIcons = null
+  let unsub = null 
 
   onMount(async () => {
-    const temp = await getFirestoreCollection(`/doodleIcons`)
-    doodleIcons = temp
+    const ref = collection(db, `/doodleIcons`)
+    unsub = onSnapshot(ref, (collectionSnap) => {
+      const temp = []
+      collectionSnap.forEach((doc) => {
+        temp.push({ 
+          id: doc.id,
+          ...doc.data()
+        })
+      })
+      doodleIcons = temp
+    })
   })
+
+  onDestroy(() => {
+    if (unsub) unsub()
+  }) 
 
   function setIsPopupOpen ({ newVal }) {
     isPopupOpen = newVal

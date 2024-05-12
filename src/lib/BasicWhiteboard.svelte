@@ -1,5 +1,5 @@
 <div>
-  <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+  <div style="display: flex; justify-content: space-between; margin-bottom: 8px; width: 240px;">
     {#each colors as pencilColor}
       <div class="color-circle"
         on:click={() => color = pencilColor}
