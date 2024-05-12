@@ -132,7 +132,7 @@
   <!-- position: relative; -->
   <div slot="content" style="display: flex; flex-grow: 1; height: 100%;">
       {#if currentMode === 'ManageRepeats'}
-        <ManageRepeatingTasks/>
+        <ManageReusableTasks/>
       {:else if currentMode === 'Dashboard'}
         <LifeDashboard {allTasks}/>  
       {:else if currentMode === 'Day'}
@@ -256,7 +256,7 @@
   import YearView from '$lib/YearView.svelte'
   import ZenJournal from '$lib/ZenJournal.svelte'
   import ZenJournalLeftNavigation from '$lib/ZenJournaLeftNavigation.svelte'
-  import ManageRepeatingTasks from '$lib/ManageRepeatingTasks.svelte'
+  import ManageReusableTasks from '$lib/ManageReusableTasks.svelte'
   import UncertainMilestones from '$lib/UncertainMilestones.svelte'
 
   import { onDestroy, onMount } from 'svelte'
@@ -268,7 +268,7 @@
   import NewThisWeekTodo from '$lib/NewThisWeekTodo.svelte'
   import { garbageCollectInvalidTasks } from '/src/scripts.js'
   import { deleteObject, getStorage, ref } from 'firebase/storage'
-
+  
   let currentMode = 'Week' // weekMode hourMode monthMode
   const userDocPath = `users/${$user.uid}`
 
