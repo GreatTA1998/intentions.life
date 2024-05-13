@@ -20,8 +20,10 @@
 
   function handleClick () {
     if (iconName === 'settings_voice') {
-      // recognition.stop()
+      recognition.stop()
     } else {
+      initSpeechRecognition()
+
       recognition.start()
       playSound()
     }
@@ -39,7 +41,7 @@
 
   onMount(() => {
     outputDiv = document.getElementById('output');
-    initSpeechRecognition()
+    // initSpeechRecognition()
   })
 
   function initSpeechRecognition () {
