@@ -19,7 +19,7 @@
      style="height: 100dvh; position: relative; display: flex; flex-direction: column;"
 >
   {#if activeTabName === 'TODAY_VIEW'}
-    <div style="font-size: 24px; margin-left: 6px; color: darkgreen;">{speechResult}</div>
+    <div style="font-size: 48px; margin-left: 6px; color: darkgreen;">{speechResult}</div>
 
     <div style="padding: 0px; overflow-y: auto;">
       {#each todayScheduledTasks as eventToday, i}
