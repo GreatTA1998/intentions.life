@@ -29,7 +29,7 @@
       recognition.abort() // even though `.stop()` works on windows, it doesn't work on Safari, so we keep the behavior consistent
     } else {
       recognition.start()
-      playSound()
+      // playSound()
     }
   }
 
