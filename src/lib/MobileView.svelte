@@ -19,6 +19,8 @@
      style="height: 100dvh; position: relative; display: flex; flex-direction: column;"
 >
   {#if activeTabName === 'TODAY_VIEW'}
+    <div style="font-size: 24px; margin-left: 6px; color: darkgreen;">{speechResult}</div>
+
     <div style="padding: 0px; overflow-y: auto;">
       {#each todayScheduledTasks as eventToday, i}
         {#if i === idxOfTimeIndicator}
@@ -79,6 +81,7 @@
   <VoiceKeywordDetect
     on:voice-start={() => isUsingVoice = true}
     on:voice-end={() => isUsingVoice = false}
+    on:new-mic-result={(e) => speechResult = e.detail}
     
     on:new-event-today={(e) => createNewEvent(e.detail)}
     on:new-todo={(e) => createNewTodo(e.detail)}
@@ -156,6 +159,7 @@
   let idxOfTimeIndicator = 0
   
   let isUsingVoice = false
+  let speechResult = ''
   
   let isDetailedCardOpen = false
   let clickedTask = {}

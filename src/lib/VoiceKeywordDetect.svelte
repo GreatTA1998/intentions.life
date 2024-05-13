@@ -28,6 +28,7 @@
     if (iconName === 'settings_voice') {
       recognition.abort() // even though `.stop()` works on windows, it doesn't work on Safari, so we keep the behavior consistent
     } else {
+      dispatch('new-mic-result', '')
       recognition.start()
       // playSound()
     }
@@ -57,6 +58,8 @@
       alert('event.error =', event.error)
     }
     recognition.onerror = (event) => {
+      if (event.error === 'aborted') return
+
       alert(`Error occurred in recognition: ${event.error}`)
     };
 
@@ -84,7 +87,7 @@
   }
 
   function interpretTranscript (transcript) {
-    const newTaskCommands = transcript.split("and")
+    const newTaskCommands = transcript.split(" and ")
     for (const newTaskCommand of newTaskCommands) {
       // exact substring match 
       if (newTaskCommand.includes(" at ")) {
@@ -127,9 +130,11 @@
           alert('Need to specify "a.m." or "p.m." such as "7 pm"')
           return
         }
+        if (taskName === '') alert('No task name detected')
         dispatch('new-event-today', { name: taskName, startTime })
       }
       else {
+        if (newTaskCommand === '') alert('No task name detected') // because I got empty ghosts on my to-do list
         dispatch('new-todo', { name: newTaskCommand })
       }
     }
