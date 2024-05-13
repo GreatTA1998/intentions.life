@@ -58,14 +58,14 @@
         console.log("scheduledTime =", scheduledTime)
 
         let startTime
-        if (scheduledTime.includes('a.m.')) {
+        if (scheduledTime.includes('a.m.') || scheduledTime.includes('AM')) { // iOS is capitalized
           // do nothing
           const [hh, mm] = scheduledTime.split(':')
           const newHH = twoDigits(hh)
 
           startTime = newHH + ':' + mm
         } 
-        else if (scheduledTime.includes('p.m.')) {
+        else if (scheduledTime.includes('p.m.') || scheduledTime.includes('PM')) { // iOS is capitalized
           const [hhmm, pm] = scheduledTime.split(" ")
           console.log('hhmm =', hhmm)
           const [hh, mm] = hhmm.split(':')
