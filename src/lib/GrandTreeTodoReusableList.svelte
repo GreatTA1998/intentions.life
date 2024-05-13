@@ -31,6 +31,7 @@
           doNotShowScheduledTasks={true}
           doNotShowCompletedTasks={true}
           {dueInHowManyDays}
+          {willShowCheckbox}
           on:task-click
           on:task-checkbox-change
           on:task-node-update
@@ -113,6 +114,7 @@
   export let listTitle
   export let enableScrolling = false
   export let hasMaxWidth = false // quickfix to prevent complicated flexbox layout ordering issues
+  export let willShowCheckbox = true
 
   let defaultDeadline
   let tasksToDisplay = []

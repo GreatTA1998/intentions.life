@@ -10,6 +10,7 @@
     outline: 0px solid red; 
     height: 100%;
   "
+  willShowCheckbox={false}
   on:new-root-task
   on:task-unscheduled
   on:subtask-create
