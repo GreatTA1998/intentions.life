@@ -54,18 +54,19 @@
     };
 
     recognition.onresult = (event) => {
+      playFinishedSound()
       const transcript = event.results[0][0].transcript;
       outputDiv.textContent = transcript;
-      console.log("transcript =", transcript)
       interpretTranscript(transcript)
       dispatch('new-mic-result', transcript)
+
+      recognition.abort()
     };
 
     recognition.onend = () => {
       iconName = 'mic'
       dispatch('voice-end', {})
       recognition.stop()
-      playFinishedSound()
       recognition.abort()
     }
   }

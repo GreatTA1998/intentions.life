@@ -16,7 +16,7 @@
 <div class:iphone-se-size={isTesting} 
      class:general-mobile-size={!isTesting}
      class:voice-active-highlight={isUsingVoice}
-     style="height: 100dvh; position: relative; display: flex; flex-direction: column-reverse;"
+     style="height: 100dvh; position: relative; display: flex; flex-direction: column;"
 >
   {#if activeTabName === 'TODAY_VIEW'}
     <div style="padding: 0px; overflow-y: auto;">
