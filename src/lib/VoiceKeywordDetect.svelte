@@ -66,7 +66,7 @@
     };
 
     recognition.onresult = (event) => {
-      playFinishedSound()
+      // playFinishedSound()
       transcript = event.results[0][0].transcript;
       outputDiv.textContent = transcript;
       interpretTranscript(transcript)
