@@ -4,7 +4,7 @@
   allTasksDue={$inclusiveWeekTodo}
   dueInHowManyDays={7}
   style="
-    background-color: white;
+    background-color: transparent;
     padding-top: var(--main-content-top-margin); 
     border-radius: 16px; 
     outline: 0px solid red; 

@@ -362,6 +362,10 @@
   async function createTaskNode ({ id, newTaskObj }) {
     const newTaskObjChecked = checkTaskObjSchema(newTaskObj, $user)
     setFirestoreDoc(tasksPath + id, newTaskObjChecked)
+
+    // this below operation is redundant because checkTaskObjSchema 
+    // will always update the `maxOrderValue` so it remains correct 
+    // not just for Create operations, but for updates and deletes 
     updateFirestoreDoc(`users/${$user.uid}`, {
       maxOrderValue: increment(3)
     })
