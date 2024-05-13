@@ -62,10 +62,8 @@
         on:task-click={(e) => openDetailedCard(e.detail)}
         on:task-checkbox-change={(e) => updateTaskNode({ id: e.detail.id, keyValueChanges: { isDone: e.detail.isDone }})}
 
-        on:new-root-task
-        on:task-unscheduled
-        on:subtask-create
-        on:task-dragged
+        on:new-root-task={(e) => createNewRootTask(e.detail)}
+        on:subtask-create={(e) => createSubtask(e.detail)}
       />
       
       <!-- TO-DO: display completed tasks below -->
@@ -185,6 +183,16 @@
     if (unsub) unsub()
   })
 
+  function createNewRootTask (newTaskObj) {
+    createTaskNodeHelper({ newTaskObj })
+  }
+
+  function createSubtask ({ id, parentID, newTaskObj }) {
+    // the parent needs to update its pointers
+    updateTaskNode({ id: parentID, keyValueChanges: { children: arrayUnion(id)}})
+    createTaskNodeHelper({ newTaskObj })
+  }
+
   function openDetailedCard ({ task }) {
     clickedTask = task 
     isDetailedCardOpen = true
@@ -239,7 +247,7 @@
       startDate: getDateInMMDD(new Date()),
       id: getRandomID()
     }
-    createTaskNodeHelper(newTaskObj)
+    createTaskNodeHelper({ newTaskObj })
   }
 
   function createNewTodo ({ name }) {
@@ -254,10 +262,10 @@
       deadlineTime: '23:59',
       id: getRandomID(),
     }
-    createTaskNodeHelper(newTaskObj)
+    createTaskNodeHelper({ newTaskObj })
   }
 
-  function createTaskNodeHelper (newTaskObj) {
+  function createTaskNodeHelper ({ newTaskObj }) {
     setFirestoreDoc(
       `/users/${$user.uid}/tasks/${newTaskObj.id}`,
       checkTaskObjSchema(newTaskObj, $user)

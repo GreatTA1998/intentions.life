@@ -6,7 +6,7 @@
 </div>
 
 
-<div id="output"></div>
+<!-- <div id="output"></div> -->
 
 <script>
   import { onMount, createEventDispatcher } from 'svelte'

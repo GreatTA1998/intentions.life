@@ -307,6 +307,9 @@ function saveTitle (newVal) {
   }
 
   .detailed-card-popup {
+    /* mobile restriction */
+    max-height: 80%;
+
     position: fixed;
     font-size: 14px;
     top: 50%;
