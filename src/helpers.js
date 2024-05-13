@@ -6,6 +6,7 @@ export function checkTaskObjSchema (task, userDoc) {
   if (!task.duration) output.duration = 30
   if (!task.parentID) output.parentID = ""
   if (!task.childrenIDs) output.childrenIDs = []
+  if (!task.startDate) output.startDate = '' // without it, `collectFutureScheduledTask` will run into a crashing error with `convertToISO`
   if (!task.orderValue) { 
     const newVal = (userDoc.maxOrderValue || 0) + 3
     output.orderValue = newVal

@@ -483,9 +483,8 @@
     futureScheduledTasks = [] // reset 
     traverseAndUpdateTree({
       fulfilsCriteria: (task) => { 
-        if (!task.startTime) return 
-        if (task.willRepeatOnWeekDayNumber) return 
-
+        if (!task.startTime || !task.startDate) return 
+        if (task.willRepeatOnWeekDayNumber) return
         const d1 = new Date(convertToISO8061({ mmdd: task.startDate }))
         
         // setHours(hoursValue 0 - 23, minutesValue 0 - 59)
