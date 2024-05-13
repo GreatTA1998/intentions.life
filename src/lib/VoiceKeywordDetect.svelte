@@ -53,6 +53,13 @@
     recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition || window.mozSpeechRecognition || window.msSpeechRecognition)();
     recognition.lang = 'en-US';
 
+    recognition.onnomatch = (event) => {
+      alert('event.error =', event.error)
+    }
+    recognition.onerror = (event) => {
+      alert(`Error occurred in recognition: ${event.error}`)
+    };
+
     recognition.onstart = () => {
       iconName = 'settings_voice'
       dispatch('voice-start', {})
