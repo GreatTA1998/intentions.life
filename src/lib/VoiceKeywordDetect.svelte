@@ -20,7 +20,7 @@
 
   function handleClick () {
     if (iconName === 'settings_voice') {
-      recognition.stop()
+      recognition.abort() // even though `.stop()` works on windows, it doesn't work on Safari, so we keep the behavior consistent
     } else {
       initSpeechRecognition()
 
@@ -66,6 +66,7 @@
       dispatch('voice-end', {})
       recognition.stop()
       playFinishedSound()
+      recognition.abort()
     }
   }
 
