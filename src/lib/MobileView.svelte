@@ -53,7 +53,7 @@
             <div class="event-scheduled-time">
               {eventToday.startTime} 
             </div>
-            <div style="font-size: 24px; display: flex; align-items: center; flex-wrap: no-wrap;">
+            <div style="font-size: 32px; display: flex; align-items: center; flex-wrap: no-wrap;">
               {eventToday.name}
             </div>
           </div>

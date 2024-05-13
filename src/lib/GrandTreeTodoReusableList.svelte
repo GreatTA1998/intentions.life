@@ -32,6 +32,7 @@
           doNotShowCompletedTasks={true}
           {dueInHowManyDays}
           {willShowCheckbox}
+          {isLargeFont}
           on:task-click
           on:task-checkbox-change
           on:task-node-update
@@ -115,6 +116,7 @@
   export let enableScrolling = false
   export let hasMaxWidth = false // quickfix to prevent complicated flexbox layout ordering issues
   export let willShowCheckbox = true
+  export let isLargeFont = false
 
   let defaultDeadline
   let tasksToDisplay = []

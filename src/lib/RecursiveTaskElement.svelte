@@ -90,6 +90,7 @@
           subtreeDeadlineInMsElapsed={updateSubtreeDeadlineInMsElapsed(taskObj, subtreeDeadlineInMsElapsed)}
           {dueInHowManyDays}
           {isMilestoneMode}
+          {isLargeFont}
           on:task-click
           on:subtask-create
           on:task-checkbox-change
@@ -177,6 +178,7 @@
   export let subtreeDeadlineInMsElapsed = Infinity
   export let dueInHowManyDays // very relevant for todo list tasks
   export let isMilestoneMode = false
+  export let isLargeFont = false
 
   let newSubtaskStringValue = ''
   let isTypingNewSubtask = false
@@ -189,10 +191,12 @@
   $: if (depth >= 0) {
     switch (depth) {
       case 0:
-        depthAdjustedFontSize = '16px'
+        if (isLargeFont) depthAdjustedFontSize = '32px'
+        else depthAdjustedFontSize = '16px'
         break
       default: 
-        depthAdjustedFontSize = '14px'
+        if (isLargeFont) depthAdjustedFontSize = '28px'
+        else depthAdjustedFontSize = '14px'
     }
   }
   

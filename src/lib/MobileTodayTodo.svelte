@@ -10,6 +10,7 @@
     height: 1000px;
   "
   willShowCheckbox={false}
+  isLargeFont={true}
   on:new-root-task
   on:task-unscheduled
   on:subtask-create
