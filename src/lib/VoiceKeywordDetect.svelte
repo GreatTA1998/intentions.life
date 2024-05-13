@@ -23,10 +23,6 @@
     recognition.start()
   }
 
-  // startButton.addEventListener('click', () => {
-  //     recognition.start();
-  //   });
-
   onMount(() => {
     const outputDiv = document.getElementById('output');
 
@@ -49,7 +45,6 @@
     recognition.onend = () => {
       iconName = 'mic'
       dispatch('voice-end', {})
-      // startButton.textContent = 'Start Voice Input';
     };
   })
 
@@ -89,12 +84,6 @@
 </script>
 
 <style>
-  .highlighted {
-    background-color: orange;
-    color: white;
-  }
-
-  
   .floating-button {
     position: absolute;
     right: 16px;
