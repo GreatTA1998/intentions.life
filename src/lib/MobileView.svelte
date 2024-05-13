@@ -11,11 +11,12 @@
   {/if}
 {/key}
 
+<!-- Reason for 100dvh: https://stackoverflow.com/a/75648985/7812829 -->
 <!--   style="padding: 6px; background-color: white; display: flex; align-items: center; justify-content: center;" -->
 <div class:iphone-se-size={isTesting} 
      class:general-mobile-size={!isTesting}
      class:voice-active-highlight={isUsingVoice}
-     style="position: relative; display: flex; flex-direction: column-reverse"
+     style="height: 100dvh; position: relative; display: flex; flex-direction: column-reverse;"
 >
   {#if activeTabName === 'TODAY_VIEW'}
     <div style="padding: 0px; overflow-y: auto;">
@@ -150,7 +151,7 @@
 
   let allTasks = []
   let todayScheduledTasks = []
-  let isTesting = true
+  let isTesting = false
   let futureScheduledTasks = null
   let activeTabName = 'TODAY_VIEW'
   let unsub
