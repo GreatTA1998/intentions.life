@@ -5,8 +5,10 @@
   </span>
 </div>
 
+<audio id="voiceStartSound" preload="auto" src="/hero_simple-celebration-03.wav"></audio>
+<audio id="voiceEndSound" preload="auto" src="/hero_simple-celebration-02.wav"></audio>
 
-<div id="output">{transcript}</div>
+<div id="output"></div>
 
 <script>
   import { onMount, createEventDispatcher } from 'svelte'
@@ -32,15 +34,18 @@
   }
 
   function playSound () {
-    voiceStartSound.play()
+    const audioElem = document.getElementById('voiceStartSound')
+    audioElem.play()
   }
 
   function playFinishedSound () {
-    voiceEndSound.play()
+    const audioElem = document.getElementById('voiceEndSound')
+    audioElem.play()
   }
 
   onMount(() => {
-    // outputDiv = document.getElementById('output');
+    outputDiv = document.getElementById('output');
+
     initSpeechRecognition()
   })
 
@@ -56,7 +61,7 @@
     recognition.onresult = (event) => {
       playFinishedSound()
       transcript = event.results[0][0].transcript;
-      // outputDiv.textContent = transcript;
+      outputDiv.textContent = transcript;
       interpretTranscript(transcript)
       dispatch('new-mic-result', transcript)
 
