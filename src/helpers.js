@@ -22,6 +22,13 @@ export function checkTaskObjSchema (task, userDoc) {
 // e.clientY := coordinates relative to VIEWPORT, so doesn't matter if root page is scrolled
 
 
+export function pureNumericalHourForm (startTime) {
+  const hh = startTime.slice(0, 2)
+  const mm = startTime.slice(3, 5)
+  return Number(hh) + (Number(mm) / 60)
+}
+
+
 export function round (value, precision) {
   var multiplier = Math.pow(10, precision || 0);
   return Math.round(value * multiplier) / multiplier;

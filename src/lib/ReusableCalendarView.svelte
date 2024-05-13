@@ -142,7 +142,7 @@
   import { onMount, beforeUpdate, afterUpdate, tick, createEventDispatcher, onDestroy } from 'svelte'
   import { browser } from '$app/environment';
   import { user, hasInitialScrolled, yPosWithinBlock } from '/src/store.js'
-  import { getDateInDDMMYYYY, getDateInMMDD, getRandomID } from '/src/helpers';
+  import { pureNumericalHourForm, getDateInMMDD, getRandomID } from '/src/helpers';
   import UXFormField from '$lib/UXFormField.svelte'
 
   export let scheduledTasks = [] 
@@ -196,12 +196,6 @@
   onDestroy(() => {
 
   })
-
-  function pureNumericalHourForm (startTime) {
-    const hh = startTime.slice(0, 2)
-    const mm = startTime.slice(3, 5)
-    return Number(hh) + (Number(mm) / 60)
-  }
 
   function p (...args) {
     console.log(...args)    

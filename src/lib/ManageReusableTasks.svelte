@@ -1,5 +1,5 @@
-<div style="padding: 24px;">
-  <div style="font-size: 32px; margin-top: 24px;">
+<div style="padding: 48px;">
+  <div style="font-size: 32px;">
     Reusable tasks
   </div>
 
