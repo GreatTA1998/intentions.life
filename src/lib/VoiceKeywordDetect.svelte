@@ -20,7 +20,7 @@
 
   function handleClick () {
     if (iconName === 'settings_voice') {
-      recognition.stop()
+      // recognition.stop()
     } else {
       recognition.start()
       playSound()
