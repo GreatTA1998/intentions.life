@@ -6,7 +6,7 @@
 </div>
 
 
-<div id="output"></div>
+<div id="output">{transcript}</div>
 
 <script>
   import { onMount, createEventDispatcher } from 'svelte'
@@ -15,33 +15,33 @@
   let outputDiv
   const dispatch = createEventDispatcher()
   let recognition
+  let transcript
 
   let iconName = 'mic'
+
+  let voiceStartSound = new Audio('/hero_simple-celebration-03.wav')
+  let voiceEndSound = new Audio('/hero_simple-celebration-02.wav')
 
   function handleClick () {
     if (iconName === 'settings_voice') {
       recognition.abort() // even though `.stop()` works on windows, it doesn't work on Safari, so we keep the behavior consistent
     } else {
-      initSpeechRecognition()
-
       recognition.start()
       playSound()
     }
   }
 
   function playSound () {
-    const ding = new Audio('/hero_simple-celebration-03.wav')
-    ding.play()
+    voiceStartSound.play()
   }
 
   function playFinishedSound () {
-    const ding = new Audio('/hero_simple-celebration-02.wav')
-    ding.play()
+    voiceEndSound.play()
   }
 
   onMount(() => {
-    outputDiv = document.getElementById('output');
-    // initSpeechRecognition()
+    // outputDiv = document.getElementById('output');
+    initSpeechRecognition()
   })
 
   function initSpeechRecognition () {
@@ -55,8 +55,8 @@
 
     recognition.onresult = (event) => {
       playFinishedSound()
-      const transcript = event.results[0][0].transcript;
-      outputDiv.textContent = transcript;
+      transcript = event.results[0][0].transcript;
+      // outputDiv.textContent = transcript;
       interpretTranscript(transcript)
       dispatch('new-mic-result', transcript)
 
