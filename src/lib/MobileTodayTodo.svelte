@@ -7,8 +7,7 @@
     background-color: transparent;
     padding-top: var(--main-content-top-margin); 
     border-radius: 16px; 
-    outline: 0px solid red; 
-    height: 100%;
+    height: 1200px;
   "
   willShowCheckbox={false}
   on:new-root-task
