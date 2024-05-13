@@ -36,7 +36,7 @@
 
     recognition.onresult = (event) => {
       const transcript = event.results[0][0].transcript;
-      // outputDiv.textContent = transcript;
+      outputDiv.textContent = transcript;
       console.log("transcript =", transcript)
       interpretTranscript(transcript)
       dispatch('new-mic-result', transcript)
@@ -64,7 +64,8 @@
           const newHH = twoDigits(hh)
 
           startTime = newHH + ':' + mm
-        } else if (scheduledTime.includes('p.m.')) {
+        } 
+        else if (scheduledTime.includes('p.m.')) {
           const [hhmm, pm] = scheduledTime.split(" ")
           console.log('hhmm =', hhmm)
           const [hh, mm] = hhmm.split(':')
@@ -73,6 +74,10 @@
           const newHH = twoDigits(militaryTime)
           
           startTime = newHH + ':' + mm
+        }
+        else {
+          alert('Need to specify "a.m." or "p.m." such as "7 pm"')
+          return
         }
         dispatch('new-event-today', { name: taskName, startTime })
       }
