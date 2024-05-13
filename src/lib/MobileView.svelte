@@ -367,7 +367,7 @@
   }
 
   .voice-active-highlight {
-    background-color: orange;
+    background-color: rgb(180, 238, 221);
   }
 
   .event-scheduled-time {

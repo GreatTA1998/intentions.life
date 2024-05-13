@@ -1,6 +1,6 @@
 
-<div on:click={handleClick} class="floating-button">
-  <span id="startButton"class="material-symbols-outlined" style="font-size: 48px;">
+<div on:click={handleClick} class="floating-button" class:highlighted-button={iconName === 'settings_voice'}>
+  <span id="startButton" class="material-symbols-outlined" class:bold-icon={iconName === 'settings_voice'} style="font-size: 48px;">
     {iconName}
   </span>
 </div>
@@ -12,20 +12,37 @@
   import { onMount, createEventDispatcher } from 'svelte'
   import { twoDigits } from '/src/helpers.js'
 
+  let outputDiv
   const dispatch = createEventDispatcher()
   let recognition
 
   let iconName = 'mic'
 
-
   function handleClick () {
-    if (iconName === 'settings_voice') return 
-    recognition.start()
+    if (iconName === 'settings_voice') {
+      recognition.stop()
+    } else {
+      recognition.start()
+      playSound()
+    }
+  }
+
+  function playSound () {
+    const ding = new Audio('/hero_simple-celebration-03.wav')
+    ding.play()
+  }
+
+  function playFinishedSound () {
+    const ding = new Audio('/hero_simple-celebration-02.wav')
+    ding.play()
   }
 
   onMount(() => {
-    const outputDiv = document.getElementById('output');
+    outputDiv = document.getElementById('output');
+    initSpeechRecognition()
+  })
 
+  function initSpeechRecognition () {
     recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition || window.mozSpeechRecognition || window.msSpeechRecognition)();
     recognition.lang = 'en-US';
 
@@ -45,8 +62,10 @@
     recognition.onend = () => {
       iconName = 'mic'
       dispatch('voice-end', {})
-    };
-  })
+      recognition.stop()
+      playFinishedSound()
+    }
+  }
 
   function interpretTranscript (transcript) {
     const newTaskCommands = transcript.split("and")
@@ -54,26 +73,39 @@
       // exact substring match 
       if (newTaskCommand.includes(" at ")) {
         const [taskName, scheduledTime] = newTaskCommand.split(" at ")
-        console.log("taskName =", taskName)
-        console.log("scheduledTime =", scheduledTime)
 
         let startTime
         if (scheduledTime.includes('a.m.') || scheduledTime.includes('AM')) { // iOS is capitalized
-          // do nothing
-          const [hh, mm] = scheduledTime.split(':')
-          const newHH = twoDigits(hh)
-
-          startTime = newHH + ':' + mm
+          if (scheduledTime.includes(':')) {
+            // windows: play golf at 10 a.m.
+            const [hh, mm] = scheduledTime.split(':')
+            startTime = twoDigits(hh) + ':' + mm
+          } 
+          else if (scheduledTime.length === 4 || scheduledTime.length === 5) {
+            // play golf at 10 AM
+            const [hh, AM] = scheduledTime.split(' ')
+            startTime = twoDigits(hh) + ':' + '00'
+          }
+          else {
+            alert('Cannot parse timing after AT keyword =', scheduledTime)
+          }
         } 
         else if (scheduledTime.includes('p.m.') || scheduledTime.includes('PM')) { // iOS is capitalized
-          const [hhmm, pm] = scheduledTime.split(" ")
-          console.log('hhmm =', hhmm)
-          const [hh, mm] = hhmm.split(':')
-          console.log('hh =', hh)
-          const militaryTime = Number(hh) + 12 
-          const newHH = twoDigits(militaryTime)
-          
-          startTime = newHH + ':' + mm
+          if (scheduledTime.includes(':')) {
+            const [hhmm, pm] = scheduledTime.split(" ")
+            const [hh, mm] = hhmm.split(':')
+            const militaryTime = Number(hh) + 12             
+            startTime = twoDigits(militaryTime) + ':' + mm
+          } 
+          else if (scheduledTime.length === 4 || scheduledTime.length === 5) { // 9 am, 10 am (no `mm` suffixes)
+            // play golf at 10 PM
+            const [hh, PM] = scheduledTime.split(' ')
+            const militaryTime = Number(hh) + 12
+            startTime = twoDigits(militaryTime) + ':' + '00'
+          } 
+          else {
+            alert('Cannot parse timing after AT keyword =', scheduledTime)
+          }
         }
         else {
           alert('Need to specify "a.m." or "p.m." such as "7 pm"')
@@ -105,4 +137,12 @@
     justify-content: center;
   }
   
+  .highlighted-button {
+    font-weight: 600;
+    background-color: orange;
+  }
+
+  .bold-icon {
+    font-weight: 600;
+  }
 </style>
