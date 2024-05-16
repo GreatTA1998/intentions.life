@@ -181,8 +181,8 @@
     // scrolling
     if (CurrentTimeIndicator) {
       setTimeout(() => {
-        if (CurrentTimeIndicator && !$hasInitialScrolled) {
-          CurrentTimeIndicator.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' })
+        if (CurrentTimeIndicator) { // && !$hasInitialScrolled
+          CurrentTimeIndicator.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'start' })
           hasInitialScrolled.set(true)
         }
       }, 0) 
