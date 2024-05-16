@@ -65,7 +65,7 @@
         <div on:click={() => dispatch('task-click', { task: taskObj })}
           class="truncate-to-one-line" 
           class:cross-out-todo={taskObj.isDone} 
-          style="margin-top: -1px; margin-left: 4px; cursor: pointer; min-width: 80px; min-height: 16px;"
+          style="margin-top: -1px; margin-left: 4px; cursor: pointer; min-width: 16px; min-height: 16px;"
         >
           <!-- {taskObj.orderValue}  -->
           {taskObj.name}

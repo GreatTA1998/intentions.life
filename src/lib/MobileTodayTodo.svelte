@@ -7,7 +7,7 @@
     background-color: transparent;
     padding-top: var(--main-content-top-margin); 
     border-radius: 16px; 
-    height: 1000px;
+    height: 2400px;
   "
   willShowCheckbox={false}
   isLargeFont={true}

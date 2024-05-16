@@ -130,7 +130,8 @@
     getDateInDDMMYYYY,
     getTimeInHHMM,
     pureNumericalHourForm,
-    checkTaskObjSchema
+    checkTaskObjSchema,
+    sortByUnscheduledThenByOrderValue
   } from '/src/helpers.js'
   import { 
     user, 
@@ -166,6 +167,8 @@
   
   const tasksPath = `/users/${$user.uid}/tasks/`
 
+  let tasksToDisplay = []
+
   $: if (allTasks.length > 0) {
     computeDataStructuresFromAllTasks(allTasks)
   }
@@ -186,6 +189,22 @@
   onDestroy(() => {
     if (unsub) unsub()
   })
+
+  ////// copied from <ReusableList/>, refactor in future
+  // svelte reactive statements are order sensitive
+  
+  $: if ($inclusiveWeekTodo.length > 0) {
+    computeTasksToDisplay()
+  }
+
+  function computeTasksToDisplay () {
+    const temp = sortByUnscheduledThenByOrderValue($inclusiveWeekTodo)
+    tasksToDisplay = temp.filter(task => !task.isDone)
+  }
+
+  ////// 
+
+
 
   function createNewRootTask (newTaskObj) {
     createTaskNodeHelper({ newTaskObj })
@@ -266,6 +285,16 @@
       deadlineTime: '23:59',
       id: getRandomID(),
     }
+
+    if (tasksToDisplay.length > 0) {
+      newTaskObj.orderValue = (0 + tasksToDisplay[0].orderValue) / 2 
+
+      // quickfix so when multiple tasks are added, they don't have the same `orderValue` which breaks drag-and-drop
+      const epsilon = Math.random() * newTaskObj.orderValue 
+      newTaskObj.orderValue += epsilon
+    } // otherwise the default `orderValue` will be `maxOrder`, handled by `checkTaskObjSchema`
+
+
     createTaskNodeHelper({ newTaskObj })
   }
 

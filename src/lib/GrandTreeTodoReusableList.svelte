@@ -23,6 +23,21 @@
       class:has-max-width={hasMaxWidth}
       class:enable-scrolling={enableScrolling} 
     >
+      {#if isTypingNewRootTask}
+        <UXFormField
+          fieldLabel="Task Name"
+          value={newRootTaskStringValue}
+          on:input={(e) => newRootTaskStringValue = e.detail.value}
+          on:focus-out={() => {
+            if (newRootTaskStringValue === '') {
+              isTypingNewRootTask = false
+            }
+          }}
+          on:task-entered={(e) => handleKeyDown(e)}
+        />
+        <div style="margin-bottom: 8px;"></div>
+      {/if}
+
       {#each tasksToDisplay as taskObj, i (taskObj.id)}
         <RecursiveTaskElement 
           {taskObj}
@@ -67,20 +82,6 @@
           parentObj={{ subtreeDeadlineInMsElapsed: convertDDMMYYYYToDateClassObject(defaultDeadline).getTime() }}
           colorForDebugging="blue"
           {dueInHowManyDays}
-        />
-      {/if}
-
-      {#if isTypingNewRootTask}
-        <UXFormField
-          fieldLabel="Task Name"
-          value={newRootTaskStringValue}
-          on:input={(e) => newRootTaskStringValue = e.detail.value}
-          on:focus-out={() => {
-            if (newRootTaskStringValue === '') {
-              isTypingNewRootTask = false
-            }
-          }}
-          on:task-entered={(e) => handleKeyDown(e)}
         />
       {/if}
     </div>
@@ -168,6 +169,11 @@
       name: taskName,
       parentID: ""
     }
+
+    if (tasksToDisplay.length > 0) {
+      newRootTaskObj.orderValue = (0 + tasksToDisplay[0].orderValue) / 2 
+    } // otherwise the default `orderValue` will be `maxOrder`, handled by `checkTaskObjSchema`
+
     dispatch('new-root-task', newRootTaskObj)
     // use same API as legacy code
   }
