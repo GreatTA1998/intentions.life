@@ -42,6 +42,19 @@
         {/if}
       </div>
 
+        <div style="margin-left: 6px; margin-right: 6px; max-width: 84px;">
+          <UXFormField
+            fieldLabel="For"
+            value={weeklyPeriodicTemplate.duration}
+            willAutofocus={false}
+            on:input={(e) => debouncedSaveDuration(e)}
+          >
+            <div slot="append" style="font-weight: 300; color: rgb(60, 60, 60); font-size: 12px;">
+              mins.
+            </div>
+          </UXFormField>
+        </div>
+
       <div style="display: flex; align-items: center;">
         <div>
           Show repeats
@@ -60,13 +73,17 @@
       </div>
 
       {#if !isEditVersion}
-        <button on:click={() => createTemplateAndGenerateTasks({ numOfWeeksInAdvance, repeatOnDayOfWeek })}>
+        <ReusableRoundButton on:click={() => createTemplateAndGenerateTasks({ numOfWeeksInAdvance, repeatOnDayOfWeek })}
+          backgroundColor="rgb(0, 89, 125)" textColor="white"
+        >
           Create repeat template and generate tasks
-        </button>
+        </ReusableRoundButton>
       {:else}
-        <button on:click={editExistingInstances}>
+        <ReusableRoundButton on:click={editExistingInstances}
+          backgroundColor="rgb(0, 89, 125)" textColor="white"
+        >
           Modify existing tasks
-        </button>
+        </ReusableRoundButton>
       {/if}
 
       <button on:click={() => { 
@@ -115,6 +132,8 @@
   import { createEventDispatcher } from 'svelte'
   import { onSnapshot, collection } from 'firebase/firestore'
   import db from '/src/db.js'
+  import ReusableRoundButton from '$lib/ReusableRoundButton.svelte'
+  import _ from 'lodash'
 
   export let isEditVersion = false
   export let weeklyPeriodicTemplate = {
@@ -157,6 +176,36 @@
   onDestroy(() => {
     if (unsub) unsub()
   }) 
+
+  function handleTaskStartInput (e) {
+    const hhmm = e.detail.value
+    if (hhmm.length !== 5) return
+    if (!hhmm.includes(':')) return
+
+    console.log('hhmm =', hhmm)
+    updateFirestoreDoc(`/users/${$user.uid}/periodicTasks/${weeklyPeriodicTemplate.id}`, {
+      startTime: hhmm
+    })
+    alert('success: saved new default start time')
+  }
+
+  const debouncedSaveDuration = _.debounce(saveDuration, 1000)
+
+  function saveDuration (e) {
+    const newValue = e.detail.value
+    if (typeof Number(newValue) !== 'number') {
+      return 
+    }
+
+    if (!weeklyPeriodicTemplate.id) alert('Create the template first, before adding details')
+
+    updateFirestoreDoc(`/users/${$user.uid}/periodicTasks/${weeklyPeriodicTemplate.id}`, {
+      duration: Number(newValue)
+    })
+    alert('success: saved new duration')
+  }
+
+
 
   function setIsPopupOpen ({ newVal }) {
     isPopupOpen = newVal
@@ -254,7 +303,7 @@
       id: individualID,
       reusableTemplateID: repeatGroupID,
       name: newTaskName,
-      startTime: '',
+      startTime: weeklyPeriodicTemplate.startTime || '',
       startYYYY: new Date().getFullYear()
       // `startDate` will be hydrated later by the 2nd `if` statement
     }
