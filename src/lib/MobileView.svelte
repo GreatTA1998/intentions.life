@@ -48,14 +48,23 @@
             class="today-event"
             class:has-already-happened={hasAlreadyHappened(eventToday)} 
             class:night-time={isNightTime(eventToday)}
-            style="margin-bottom: 0px;"
+            style="
+              margin-bottom: 0px;
+              background-image: {eventToday.imageDownloadURL ? `url(${eventToday.imageDownloadURL})` : ''};
+              background-size: contain;
+              background-repeat: no-repeat;
+            "
           >
-            <div class="event-scheduled-time">
-              {eventToday.startTime} 
-            </div>
-            <div style="font-size: 32px; display: flex; align-items: center; flex-wrap: no-wrap;">
-              {eventToday.name}
-            </div>
+            {#if !eventToday.imageDownloadURL}
+              <div class="event-scheduled-time">
+                {eventToday.startTime} 
+              </div>
+              <div style="font-size: 32px; display: flex; align-items: center; flex-wrap: no-wrap;">
+                {eventToday.name}
+              </div>
+            {:else}
+              <div style="width: 100%; height: 240px;"></div>
+            {/if}
           </div>
         {/if}
       {/each}

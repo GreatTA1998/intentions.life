@@ -181,7 +181,8 @@
     // scrolling
     if (CurrentTimeIndicator) {
       setTimeout(() => {
-        if (CurrentTimeIndicator) { // && !$hasInitialScrolled
+        // the calendar is re-rendered on every task drag-and-drop, so we don't want to reset scrolling each time
+        if (CurrentTimeIndicator && !$hasInitialScrolled) { 
           CurrentTimeIndicator.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'start' })
           hasInitialScrolled.set(true)
         }

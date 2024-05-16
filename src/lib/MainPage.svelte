@@ -70,7 +70,13 @@
     </GrandTreeTodoPopupButton>
 
     <div class="day-week-toggle-segment">
-      <div on:click={() => currentMode = 'Week'}
+      <!-- quickfix so pressing home ALWAYS recalibrates you to today's region -->
+      <div on:click={async () => { 
+          currentMode = ''
+          await tick()
+          hasInitialScrolled.set(false)
+          currentMode = 'Week'
+        }}
         class="ux-tab-item" 
         class:active-ux-tab={currentMode === 'Week'} 
         class:transparent-inactive-tab={currentMode === 'Day'}
@@ -236,7 +242,8 @@
     allTasksDueThisLife,
     longHorizonTasks,
     tasksScheduledOn,
-    inclusiveWeekTodo
+    inclusiveWeekTodo,
+    hasInitialScrolled
   } from '/src/store.js'
   import JournalPopup from '$lib/JournalPopup.svelte'
   import FinancePopup from '$lib/FinancePopup.svelte'
@@ -254,7 +261,7 @@
   import ManageReusableTasks from '$lib/ManageReusableTasks.svelte'
   import UncertainMilestones from '$lib/UncertainMilestones.svelte'
 
-  import { onDestroy, onMount } from 'svelte'
+  import { onDestroy, onMount, tick } from 'svelte'
   import { goto } from '$app/navigation';
   import { getAuth, signOut } from 'firebase/auth'
   import db from '/src/db.js'
