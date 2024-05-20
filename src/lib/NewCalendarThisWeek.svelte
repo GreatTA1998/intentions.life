@@ -54,14 +54,11 @@
                 {#if doodleIcons}
                   <div style="display: flex; flex-wrap: wrap;">
                     {#each getScheduledTasks(dateClassObj).filter(task => !task.startTime && task.iconDataURL) as iconTask}
-                      <img on:click={() => dispatch('task-click', { task: iconTask })}
-                        src={iconTask.iconDataURL} 
-                        style="width: 32px; height: 32px;"
-                        draggable="true"
-                        on:dragstart|self={(e) => startDragMove(e, iconTask.id)} 
-                      >
-                      <!-- <div style="font-size: 2px;">{iconTask.name}</div>
-                      <div style="font-size: 2px;">{iconTask.repeatGroupID}</div> -->
+                      <FunctionalDoodleIcon
+                        {iconTask}
+                        on:task-click
+                        on:task-checkbox-change
+                      />
                     {/each}
                   </div>
                 {/if}
@@ -121,6 +118,7 @@
 </div>
 
 <script>
+import FunctionalDoodleIcon from '$lib/FunctionalDoodleIcon.svelte'
 import ReusableCalendarView from '$lib/ReusableCalendarView.svelte'
 import { MIKA_PIXELS_PER_HOUR, getDateInMMDD, getDateInDDMMYYYY } from '/src/helpers'
 import { onMount, createEventDispatcher } from 'svelte'

@@ -43,15 +43,27 @@
           width: 94%;
         "
       >
-        <ReusableTaskElement
-          {task}
-          pixelsPerHour={pixelsPerMinute * 60}
-          fontSize={0.8}
-          hasCheckbox
-          on:task-click
-          on:task-update
-          on:task-checkbox-change
-        />
+        {#if task.iconDataURL}
+          <ReusableIconTaskElement
+            {task}
+            pixelsPerHour={pixelsPerMinute * 60}
+            fontSize={0.8}
+            hasCheckbox={false}
+            on:task-click
+            on:task-update
+            on:task-checkbox-change
+          />          
+        {:else}
+          <ReusableTaskElement
+            {task}
+            pixelsPerHour={pixelsPerMinute * 60}
+            fontSize={0.8}
+            hasCheckbox
+            on:task-click
+            on:task-update
+            on:task-checkbox-change
+          />          
+        {/if}
       </div>
     {/each}
       
@@ -139,6 +151,7 @@
   import { getFirestoreCollection } from '/src/crud.js'
   import { getDateOfToday, getTrueY, computeMillisecsDifference, convertDDMMYYYYToDateClassObject, getTimeInHHMM } from '/src/helpers.js'
   import ReusableTaskElement from '$lib/ReusableTaskElement.svelte'
+  import ReusableIconTaskElement from '$lib/ReusableIconTaskElement.svelte'
   import { onMount, beforeUpdate, afterUpdate, tick, createEventDispatcher, onDestroy } from 'svelte'
   import { browser } from '$app/environment';
   import { user, hasInitialScrolled, yPosWithinBlock } from '/src/store.js'

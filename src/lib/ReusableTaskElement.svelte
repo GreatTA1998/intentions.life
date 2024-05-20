@@ -14,7 +14,7 @@
     height: {height}px; 
     min-height: 12px;
     font-size: {fontSize}rem;
-    opacity: {task.isDone ? '0.5' : '0.9'};
+    opacity: {task.isDone ? '0.9' : '0.7'};
     outline: 0px solid red;
     background-color: {isBulletPoint ? '' : 'var(--experimental-black)'};
     background-image: {task.imageDownloadURL ? `url(${task.imageDownloadURL})` : ''};
