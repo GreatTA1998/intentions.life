@@ -5,23 +5,27 @@
   Note, the HTML checkbox tick color literally cannot be changed, but it will be automatically white if it "decides" that our chosen background color is dark enough, 
   or vice versa
  -->
+
+ <!--    background-image: {task.imageDownloadURL ? `url(${task.imageDownloadURL})` : ''};
+   background-size: contain;
+   background-repeat: no-repeat; -->
+
  <div 
  on:click={() => dispatch('task-click', { task })}
  draggable="true" 
  on:dragstart|self={(e) => startDragMove(e, task.id)} 
  class:calendar-block={!isBulletPoint}
- class:clear-border={task.isDone && !isBulletPoint}
+ class:graph-paper-texture={!isBulletPoint}
+ class:clear-border={!isBulletPoint}
+ class="graph-paper-texture"
  style="
    position: relative;
    height: {height}px; 
    min-height: 12px;
    font-size: {fontSize}rem;
-   opacity: {task.isDone ? '1' : '1'};
+   opacity: {task.isDone ? '0.9' : '0.7'};
    outline: 0px solid black;
-   background-color: {isBulletPoint ? '' : 'transparent'};
-   background-image: {task.imageDownloadURL ? `url(${task.imageDownloadURL})` : ''};
-   background-size: contain;
-   background-repeat: no-repeat;
+   background-color: {isBulletPoint ? '' : '#f8f8f2;'};
    padding-left: {isBulletPoint ? '0px' : 'var(--left-padding)'};
    padding-right: var(--left-padding);
 
@@ -61,7 +65,7 @@
     {#if !isBulletPoint}
       <div style="flex-grow: 1; overflow: hidden;">
         <div class="truncate-to-one-line" 
-          style="font-size: 12px; font-weight: 300; color: {isBulletPoint ? 'rgb(30, 30, 30)' : 'rgb(30, 30, 30)'};">
+          style="font-size: 12px; font-weight: 400; color: {isBulletPoint ? 'rgb(0,0,0)' : 'rgb(0,0,0)'};">
           {task.notes || ''}
         </div>
       </div>
@@ -170,21 +174,16 @@
    /* padding-top: var(--left-padding); */
    cursor: pointer;
    border-radius: var(--left-padding);
-   border: 1px solid rgb(230, 230, 230);
-   /* border-left: 2px solid rgb(17, 100, 45); */
  }
 
  .clear-border {
-  border: 1px solid rgb(180, 180, 180);
+  border: 1px solid var(--experimental-black);
  }
 
- .task-name {
-   margin-top: -1px; 
-   margin-left: 4px; 
-   width: 100%;
-   font-size: 14px;
-   font-weight: 500;
-   cursor: pointer; 
-   color: rgb(0, 0, 0);
+ .graph-paper-texture {
+    background-image: 
+      linear-gradient(90deg, rgba(200,200,200,0.8) 1px, transparent 0), 
+      linear-gradient(180deg, rgba(200,200,200,0.8) 1px, transparent 0);
+    background-size: 24px 24px; /* Adjust the size of the pattern */
  }
 </style>
