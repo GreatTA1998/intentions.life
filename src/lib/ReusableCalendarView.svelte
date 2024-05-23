@@ -67,8 +67,6 @@
       </div>
     {/each}
       
-    <!-- This offsets the fact that the timestamp needs a -6 margin to not be cut off from the top edge of the container -->
-    <div style="margin-top: 6px;"></div>
 
     {#if isDirectlyCreatingTask}
       <div 
@@ -135,13 +133,14 @@
           })}px;
         "
       > 
+
+      <hr 
+        style="border: 2px solid var(--location-indicator-color); border-radius: 5px; width: 100%; margin-top: 0px; margin-bottom: 0px;"
+        bind:this={CurrentTimeIndicator}
+      > 
         <div style="font-size: 12px; color: var(--location-indicator-color); font-weight: 600;">
           {getTimeInHHMM({ dateClassObj: new Date() })}
         </div>
-        <hr 
-          style="border: 2px solid var(--location-indicator-color); border-radius: 5px; width: 100%; margin-top: 2px;"
-          bind:this={CurrentTimeIndicator}
-        > 
       </div>
     {/if}
   </div>
@@ -407,14 +406,11 @@
     so the absolute positionings will count from the right place (no need to fully understand yet) 
 
     height: 200% is just so it's high enough to contain all the absolute elements
-
-    without border-box, the padding on top will add ON TOP OF 100% height  
   */
 
   .calendar-day-container {
     width: 100%;
   }
-
 
   .green-text {
     color: #0085FF;
