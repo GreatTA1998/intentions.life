@@ -135,7 +135,7 @@
     {
       videoSrc: '',
       title: 'Reusable Tasks',
-      subtitle: 'Efficient UX for tasks you do often',
+      subtitle: 'Efficient UX for habits & routines',
       iconName: 'restart_alt',
       description: `There's a place where you can configure all your repeating tasks. Habits can repeat on specific days, without needing a specific time. 
 
@@ -148,7 +148,7 @@
     {
       videoSrc: '',
       title: 'UNCERTAIN GOALS',
-      subtitle: "Visualize progress, including failed paths",
+      subtitle: "Visualize progress, including tried failures",
       iconName: 'sports_score',
       description: `Many tasks involve many unforeseen steps and difficulties. If you're blocked on a task because you're awaiting others, it will be put to the side and de-emphasized.
       
@@ -158,7 +158,7 @@
     {
       videoSrc: '',
       title: 'Context-based Photos',
-      subtitle: 'A more vibrant way to browse photos',
+      subtitle: "A more natural way to revisit memories",
       iconName: 'image',
       description: `Calendar-centric photos allows you to display your favorite photos in context, giving you a delightful, visual history of your week.
       
