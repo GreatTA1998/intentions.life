@@ -18,14 +18,15 @@
       <div slot="content" style="display: flex; flex-grow: 1; height: 100%; padding: 3%;" class="home-page-background">
         <div style="width: 90vw; min-width: 200px; height: 80vh; border-radius: 10px;">
           <div class="hero-title">
-            Modern calendar for a healthy life
+            A modern calendar for organizing life
           </div>
     
           <div style="display: flex; margin-top: 24px; flex-wrap: wrap;">
             <div class="secondary-description">
-              Every big company has a calendar. Google made a calendar. So did Apple, Microsoft, Notion, Motion, VimCal, cal.com... the list goes on.
+              Google made a calendar. So did Apple, Microsoft, Notion, Motion, VimCal, cal.com... the list goes on.
               <br><br>
-              But this calendar is <u>different in 4 crucial ways</u>, so that you can visualize everything - from your smallest habits & chores, to your biggest milestones & dreams.
+              But only this calendar has these <b>4 features</b>, so you can effectively manage all the small, important things in life,
+              without losing sight of your long-term goals and dreams.
             </div>
             
             <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 12px 0px;" class="action-buttons">
@@ -48,7 +49,7 @@
             
             <div style="position: relative; justify-content: center;">
               <div class="silent-video">
-                <img src="/default-calendar-view-screenshot.png" style="width: 100%; height: 100%;">
+                <img src="/default-calendar-view-screenshot.png" style="width: 100%; height: 100%; box-shadow: 0 4px 8px rgba(148, 90, 35, 0.4);">
               </div>
 
               <div class="ability-icons">
@@ -57,7 +58,7 @@
                     class:active-thumbnail={currentIdx === i}  
                     class:inactive-thumbnail={currentIdx !== i}
                   >
-                    <span class="material-symbols-outlined" style="font-size: 72px; color: white;">
+                    <span class="material-symbols-outlined" style="font-size: 47px; color: white;">
                       {ability.iconName}
                     </span>
                   </div>
@@ -67,13 +68,20 @@
 
             <div class="explanatory-card">
               <div style="display: flex; align-items: center;">
-                <span class="material-symbols-outlined" style="font-size: 72px; color: white;">
-                  {fourAbilities[currentIdx].iconName}
-                </span>
-                
-                <div class="card-title" style="margin-left: 16px;">
-                  {fourAbilities[currentIdx].title}
+                <div class="ability-icon" class:active-thumbnail={true}>
+                  <span class="material-symbols-outlined" style="font-size: 48px; color: white;">
+                    {fourAbilities[currentIdx].iconName}
+                  </span>
                 </div>
+
+                 <div style="padding-left: 16px;">
+                    <div class="card-title">
+                      {fourAbilities[currentIdx].title}
+                    </div>
+                    <div style="font-size: 24px; color: rgb(240, 240, 240);">
+                      {fourAbilities[currentIdx].subtitle}
+                    </div>
+                 </div>
               </div>
 
               <div class="card-description">
@@ -114,7 +122,8 @@
   let fourAbilities = [
     {
       videoSrc: '',
-      title: 'Calendar + Todo-list',
+      title: 'Branching Todo-list',
+      subtitle: 'No more long, messy lists',
       iconName: 'house',
       description: `The home view is the week calendar, because everything eventually ends up here - whether it's a reusable habit, a milestone deadlines, a todo-item, or just a scheduled event.
 
@@ -126,6 +135,7 @@
     {
       videoSrc: '',
       title: 'Reusable Tasks',
+      subtitle: 'Efficient UX for tasks you do often',
       iconName: 'restart_alt',
       description: `There's a place where you can configure all your repeating tasks. Habits can repeat on specific days, without needing a specific time. 
 
@@ -137,7 +147,8 @@
     },
     {
       videoSrc: '',
-      title: 'Uncertain Milestones',
+      title: 'UNCERTAIN GOALS',
+      subtitle: "Visualize progress, including failed paths",
       iconName: 'sports_score',
       description: `Many tasks involve many unforeseen steps and difficulties. If you're blocked on a task because you're awaiting others, it will be put to the side and de-emphasized.
       
@@ -146,8 +157,9 @@
     },
     {
       videoSrc: '',
-      title: 'Photos + Icons',
-      iconName: 'imagesmode',
+      title: 'Context-based Photos',
+      subtitle: 'A more vibrant way to browse photos',
+      iconName: 'image',
       description: `Calendar-centric photos allows you to display your favorite photos in context, giving you a delightful, visual history of your week.
       
       `
@@ -176,18 +188,21 @@
 </script>
 
 <style lang="scss">
+  :root {
+    --ability-showcase-bg-color: rgb(0, 0, 0);
+  }
+
   .active-thumbnail {
-    border: 2px solid #007bff; /* Bright blue */
-    background-color: rgba(0, 123, 255, 0.2);
-    box-shadow: 0 8px 16px rgba(0, 123, 255, 0.9);
+    border: 1px solid var(--logo-twig-color);
+    box-shadow: 0 8px 16px rgba(148, 90, 35, 1);
   }
 
   .inactive-thumbnail {
-    opacity: 0.7;
+    filter: opacity(0.7) blur(2px);
   }
 
   .home-page-background {
-    background-color: #193b19;
+    background-color: rgb(250, 250, 250);
   }
 
 
@@ -221,7 +236,7 @@
   }
 
   .ability-icon {
-    background-color: rgb(30, 51, 56);
+    background-color: var(--ability-showcase-bg-color);
     width: 80px;
     height: 80px;
     cursor: pointer;
@@ -231,29 +246,31 @@
     justify-content: center;
   }
 
+
   .explanatory-card {
     width: 620px;
     height: 540px;
-    background-color: var(--calendar-bg-color);
-    background-color: rgb(10, 31, 5);
-    padding: 16px;
+    background-color: var(--ability-showcase-bg-color);
+    padding: 24px;
     // border-top-right-radius: 16px;
     // border-bottom-right-radius: 16px;
   }
 
 
   .card-title {
-    font-size: 48px;
+    font-size: 34px;
     font-weight: 600;
     color: white;
+    text-transform: uppercase;
   }
 
   .card-description {
-    margin-top: 24px;
+    margin-top: 48px;
     padding: 16px;
     white-space: pre-line;
-    color: rgb(210, 210, 210);
-    font-size: 20px;
+    color: rgb(250, 250, 250);
+    font-size: 18px;
+    font-style: italic;
   }
 
 
@@ -297,11 +314,11 @@
   .secondary-description {
     font-weight: 500; 
     display: inline; 
-    color: white;
+    color: rgb(80, 80, 80);
   }
 
   .hero-title {
-    color: white;
+    color: rgb(80, 80, 80);
     font-size: 3rem; 
     font-weight: 600;
   }

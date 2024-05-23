@@ -53,8 +53,10 @@
 
 <style>
   .sign-in-button {
-    background-color: rgb(30, 51, 56);
-    color: white;
+    border: 2px solid var(--logo-twig-color);
+    font-weight: 600;
+    color: var(--logo-twig-color);
+    background-color: white;
     margin-bottom: 2px;
     width: 200px;
     padding-top: 6px;
