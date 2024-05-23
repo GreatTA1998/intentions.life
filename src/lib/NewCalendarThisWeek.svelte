@@ -49,7 +49,7 @@
           </div>  
 
           {#if isShowingDockingArea}
-            <div style="overflow: hidden;">
+            <div style="overflow: hidden; margin-top: 4px;">
               {#key intForTriggeringRerender}
                 {#if doodleIcons}
                   <div style="display: flex; flex-wrap: wrap;">
