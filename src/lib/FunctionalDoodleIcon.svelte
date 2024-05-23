@@ -4,8 +4,8 @@
     on:click|stopPropagation={handleSingleOrDoubleClick}
     src={iconTask.iconDataURL} 
     class:clearly-visible={iconTask.isDone}
-    class:semi-transparent={!iconTask.isDone}
-    style="width: 36px; height: 36px; border: 0px solid blue;"
+    class:task-not-done={!iconTask.isDone}
+    style="width: 32px; height: 32px; border: 0px solid blue; cursor: pointer;"
     class:radial-glow={iconTask.isDone}
     draggable="true"
     on:dragstart|self={(e) => startDragMove(e, iconTask.id)} 
@@ -68,8 +68,8 @@
 </script>
 
 <style>
-  .semi-transparent {
-    opacity: 0.5;
+  .task-not-done {
+    filter: grayscale(80%) opacity(0.8) blur(0.8px);
   }
 
   .clearly-visible {
