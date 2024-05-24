@@ -7,7 +7,7 @@
     <div style="display: flex;">
       <div>
         <div style="font-size: 24px; margin-bottom: 12px;">
-          Weekly
+          Frequent
 
           <ManageRepeatingTasksUnifiedWeeklyPopup  
             let:setIsPopupOpen={setIsPopupOpen}
