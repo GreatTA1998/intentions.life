@@ -55,19 +55,16 @@
           </UXFormField>
         </div>
 
-      <div style="display: flex; align-items: center;">
+      <div style="display: flex; align-items: center; padding-bottom: 8px;">
         <div>
           Show repeats
         </div>
 
-        <div style="width: 40px;">
-          <UXFormField
-            fieldLabel=""
-            value={''}
-            willAutofocus={false}
-            on:input={(e) => handleTaskStartInput(e)}
-            placeholder="2"
-          />  
+        <div>
+          <input class="underlined-input"
+            value={numOfWeeksInAdvance}
+            on:input={e => numOfWeeksInAdvance = e.target.value}
+          >
         </div>
         weeks into the future
       </div>
@@ -86,10 +83,7 @@
         </ReusableRoundButton>
       {/if}
 
-      <button on:click={() => { 
-        dispatch('delete');
-        isPopupOpen = false 
-      }}
+      <button on:click={properlyDeleteTemplate}
       >
         Delete
       </button>
@@ -98,7 +92,10 @@
         {#if doodleIcons}
           {#each doodleIcons as doodleIcon}
             <img 
-              on:click={() => editExistingInstances({ iconDataURL: doodleIcon.dataURL })} 
+              on:click={() => { 
+                iconDataURL = doodleIcon.dataURL
+                editExistingInstances()
+              }}
               src={doodleIcon.dataURL}
               style="width: 48px; height: 48px; cursor: pointer;"
             >
@@ -139,9 +136,18 @@
   export let weeklyPeriodicTemplate = {
     name: '',
     repeatOnDayOfWeek: Array(7).fill(0),
-    repeatGroupID: ''
+    repeatGroupID: '',
+    iconDataURL: ''
   }
   export let defaultOrderValue = 1
+
+  //// IMPORTANT
+  // `repeatGroupID`: used for modifying instances of a repeating task (name is for legacy reasons)
+
+  // `reusableTemplateID`: for collecting statistics for a task (no reason why it must be this way, it's just legacy reasons)
+  
+  let allGeneratedTasksToUpload = [] 
+  let numOfWeeksInAdvance = 2
 
   const dispatch = createEventDispatcher()
 
@@ -152,8 +158,8 @@
   let repeatOnDayOfWeek = weeklyPeriodicTemplate.repeatOnDayOfWeek
   let repeatGroupID = weeklyPeriodicTemplate.repeatGroupID
   let newTaskName = weeklyPeriodicTemplate.name
+  let iconDataURL = weeklyPeriodicTemplate.iconDataURL
 
-  let numOfWeeksInAdvance = 2
   let hasSpecificTime = false
 
   let doodleIcons = null
@@ -176,6 +182,14 @@
   onDestroy(() => {
     if (unsub) unsub()
   }) 
+
+  async function properlyDeleteTemplate () {
+    if (confirm('Are you sure? This will delete all "Time Spent" records too. If you just want to stop future repeats, you can set the weekly repeats to no days instead.')) {
+      await deleteExistingFutureInstances()
+      deleteFirestoreDoc(`/users/${$user.uid}/periodicTasks/${weeklyPeriodicTemplate.id}`)
+      isPopupOpen = false 
+    } 
+  }
 
   function handleTaskStartInput (e) {
     const hhmm = e.detail.value
@@ -211,44 +225,55 @@
     isPopupOpen = newVal
   }
 
+
   // effectively a delete + create
-  async function editExistingInstances ({ iconDataURL = '' }) {
+  async function editExistingInstances () {
     // update the template itself
     updateFirestoreDoc(`/users/${$user.uid}/periodicTasks/${weeklyPeriodicTemplate.id}`, {
       repeatOnDayOfWeek,
       name: newTaskName,
       iconDataURL
     })
-    // find all the repeat groups scheduled from today's date (don't care about the past)
 
-    const q = createFirestoreQuery({
-      collectionPath: `/users/${$user.uid}/tasks`,
-      criteriaTerms: ['repeatGroupID', '==', weeklyPeriodicTemplate.repeatGroupID]
-    })
-
-    const allRepeatInstances = await getFirestoreQuery(q)
-    const currAndFutureInstances = allRepeatInstances.filter(instance => {
-      const d1 = new Date()
-      const d2 = convertMMDDToDateClassObject(instance.startDate, instance.startYYYY)
-      const dayDiff = computeDayDifference(d1, d2) // dayDiff := d2 - d1 
-      return dayDiff >= 0
-    })
-
-    // delete all of them, use a Firestore batch
-    for (const instance of currAndFutureInstances) {
-      deleteFirestoreDoc(`/users/${$user.uid}/tasks/${instance.id}`)
-    }
+    await deleteExistingFutureInstances()
 
     // with a clean slate, generate new ones
     createNewInstancesOfWeeklyRepeatingTasks({
       repeatGroupID: weeklyPeriodicTemplate.repeatGroupID,
-      numOfWeeksInAdvance,
       repeatOnDayOfWeek,
-      iconDataURL
     })
   }  
 
-  function createTemplateAndGenerateTasks ({ numOfWeeksInAdvance, repeatOnDayOfWeek }) {
+  // find all the repeat groups scheduled from today's date (don't care about the past)
+  async function deleteExistingFutureInstances () {
+    return new Promise(async (resolve) => {
+      const q = createFirestoreQuery({
+        collectionPath: `/users/${$user.uid}/tasks`,
+        criteriaTerms: ['repeatGroupID', '==', weeklyPeriodicTemplate.repeatGroupID]
+      })
+
+      const allRepeatInstances = await getFirestoreQuery(q)
+      const currAndFutureInstances = allRepeatInstances.filter(instance => {
+        const d1 = new Date()
+        const d2 = convertMMDDToDateClassObject(instance.startDate, instance.startYYYY)
+        const dayDiff = computeDayDifference(d1, d2) // dayDiff := d2 - d1 
+        return dayDiff >= 0
+      })
+
+      const deleteRequests = []
+
+      // delete all of them, use a Firestore batch
+      for (const instance of currAndFutureInstances) {
+        deleteRequests.push(
+          deleteFirestoreDoc(`/users/${$user.uid}/tasks/${instance.id}`)
+        )
+      }
+      await Promise.all(deleteRequests)
+      resolve()
+    })
+  }
+
+  function createTemplateAndGenerateTasks ({ repeatOnDayOfWeek }) {
     const id = getRandomID()
     repeatGroupID = id
 
@@ -263,15 +288,17 @@
 
     createNewInstancesOfWeeklyRepeatingTasks({ 
       repeatGroupID: id,
-      numOfWeeksInAdvance, 
       repeatOnDayOfWeek
     })
   }
 
-  let allGeneratedTasksToUpload = [] 
-
   // repeatOnDaysOfMonth: [0, 0, 0, 1, ... 0, 1]
-  function createNewInstancesOfWeeklyRepeatingTasks ({ numOfWeeksInAdvance = 2, repeatOnDayOfWeek, repeatGroupID, iconDataURL }) {
+  function createNewInstancesOfWeeklyRepeatingTasks ({ repeatOnDayOfWeek, repeatGroupID }) {
+    if (!numOfWeeksInAdvance) {
+      alert(`"Show repeats _ into the future" must be filled`)
+    }
+    allGeneratedTasksToUpload = []
+
     const d = new Date()
     for (let i = 0; i < 7 * numOfWeeksInAdvance; i++) {
       const weekDayNumber = mod(d.getDay() - 1, 7) // for getDay(), Sunday = 0, Monday = 1
@@ -280,7 +307,7 @@
           dateClassObj: new Date(d.getTime()), 
           repeatGroupID 
         })
-        allGeneratedTasksToUpload.push({ iconDataURL, ...generatedTask })
+        allGeneratedTasksToUpload.push({ ...generatedTask })
       }
 
       d.setDate(d.getDate() + 1)
@@ -293,7 +320,6 @@
         task
       )
     }
-    console.log("success")
   }
 
   function createRepeatedTask({ dateClassObj, repeatGroupID }) {
@@ -304,7 +330,8 @@
       reusableTemplateID: repeatGroupID,
       name: newTaskName,
       startTime: weeklyPeriodicTemplate.startTime || '',
-      startYYYY: new Date().getFullYear()
+      startYYYY: new Date().getFullYear(),
+      iconDataURL
       // `startDate` will be hydrated later by the 2nd `if` statement
     }
 
@@ -336,6 +363,18 @@
 </script>
 
 <style>
+  .underlined-input {
+    border: none;
+    border-bottom: 2px solid #313131;
+    outline: none;
+    padding: 4px;
+    padding-bottom: 4px;
+    font-size: 16px;
+    width: 20px;
+    margin: 4px;
+    font-weight: 500;
+  }
+
   .highlighted {
     background-color: orange;
   }
