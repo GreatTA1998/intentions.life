@@ -32,9 +32,9 @@
       style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; row-gap: 24px; margin-top: 24px; font-size: 1.2em;"
     >
       <div style="display: flex; align-items: center;" class:half-invisible={!isScheduled(taskObject)}>
-        <div style="max-width: 230px;">
+        <div style="max-width: 140px;">
           <UXFormField
-            fieldLabel="Scheduled on (MM/DD hh:mm)"
+            fieldLabel="MM/DD hh:mm"
             value={taskObject.startDate + ' ' + taskObject.startTime}
             willAutofocus={false}
             on:input={(e) => handleTaskStartInput(e)}
@@ -42,15 +42,15 @@
           />
         </div>
 
-        <div style="margin-left: 6px; margin-right: 6px; max-width: 84px;">
+        <div style="margin-left: 6px; margin-right: 6px; max-width: 80px;">
           <UXFormField
-            fieldLabel="For"
-            value={taskObject.duration}
+            fieldLabel="Duration"
+            value={Math.round(taskObject.duration)}
             willAutofocus={false}
-            on:input={(e) => debouncedSaveDuration(e)}
+            on:input={(e) => handleDurationInput(e)}
           >
             <div slot="append" style="font-weight: 300; color: rgb(60, 60, 60); font-size: 12px;">
-              mins.
+              min
             </div>
           </UXFormField>
         </div>
@@ -60,26 +60,9 @@
         <ReusableRoundButton on:click={() => saveTaskStart(newStartMMDD, newStartHHMM)} backgroundColor="rgb(0, 89, 125)" textColor="white">Save changes</ReusableRoundButton>
       {/if}
 
-      {#if isEditingDeadline}
-        <ReusableRoundButton on:click={() => saveDeadline(newDeadlineDate, newDeadlineTime)} backgroundColor="rgb(0, 89, 125)" textColor="white">Save changes</ReusableRoundButton>
+      {#if isEditingDuration}
+        <ReusableRoundButton on:click={() => saveDuration(newDuration)} backgroundColor="rgb(0, 89, 125)" textColor="white">Save changes</ReusableRoundButton>
       {/if}
-
-      <!-- 178px is the min. width that fully contains the placeholder text -->
-      <div class:half-invisible={!hasDeadline(taskObject)} 
-        style="font-size: 1.2em; display: flex; align-items: center; max-width: 230px;"
-      >
-        <UXFormField
-          fieldLabel="Due (dd/MM/YYYY hh:mm)"
-          value={currentDeadlineValue}
-          placeholder="31/12/2024 16:30"
-          willAutofocus={false}
-          on:input={(e) => handleDeadlineInput(e)}
-        >
-          <span slot="icon" class="material-symbols-outlined" style="margin-right: 4px; font-size: 18px; color: {hasDeadline(taskObject) ? 'red' : ''};">
-            alarm
-          </span>
-        </UXFormField>
-      </div>
     </div>
 
     <div style="width: 100%; margin-top: 24px; margin-bottom: 24px;">
@@ -135,13 +118,15 @@ import {
   convertDDMMYYYYToDateClassObject,
   clickOutside, 
 } from '/src/helpers.js'
-import DetailedCardPopupRepeat from '$lib/DetailedCardPopupRepeat.svelte'
 import UXFormField from '$lib/UXFormField.svelte'
 import UXFormTextArea from '$lib/UXFormTextArea.svelte'
 import ReusableRoundButton from '$lib/ReusableRoundButton.svelte'
 import ReusableCheckbox from '$lib/ReusableCheckbox.svelte'
 
 export let taskObject 
+
+let newDuration 
+let isEditingDuration
 
 let newDeadlineDate
 let newDeadlineTime
@@ -150,7 +135,6 @@ let isEditingTaskStart = false
 let newStartMMDD
 let newStartHHMM
 
-let isEditingDeadline = false
 
 let TaskImageElem
 let PopupElem
@@ -166,10 +150,6 @@ let isViewingPhoto = false
 
 function isScheduled (taskObj) {
   return taskObj.startDate && taskObj.startTime && taskObj.startYYYY
-}
-
-function hasDeadline (taskObj) {
-  return taskObj.deadlineDate && taskObject.deadlineTime
 }
 
 onMount(() => {
@@ -192,6 +172,11 @@ onDestroy(() => {
   
 })
 
+function handleDurationInput (e) {
+  isEditingDuration = true
+  newDuration = e.detail.value
+}
+
 // the other place to pay attention to is <RecursiveTaskElement/>
 // but the idea is still the same, provide an "undo"
 // for root level tasks because they disappear on completion
@@ -209,10 +194,8 @@ function handleCheckboxChange (e) {
 
 const debouncedSaveTitle = _.debounce(saveTitle, 800)
 const debouncedSaveNotes = _.debounce(saveNotes, 1500)
-const debouncedSaveDuration = _.debounce(saveDuration, 1000)
 
-function saveDuration (e) {
-  const newValue = e.detail.value
+function saveDuration (newValue) {
   if (typeof Number(newValue) !== 'number') {
     return 
   }
@@ -222,6 +205,7 @@ function saveDuration (e) {
       duration: Number(newValue) 
     } 
   })
+  isEditingDuration = false
 }
 
 function saveTaskStart (MMDD, HHMM) {
@@ -328,7 +312,7 @@ function saveTitle (newVal) {
     -webkit-box-shadow:  0px 0px 0px 9999px rgba(0, 0, 0, 0.5);
   }
 
-  /* Refer to: https://stackoverflow.com/questions/3131072/how-to-change-input-text-box-style-to-line */
+  /* Refer to: https://stackoverflow.com/a/3131082/7812829 */
   input[type=text] {
     background: transparent;
     border: none;
@@ -336,7 +320,6 @@ function saveTitle (newVal) {
     outline: none;
     font-size: 23px;
     font-weight: 700;
-    /* padding: 10px 0px; */
     padding-left: 0px;
     padding-bottom: 6px;
   }
@@ -366,12 +349,5 @@ a {
   font-family: sans-serif;
   font-size: 1rem;
   height: 5px;
-}
-
-a:hover,
-a:focus {
-  border: 1px solid orange;
-  background-color: orange;
-  color: #fff;
 }
 </style>

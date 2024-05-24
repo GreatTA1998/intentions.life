@@ -5,18 +5,41 @@
 {#if isPopupOpen}
   <div class="fullscreen-invisible-modular-popup-layer" on:click|self={() => isPopupOpen = false}>
     <div class="detailed-card-popup">
-      <input bind:value={newTaskName}>
+      <input 
+        type="text" 
+        bind:value={newTaskName} 
+        placeholder="Untitled"
+        style="margin-left: 12px; width: 100%; box-sizing: border-box; font-size: 24px;"
+        class="title-underline-input"
+      >
 
-      <div style="display: flex; margin-top: 24px;">
-        {#each {length: 7} as _, i}
-          <div 
-            on:click={() => repeatOnDayOfWeek[i] = !repeatOnDayOfWeek[i]} 
-            class="circle"
-            class:highlighted={repeatOnDayOfWeek[i]}
-          >
-            {dayOfWeekSymbol[i]}
+      <div style="display: flex; align-items: center; margin-top: 24px; gap: 8px;">
+        <div style="display: flex;">
+          {#each {length: 7} as _, i}
+            <div 
+              on:click={() => repeatOnDayOfWeek[i] = !repeatOnDayOfWeek[i]} 
+              class="circle"
+              class:highlighted={repeatOnDayOfWeek[i]}
+            >
+              {dayOfWeekSymbol[i]}
+            </div>
+          {/each}
+        </div>
+
+        
+        <div style="display: flex; align-items: center;">
+          <div>
+            Show repeats
           </div>
-        {/each}
+
+          <div>
+            <input class="underlined-input"
+              value={numOfWeeksInAdvance}
+              on:input={e => numOfWeeksInAdvance = e.target.value}
+            >
+          </div>
+          weeks into the future
+        </div>
       </div>
 
       
@@ -42,51 +65,41 @@
         {/if}
       </div>
 
-        <div style="margin-left: 6px; margin-right: 6px; max-width: 84px;">
-          <UXFormField
-            fieldLabel="For"
-            value={weeklyPeriodicTemplate.duration}
-            willAutofocus={false}
-            on:input={(e) => debouncedSaveDuration(e)}
-          >
-            <div slot="append" style="font-weight: 300; color: rgb(60, 60, 60); font-size: 12px;">
-              mins.
-            </div>
-          </UXFormField>
-        </div>
-
-      <div style="display: flex; align-items: center; padding-bottom: 8px;">
-        <div>
-          Show repeats
-        </div>
-
-        <div>
-          <input class="underlined-input"
-            value={numOfWeeksInAdvance}
-            on:input={e => numOfWeeksInAdvance = e.target.value}
-          >
-        </div>
-        weeks into the future
+      <div style="margin-left: 6px; margin-right: 6px; max-width: 84px;">
+        <UXFormField
+          fieldLabel="For"
+          value={weeklyPeriodicTemplate.duration}
+          willAutofocus={false}
+          on:input={(e) => debouncedSaveDuration(e)}
+        >
+          <div slot="append" style="font-weight: 300; color: rgb(60, 60, 60); font-size: 12px;">
+            mins.
+          </div>
+        </UXFormField>
       </div>
 
-      {#if !isEditVersion}
-        <ReusableRoundButton on:click={() => createTemplateAndGenerateTasks({ numOfWeeksInAdvance, repeatOnDayOfWeek })}
-          backgroundColor="rgb(0, 89, 125)" textColor="white"
-        >
-          Create repeat template and generate tasks
-        </ReusableRoundButton>
-      {:else}
-        <ReusableRoundButton on:click={editExistingInstances}
-          backgroundColor="rgb(0, 89, 125)" textColor="white"
-        >
-          Modify existing tasks
-        </ReusableRoundButton>
-      {/if}
+      <div style="display: flex; justify-content: space-between; width: 100%; margin-top: 16px;">
+        {#if !isEditVersion}
+          <ReusableRoundButton on:click={() => createTemplateAndGenerateTasks({ numOfWeeksInAdvance, repeatOnDayOfWeek })}
+            backgroundColor="rgb(0, 89, 125)" textColor="white"
+          >
+            Create repeat template and generate tasks
+          </ReusableRoundButton>
+        {:else}
+          <ReusableRoundButton on:click={editExistingInstances}
+            backgroundColor="rgb(0, 89, 125)" textColor="white"
+          >
+            Modify existing tasks
+          </ReusableRoundButton>
+        {/if}
 
-      <button on:click={properlyDeleteTemplate}
-      >
-        Delete
-      </button>
+
+        <span class="material-symbols-outlined" on:click|stopPropagation={properlyDeleteTemplate} 
+          style="cursor: pointer; margin-left: auto; right: 0px; border: 1px solid grey; border-radius: 24px; padding: 4px;"
+        >
+          delete
+        </span>
+      </div>
 
       <div style="margin-top: 16px;">
         {#if doodleIcons}
@@ -363,6 +376,18 @@
 </script>
 
 <style>
+  .title-underline-input {
+     /* Refer to: https://stackoverflow.com/a/3131082/7812829 */
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid #DBDBDD;
+    outline: none;
+    font-size: 23px;
+    font-weight: 700;
+    padding-left: 0px;
+    padding-bottom: 6px;
+  }
+
   .underlined-input {
     border: none;
     border-bottom: 2px solid #313131;
