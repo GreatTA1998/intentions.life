@@ -101,17 +101,27 @@
         </span>
       </div>
 
-      <div style="margin-top: 16px;">
+      <!-- ICON SECTION -->
+      <div style="margin-top: 16px; display: flex; width: 100%; flex-wrap: wrap;">
         {#if doodleIcons}
           {#each doodleIcons as doodleIcon}
-            <img 
-              on:click={() => { 
-                iconDataURL = doodleIcon.dataURL
-                editExistingInstances()
-              }}
-              src={doodleIcon.dataURL}
-              style="width: 48px; height: 48px; cursor: pointer;"
-            >
+            <div>
+              <img 
+                on:click={() => { 
+                  iconDataURL = doodleIcon.dataURL
+                  editExistingInstances()
+                }}
+                src={doodleIcon.dataURL}
+                style="width: 48px; height: 48px; cursor: pointer;"
+                class:orange-border={weeklyPeriodicTemplate.iconDataURL === doodleIcon.dataURL}
+              >
+              
+              {#if weeklyPeriodicTemplate.iconDataURL === doodleIcon.dataURL && hasPermission(weeklyPeriodicTemplate)}
+                <div on:click={() => handleDelete(doodleIcon.id)} style="cursor: pointer; font-size: 14px;">
+                  Delete
+                </div>
+              {/if}
+            </div>
           {/each}
         {/if}
       </div>
@@ -133,7 +143,14 @@
     mod,
     twoDigits
   } from '/src/helpers.js'
-  import { setFirestoreDoc, deleteFirestoreDoc, getFirestoreCollection, createFirestoreQuery, getFirestoreQuery, updateFirestoreDoc } from '/src/crud.js'
+  import { 
+    setFirestoreDoc, 
+    deleteFirestoreDoc, 
+    getFirestoreCollection, 
+    createFirestoreQuery, 
+    getFirestoreQuery, 
+    updateFirestoreDoc 
+  } from '/src/crud.js'
   import { user } from '/src/store.js'
   import { onMount, onDestroy } from 'svelte'
   import UXFormField from '$lib/UXFormField.svelte'
@@ -195,6 +212,27 @@
   onDestroy(() => {
     if (unsub) unsub()
   }) 
+
+  function hasPermission (weeklyPeriodicTemplate) {
+    // find the `doodleIconDoc` first
+    let iconDoc = null
+    for (let doodleIcon of doodleIcons) {
+      if (doodleIcon.dataURL === weeklyPeriodicTemplate.iconDataURL) {
+        iconDoc = doodleIcon
+        break
+      }
+    }
+
+    // now check creatorUID
+    if (!iconDoc.creatorUID) return true
+    else return iconDoc.creatorUID === $user.uid
+  }
+
+  function handleDelete (id) {
+    if (id && confirm('Are you sure you want to delete this icon?')) {
+      deleteFirestoreDoc(`/doodleIcons/${id}`)
+    }
+  }
 
   async function properlyDeleteTemplate () {
     if (confirm('Are you sure? This will delete all "Time Spent" records too. If you just want to stop future repeats, you can set the weekly repeats to no days instead.')) {
@@ -326,7 +364,6 @@
       d.setDate(d.getDate() + 1)
     }
 
-    console.log('allGeneratedTasksToUpload =', allGeneratedTasksToUpload)
     for (const task of allGeneratedTasksToUpload) {
       setFirestoreDoc(
         `/users/${$user.uid}/tasks/${task.id}`,
@@ -376,6 +413,15 @@
 </script>
 
 <style>
+  .orange-border {
+    /* border: 4px solid orange; */
+    border: 1px solid var(--logo-twig-color);
+    background-image: 
+      linear-gradient(90deg, rgba(200,200,200,0.8) 1px, transparent 0), 
+      linear-gradient(180deg, rgba(200,200,200,0.8) 1px, transparent 0);
+    background-size: 12px 12px; /* Adjust the size of the pattern */
+  }
+
   .title-underline-input {
      /* Refer to: https://stackoverflow.com/a/3131082/7812829 */
     background: transparent;

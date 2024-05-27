@@ -6,9 +6,6 @@
   }}
 />
 
-
-
-
 <script>
   import { onMount } from 'svelte'
   import BasicWhiteboard from '$lib/BasicWhiteboard.svelte'
@@ -19,10 +16,10 @@
   function saveDoodleIconToDatabase (dataURL) {  
     const id = getRandomID()
     setFirestoreDoc(`/doodleIcons/${id}`, {
-      name: 'Untitled icon',
-      dataURL
+      id,
+      dataURL,
+      creatorUID: $user.uid
     })
-    console.log("successfully saved")
   }
 
   let finalDataURL = ''
