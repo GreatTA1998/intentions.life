@@ -184,6 +184,17 @@ export function getHH () {
   return `${hh}`
 }
 
+export function getHHMM (dateClassObj) {
+  const d = dateClassObj
+  const hhmm = ensureTwoDigits(d.getHours()) + ':' + ensureTwoDigits(d.getMinutes())
+  return hhmm
+}
+
+// now format to hh:mm format to be compatible with old API
+export function ensureTwoDigits (number) {
+  return (number < 10 ? `0${number}` : `${number}`)
+}
+
 export function getRandomID () {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let autoId = '';
