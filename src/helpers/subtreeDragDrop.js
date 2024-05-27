@@ -34,6 +34,20 @@ export function helper ({ node, todoListUpperBound, parentObj, batch, userDoc })
 
 export function correctDeadlineIfNecessary ({ node, todoListUpperBound, parentObj, batch, userDoc }) {
   const shallowCopy = {...node}
+  const ref = doc(db, `users/${userDoc.uid}/tasks/${shallowCopy.id}`)
+  
+  // QUICKFIX
+  if (todoListUpperBound === 7) {
+    const d = new Date() // just set deadline to today, so that it shows up on "This Week's To-do"
+    batch.update(ref, { 
+      deadlineDate: getDateInDDMMYYYY(d),
+      deadlineTime: '23:59'
+    })
+    shallowCopy.deadlineDate = getDateInDDMMYYYY(d)
+    shallowCopy.deadlineTime = '23:59'
+    return shallowCopy
+  }
+  
   if (!isWithinTodoInterval({ node, todoListUpperBound })) {
     // NOTE: unintuitively, at the top level of the todo,  
     // `parentObj`is still defined, but only 1 property: { subtreeDeadlineInMsElapsed }
@@ -52,7 +66,6 @@ export function correctDeadlineIfNecessary ({ node, todoListUpperBound, parentOb
     }
   }
   const { deadlineDate, deadlineTime } = shallowCopy
-  const ref = doc(db, `users/${userDoc.uid}/tasks/${shallowCopy.id}`)
 
   batch.update(ref, { 
     deadlineDate, 

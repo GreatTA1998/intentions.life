@@ -129,14 +129,14 @@
     updateObj.startDate = ''
     updateObj.startYYYY = ''
 
-    // 3. DEADLINE DEPRECATE
-    // updateObj = correctDeadlineIfNecessary({ 
-    //   node: updateObj, 
-    //   todoListUpperBound: dueInHowManyDays, 
-    //   parentObj,
-    //   batch,
-    //   userDoc: $user
-    // })
+    // 3. KEEP CONSISTENT DEADLINE HANDLING API WITH THE ROOT TODO DROPZONE
+    updateObj = correctDeadlineIfNecessary({ 
+      node: updateObj, 
+      todoListUpperBound: dueInHowManyDays, 
+      parentObj,
+      batch,
+      userDoc: $user
+    })
 
     // 4. PARENTID
     if ($whatIsBeingDragged === 'top-level-task-within-this-todo-list' && ancestorRoomIDs.length === 1) {

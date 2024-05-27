@@ -120,6 +120,7 @@
   import { 
     computeMillisecsDifference, 
     convertDDMMYYYYToDateClassObject, 
+    ensureTwoDigits,
     getTimeInHHMM, 
     getHHMM,
     pureNumericalHourForm
