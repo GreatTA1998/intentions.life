@@ -19,7 +19,6 @@
       {#each dateClassObjects as dateClassObj}
         <div class="day-header sticky-day-of-week-abbreviation" 
           style="
-            height: fit-content; 
             padding-top: var(--main-content-top-margin);
             padding-bottom: 18px;
           "
@@ -29,7 +28,7 @@
           <div>
             <div 
               class="center-flex day-name-label" 
-              class:active-day-name={getDateInDDMMYYYY(dateClassObj) === getDateInDDMMYYYY(new Date())}
+              class:active-day-name={!isFuture(dateClassObj)}
             >
               {dateClassObj.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase()}
             </div>
@@ -120,7 +119,7 @@
 <script>
 import FunctionalDoodleIcon from '$lib/FunctionalDoodleIcon.svelte'
 import ReusableCalendarView from '$lib/ReusableCalendarView.svelte'
-import { MIKA_PIXELS_PER_HOUR, getDateInMMDD, getDateInDDMMYYYY } from '/src/helpers'
+import { MIKA_PIXELS_PER_HOUR, getDateInMMDD, getDateInDDMMYYYY, computeDayDifference } from '/src/helpers.js'
 import { onMount, createEventDispatcher } from 'svelte'
 import { tasksScheduledOn } from '/src/store.js'
 import ReusableCheckbox from '$lib/ReusableCheckbox.svelte'
@@ -160,6 +159,10 @@ onMount(() => {
 
   fetchDoodleIcons()
 })
+
+function isFuture (dateClassObj) {
+  return 0 < computeDayDifference(new Date(), dateClassObj)  // dayDiff := d2 - d1 
+}
 
 function startDragMove (e, id) {
    e.dataTransfer.setData("text/plain", id)

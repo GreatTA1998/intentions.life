@@ -37,14 +37,11 @@
     if (timer) {
       clearTimeout(timer)
       timer = null
-      console.log('double click detected')
 
       dispatch('task-checkbox-change', { id: iconTask.id, isDone: !iconTask.isDone })
     } 
     else {
-      console.log("first click detected")
       timer = setTimeout(() => {
-        console.log('handled as single click')
         dispatch('task-click', { task: iconTask })
       
         timer = null

@@ -114,7 +114,7 @@
   export let fontSize = 1
 
   $: height = (pixelsPerHour / 60) * task.duration
-  $: isBulletPoint = height < 20
+  $: isBulletPoint = height < 24 // 24px is exactly enough to not crop the checkbox and the task name
 
   const dispatch = createEventDispatcher()
   let startY = 0
