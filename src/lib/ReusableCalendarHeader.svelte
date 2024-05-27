@@ -86,12 +86,12 @@
 
   export let dateClassObj
   export let intForTriggeringRerender
+  export let isShowingDockingArea
 
   let doodleIcons = null
 
   const dispatch = createEventDispatcher()
   let isDirectlyCreatingTask = false
-  let isShowingDockingArea = true
 
   onMount(async () => {
     const temp = await getFirestoreCollection('/doodleIcons')

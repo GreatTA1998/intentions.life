@@ -20,6 +20,7 @@
         <ReusableCalendarHeader 
           {dateClassObj}
           {intForTriggeringRerender}
+          {isShowingDockingArea}
           on:task-scheduled  
           on:new-root-task
           on:task-click
