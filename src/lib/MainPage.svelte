@@ -127,8 +127,8 @@
     </span>
 
     <PopupCustomerSupport let:setIsPopupOpen={setIsPopupOpen}>
-      <span on:click={() => setIsPopupOpen({ newVal: true })}  class="material-symbols-outlined mika-hover" style="font-size: 32px; cursor: pointer;">
-        support_agent
+      <span on:click={() => setIsPopupOpen({ newVal: true })}  class="material-symbols-outlined mika-hover" style="font-size: 28px; cursor: pointer;">
+        phone
       </span>
     </PopupCustomerSupport>
   </div>
