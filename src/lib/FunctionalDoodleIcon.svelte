@@ -29,7 +29,7 @@
   export let iconTask
 
   let timer
-  let delay = 200
+  let delay = 300
 
   const dispatch = createEventDispatcher()
 
@@ -37,7 +37,6 @@
     if (timer) {
       clearTimeout(timer)
       timer = null
-
       dispatch('task-checkbox-change', { id: iconTask.id, isDone: !iconTask.isDone })
     } 
     else {

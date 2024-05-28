@@ -21,6 +21,7 @@
           {dateClassObj}
           {intForTriggeringRerender}
           {isShowingDockingArea}
+          on:task-checkbox-change
           on:task-scheduled  
           on:new-root-task
           on:task-click
