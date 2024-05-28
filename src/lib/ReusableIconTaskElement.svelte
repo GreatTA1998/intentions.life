@@ -75,7 +75,7 @@
 
   {#if !isBulletPoint}
     <div style="flex-grow: 1; overflow: hidden; margin-left: 4px;">
-      <div style="font-size: 12px; font-weight: 400;};">
+      <div style="font-size: 12px; font-weight: 400; color: rgb(20, 20, 20);">
         {task.notes || ''}
       </div>
     </div>
