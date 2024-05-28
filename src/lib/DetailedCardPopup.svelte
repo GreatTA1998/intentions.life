@@ -5,109 +5,114 @@
         bind:this={TaskImageElem}
         on:click|self={() => isViewingPhoto ? isViewingPhoto = false : ''}
         src={taskObject.imageDownloadURL}
-        class:blurred-image={!isViewingPhoto}
+        class:blurred-image={false}
         class:clear-image={isViewingPhoto}
-        style="position: absolute; inset: 0px; width: 100%; height: 100%;"
+        style="width: 100%; height: 100%;"
       >
     {/if}
 
-    <div style="display: flex; align-items: center;">
-      <ReusableCheckbox
-        value={taskObject.isDone}
-        on:change={(e) => handleCheckboxChange(e)}
-        zoom={1.2}
-      />
+    <div style="padding: 24px;">
+      <div style="display: flex; align-items: center;">
+        <ReusableCheckbox
+          value={taskObject.isDone}
+          on:change={(e) => handleCheckboxChange(e)}
+          zoom={1.2}
+        />
 
-      <input 
-        type="text" 
-        bind:value={titleOfTask} 
-        on:input={(e) => debouncedSaveTitle(e.target.value)}
-        placeholder="Untitled"
-        style="margin-left: 12px; width: 100%; box-sizing: border-box; font-size: 24px;"
-      >
-    </div>
-
-    <!-- In future, display in readable month / day form -->
-    <div
-      style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; row-gap: 24px; margin-top: 24px; font-size: 1.2em;"
-    >
-      <div style="display: flex; align-items: center;" class:half-invisible={!isScheduled(taskObject)}>
-        <div style="max-width: 140px;">
-          <UXFormField
-            fieldLabel="MM/DD hh:mm"
-            value={taskObject.startDate + ' ' + taskObject.startTime}
-            willAutofocus={false}
-            on:input={(e) => handleTaskStartInput(e)}
-            placeholder="MM/dd hh:mm"
-          />
-        </div>
-
-        <div style="margin-left: 6px; margin-right: 6px; max-width: 80px;">
-          <UXFormField
-            fieldLabel="Duration"
-            value={Math.round(taskObject.duration)}
-            willAutofocus={false}
-            on:input={(e) => handleDurationInput(e)}
-          >
-            <div slot="append" style="font-weight: 300; color: rgb(60, 60, 60); font-size: 12px;">
-              min
-            </div>
-          </UXFormField>
-        </div>
+        <input 
+          type="text" 
+          bind:value={titleOfTask} 
+          on:input={(e) => debouncedSaveTitle(e.target.value)}
+          placeholder="Untitled"
+          style="margin-left: 12px; width: 100%; box-sizing: border-box; font-size: 24px;"
+        >
       </div>
 
-      {#if isEditingTaskStart}
-        <ReusableRoundButton on:click={() => saveTaskStart(newStartMMDD, newStartHHMM)} backgroundColor="rgb(0, 89, 125)" textColor="white">Save changes</ReusableRoundButton>
-      {/if}
+      <!-- In future, display in readable month / day form -->
+      <div
+        style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; row-gap: 24px; margin-top: 24px; font-size: 1.2em;"
+      >
+        <div style="display: flex; align-items: center;" class:half-invisible={!isScheduled(taskObject)}>
+          <div style="max-width: 140px;">
+            <UXFormField
+              fieldLabel="MM/DD hh:mm"
+              value={taskObject.startDate + ' ' + taskObject.startTime}
+              willAutofocus={false}
+              on:input={(e) => handleTaskStartInput(e)}
+              placeholder="MM/dd hh:mm"
+            />
+          </div>
 
-      {#if isEditingDuration}
-        <ReusableRoundButton on:click={() => saveDuration(newDuration)} backgroundColor="rgb(0, 89, 125)" textColor="white">Save changes</ReusableRoundButton>
-      {/if}
-    </div>
+          <div style="margin-left: 6px; margin-right: 6px; max-width: 80px;">
+            <UXFormField
+              fieldLabel="Duration"
+              value={Math.round(taskObject.duration)}
+              willAutofocus={false}
+              on:input={(e) => handleDurationInput(e)}
+            >
+              <div slot="append" style="font-weight: 300; color: rgb(60, 60, 60); font-size: 12px;">
+                min
+              </div>
+            </UXFormField>
+          </div>
+        </div>
 
-    <div style="width: 100%; margin-top: 24px; margin-bottom: 24px;">
-      <UXFormTextArea fieldLabel="Notes"
-        value={notesAboutTask}
-        on:input={(e) => debouncedSaveNotes(e.detail)}
-        placeholder=""
-      />
-    </div>
-
-    <div style="margin-top: 0px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
-      <div style="display: flex; align-items: center; width: 100%;">
-        {#if taskObject.imageDownloadURL}
-          <span class="material-symbols-outlined"  on:click={() => isViewingPhoto = !isViewingPhoto} style="cursor: pointer; margin-left: 6px; border: 1px solid grey; border-radius: 24px; padding: 4px;">
-            image_search
-          </span>
+        {#if isEditingTaskStart}
+          <ReusableRoundButton on:click={() => saveTaskStart(newStartMMDD, newStartHHMM)} backgroundColor="rgb(0, 89, 125)" textColor="white">Save changes</ReusableRoundButton>
         {/if}
 
-        <span class="material-symbols-outlined" on:click|stopPropagation={confirmDelete} 
-          style="cursor: pointer; margin-left: auto; right: 0px; border: 1px solid grey; border-radius: 24px; padding: 4px;"
-        >
-          delete
-        </span>
-      </div>
-    </div>
-
-      <div style="font-size: 1rem; margin-top: 0px; margin-bottom: 12px; font-weight: 400;">
-        Full ancestral tree
+        {#if isEditingDuration}
+          <ReusableRoundButton on:click={() => saveDuration(newDuration)} backgroundColor="rgb(0, 89, 125)" textColor="white">Save changes</ReusableRoundButton>
+        {/if}
       </div>
 
-      {#if taskObject.rootAncestor}
-        <div style="max-height: 500px; overflow-y: auto;">
-          <RecursiveBulletPoint
-            taskObject={taskObject.rootAncestor}
-            originalPopupTask={taskObject}
-            rootAncestor={taskObject.rootAncestor}
-            on:task-click
-            on:task-checkbox-change
+      <div style="width: 100%; margin-top: 24px; margin-bottom: 24px;">
+        <UXFormTextArea fieldLabel="Notes"
+          value={notesAboutTask}
+          on:input={(e) => debouncedSaveNotes(e.detail)}
+          placeholder=""
+        />
+      </div>
+
+      <div style="margin-top: 0px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+        <div style="display: flex; align-items: center; width: 100%;">
+          {#if taskObject.imageDownloadURL}
+            <span class="material-symbols-outlined"  on:click={() => isViewingPhoto = !isViewingPhoto} style="cursor: pointer; margin-left: 6px; border: 1px solid grey; border-radius: 24px; padding: 4px;">
+              image_search
+            </span>
+          {/if}
+
+          <span class="material-symbols-outlined" on:click|stopPropagation={confirmDelete} 
+            style="cursor: pointer; margin-left: auto; right: 0px; border: 1px solid grey; border-radius: 24px; padding: 4px;"
           >
-
-          </RecursiveBulletPoint>
+            delete
+          </span>
         </div>
-      {/if}
+      </div>
+
+        <div style="font-size: 1rem; margin-top: 0px; margin-bottom: 12px; font-weight: 400;">
+          Full ancestral tree
+        </div>
+
+        {#if taskObject.rootAncestor}
+          <div style="max-height: 500px; overflow-y: auto;">
+            <RecursiveBulletPoint
+              taskObject={taskObject.rootAncestor}
+              originalPopupTask={taskObject}
+              rootAncestor={taskObject.rootAncestor}
+              on:task-click
+              on:task-checkbox-change
+            >
+
+            </RecursiveBulletPoint>
+          </div>
+        {/if}
+    </div>
+    <!-- End of padding container -->
   </div>
+  <!-- End of detailed-card-popup -->
 </div>
+<!-- End of modular invisible layer -->
 
 <script>
 import { createEventDispatcher, onMount, onDestroy, tick } from 'svelte'
@@ -154,16 +159,33 @@ function isScheduled (taskObj) {
 
 onMount(() => {
   if (taskObject.imageDownloadURL) {
+    // solution based on Claude
     TaskImageElem.onload = () => {
+      const marginFactor = 0.95
+      const viewportHeight = marginFactor * window.innerHeight
+      const viewportWidth = marginFactor * window.innerWidth
+
       const { naturalWidth, naturalHeight } = TaskImageElem
-      const minDimension = 400 // (given the current CSS for this popup)
-      if (naturalWidth < naturalHeight) {
-        PopupElem.style.width = minDimension + 'px'
-        PopupElem.style.height = minDimension * (naturalHeight / naturalWidth) + 'px'
+
+      const imageAspectRatio = naturalWidth / naturalHeight
+      const viewportAspectRatio = viewportWidth / viewportHeight
+
+      let maxWidth, maxHeight
+
+      if (imageAspectRatio > viewportAspectRatio) {
+        // Image is wider than the viewport, so scale based on width
+        maxWidth = viewportWidth
+        maxHeight = Math.floor(viewportWidth / imageAspectRatio)
       } else {
-        PopupElem.style.height = minDimension + 'px'
-        PopupElem.style.width = minDimension * (naturalWidth / naturalHeight) + 'px'
+        // Image is taller than the viewport, so scale based on height
+        maxHeight = viewportHeight
+        maxWidth = Math.floor(viewportHeight * imageAspectRatio)
       }
+
+      PopupElem.style.width = maxWidth + 'px'
+      PopupElem.style.height = maxHeight + 'px'
+
+      return { maxWidth, maxHeight }
     }
   }
 })
@@ -279,6 +301,12 @@ function saveTitle (newVal) {
 </script>
 
 <style>
+  ::-webkit-scrollbar {
+    width: 0px;
+    height: 0px;
+    background: transparent;
+  }
+
   .blurred-image {
     filter: blur(6px) brightness(1.0) contrast(1.0) saturate(1.0);  z-index: -1;
   }
@@ -304,7 +332,6 @@ function saveTitle (newVal) {
     
     height: fit-content;
 
-    padding: 24px;
     border-radius: 24px;
     background-color: white;
  
