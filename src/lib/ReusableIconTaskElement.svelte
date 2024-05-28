@@ -21,10 +21,9 @@
  style="
    position: relative;
    height: {height}px; 
-   min-height: 12px;
+   min-height: 32px;
    font-size: {fontSize}rem;
    opacity: {task.isDone ? '0.9' : '0.7'};
-   outline: 0px solid black;
    background-color: {isBulletPoint ? '' : '#f8f8f2;'};
    padding-left: {isBulletPoint ? '0px' : 'var(--left-padding)'};
    padding-right: var(--left-padding);
@@ -62,22 +61,25 @@
       on:task-checkbox-change
     />
 
-    {#if !isBulletPoint}
-      <div style="flex-grow: 1; overflow: hidden;">
+    {#if isBulletPoint}
+      <!-- <div style="flex-grow: 1; overflow: hidden;">
         <div class="truncate-to-one-line" 
           style="font-size: 12px; font-weight: 400; color: {isBulletPoint ? 'rgb(0,0,0)' : 'rgb(0,0,0)'};">
           {task.notes || ''}
         </div>
-      </div>
+      </div> -->
     {/if}
-     <!-- <img src={task.iconDataURL} style="pointer-events: none; width: 32px; height: 32px;"> -->
-     <!-- <div class="task-name truncate-to-one-line" style="color: {isBulletPoint ? '' : 'white'}">
-       {task.name}
-     </div> -->
 
  </div>
  <!-- End of task name flexbox -->
 
+  {#if !isBulletPoint}
+    <div style="flex-grow: 1; overflow: hidden; margin-left: 4px;">
+      <div style="font-size: 12px; font-weight: 400;};">
+        {task.notes || ''}
+      </div>
+    </div>
+  {/if}
 
    <!-- 
      `1vw`: if it's too wide, it overlaps with the task name for short duration tasks 
@@ -94,7 +96,6 @@
        height: {height/12}px; 
        min-height: 3px;
        width: {isBulletPoint ? '20%' : '100%'}; 
-       outline: 0px solid blue;
      "
    >
  </div>

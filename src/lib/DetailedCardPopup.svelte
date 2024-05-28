@@ -28,43 +28,10 @@
         >
       </div>
 
-      <!-- In future, display in readable month / day form -->
-      <div
-        style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; row-gap: 24px; margin-top: 24px; font-size: 1.2em;"
-      >
-        <div style="display: flex; align-items: center;" class:half-invisible={!isScheduled(taskObject)}>
-          <div style="max-width: 140px;">
-            <UXFormField
-              fieldLabel="MM/DD hh:mm"
-              value={taskObject.startDate + ' ' + taskObject.startTime}
-              willAutofocus={false}
-              on:input={(e) => handleTaskStartInput(e)}
-              placeholder="MM/dd hh:mm"
-            />
-          </div>
-
-          <div style="margin-left: 6px; margin-right: 6px; max-width: 80px;">
-            <UXFormField
-              fieldLabel="Duration"
-              value={Math.round(taskObject.duration)}
-              willAutofocus={false}
-              on:input={(e) => handleDurationInput(e)}
-            >
-              <div slot="append" style="font-weight: 300; color: rgb(60, 60, 60); font-size: 12px;">
-                min
-              </div>
-            </UXFormField>
-          </div>
-        </div>
-
-        {#if isEditingTaskStart}
-          <ReusableRoundButton on:click={() => saveTaskStart(newStartMMDD, newStartHHMM)} backgroundColor="rgb(0, 89, 125)" textColor="white">Save changes</ReusableRoundButton>
-        {/if}
-
-        {#if isEditingDuration}
-          <ReusableRoundButton on:click={() => saveDuration(newDuration)} backgroundColor="rgb(0, 89, 125)" textColor="white">Save changes</ReusableRoundButton>
-        {/if}
-      </div>
+      <DetailedCardPopupStartTimeDuration
+        {taskObject}
+        on:task-update
+      />
 
       <div style="width: 100%; margin-top: 24px; margin-bottom: 24px;">
         <UXFormTextArea fieldLabel="Notes"
@@ -76,11 +43,11 @@
 
       <div style="margin-top: 0px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
         <div style="display: flex; align-items: center; width: 100%;">
-          {#if taskObject.imageDownloadURL}
+          <!-- {#if taskObject.imageDownloadURL}
             <span class="material-symbols-outlined"  on:click={() => isViewingPhoto = !isViewingPhoto} style="cursor: pointer; margin-left: 6px; border: 1px solid grey; border-radius: 24px; padding: 4px;">
               image_search
             </span>
-          {/if}
+          {/if} -->
 
           <span class="material-symbols-outlined" on:click|stopPropagation={confirmDelete} 
             style="cursor: pointer; margin-left: auto; right: 0px; border: 1px solid grey; border-radius: 24px; padding: 4px;"
@@ -123,23 +90,15 @@ import {
   convertDDMMYYYYToDateClassObject,
   clickOutside, 
 } from '/src/helpers.js'
-import UXFormField from '$lib/UXFormField.svelte'
 import UXFormTextArea from '$lib/UXFormTextArea.svelte'
 import ReusableRoundButton from '$lib/ReusableRoundButton.svelte'
 import ReusableCheckbox from '$lib/ReusableCheckbox.svelte'
+import DetailedCardPopupStartTimeDuration from '$lib/DetailedCardPopupStartTimeDuration.svelte'
 
 export let taskObject 
 
-let newDuration 
-let isEditingDuration
-
 let newDeadlineDate
 let newDeadlineTime
-
-let isEditingTaskStart = false
-let newStartMMDD
-let newStartHHMM
-
 
 let TaskImageElem
 let PopupElem
@@ -153,15 +112,11 @@ let notesAboutTask = taskObject.notes || ''
 let titleOfTask = taskObject.name || ''
 let isViewingPhoto = false
 
-function isScheduled (taskObj) {
-  return taskObj.startDate && taskObj.startTime && taskObj.startYYYY
-}
-
 onMount(() => {
   if (taskObject.imageDownloadURL) {
     // solution based on Claude
     TaskImageElem.onload = () => {
-      const marginFactor = 0.95
+      const marginFactor = 0.9
       const viewportHeight = marginFactor * window.innerHeight
       const viewportWidth = marginFactor * window.innerWidth
 
@@ -194,11 +149,6 @@ onDestroy(() => {
   
 })
 
-function handleDurationInput (e) {
-  isEditingDuration = true
-  newDuration = e.detail.value
-}
-
 // the other place to pay attention to is <RecursiveTaskElement/>
 // but the idea is still the same, provide an "undo"
 // for root level tasks because they disappear on completion
@@ -217,28 +167,6 @@ function handleCheckboxChange (e) {
 const debouncedSaveTitle = _.debounce(saveTitle, 800)
 const debouncedSaveNotes = _.debounce(saveNotes, 1500)
 
-function saveDuration (newValue) {
-  if (typeof Number(newValue) !== 'number') {
-    return 
-  }
-  dispatch('task-update', { 
-    id: taskObject.id, 
-    keyValueChanges: { 
-      duration: Number(newValue) 
-    } 
-  })
-  isEditingDuration = false
-}
-
-function saveTaskStart (MMDD, HHMM) {
-  dispatch('task-update', { id: taskObject.id, keyValueChanges: {
-    startDate: MMDD,
-    startTime: HHMM,
-    startYYYY: new Date().getFullYear()
-  }})
-  isEditingTaskStart = false
-}
-
 function saveDeadline (DDMMYYYY, HHMM) {
   const d1 = convertDDMMYYYYToDateClassObject(DDMMYYYY, HHMM)
   if (d1.getTime() > taskObject.subtreeDeadlineInMsElapsed) {
@@ -254,18 +182,6 @@ function saveDeadline (DDMMYYYY, HHMM) {
     }
   })
   isEditingDeadline = false
-}
-
-function handleTaskStartInput (e) {
-  isEditingTaskStart = true
-  const newVal = e.detail.value
-  newStartMMDD = newVal.split(" ")[0]
-  newStartHHMM = newVal.split(" ")[1]
-
-  // quickfix for space bar causing time to be ignored (I ran into it as well, not just dad)
-  if (newVal[0] === ' ') {
-    alert('Empty space detected at the start _12/31 15:00, please delete.')
-  }
 }
 
 function handleDeadlineInput (e) {

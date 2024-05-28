@@ -19,6 +19,7 @@
             <div 
               on:click={() => repeatOnDayOfWeek[i] = !repeatOnDayOfWeek[i]} 
               class="circle"
+              class:not-selected={!repeatOnDayOfWeek[i]}
               class:highlighted={repeatOnDayOfWeek[i]}
             >
               {dayOfWeekSymbol[i]}
@@ -42,42 +43,57 @@
         </div>
       </div>
 
-      
-      <div style="display: flex; align-items: center; padding-top: 8px;">
-        <div style="margin: 8px;">
-          Designated time
-        </div>
-
-        <div style="margin-top: 0px;">
-          <UXToggleSwitch on:new-checked-state={(e) => hasSpecificTime = e.detail.isChecked}/>
-        </div>
-
-        {#if hasSpecificTime}
-          <div style="max-width: 120px; margin-left: 8px;">
+      <!-- COPY AND PASTED FROM <DetailedCardPopup/> -->
+      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; row-gap: 24px; margin-top: 24px; font-size: 1.2em;">
+        <div style="display: flex; align-items: center;" class:half-invisible={!isScheduled(weeklyPeriodicTemplate)}>
+          <div style="margin-left: 6px; margin-right: 6px; max-width: 80px;">
             <UXFormField
-              fieldLabel="Time (hh:mm)"
-              value={''}
+              fieldLabel="Duration"
+              value={Math.round(weeklyPeriodicTemplate.duration) || 30}
               willAutofocus={false}
-              on:input={(e) => handleTaskStartInput(e)}
-              placeholder="17:30"
-            />
+              on:input={(e) => handleDurationInput(e)}
+            >
+              <div slot="append" style="font-weight: 300; color: rgb(60, 60, 60); font-size: 12px;">
+                min
+              </div>
+            </UXFormField>
           </div>
+
+          <div style="margin-top: 0px; margin-left: 16px;">
+            <div style="font-size: 14px; rgb(40, 40, 40); margin-bottom: 8px;">
+              (OPTIONAL) start time
+            </div>
+            <div>
+              <UXToggleSwitch on:new-checked-state={(e) => hasSpecificTime = e.detail.isChecked}/>
+            </div> 
+          </div>
+  
+          {#if hasSpecificTime}
+            <div style="max-width: 70px; margin-left: 8px;">
+              <UXFormField
+                fieldLabel="hh:mm"
+                value={weeklyPeriodicTemplate.startTime}
+                willAutofocus={false}
+                on:input={(e) => handleTaskStartInput(e)}
+                placeholder="17:30"
+              />
+            </div>
+          {/if}
+        </div>
+      
+        {#if isEditingTaskStart}
+          <ReusableRoundButton on:click={() => saveTaskStart(newStartMMDD, newStartHHMM)} backgroundColor="rgb(0, 89, 125)" textColor="white">
+            Update today & future tasks
+          </ReusableRoundButton>
+        {/if}
+      
+        {#if isEditingDuration}
+          <ReusableRoundButton on:click={() => saveDuration(newDuration)} backgroundColor="rgb(0, 89, 125)" textColor="white">
+            Update today & future tasks
+          </ReusableRoundButton>
         {/if}
       </div>
-
-      <div style="margin-left: 6px; margin-right: 6px; max-width: 84px;">
-        <UXFormField
-          fieldLabel="For"
-          value={weeklyPeriodicTemplate.duration}
-          willAutofocus={false}
-          on:input={(e) => debouncedSaveDuration(e)}
-        >
-          <div slot="append" style="font-weight: 300; color: rgb(60, 60, 60); font-size: 12px;">
-            mins.
-          </div>
-        </UXFormField>
-      </div>
-
+      
       <div style="display: flex; justify-content: space-between; width: 100%; margin-top: 16px;">
         {#if !isEditVersion}
           <ReusableRoundButton on:click={() => createTemplateAndGenerateTasks({ numOfWeeksInAdvance, repeatOnDayOfWeek })}
@@ -86,11 +102,11 @@
             Create repeat template and generate tasks
           </ReusableRoundButton>
         {:else}
-          <ReusableRoundButton on:click={editExistingInstances}
+          <!-- <ReusableRoundButton on:click={editExistingInstances}
             backgroundColor="rgb(0, 89, 125)" textColor="white"
           >
             Modify existing tasks
-          </ReusableRoundButton>
+          </ReusableRoundButton> -->
         {/if}
 
 
@@ -167,7 +183,8 @@
     name: '',
     repeatOnDayOfWeek: Array(7).fill(0),
     repeatGroupID: '',
-    iconDataURL: ''
+    iconDataURL: '',
+    duration: 30
   }
   export let defaultOrderValue = 1
 
@@ -176,6 +193,9 @@
 
   // `reusableTemplateID`: for collecting statistics for a task (no reason why it must be this way, it's just legacy reasons)
   
+  let isEditingTaskStart = false
+  let isEditingDuration = false
+
   let allGeneratedTasksToUpload = [] 
   let numOfWeeksInAdvance = 2
 
@@ -189,6 +209,7 @@
   let repeatGroupID = weeklyPeriodicTemplate.repeatGroupID
   let newTaskName = weeklyPeriodicTemplate.name
   let iconDataURL = weeklyPeriodicTemplate.iconDataURL
+  let duration = weeklyPeriodicTemplate.duration
 
   let hasSpecificTime = false
 
@@ -212,6 +233,11 @@
   onDestroy(() => {
     if (unsub) unsub()
   }) 
+
+  function handleDurationInput (e) {
+    isEditingDuration = true
+    newDuration = e.detail.value
+  }
 
   function hasPermission (weeklyPeriodicTemplate) {
     // find the `doodleIconDoc` first
@@ -243,6 +269,8 @@
   }
 
   function handleTaskStartInput (e) {
+    isEditingTaskStart = true
+
     const hhmm = e.detail.value
     if (hhmm.length !== 5) return
     if (!hhmm.includes(':')) return
@@ -410,6 +438,10 @@
     taskObjCopy = checkTaskObjSchema(taskObjCopy, $user)
     return taskObjCopy
   }
+
+  function isScheduled (taskObj) {
+    return taskObj.startDate && taskObj.startTime && taskObj.startYYYY
+  }
 </script>
 
 <style>
@@ -448,6 +480,8 @@
 
   .highlighted {
     background-color: orange;
+    color: black;
+    font-weight: 600;
   }
   .detailed-card-popup {
     position: fixed;
@@ -476,7 +510,7 @@
     line-height: 30px;
     border-radius: 50%;
     font-size: 12px;
-    color: #fff;
+    /* color: #fff; */
     text-align: center;
     background: #000;
 
@@ -490,5 +524,10 @@
 
   .highlighted {
     background: orange;
+  }
+
+  .not-selected {
+    color: rgb(160, 160, 160);
+    background-color: rgb(100, 100, 100);
   }
 </style>
