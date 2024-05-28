@@ -6,9 +6,9 @@
 <script>
   import { createEventDispatcher } from "svelte"
   
-  const dispatch = createEventDispatcher()
+  export let isChecked = false
 
-  let isChecked = false
+  const dispatch = createEventDispatcher()
 
   $: {
     dispatch('new-checked-state', { isChecked: isChecked })

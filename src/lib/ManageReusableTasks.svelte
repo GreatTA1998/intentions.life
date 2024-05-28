@@ -32,7 +32,7 @@
             <ManageRepeatingTasksUnifiedWeeklyPopup 
               let:setIsPopupOpen={setIsPopupOpen} 
               isEditVersion={true} 
-              weeklyPeriodicTemplate={weeklyTask}
+              weeklyTemplate={weeklyTask}
               on:delete={() => deleteTemplate(weeklyTask)}
             >
               <div on:click={() => setIsPopupOpen({ newVal: true })} 

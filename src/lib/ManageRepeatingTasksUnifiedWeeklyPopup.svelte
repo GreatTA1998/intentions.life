@@ -8,107 +8,34 @@
       <input 
         type="text" 
         bind:value={newTaskName} 
+        on:input={(e) => debouncedRenameTask(e.target.value)}
         placeholder="Untitled"
         style="margin-left: 12px; width: 100%; box-sizing: border-box; font-size: 24px;"
         class="title-underline-input"
       >
 
-      <div style="display: flex; align-items: center; margin-top: 24px; gap: 8px;">
-        <div style="display: flex;">
-          {#each {length: 7} as _, i}
-            <div 
-              on:click={() => repeatOnDayOfWeek[i] = !repeatOnDayOfWeek[i]} 
-              class="circle"
-              class:not-selected={!repeatOnDayOfWeek[i]}
-              class:highlighted={repeatOnDayOfWeek[i]}
-            >
-              {dayOfWeekSymbol[i]}
-            </div>
-          {/each}
-        </div>
+      {#key weeklyTemplate}
+        <PeriodicWeeklyModule
+          {weeklyTemplate}
+          on:new-weekly-schedule={(e) => editExistingInstances(e.detail)}
+        />
+      {/key}
 
-        
-        <div style="display: flex; align-items: center;">
-          <div>
-            Show repeats
-          </div>
-
-          <div>
-            <input class="underlined-input"
-              value={numOfWeeksInAdvance}
-              on:input={e => numOfWeeksInAdvance = e.target.value}
-            >
-          </div>
-          weeks into the future
-        </div>
-      </div>
-
-      <!-- COPY AND PASTED FROM <DetailedCardPopup/> -->
-      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; row-gap: 24px; margin-top: 24px; font-size: 1.2em;">
-        <div style="display: flex; align-items: center;" class:half-invisible={!isScheduled(weeklyPeriodicTemplate)}>
-          <div style="margin-left: 6px; margin-right: 6px; max-width: 80px;">
-            <UXFormField
-              fieldLabel="Duration"
-              value={Math.round(weeklyPeriodicTemplate.duration) || 30}
-              willAutofocus={false}
-              on:input={(e) => handleDurationInput(e)}
-            >
-              <div slot="append" style="font-weight: 300; color: rgb(60, 60, 60); font-size: 12px;">
-                min
-              </div>
-            </UXFormField>
-          </div>
-
-          <div style="margin-top: 0px; margin-left: 16px;">
-            <div style="font-size: 14px; rgb(40, 40, 40); margin-bottom: 8px;">
-              (OPTIONAL) start time
-            </div>
-            <div>
-              <UXToggleSwitch on:new-checked-state={(e) => hasSpecificTime = e.detail.isChecked}/>
-            </div> 
-          </div>
-  
-          {#if hasSpecificTime}
-            <div style="max-width: 70px; margin-left: 8px;">
-              <UXFormField
-                fieldLabel="hh:mm"
-                value={weeklyPeriodicTemplate.startTime}
-                willAutofocus={false}
-                on:input={(e) => handleTaskStartInput(e)}
-                placeholder="17:30"
-              />
-            </div>
-          {/if}
-        </div>
-      
-        {#if isEditingTaskStart}
-          <ReusableRoundButton on:click={() => saveTaskStart(newStartMMDD, newStartHHMM)} backgroundColor="rgb(0, 89, 125)" textColor="white">
-            Update today & future tasks
-          </ReusableRoundButton>
-        {/if}
-      
-        {#if isEditingDuration}
-          <ReusableRoundButton on:click={() => saveDuration(newDuration)} backgroundColor="rgb(0, 89, 125)" textColor="white">
-            Update today & future tasks
-          </ReusableRoundButton>
-        {/if}
-      </div>
+      <ManageRepeatingTasksUnifiedWeeklyPopupDurationStartTime
+        {weeklyTemplate}
+        on:weekly-template-update={(e) => updateWeeklyTemplate(e.detail)}
+        on:duration-update={(e) => updateWeeklyTemplate(e.detail)}
+        on:start-time-update={(e) => updateWeeklyTemplate(e.detail)}
+      />
       
       <div style="display: flex; justify-content: space-between; width: 100%; margin-top: 16px;">
         {#if !isEditVersion}
-          <ReusableRoundButton on:click={() => createTemplateAndGenerateTasks({ numOfWeeksInAdvance, repeatOnDayOfWeek })}
+          <ReusableRoundButton on:click={() => createTemplateAndGenerateTasks({ numOfWeeksInAdvance: 2, repeatOnDayOfWeek })}
             backgroundColor="rgb(0, 89, 125)" textColor="white"
           >
             Create repeat template and generate tasks
           </ReusableRoundButton>
-        {:else}
-          <!-- <ReusableRoundButton on:click={editExistingInstances}
-            backgroundColor="rgb(0, 89, 125)" textColor="white"
-          >
-            Modify existing tasks
-          </ReusableRoundButton> -->
         {/if}
-
 
         <span class="material-symbols-outlined" on:click|stopPropagation={properlyDeleteTemplate} 
           style="cursor: pointer; margin-left: auto; right: 0px; border: 1px solid grey; border-radius: 24px; padding: 4px;"
@@ -123,16 +50,13 @@
           {#each doodleIcons as doodleIcon}
             <div>
               <img 
-                on:click={() => { 
-                  iconDataURL = doodleIcon.dataURL
-                  editExistingInstances()
-                }}
+                on:click={() => updateWeeklyTemplate({ iconDataURL: doodleIcon.dataURL })}
                 src={doodleIcon.dataURL}
                 style="width: 48px; height: 48px; cursor: pointer;"
-                class:orange-border={weeklyPeriodicTemplate.iconDataURL === doodleIcon.dataURL}
+                class:orange-border={weeklyTemplate.iconDataURL === doodleIcon.dataURL}
               >
               
-              {#if weeklyPeriodicTemplate.iconDataURL === doodleIcon.dataURL && hasPermission(weeklyPeriodicTemplate)}
+              {#if weeklyTemplate.iconDataURL === doodleIcon.dataURL && hasPermission(weeklyTemplate)}
                 <div on:click={() => handleDelete(doodleIcon.id)} style="cursor: pointer; font-size: 14px;">
                   Delete
                 </div>
@@ -150,6 +74,8 @@
 {/if}
 
 <script>
+  import PeriodicWeeklyModule from '$lib/PeriodicWeeklyModule.svelte'
+  import ManageRepeatingTasksUnifiedWeeklyPopupDurationStartTime from '$lib/ManageRepeatingTasksUnifiedWeeklyPopupDurationStartTime.svelte'
   import { 
     getRandomID, 
     checkTaskObjSchema, 
@@ -169,8 +95,6 @@
   } from '/src/crud.js'
   import { user } from '/src/store.js'
   import { onMount, onDestroy } from 'svelte'
-  import UXFormField from '$lib/UXFormField.svelte'
-  import UXToggleSwitch from '$lib/UXToggleSwitch.svelte'
   import ExperimentalCanvas from '$lib/ExperimentalCanvas.svelte'
   import { createEventDispatcher } from 'svelte'
   import { onSnapshot, collection } from 'firebase/firestore'
@@ -179,7 +103,7 @@
   import _ from 'lodash'
 
   export let isEditVersion = false
-  export let weeklyPeriodicTemplate = {
+  export let weeklyTemplate = {
     name: '',
     repeatOnDayOfWeek: Array(7).fill(0),
     repeatGroupID: '',
@@ -190,31 +114,23 @@
 
   //// IMPORTANT
   // `repeatGroupID`: used for modifying instances of a repeating task (name is for legacy reasons)
-
   // `reusableTemplateID`: for collecting statistics for a task (no reason why it must be this way, it's just legacy reasons)
   
-  let isEditingTaskStart = false
-  let isEditingDuration = false
-
   let allGeneratedTasksToUpload = [] 
-  let numOfWeeksInAdvance = 2
-
-  const dispatch = createEventDispatcher()
-
-  let dayOfWeekSymbol = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
   let isPopupOpen = false
 
-  // TO-DO: refactor 
-  let repeatOnDayOfWeek = weeklyPeriodicTemplate.repeatOnDayOfWeek
-  let repeatGroupID = weeklyPeriodicTemplate.repeatGroupID
-  let newTaskName = weeklyPeriodicTemplate.name
-  let iconDataURL = weeklyPeriodicTemplate.iconDataURL
-  let duration = weeklyPeriodicTemplate.duration
-
-  let hasSpecificTime = false
+  let repeatOnDayOfWeek = weeklyTemplate.repeatOnDayOfWeek
+  let repeatGroupID = weeklyTemplate.repeatGroupID
+  let newTaskName = weeklyTemplate.name
+  let iconDataURL = weeklyTemplate.iconDataURL
 
   let doodleIcons = null
   let unsub = null 
+
+  const debouncedRenameTask = _.debounce(
+    (newVal) => updateWeeklyTemplate({ name: newVal }), 
+    800
+  )
 
   onMount(async () => {
     const ref = collection(db, `/doodleIcons`)
@@ -234,16 +150,30 @@
     if (unsub) unsub()
   }) 
 
-  function handleDurationInput (e) {
-    isEditingDuration = true
-    newDuration = e.detail.value
+  async function updateWeeklyTemplate (keyValueChanges) {
+    await updateFirestoreDoc(
+      `/users/${$user.uid}/periodicTasks/${weeklyTemplate.id}`, 
+      keyValueChanges
+    )
+    propagateChangeToFutureInstances(keyValueChanges)
   }
 
-  function hasPermission (weeklyPeriodicTemplate) {
+  // a general function
+  async function propagateChangeToFutureInstances (keyValueChanges) {
+    const futureInstances = await getFutureInstances()
+    for (const taskInstance of futureInstances) {
+      updateFirestoreDoc(
+        `/users/${$user.uid}/tasks/${taskInstance.id}`, 
+        keyValueChanges
+      )
+    }
+  }
+
+  function hasPermission (weeklyTemplate) {
     // find the `doodleIconDoc` first
     let iconDoc = null
     for (let doodleIcon of doodleIcons) {
-      if (doodleIcon.dataURL === weeklyPeriodicTemplate.iconDataURL) {
+      if (doodleIcon.dataURL === weeklyTemplate.iconDataURL) {
         iconDoc = doodleIcon
         break
       }
@@ -263,41 +193,10 @@
   async function properlyDeleteTemplate () {
     if (confirm('Are you sure? This will delete all "Time Spent" records too. If you just want to stop future repeats, you can set the weekly repeats to no days instead.')) {
       await deleteExistingFutureInstances()
-      deleteFirestoreDoc(`/users/${$user.uid}/periodicTasks/${weeklyPeriodicTemplate.id}`)
+      deleteFirestoreDoc(`/users/${$user.uid}/periodicTasks/${weeklyTemplate.id}`)
       isPopupOpen = false 
     } 
   }
-
-  function handleTaskStartInput (e) {
-    isEditingTaskStart = true
-
-    const hhmm = e.detail.value
-    if (hhmm.length !== 5) return
-    if (!hhmm.includes(':')) return
-
-    console.log('hhmm =', hhmm)
-    updateFirestoreDoc(`/users/${$user.uid}/periodicTasks/${weeklyPeriodicTemplate.id}`, {
-      startTime: hhmm
-    })
-    alert('success: saved new default start time')
-  }
-
-  const debouncedSaveDuration = _.debounce(saveDuration, 1000)
-
-  function saveDuration (e) {
-    const newValue = e.detail.value
-    if (typeof Number(newValue) !== 'number') {
-      return 
-    }
-
-    if (!weeklyPeriodicTemplate.id) alert('Create the template first, before adding details')
-
-    updateFirestoreDoc(`/users/${$user.uid}/periodicTasks/${weeklyPeriodicTemplate.id}`, {
-      duration: Number(newValue)
-    })
-    alert('success: saved new duration')
-  }
-
 
 
   function setIsPopupOpen ({ newVal }) {
@@ -306,29 +205,33 @@
 
 
   // effectively a delete + create
-  async function editExistingInstances () {
+  async function editExistingInstances ({ 
+    repeatOnDayOfWeek, 
+    numOfWeeksInAdvance 
+  }) {
     // update the template itself
-    updateFirestoreDoc(`/users/${$user.uid}/periodicTasks/${weeklyPeriodicTemplate.id}`, {
+    updateFirestoreDoc(`/users/${$user.uid}/periodicTasks/${weeklyTemplate.id}`, {
       repeatOnDayOfWeek,
       name: newTaskName,
-      iconDataURL
+      iconDataURL,
+      numOfWeeksInAdvance
     })
 
     await deleteExistingFutureInstances()
 
     // with a clean slate, generate new ones
     createNewInstancesOfWeeklyRepeatingTasks({
-      repeatGroupID: weeklyPeriodicTemplate.repeatGroupID,
+      repeatGroupID: weeklyTemplate.repeatGroupID,
       repeatOnDayOfWeek,
+      numOfWeeksInAdvance
     })
   }  
 
-  // find all the repeat groups scheduled from today's date (don't care about the past)
-  async function deleteExistingFutureInstances () {
+  function getFutureInstances () {
     return new Promise(async (resolve) => {
       const q = createFirestoreQuery({
         collectionPath: `/users/${$user.uid}/tasks`,
-        criteriaTerms: ['repeatGroupID', '==', weeklyPeriodicTemplate.repeatGroupID]
+        criteriaTerms: ['repeatGroupID', '==', weeklyTemplate.repeatGroupID]
       })
 
       const allRepeatInstances = await getFirestoreQuery(q)
@@ -338,6 +241,14 @@
         const dayDiff = computeDayDifference(d1, d2) // dayDiff := d2 - d1 
         return dayDiff >= 0
       })
+      resolve(currAndFutureInstances)
+    })
+  }
+
+  // find all the repeat groups scheduled from today's date (don't care about the past)
+  async function deleteExistingFutureInstances () {
+    return new Promise(async (resolve) => {
+      const currAndFutureInstances = await getFutureInstances()
 
       const deleteRequests = []
 
@@ -367,14 +278,15 @@
 
     createNewInstancesOfWeeklyRepeatingTasks({ 
       repeatGroupID: id,
-      repeatOnDayOfWeek
+      repeatOnDayOfWeek,
+      numOfWeeksInAdvance: 2
     })
   }
 
   // repeatOnDaysOfMonth: [0, 0, 0, 1, ... 0, 1]
-  function createNewInstancesOfWeeklyRepeatingTasks ({ repeatOnDayOfWeek, repeatGroupID }) {
+  function createNewInstancesOfWeeklyRepeatingTasks ({ repeatOnDayOfWeek, repeatGroupID, numOfWeeksInAdvance }) {
     if (!numOfWeeksInAdvance) {
-      alert(`"Show repeats _ into the future" must be filled`)
+      alert(`"Show repeats _ weeks ahead" must be filled`)
     }
     allGeneratedTasksToUpload = []
 
@@ -407,7 +319,7 @@
       id: individualID,
       reusableTemplateID: repeatGroupID,
       name: newTaskName,
-      startTime: weeklyPeriodicTemplate.startTime || '',
+      startTime: weeklyTemplate.startTime || '',
       startYYYY: new Date().getFullYear(),
       iconDataURL
       // `startDate` will be hydrated later by the 2nd `if` statement
@@ -438,10 +350,6 @@
     taskObjCopy = checkTaskObjSchema(taskObjCopy, $user)
     return taskObjCopy
   }
-
-  function isScheduled (taskObj) {
-    return taskObj.startDate && taskObj.startTime && taskObj.startYYYY
-  }
 </script>
 
 <style>
@@ -466,23 +374,6 @@
     padding-bottom: 6px;
   }
 
-  .underlined-input {
-    border: none;
-    border-bottom: 2px solid #313131;
-    outline: none;
-    padding: 4px;
-    padding-bottom: 4px;
-    font-size: 16px;
-    width: 20px;
-    margin: 4px;
-    font-weight: 500;
-  }
-
-  .highlighted {
-    background-color: orange;
-    color: black;
-    font-weight: 600;
-  }
   .detailed-card-popup {
     position: fixed;
     font-size: 14px;
@@ -501,33 +392,6 @@
     background-color: white;
  
   /*    border: 1px solid #000; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);*/
-    -webkit-box-shadow:  0px 0px 0px 9999px rgba(0, 0, 0, 0.5);
-  }
-
-  .circle {
-    width: 30px;
-    height: 30px;
-    line-height: 30px;
-    border-radius: 50%;
-    font-size: 12px;
-    /* color: #fff; */
-    text-align: center;
-    background: #000;
-
-    /* extra */
-    margin-right: 8px;
-  }
-
-  .circle:hover {
-    cursor: pointer;
-  }
-
-  .highlighted {
-    background: orange;
-  }
-
-  .not-selected {
-    color: rgb(160, 160, 160);
-    background-color: rgb(100, 100, 100);
+    box-shadow:  0px 0px 0px 9999px rgba(0, 0, 0, 0.5);
   }
 </style>
