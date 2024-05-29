@@ -15,7 +15,7 @@
       >
       
       <div style="display: flex; justify-content: space-between; width: 100%; margin-top: 16px;">
-        <ReusableRoundButton on:click={createWeeklyTemplate}
+        <ReusableRoundButton on:click={createMonthlyTemplate}
           backgroundColor="rgb(0, 89, 125)" textColor="white"
         >
           Create template
@@ -49,13 +49,13 @@
     isPopupOpen = newVal
   }
 
-  function createWeeklyTemplate () {
+  function createMonthlyTemplate () {
     const id = getRandomID()
 
     setFirestoreDoc(`/users/${$user.uid}/periodicTasks/${id}`, {
       name: newTaskName,
-      repeatOnDayOfWeek: Array(7).fill(0),
-      numOfWeeksInAdvance: 2,
+      repeatOnDayOfMonth: Array(27).fill(0),
+      willRepeatOnLastDay: false,
       repeatGroupID: id,
       reusableTemplateID: id,
       orderValue: defaultOrderValue

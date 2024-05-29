@@ -90,14 +90,14 @@
             Monthly
           </div>
 
-          <ManageRepeatingTasksUnifiedMonthlyPopup  
+          <ManageReusableTasksCreateMonthly  
             let:setIsPopupOpen={setIsPopupOpen}
             defaultOrderValue={sortedMonthlyTasks.length}
           >
             <span on:click={() => setIsPopupOpen({ newVal: true })} class="add-reusable-task-button">
               +
             </span>
-          </ManageRepeatingTasksUnifiedMonthlyPopup>
+          </ManageReusableTasksCreateMonthly>
         </div>
 
         {#each sortedMonthlyTasks as periodicTask, i}
@@ -172,6 +172,7 @@
   import ManageRepeatingTasksUnifiedMonthlyPopup from '$lib/ManageRepeatingTasksUnifiedMonthlyPopup.svelte'
   import ManageReusableTasksWeeklyPopup from '$lib/ManageReusableTasksWeeklyPopup.svelte'
   import ManageReusableTasksCreateWeekly from '$lib/ManageReusableTasksCreateWeekly.svelte'
+  import ManageReusableTasksCreateMonthly from '$lib/ManageReusableTasksCreateMonthly.svelte'
   import ReusableSimpleDropzone from '$lib/ReusableSimpleDropzone.svelte'
   import { updateFirestoreDoc, deleteFirestoreDoc } from '/src/crud.js'
   import { onMount, onDestroy } from 'svelte'

@@ -51,15 +51,10 @@
         {/if}
       </div>
 
-      {#if !isEditVersion}
-        <button on:click={() => createTemplateAndGenerateTasks({ numOfMonthsInAdvance: 2, repeatOnDayOfMonth, willRepeatOnLastDay: true })}>
-          Create repeat template and generate tasks
-        </button>
-      {:else}
+
         <button on:click={editExistingInstances}>
           Modify existing tasks
         </button>
-      {/if}
 
       <button on:click={() => { 
         dispatch('delete');
@@ -81,7 +76,6 @@
   import UXToggleSwitch from '$lib/UXToggleSwitch.svelte'
   import { createEventDispatcher } from 'svelte'
 
-  export let isEditVersion = false
   export let monthlyPeriodicTemplate = {
     name: '',
     repeatOnDayOfMonth: Array(27).fill(0),
