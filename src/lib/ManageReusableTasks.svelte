@@ -231,7 +231,7 @@
   async function summarizeReusedTasks (reusableTaskTemplates) {    
     for (const taskTemplate of reusableTaskTemplates) {
       const taskInstances = collectTaskInstances({ reusableTemplateID: taskTemplate.id })
-      const totalMinutesDuration = taskInstances.reduce((accum, currObj) => accum + currObj.duration, 0)
+      const totalMinutesDuration = taskInstances.reduce((accum, currObj) => accum + Number(currObj.duration), 0) // defensive programming, so it doesn't say I flossed for 154 hours
       const hourDuration = totalMinutesDuration / 60
 
       getStatsFromTaskID[taskTemplate.id] = { 

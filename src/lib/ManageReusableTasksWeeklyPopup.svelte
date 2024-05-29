@@ -35,35 +35,51 @@
       </div>
 
       <!-- ICON SECTION -->
-      <div style="margin-top: 16px; display: flex; width: 100%; flex-wrap: wrap;">
-        {#if doodleIcons}
-          {#each doodleIcons as doodleIcon}
-            <div>
-              <img 
-                on:click={() => updateWeeklyTemplate({ iconDataURL: doodleIcon.dataURL })}
-                src={doodleIcon.dataURL}
-                style="width: 48px; height: 48px; cursor: pointer;"
-                class:orange-border={weeklyTemplate.iconDataURL === doodleIcon.dataURL}
-              >
-              
-              {#if weeklyTemplate.iconDataURL === doodleIcon.dataURL && hasPermission(weeklyTemplate)}
-                <div on:click={() => handleDelete(doodleIcon.id)} style="cursor: pointer; font-size: 14px;">
-                  Delete
-                </div>
-              {/if}
-            </div>
-          {/each}
+      {#if !$user.isSubscriber}
+        <div on:click={() => isShowingPremiumPopup = !isShowingPremiumPopup} style="" class="premium-intro-button">
+          <span class="material-symbols-outlined" style="margin-right: 4px;">
+            forest
+          </span>
+         
+          <div style="font-weight: 500;">
+            Use intentions.life visual
+          </div>
+        </div>
+        {#if isShowingPremiumPopup}
+          <PremiumPopup/>
         {/if}
-      </div>
+      {:else}
+        <div style="margin-top: 16px; display: flex; width: 100%; flex-wrap: wrap;">
+          {#if doodleIcons}
+            {#each doodleIcons as doodleIcon}
+              <div>
+                <img 
+                  on:click={() => updateWeeklyTemplate({ iconDataURL: doodleIcon.dataURL })}
+                  src={doodleIcon.dataURL}
+                  style="width: 48px; height: 48px; cursor: pointer;"
+                  class:orange-border={weeklyTemplate.iconDataURL === doodleIcon.dataURL}
+                >
+                
+                {#if weeklyTemplate.iconDataURL === doodleIcon.dataURL && hasPermission(weeklyTemplate)}
+                  <div on:click={() => handleDelete(doodleIcon.id)} style="cursor: pointer; font-size: 14px;">
+                    Delete
+                  </div>
+                {/if}
+              </div>
+            {/each}
+          {/if}
+        </div>
 
-      <div style="margin-top: 16px; display: flex; justify-content: center">
-        <ExperimentalCanvas/>
-      </div>
+        <div style="margin-top: 16px; display: flex; justify-content: center">
+          <ExperimentalCanvas/>
+        </div>
+      {/if}
     </div>
   </div>
 {/if}
 
 <script>
+  import PremiumPopup from '$lib/PremiumPopup.svelte'
   import PeriodicWeeklyModule from '$lib/PeriodicWeeklyModule.svelte'
   import ManageReusableTasksWeeklyPopupDurationStartTime from '$lib/ManageReusableTasksWeeklyPopupDurationStartTime.svelte'
   import { 
@@ -97,6 +113,7 @@
   }
   export let defaultOrderValue = 1
 
+  let isShowingPremiumPopup = false
   let allGeneratedTasksToUpload = [] 
   let isPopupOpen = false
 
@@ -311,6 +328,11 @@
 </script>
 
 <style>
+  .premium-intro-button {
+    display: flex; align-items: center; color: #541d69;
+    font-size: 16px;
+  }
+
   .orange-border {
     /* border: 4px solid orange; */
     border: 1px solid var(--logo-twig-color);
