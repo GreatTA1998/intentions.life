@@ -143,7 +143,7 @@
               </div>
               <!-- end of visual representation -->
 
-              <ManageRepeatingTasksUnifiedMonthlyPopup 
+              <ManageReusableTasksMonthlyPopup 
                 let:setIsPopupOpen={setIsPopupOpen} 
                 isEditVersion={true} 
                 monthlyPeriodicTemplate={periodicTask}
@@ -155,7 +155,7 @@
                 >
                   {periodicTask.name}
                 </div>
-              </ManageRepeatingTasksUnifiedMonthlyPopup>
+              </ManageReusableTasksMonthlyPopup>
             </div>
           </div>
 
@@ -169,7 +169,7 @@
 </div>
 
 <script>
-  import ManageRepeatingTasksUnifiedMonthlyPopup from '$lib/ManageRepeatingTasksUnifiedMonthlyPopup.svelte'
+  import ManageReusableTasksMonthlyPopup from '$lib/ManageReusableTasksMonthlyPopup.svelte'
   import ManageReusableTasksWeeklyPopup from '$lib/ManageReusableTasksWeeklyPopup.svelte'
   import ManageReusableTasksCreateWeekly from '$lib/ManageReusableTasksCreateWeekly.svelte'
   import ManageReusableTasksCreateMonthly from '$lib/ManageReusableTasksCreateMonthly.svelte'

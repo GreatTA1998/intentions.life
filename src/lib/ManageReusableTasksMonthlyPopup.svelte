@@ -51,10 +51,9 @@
         {/if}
       </div>
 
-
-        <button on:click={editExistingInstances}>
-          Modify existing tasks
-        </button>
+      <button on:click={editExistingInstances}>
+        Modify existing tasks
+      </button>
 
       <button on:click={() => { 
         dispatch('delete');
