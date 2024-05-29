@@ -5,77 +5,49 @@
 {#if isPopupOpen}
   <div class="fullscreen-invisible-modular-popup-layer" on:click|self={() => isPopupOpen = false}>
     <div class="detailed-card-popup">
-      <input bind:value={newTaskName}>
+      <input 
+        type="text" 
+        bind:value={newTaskName} 
+        on:input={(e) => debouncedRenameTemplate(e.target.value)}
+        placeholder="Untitled"
+        style="margin-left: 12px; width: 100%; font-size: 24px;"
+        class="title-underline-input"
+      >
 
-      <div style="display: flex; margin-top: 24px;">
-        {#each Array(27) as _, i}
-          <div 
-            on:click={() => repeatOnDayOfMonth[i] = !repeatOnDayOfMonth[i]} 
-            class="day-of-month-square"
-            class:highlighted={repeatOnDayOfMonth[i]}
-          >
-            {i + 1}
-          </div>
-        {/each}
+      {#key monthlyTemplate}
+        <PeriodicMonthlyModule
+          {monthlyTemplate}
+          on:new-monthly-schedule={(e) => editExistingInstances(e.detail)}
+        />
+      {/key}
+    
+      <ManageReusableTasksWeeklyPopupDurationStartTime
+        weeklyTemplate={monthlyTemplate}
+        on:weekly-template-update={(e) => updateMonthlyTemplate(e.detail)}
+      />
 
-        <div 
-          on:click={() => willRepeatOnLastDay = !willRepeatOnLastDay} 
-          class="day-of-month-square" 
-          class:highlighted={willRepeatOnLastDay}
-          style="width: fit-content;"
+      <div style="display: flex; justify-content: space-between; width: 100%; margin-top: 16px;">
+        <span class="material-symbols-outlined" on:click|stopPropagation={properlyDeleteTemplate} 
+          style="cursor: pointer; margin-left: auto; right: 0px; border: 1px solid grey; border-radius: 24px; padding: 4px;"
         >
-          Last day
-        </div>
+          delete
+        </span>
       </div>
-
-      
-      <div style="display: flex; align-items: center; padding-top: 8px;">
-        <div style="margin: 8px;">
-          Designated time
-        </div>
-
-        <div style="margin-top: 0px;">
-          <UXToggleSwitch on:new-checked-state={(e) => hasSpecificTime = e.detail.isChecked}/>
-        </div>
-
-        {#if hasSpecificTime}
-          <div style="max-width: 120px; margin-left: 8px;">
-            <UXFormField
-              fieldLabel="Time (hh:mm)"
-              value={''}
-              willAutofocus={false}
-              on:input={(e) => handleTaskStartInput(e)}
-              placeholder="17:30"
-            />
-          </div>
-        {/if}
-      </div>
-
-      <button on:click={editExistingInstances}>
-        Modify existing tasks
-      </button>
-
-      <button on:click={() => { 
-        dispatch('delete');
-        isPopupOpen = false 
-      }
-      }>
-        Delete
-      </button>
     </div>
   </div>
 {/if}
 
 <script>
+  import ManageReusableTasksWeeklyPopupDurationStartTime from '$lib/ManageReusableTasksWeeklyPopupDurationStartTime.svelte'
+  import PeriodicMonthlyModule from '$lib/PeriodicMonthlyModule.svelte'
   import { getRandomID, checkTaskObjSchema, getDateInMMDD, convertMMDDToDateClassObject, computeDayDifference } from '/src/helpers.js'
   import { setFirestoreDoc, deleteFirestoreDoc, getFirestoreCollection, createFirestoreQuery, getFirestoreQuery, updateFirestoreDoc } from '/src/crud.js'
   import { user } from '/src/store.js'
   import { onMount } from 'svelte'
-  import UXFormField from '$lib/UXFormField.svelte'
-  import UXToggleSwitch from '$lib/UXToggleSwitch.svelte'
   import { createEventDispatcher } from 'svelte'
+  import _ from 'lodash'
 
-  export let monthlyPeriodicTemplate = {
+  export let monthlyTemplate = {
     name: '',
     repeatOnDayOfMonth: Array(27).fill(0),
     willRepeatOnLastDay: false,
@@ -87,77 +59,99 @@
 
   let isPopupOpen = false
 
-  // TO-DO: refactor 
-  let repeatOnDayOfMonth = monthlyPeriodicTemplate.repeatOnDayOfMonth
-  let willRepeatOnLastDay = monthlyPeriodicTemplate.willRepeatOnLastDay
-  let repeatGroupID = monthlyPeriodicTemplate.repeatGroupID
-  let newTaskName = monthlyPeriodicTemplate.name
-
-  let hasSpecificTime = false
-
+  let repeatGroupID = monthlyTemplate.repeatGroupID
+  let newTaskName = monthlyTemplate.name
+  
+  const debouncedRenameTemplate = _.debounce(
+    (newVal) => updateMonthlyTemplate({ name: newVal }), 
+    800
+  )
 
   onMount(async () => {
   })
+
+  async function properlyDeleteTemplate () {
+    if (confirm('Are you sure? This will delete all "Time Spent" records too. If you just want to stop future repeats, you can set the weekly repeats to no days instead.')) {
+      await deleteExistingFutureInstances()
+      deleteFirestoreDoc(`/users/${$user.uid}/periodicTasks/${monthlyTemplate.id}`)
+      isPopupOpen = false 
+    } 
+  }
+
+  async function updateMonthlyTemplate (keyValueChanges) {
+    console.log("keyValueChanges =", keyValueChanges)
+    await updateFirestoreDoc(
+      `/users/${$user.uid}/periodicTasks/${monthlyTemplate.id}`, 
+      keyValueChanges
+    )
+    propagateChangeToFutureInstances(keyValueChanges)
+  }
+
+  async function propagateChangeToFutureInstances (keyValueChanges) {
+    const futureInstances = await getFutureInstances()
+    for (const taskInstance of futureInstances) {
+      updateFirestoreDoc(
+        `/users/${$user.uid}/tasks/${taskInstance.id}`, 
+        keyValueChanges
+      )
+    }
+  }
+
+  function getFutureInstances () {
+    return new Promise(async (resolve) => {
+      const q = createFirestoreQuery({
+        collectionPath: `/users/${$user.uid}/tasks`,
+        criteriaTerms: ['repeatGroupID', '==', monthlyTemplate.repeatGroupID]
+      })
+
+      const allRepeatInstances = await getFirestoreQuery(q)
+      const currAndFutureInstances = allRepeatInstances.filter(instance => {
+        const d1 = new Date()
+        const d2 = convertMMDDToDateClassObject(instance.startDate, instance.startYYYY)
+        const dayDiff = computeDayDifference(d1, d2) // dayDiff := d2 - d1 
+        return dayDiff >= 0
+      })
+      resolve(currAndFutureInstances)
+    })
+  }
 
   function setIsPopupOpen ({ newVal }) {
     isPopupOpen = newVal
   }
 
   // effectively a delete + create
-  async function editExistingInstances () {
-    // update the template itself
-    updateFirestoreDoc(`/users/${$user.uid}/periodicTasks/${monthlyPeriodicTemplate.id}`, {
+  async function editExistingInstances ({ repeatOnDayOfMonth, willRepeatOnLastDay }) {
+    updateFirestoreDoc(`/users/${$user.uid}/periodicTasks/${monthlyTemplate.id}`, {
       repeatOnDayOfMonth,
       willRepeatOnLastDay,
       name: newTaskName
     })
-    // find all the repeat groups scheduled from today's date (don't care about the past)
 
-    const q = createFirestoreQuery({
-      collectionPath: `/users/${$user.uid}/tasks`,
-      criteriaTerms: ['repeatGroupID', '==', monthlyPeriodicTemplate.repeatGroupID]
-    })
+    await deleteExistingFutureInstances()
 
-    const allRepeatInstances = await getFirestoreQuery(q)
-    const currAndFutureInstances = allRepeatInstances.filter(instance => {
-      const d1 = new Date()
-      const d2 = convertMMDDToDateClassObject(instance.startDate, instance.startYYYY)
-      const dayDiff = computeDayDifference(d1, d2) // dayDiff := d2 - d1 
-      return dayDiff >= 0
-    })
-
-    // delete all of them, use a Firestore batch
-    for (const instance of currAndFutureInstances) {
-      deleteFirestoreDoc(`/users/${$user.uid}/tasks/${instance.id}`)
-    }
-
-    // with a clean slate, generate new ones
     createNewInstancesOfMonthlyRepeatingTasks({
-      repeatGroupID: monthlyPeriodicTemplate.repeatGroupID,
+      repeatGroupID: monthlyTemplate.repeatGroupID,
       numOfMonthsInAdvance: 2,
       repeatOnDayOfMonth,
       willRepeatOnLastDay 
     })
   }  
+  
+  // find all the repeat groups scheduled from today's date (don't care about the past)
+  async function deleteExistingFutureInstances () {
+    return new Promise(async (resolve) => {
+      const currAndFutureInstances = await getFutureInstances()
 
-  function createTemplateAndGenerateTasks ({ numOfMonthsInAdvance = 2, repeatOnDayOfMonth, willRepeatOnLastDay }) {
-    // create template
-    const id = getRandomID()
-    repeatGroupID = id
-    setFirestoreDoc(`/users/${$user.uid}/periodicTasks/${id}`, {
-      name: newTaskName,
-      repeatOnDayOfMonth,
-      willRepeatOnLastDay,
-      repeatGroupID: id,
-      orderValue: defaultOrderValue,
-      reusableTemplateID: id
-    })
+      const deleteRequests = []
 
-    createNewInstancesOfMonthlyRepeatingTasks({ 
-      repeatGroupID: id,
-      numOfMonthsInAdvance: 2, 
-      repeatOnDayOfMonth, 
-      willRepeatOnLastDay
+      // delete all of them, use a Firestore batch
+      for (const instance of currAndFutureInstances) {
+        deleteRequests.push(
+          deleteFirestoreDoc(`/users/${$user.uid}/tasks/${instance.id}`)
+        )
+      }
+      await Promise.all(deleteRequests)
+      resolve()
     })
   }
 
@@ -227,22 +221,18 @@
 </script>
 
 <style>
-  .day-of-month-square {
-    width: 24px; 
-    height: 24px; 
-    border: 1px solid black; 
-    margin: 0px;
-    
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    cursor: pointer;
+  .title-underline-input {
+     /* Refer to: https://stackoverflow.com/a/3131082/7812829 */
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid #DBDBDD;
+    outline: none;
+    font-size: 23px;
+    font-weight: 700;
+    padding-left: 0px;
+    padding-bottom: 6px;
   }
 
-  .highlighted {
-    background-color: orange;
-  }
   .detailed-card-popup {
     position: fixed;
     font-size: 14px;
@@ -260,7 +250,7 @@
     border-radius: 24px;
     background-color: white;
  
-  /*    border: 1px solid #000; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);*/
-    -webkit-box-shadow:  0px 0px 0px 9999px rgba(0, 0, 0, 0.5);
+    /* border: 1px solid #000; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);*/
+    box-shadow:  0px 0px 0px 9999px rgba(0, 0, 0, 0.5);
   }
 </style>

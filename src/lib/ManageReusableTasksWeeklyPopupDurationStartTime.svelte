@@ -86,16 +86,12 @@
 
   function handleDurationInput (e) {
     isEditingDuration = true
-    newDuration = e.detail.value
+    newDuration = Number(e.detail.value)
   }
 
   function handleTaskStartInput (e) {
     isEditingTaskStart = true
-
     const hhmm = e.detail.value
-    if (hhmm.length !== 5) return
-    if (!hhmm.includes(':')) return
-
     newStartHHMM = hhmm
   }
 

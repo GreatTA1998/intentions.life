@@ -34,7 +34,7 @@
               weeklyTemplate={weeklyTask}
             >
               <div on:click={() => setIsPopupOpen({ newVal: true })} 
-                style="margin-left: 8px; display: flex; align-items: center;"
+                style="display: flex; align-items: center;"
                 draggable="true"
                 on:dragstart|self={(e) => dragstart_handler(e, weeklyTask)}  
               > 
@@ -44,7 +44,7 @@
                   <div style="width: 60px; height: 60px"></div>
                 {/if}
 
-                <div style="width: 180px;">
+                <div style="width: {weeklyTaskWidthInPx}px;">
                   <div style="font-size: 16px; font-color: rgb(120, 120, 120)">
                     <!-- {weeklyTask.orderValue}  -->
                     {weeklyTask.name}
@@ -64,7 +64,7 @@
                     <div style="display: flex; align-items: center; margin-top: 8px; margin-bottom: 0px;">
                       {#each {length: getStatsFromTaskID[weeklyTask.id].frequency} as _, i}
                         <div style="background: green; border-radius: 4px; 
-                          width: {getDisplayLength(weeklyTask)}px; height: 4px; margin-right: 2px;"></div>
+                          width: {getDisplayLength(weeklyTask)}px; height: 3px; margin-right: 2px;"></div>
                       {/each}
                     </div>      
                     <div style="font-weight: 400; font-size: 14px;  margin-top: 8px; color: green">
@@ -103,61 +103,60 @@
         {#each sortedMonthlyTasks as periodicTask, i}
           {#if i === 0}
             <ReusableSimpleDropzone on:new-order-value={(e) => updateOrderOfDraggedTemplate(e.detail)} aboveOrder={0} belowOrder={periodicTasks[0].orderValue} />
-          <!-- general case drop-zone: must be between 2 tasks-->
+            <!-- general case drop-zone: must be between 2 tasks-->
           {:else if i > 0 && i < periodicTasks.length}
             <ReusableSimpleDropzone on:new-order-value={(e) => updateOrderOfDraggedTemplate(e.detail)} aboveOrder={periodicTasks[i-1].orderValue} belowOrder={periodicTasks[i].orderValue} />
           {/if}
 
-          <div class="monthly-periodicity-task" style="margin-top: 12px;">
-            <div style="display: flex; align-items: center; position: relative;">
-              <div style="position: relative; width: 94px; height: 20px; display: flex; align-items: center;">
-                <div style="position: relative; width: 94px; height: 1px; background-color: #ccc; display: flex; align-items: center;">
-                  <span class="tick start"></span>
-                  <span class="tick end"></span>
-                </div>
+          <ManageReusableTasksMonthlyPopup 
+            let:setIsPopupOpen={setIsPopupOpen} 
+            monthlyTemplate={periodicTask}
+          >
+            <div class="monthly-periodic-task" on:click={() => setIsPopupOpen({ newVal: true })}  >
+              <div style="display: flex; align-items: center; position: relative;">
+                <div style="position: relative; width: 94px; height: 20px; display: flex; align-items: center;">
+                  <div style="position: relative; width: 94px; height: 1px; background-color: #ccc; display: flex; align-items: center;">
+                    <span class="tick start"></span>
+                    <span class="tick end"></span>
+                  </div>
 
-                <!-- orange circle dots -->
-                <div style="position: absolute; display: flex; width: 90px; outline: 0px solid red; align-items: center;">
-                  {#each Array(27) as _, i}
-                    {#if periodicTask.repeatOnDayOfMonth[i]}
-                      <div style="width: 6px; height: 6px; border: 0px solid black; border-radius: 8px;
-                          position: absolute; 
-                          left: {3 * i}px
+                  <!-- orange circle dots -->
+                  <div style="position: absolute; display: flex; width: 90px; outline: 0px solid red; align-items: center;">
+                    {#each Array(27) as _, i}
+                      {#if periodicTask.repeatOnDayOfMonth[i]}
+                        <div style="width: 6px; height: 6px; border: 0px solid black; border-radius: 8px;
+                            position: absolute; 
+                            left: {3 * i}px
+                          "
+                          class="highlighted"
+                        >
+                        </div>
+                      {/if}
+                    {/each}
+                    
+                    {#if periodicTask.willRepeatOnLastDay}
+                      <div 
+                        style="width: 6px; height: 6px; border: 0px solid black; border-radius: 8px;
+                          position: absolute; left: {3 * 30}px
                         "
                         class="highlighted"
                       >
                       </div>
                     {/if}
-                  {/each}
-                  
-                  {#if periodicTask.willRepeatOnLastDay}
-                    <div 
-                      style="width: 6px; height: 6px; border: 0px solid black; border-radius: 8px;
-                        position: absolute; left: {3 * 30}px
-                      "
-                      class="highlighted"
-                    >
-                    </div>
-                  {/if}
+                  </div>
                 </div>
-              </div>
-              <!-- end of visual representation -->
+                <!-- end of visual representation -->
 
-              <ManageReusableTasksMonthlyPopup 
-                let:setIsPopupOpen={setIsPopupOpen} 
-                isEditVersion={true} 
-                monthlyPeriodicTemplate={periodicTask}
-              >
                 <div
-                  on:click={() => setIsPopupOpen({ newVal: true })}  style="margin-left: 12px; cursor: pointer;"
+                  style="margin-left: 12px; cursor: pointer;"
                   draggable="true"
                   on:dragstart|self={(e) => dragstart_handler(e, periodicTask)}
                 >
                   {periodicTask.name}
                 </div>
-              </ManageReusableTasksMonthlyPopup>
+              </div>
             </div>
-          </div>
+          </ManageReusableTasksMonthlyPopup>
 
           {#if i === periodicTasks.length - 1}
             <ReusableSimpleDropzone on:new-order-value={(e) => updateOrderOfDraggedTemplate(e.detail)} aboveOrder={periodicTasks[i].orderValue} belowOrder={periodicTasks[i].orderValue + 1}/>
@@ -193,6 +192,7 @@
 
   let getStatsFromTaskID = {} 
   let maxHourDuration = 0
+  let weeklyTaskWidthInPx = 180
 
   $: if (periodicTasks) {
     sortedPeriodicTasks = periodicTasks.sort((a, b) => a.orderValue - b.orderValue)
@@ -221,8 +221,9 @@
   })
 
   function getDisplayLength (weeklyTask) {
-    const weeklySectionWidth = 560
-    const pixelsPerHour = weeklySectionWidth / maxHourDuration
+    // imperfect code, quick-fix was to divide by 3
+    const maxTimeBarWidth = (window.innerWidth / 3) - weeklyTaskWidthInPx
+    const pixelsPerHour = maxTimeBarWidth / maxHourDuration
     const accurateLength = (getStatsFromTaskID[weeklyTask.id].hourDuration/getStatsFromTaskID[weeklyTask.id].frequency) * pixelsPerHour
     return accurateLength
   }
@@ -272,6 +273,11 @@
 </script>
 
 <style>
+  .monthly-periodic-task {
+    margin-top: 12px; 
+    cursor: pointer;
+  }
+
   .add-reusable-task-button {
     font-size: 26px; 
     margin-left: 8px;
