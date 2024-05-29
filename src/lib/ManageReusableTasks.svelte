@@ -9,14 +9,14 @@
         <div style="font-size: 24px; margin-bottom: 12px;">
           Frequent
 
-          <ManageRepeatingTasksUnifiedWeeklyPopup  
+          <ManageReusableTasksCreateWeekly  
             let:setIsPopupOpen={setIsPopupOpen}
             defaultOrderValue={sortedWeeklyTasks.length}
           >
             <span on:click={() => setIsPopupOpen({ newVal: true })} class="add-reusable-task-button">
               +
             </span>
-          </ManageRepeatingTasksUnifiedWeeklyPopup>
+          </ManageReusableTasksCreateWeekly>
         </div>
       
         <!-- at least requires `periodicTasks` to be an `[]` i.e. loading finished, instead of null -->
@@ -28,12 +28,10 @@
             <ReusableSimpleDropzone on:new-order-value={(e) => updateOrderOfDraggedTemplate(e.detail)} aboveOrder={sortedWeeklyTasks[i-1].orderValue} belowOrder={sortedWeeklyTasks[i].orderValue} />
           {/if}
 
-          <div style="display: flex; align-items: center;">
-            <ManageRepeatingTasksUnifiedWeeklyPopup 
+          <div style="display: flex; align-items: center; cursor: pointer;">
+            <ManageReusableTasksWeeklyPopup 
               let:setIsPopupOpen={setIsPopupOpen} 
-              isEditVersion={true} 
               weeklyTemplate={weeklyTask}
-              on:delete={() => deleteTemplate(weeklyTask)}
             >
               <div on:click={() => setIsPopupOpen({ newVal: true })} 
                 style="margin-left: 8px; display: flex; align-items: center;"
@@ -75,7 +73,7 @@
                   </div>
                 {/if}
               </div>
-            </ManageRepeatingTasksUnifiedWeeklyPopup>
+            </ManageReusableTasksWeeklyPopup>
           </div>
 
           {#if i === sortedWeeklyTasks.length - 1}
@@ -149,7 +147,6 @@
                 let:setIsPopupOpen={setIsPopupOpen} 
                 isEditVersion={true} 
                 monthlyPeriodicTemplate={periodicTask}
-                on:delete={() => deleteTemplate(periodicTask)}
               >
                 <div
                   on:click={() => setIsPopupOpen({ newVal: true })}  style="margin-left: 12px; cursor: pointer;"
@@ -173,7 +170,8 @@
 
 <script>
   import ManageRepeatingTasksUnifiedMonthlyPopup from '$lib/ManageRepeatingTasksUnifiedMonthlyPopup.svelte'
-  import ManageRepeatingTasksUnifiedWeeklyPopup from '$lib/ManageRepeatingTasksUnifiedWeeklyPopup.svelte'
+  import ManageReusableTasksWeeklyPopup from '$lib/ManageReusableTasksWeeklyPopup.svelte'
+  import ManageReusableTasksCreateWeekly from '$lib/ManageReusableTasksCreateWeekly.svelte'
   import ReusableSimpleDropzone from '$lib/ReusableSimpleDropzone.svelte'
   import { updateFirestoreDoc, deleteFirestoreDoc } from '/src/crud.js'
   import { onMount, onDestroy } from 'svelte'
@@ -259,10 +257,6 @@
       }
     })
     return output
-  }
-
-  function deleteTemplate ({ id }) {
-    deleteFirestoreDoc(`/users/${$user.uid}/periodicTasks/${id}`)
   }
 
   function dragstart_handler (e, monthlyPeriodicTemplate) {

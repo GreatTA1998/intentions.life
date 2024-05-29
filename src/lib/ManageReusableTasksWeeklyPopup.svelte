@@ -10,7 +10,7 @@
         bind:value={newTaskName} 
         on:input={(e) => debouncedRenameTask(e.target.value)}
         placeholder="Untitled"
-        style="margin-left: 12px; width: 100%; box-sizing: border-box; font-size: 24px;"
+        style="margin-left: 12px; width: 100%; font-size: 24px;"
         class="title-underline-input"
       >
 
@@ -21,22 +21,12 @@
         />
       {/key}
 
-      <ManageRepeatingTasksUnifiedWeeklyPopupDurationStartTime
+      <ManageReusableTasksWeeklyPopupDurationStartTime
         {weeklyTemplate}
         on:weekly-template-update={(e) => updateWeeklyTemplate(e.detail)}
-        on:duration-update={(e) => updateWeeklyTemplate(e.detail)}
-        on:start-time-update={(e) => updateWeeklyTemplate(e.detail)}
       />
       
       <div style="display: flex; justify-content: space-between; width: 100%; margin-top: 16px;">
-        {#if !isEditVersion}
-          <ReusableRoundButton on:click={() => createTemplateAndGenerateTasks({ numOfWeeksInAdvance: 2, repeatOnDayOfWeek })}
-            backgroundColor="rgb(0, 89, 125)" textColor="white"
-          >
-            Create repeat template and generate tasks
-          </ReusableRoundButton>
-        {/if}
-
         <span class="material-symbols-outlined" on:click|stopPropagation={properlyDeleteTemplate} 
           style="cursor: pointer; margin-left: auto; right: 0px; border: 1px solid grey; border-radius: 24px; padding: 4px;"
         >
@@ -75,20 +65,18 @@
 
 <script>
   import PeriodicWeeklyModule from '$lib/PeriodicWeeklyModule.svelte'
-  import ManageRepeatingTasksUnifiedWeeklyPopupDurationStartTime from '$lib/ManageRepeatingTasksUnifiedWeeklyPopupDurationStartTime.svelte'
+  import ManageReusableTasksWeeklyPopupDurationStartTime from '$lib/ManageReusableTasksWeeklyPopupDurationStartTime.svelte'
   import { 
     getRandomID, 
-    checkTaskObjSchema, 
-    getDateInMMDD, 
+    checkTaskObjSchema,  
     convertMMDDToDateClassObject, 
-    computeDayDifference,
+    computeDayDifference, 
     mod,
     twoDigits
   } from '/src/helpers.js'
   import { 
     setFirestoreDoc, 
     deleteFirestoreDoc, 
-    getFirestoreCollection, 
     createFirestoreQuery, 
     getFirestoreQuery, 
     updateFirestoreDoc 
@@ -102,7 +90,6 @@
   import ReusableRoundButton from '$lib/ReusableRoundButton.svelte'
   import _ from 'lodash'
 
-  export let isEditVersion = false
   export let weeklyTemplate = {
     name: '',
     repeatOnDayOfWeek: Array(7).fill(0),
@@ -112,10 +99,6 @@
   }
   export let defaultOrderValue = 1
 
-  //// IMPORTANT
-  // `repeatGroupID`: used for modifying instances of a repeating task (name is for legacy reasons)
-  // `reusableTemplateID`: for collecting statistics for a task (no reason why it must be this way, it's just legacy reasons)
-  
   let allGeneratedTasksToUpload = [] 
   let isPopupOpen = false
 
@@ -151,6 +134,7 @@
   }) 
 
   async function updateWeeklyTemplate (keyValueChanges) {
+    console.log('keyValueChanges =', keyValueChanges)
     await updateFirestoreDoc(
       `/users/${$user.uid}/periodicTasks/${weeklyTemplate.id}`, 
       keyValueChanges
@@ -205,15 +189,12 @@
 
 
   // effectively a delete + create
-  async function editExistingInstances ({ 
-    repeatOnDayOfWeek, 
-    numOfWeeksInAdvance 
-  }) {
+  async function editExistingInstances ({ repeatOnDayOfWeek, numOfWeeksInAdvance }) {
     // update the template itself
     updateFirestoreDoc(`/users/${$user.uid}/periodicTasks/${weeklyTemplate.id}`, {
       repeatOnDayOfWeek,
       name: newTaskName,
-      iconDataURL,
+      iconDataURL: weeklyTemplate.iconDataURL || '',
       numOfWeeksInAdvance
     })
 
@@ -321,7 +302,7 @@
       name: newTaskName,
       startTime: weeklyTemplate.startTime || '',
       startYYYY: new Date().getFullYear(),
-      iconDataURL
+      iconDataURL: weeklyTemplate.iconDataURL || ''
       // `startDate` will be hydrated later by the 2nd `if` statement
     }
 
@@ -391,7 +372,7 @@
     border-radius: 24px;
     background-color: white;
  
-  /*    border: 1px solid #000; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);*/
+    /* border: 1px solid #000; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);*/
     box-shadow:  0px 0px 0px 9999px rgba(0, 0, 0, 0.5);
   }
 </style>
