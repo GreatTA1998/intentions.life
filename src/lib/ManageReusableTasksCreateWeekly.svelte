@@ -8,7 +8,7 @@
       <input 
         type="text" 
         bind:value={newTaskName} 
-        placeholder="e.g. meditate, floss"
+        placeholder="Untitled"
         style="margin-left: 12px; width: 100%; font-size: 24px;"
         class="title-underline-input"
         autofocus
@@ -58,7 +58,7 @@
       numOfWeeksInAdvance: 2,
       repeatGroupID: id,
       reusableTemplateID: id,
-      orderValue: defaultOrderValue
+      orderValue: defaultOrderValue + Math.random() * 0.5
     })
 
     newTaskName = ''

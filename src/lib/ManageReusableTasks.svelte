@@ -147,15 +147,16 @@
                   style="margin-left: 12px; cursor: pointer;"
                   draggable="true"
                   on:dragstart|self={(e) => dragstart_handler(e, periodicTask)}
-                >
+                > 
+                  <!-- {periodicTask.orderValue} -->
                   {periodicTask.name}
                 </div>
               </div>
             </div>
           </ManageReusableTasksMonthlyPopup>
 
-          {#if i === periodicTasks.length - 1}
-            <ReusableSimpleDropzone on:new-order-value={(e) => updateOrderOfDraggedTemplate(e.detail)} aboveOrder={periodicTasks[i].orderValue} belowOrder={periodicTasks[i].orderValue + 1}/>
+          {#if i === sortedMonthlyTasks.length - 1}
+            <ReusableSimpleDropzone on:new-order-value={(e) => updateOrderOfDraggedTemplate(e.detail)} aboveOrder={sortedMonthlyTasks[i].orderValue} belowOrder={sortedMonthlyTasks[i].orderValue + 1}/>
           {/if}
         {/each}
       </div>
@@ -191,9 +192,9 @@
   let weeklyTaskWidthInPx = 180
 
   $: if (periodicTasks) {
-    sortedPeriodicTasks = periodicTasks.sort((a, b) => a.orderValue - b.orderValue)
-    sortedWeeklyTasks = sortedPeriodicTasks.filter(task => task.repeatOnDayOfWeek)
-    sortedMonthlyTasks = sortedPeriodicTasks.filter(task => task.repeatOnDayOfMonth)
+    sortedPeriodicTasks = periodicTasks 
+    sortedWeeklyTasks = sortedPeriodicTasks.filter(task => task.repeatOnDayOfWeek).sort((a, b) => a.orderValue - b.orderValue)
+    sortedMonthlyTasks = sortedPeriodicTasks.filter(task => task.repeatOnDayOfMonth).sort((a, b) => a.orderValue - b.orderValue)
 
     summarizeReusedTasks(periodicTasks)
   }

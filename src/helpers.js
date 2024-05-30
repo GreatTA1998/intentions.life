@@ -9,7 +9,8 @@ export function checkTaskObjSchema (task, userDoc) {
   if (!task.startDate) output.startDate = '' // without it, `collectFutureScheduledTask` will run into a crashing error with `convertToISO`
   if (!task.orderValue) { 
     const newVal = (userDoc.maxOrderValue || 0) + 3
-    output.orderValue = newVal
+    const epsilon = Math.random() * 0.5
+    output.orderValue = newVal + epsilon
     updateFirestoreDoc(`/users/${userDoc.uid}`, {
       maxOrderValue: newVal
     })
