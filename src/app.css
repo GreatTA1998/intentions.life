@@ -20,7 +20,8 @@
 
   --calendar-section-left-spacing: 2vw;
 
-  --calendar-day-section-width: max(10vw, 120px); 
+  --calendar-day-section-width: 200px;
+  /* max(10vw, 120px);  */
 }
 
 * {

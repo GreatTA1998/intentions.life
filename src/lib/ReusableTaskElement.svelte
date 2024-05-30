@@ -14,8 +14,7 @@
     height: {height}px; 
     min-height: 12px;
     font-size: {fontSize}rem;
-    opacity: {task.isDone ? '0.5' : '0.9'};
-    outline: 0px solid red;
+    opacity: {task.isDone ? '0.9' : '0.7'};
     background-color: {isBulletPoint ? '' : 'var(--experimental-black)'};
     background-image: {task.imageDownloadURL ? `url(${task.imageDownloadURL})` : ''};
     background-size: contain;
@@ -94,7 +93,6 @@
         height: {height/12}px; 
         min-height: 3px;
         width: {isBulletPoint ? '20%' : '100%'}; 
-        outline: 0px solid blue;
       "
     >
   </div>
@@ -114,7 +112,7 @@
   export let fontSize = 1
 
   $: height = (pixelsPerHour / 60) * task.duration
-  $: isBulletPoint = height < 20
+  $: isBulletPoint = height < 24 // 24px is exactly enough to not crop the checkbox and the task name
 
   const dispatch = createEventDispatcher()
   let startY = 0

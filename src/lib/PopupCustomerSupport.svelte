@@ -10,7 +10,8 @@
       </div>
 
       <div style="margin-top: 24px; margin-bottom: 24px;">
-        Hello! Thanks for trying Life Organizer. If you are running into issues or have any suggestions, let me know and I can often act on it within 24 hours.
+        Hello! Thanks for trying Intentions. If you are running into issues or have any suggestions, email me (99% reply rate within a week),
+        or you can call me directly (9 am - 5 pm Tokyo Standard Time).
       </div>
 
       <div style="display: flex; align-items: center;">

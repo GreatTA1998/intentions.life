@@ -1,21 +1,7 @@
-<div style="
-  background-color: var(--accent-color);
-  color: white; 
-  margin-bottom: 2px;
-  width: 200px;
-  padding-top: 6px;
-  padding-bottom: 6px;
-  border-radius: 24px;
-  align-text: center;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  height: 40px;
-"
+<div class="sign-in-button"
   on:click={signInWithGoogle}
 >
-  Try it
+  Get Started
   <span class="material-symbols-outlined" style="font-size: 32px; margin-left: 4px;">
     arrow_right_alt
   </span>
@@ -64,3 +50,23 @@
     }
   }
 </script>
+
+<style>
+  .sign-in-button {
+    border: 2px solid var(--logo-twig-color);
+    font-weight: 600;
+    color: var(--logo-twig-color);
+    background-color: white;
+    margin-bottom: 2px;
+    width: 200px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+    border-radius: 24px;
+    align-text: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    height: 40px;
+  }
+</style>

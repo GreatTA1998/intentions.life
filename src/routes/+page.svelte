@@ -1,7 +1,7 @@
 {#if hasFetchedUser}
   <!-- <div id="background-image-holder" style="height: 100vh; display: flex; justify-content: center; align-items: center;"> -->
     <NavbarAndContentWrapper>
-      <div slot="navbar" class="top-navbar transparent-glow-navbar" style="background: transparent; border-bottom: 1px solid lightgrey; padding-left: 4%; padding-right: 4%;">
+      <!-- <div slot="navbar" class="top-navbar transparent-glow-navbar" style="background: transparent; border-bottom: 1px solid lightgrey; padding-left: 4%; padding-right: 4%;">
         <img 
           src="/trueoutput-square-nobg.png" 
           style="width: 26px; height: 36px;"
@@ -13,18 +13,20 @@
           </div>
         </PopupLogin>
       </div>
-      
-      <div slot="content" style="display: flex; flex-grow: 1; height: 100%; padding: 4%; background: #193b19;">
+       -->
+      <!-- background: #193b19; -->
+      <div slot="content" style="display: flex; flex-grow: 1; height: 100%; padding: 3%;" class="home-page-background">
         <div style="width: 90vw; min-width: 200px; height: 80vh; border-radius: 10px;">
           <div class="hero-title">
-            A modern calendar with branching todo-lists
+            A modern calendar for organizing life
           </div>
     
           <div style="display: flex; margin-top: 24px; flex-wrap: wrap;">
             <div class="secondary-description">
-              See your todo-list and calendar side-by-side.
-              Achieve complex, uncertain milestones by keeping track of everything you tried but failed.
-              Cultivate your habits with flexible repeats.
+              Google made a calendar. So did Apple, Microsoft, Notion, Motion, VimCal, cal.com... the list goes on.
+              <br><br>
+              But only this calendar has these <b>4 features</b>, so you can effectively manage all the small, important things in life,
+              without losing sight of your long-term goals and dreams.
             </div>
             
             <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 12px 0px;" class="action-buttons">
@@ -47,31 +49,39 @@
             
             <div style="position: relative; justify-content: center;">
               <div class="silent-video">
-
+                <img src="/default-calendar-view-screenshot.png" style="width: 100%; height: 100%; box-shadow: 0 4px 8px rgba(148, 90, 35, 0.4);">
               </div>
 
               <div class="ability-icons">
-                <div class="ability-icon" on:click={() => currentIdx = 0}>
-                  
-                </div>
-
-                <div class="ability-icon" on:click={() => currentIdx = 1}>
-                  
-                </div>
-
-                <div class="ability-icon" on:click={() => currentIdx = 2}>
-                  
-                </div>
-
-                <div class="ability-icon" on:click={() => currentIdx = 3}>
-                  
-                </div>
+                {#each fourAbilities as ability, i}
+                  <div class="ability-icon" on:click={() => currentIdx = i}
+                    class:active-thumbnail={currentIdx === i}  
+                    class:inactive-thumbnail={currentIdx !== i}
+                  >
+                    <span class="material-symbols-outlined" style="font-size: 47px; color: white;">
+                      {ability.iconName}
+                    </span>
+                  </div>
+                {/each}
               </div>
             </div>
 
             <div class="explanatory-card">
-              <div class="card-title">
-                {fourAbilities[currentIdx].title}
+              <div style="display: flex; align-items: center;">
+                <div class="ability-icon" class:active-thumbnail={true}>
+                  <span class="material-symbols-outlined" style="font-size: 48px; color: white;">
+                    {fourAbilities[currentIdx].iconName}
+                  </span>
+                </div>
+
+                 <div style="padding-left: 16px;">
+                    <div class="card-title">
+                      {fourAbilities[currentIdx].title}
+                    </div>
+                    <div style="font-size: 24px; color: rgb(240, 240, 240);">
+                      {fourAbilities[currentIdx].subtitle}
+                    </div>
+                 </div>
               </div>
 
               <div class="card-description">
@@ -112,27 +122,22 @@
   let fourAbilities = [
     {
       videoSrc: '',
-      title: 'Todo-calendar view',
-      description: `The todo-calendar view is the default view, because it shows you everything you need to actually do (for the week).
+      title: 'Branching Todo-list',
+      subtitle: 'No more long, messy lists',
+      iconName: 'house',
+      description: `The home view is the week calendar, because everything eventually ends up here - whether it's a reusable habit, a milestone deadlines, a todo-item, or just a scheduled event.
 
-                    Drag tasks from the todo-list to the calendar. Tasks will only show up in either the todo or the calendar. 
-
-                    If one todo-list isn't enough, you can expand it and see multiple todo-lists all at once.
+                    The todo-list can branch indefinitely, making it easy to re-organize your to-do list into a few readable categories rather than a long linear list.
+                    
+                    You can drag any task from the todo-list to the calendar. The calendar is free scrolling, making it easy to travel backwards and forwards.
                    `
     },
     {
       videoSrc: '',
-      title: 'Visual timelines',
-      description: `Many tasks involve many unforeseen steps and difficulties. If you're blocked on a task because you're awaiting others, it will be put to the side and de-emphasized.
-      
-      But if you don't hear back within the expected follow-up time, the task will be re-emphasized, and also copied onto the relevant calendar day.
-      `
-    },
-    {
-      videoSrc: '',
-      title: 'Design habits and routines',
-      description: `
-        There's a place where you can configure all your repeating tasks. Habits can repeat on specific days, without needing a specific time. 
+      title: 'Reusable Tasks',
+      subtitle: 'Efficient UX for habits & routines',
+      iconName: 'restart_alt',
+      description: `There's a place where you can configure all your repeating tasks. Habits can repeat on specific days, without needing a specific time. 
 
         The reason the repeats are "flexible", is because you can even schedule a weekly habit that doesn't have a pre-designated day. Just drag it to the calendar when good timing emerges.
         (1-minute duration is also supported.)
@@ -142,15 +147,22 @@
     },
     {
       videoSrc: '',
-      title: 'Photo, journaling and statistics',
-      description: `Beyond the expectations of a calendar app, there are some unconventional features.
-
-        Calendar-centric photos allows you to display your favorite photos in context, giving you a delightful, visual history of your week.
-
-        The journal has a better atmosphere than a stale white page. 
-        
-        Statistics summarizes how much time you spent on tasks.
-        `
+      title: 'UNCERTAIN GOALS',
+      subtitle: "Visualize progress, including tried failures",
+      iconName: 'sports_score',
+      description: `Many tasks involve many unforeseen steps and difficulties. If you're blocked on a task because you're awaiting others, it will be put to the side and de-emphasized.
+      
+      But if you don't hear back within the expected follow-up time, the task will be re-emphasized, and also copied onto the relevant calendar day.
+      `
+    },
+    {
+      videoSrc: '',
+      title: 'Context-based Photos',
+      subtitle: "A more natural way to revisit memories",
+      iconName: 'image',
+      description: `Calendar-centric photos allows you to display your favorite photos in context, giving you a delightful, visual history of your week.
+      
+      `
     }
   ]
 
@@ -176,6 +188,24 @@
 </script>
 
 <style lang="scss">
+  :root {
+    --ability-showcase-bg-color: rgb(0, 0, 0);
+  }
+
+  .active-thumbnail {
+    border: 1px solid var(--logo-twig-color);
+    box-shadow: 0 8px 16px rgba(148, 90, 35, 1);
+  }
+
+  .inactive-thumbnail {
+    filter: opacity(0.7) blur(2px);
+  }
+
+  .home-page-background {
+    background-color: rgb(250, 250, 250);
+  }
+
+
   .silent-video {
     // outline: 2px solid red; 
     width: 800px; 
@@ -195,10 +225,10 @@
     margin-right: auto;
 
     top: auto;
-    outline: 2px solid purple;
+    outline: 0px solid purple;
     width: 400px;
     height: 100px;
-    bottom: -80px;
+    bottom: -24px;
 
     display: flex;
     justify-content: space-evenly;
@@ -206,32 +236,41 @@
   }
 
   .ability-icon {
-    outline: 2px solid green;
+    background-color: var(--ability-showcase-bg-color);
     width: 80px;
     height: 80px;
     cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
+
 
   .explanatory-card {
     width: 620px;
-    height: 400px;
-    background-color: var(--calendar-bg-color);
-    padding: 16px;
+    height: 540px;
+    background-color: var(--ability-showcase-bg-color);
+    padding: 24px;
     // border-top-right-radius: 16px;
     // border-bottom-right-radius: 16px;
   }
 
 
   .card-title {
-    font-size: 24px;
+    font-size: 34px;
     font-weight: 600;
-    color: black;
+    color: white;
+    text-transform: uppercase;
   }
 
   .card-description {
-    margin-top: 12px;
+    margin-top: 48px;
+    padding: 16px;
     white-space: pre-line;
-    color: black;
+    color: rgb(250, 250, 250);
+    font-size: 18px;
+    font-style: italic;
   }
 
 
@@ -275,11 +314,11 @@
   .secondary-description {
     font-weight: 500; 
     display: inline; 
-    color: white;
+    color: rgb(80, 80, 80);
   }
 
   .hero-title {
-    color: white;
+    color: rgb(80, 80, 80);
     font-size: 3rem; 
     font-weight: 600;
   }

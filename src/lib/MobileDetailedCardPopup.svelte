@@ -92,10 +92,8 @@
 
     <div style="margin-top: 0px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
       <div style="display: flex; align-items: center; width: 100%;">
-        {#if taskObject.imageDownloadURL}
-          <span class="material-symbols-outlined"  on:click={() => isViewingPhoto = !isViewingPhoto} style="cursor: pointer; margin-left: 6px; border: 1px solid grey; border-radius: 24px; padding: 4px;">
-            image_search
-          </span>
+        {#if !taskObject.imageDownloadURL}
+          <MobileDetailedCardPopupPhotoUpload {taskObject}/>
         {/if}
 
         <span class="material-symbols-outlined" on:click|stopPropagation={confirmDelete} 
@@ -106,7 +104,7 @@
       </div>
     </div>
 
-      <div style="font-size: 1rem; margin-top: 0px; margin-bottom: 12px; font-weight: 400;">
+      <div style="font-size: 1rem; margin-top: 16px; margin-bottom: 12px; font-weight: 400;">
         Full ancestral tree
       </div>
 
@@ -135,6 +133,7 @@ import {
   convertDDMMYYYYToDateClassObject,
   clickOutside, 
 } from '/src/helpers.js'
+import MobileDetailedCardPopupPhotoUpload from '$lib/MobileDetailedCardPopupPhotoUpload.svelte'
 import DetailedCardPopupRepeat from '$lib/DetailedCardPopupRepeat.svelte'
 import UXFormField from '$lib/UXFormField.svelte'
 import UXFormTextArea from '$lib/UXFormTextArea.svelte'

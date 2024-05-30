@@ -5,126 +5,79 @@
         bind:this={TaskImageElem}
         on:click|self={() => isViewingPhoto ? isViewingPhoto = false : ''}
         src={taskObject.imageDownloadURL}
-        class:blurred-image={!isViewingPhoto}
+        class:blurred-image={false}
         class:clear-image={isViewingPhoto}
-        style="position: absolute; inset: 0px; width: 100%; height: 100%;"
+        style="width: 100%; height: 100%;"
       >
     {/if}
 
-    <div style="display: flex; align-items: center;">
-      <ReusableCheckbox
-        value={taskObject.isDone}
-        on:change={(e) => handleCheckboxChange(e)}
-        zoom={1.2}
-      />
+    <div style="padding: 24px;">
+      <div style="display: flex; align-items: center;">
+        <ReusableCheckbox
+          value={taskObject.isDone}
+          on:change={(e) => handleCheckboxChange(e)}
+          zoom={1.2}
+        />
 
-      <input 
-        type="text" 
-        bind:value={titleOfTask} 
-        on:input={(e) => debouncedSaveTitle(e.target.value)}
-        placeholder="Untitled"
-        style="margin-left: 12px; width: 100%; box-sizing: border-box; font-size: 24px;"
-      >
-    </div>
-
-    <!-- In future, display in readable month / day form -->
-    <div
-      style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; row-gap: 24px; margin-top: 24px; font-size: 1.2em;"
-    >
-      <div style="display: flex; align-items: center;" class:half-invisible={!isScheduled(taskObject)}>
-        <div style="max-width: 230px;">
-          <UXFormField
-            fieldLabel="Scheduled on (MM/DD hh:mm)"
-            value={taskObject.startDate + ' ' + taskObject.startTime}
-            willAutofocus={false}
-            on:input={(e) => handleTaskStartInput(e)}
-            placeholder="MM/dd hh:mm"
-          />
-        </div>
-
-        <div style="margin-left: 6px; margin-right: 6px; max-width: 84px;">
-          <UXFormField
-            fieldLabel="For"
-            value={taskObject.duration}
-            willAutofocus={false}
-            on:input={(e) => debouncedSaveDuration(e)}
-          >
-            <div slot="append" style="font-weight: 300; color: rgb(60, 60, 60); font-size: 12px;">
-              mins.
-            </div>
-          </UXFormField>
-        </div>
-      </div>
-
-      {#if isEditingTaskStart}
-        <ReusableRoundButton on:click={() => saveTaskStart(newStartMMDD, newStartHHMM)} backgroundColor="rgb(0, 89, 125)" textColor="white">Save changes</ReusableRoundButton>
-      {/if}
-
-      {#if isEditingDeadline}
-        <ReusableRoundButton on:click={() => saveDeadline(newDeadlineDate, newDeadlineTime)} backgroundColor="rgb(0, 89, 125)" textColor="white">Save changes</ReusableRoundButton>
-      {/if}
-
-      <!-- 178px is the min. width that fully contains the placeholder text -->
-      <div class:half-invisible={!hasDeadline(taskObject)} 
-        style="font-size: 1.2em; display: flex; align-items: center; max-width: 230px;"
-      >
-        <UXFormField
-          fieldLabel="Due (dd/MM/YYYY hh:mm)"
-          value={currentDeadlineValue}
-          placeholder="31/12/2024 16:30"
-          willAutofocus={false}
-          on:input={(e) => handleDeadlineInput(e)}
+        <input 
+          type="text" 
+          bind:value={titleOfTask} 
+          on:input={(e) => debouncedSaveTitle(e.target.value)}
+          placeholder="Untitled"
+          style="margin-left: 12px; width: 100%; box-sizing: border-box; font-size: 24px;"
         >
-          <span slot="icon" class="material-symbols-outlined" style="margin-right: 4px; font-size: 18px; color: {hasDeadline(taskObject) ? 'red' : ''};">
-            alarm
-          </span>
-        </UXFormField>
       </div>
-    </div>
 
-    <div style="width: 100%; margin-top: 24px; margin-bottom: 24px;">
-      <UXFormTextArea fieldLabel="Notes"
-        value={notesAboutTask}
-        on:input={(e) => debouncedSaveNotes(e.detail)}
-        placeholder=""
+      <DetailedCardPopupStartTimeDuration
+        {taskObject}
+        on:task-update
       />
-    </div>
 
-    <div style="margin-top: 0px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
-      <div style="display: flex; align-items: center; width: 100%;">
-        {#if taskObject.imageDownloadURL}
-          <span class="material-symbols-outlined"  on:click={() => isViewingPhoto = !isViewingPhoto} style="cursor: pointer; margin-left: 6px; border: 1px solid grey; border-radius: 24px; padding: 4px;">
-            image_search
+      <div style="width: 100%; margin-top: 24px; margin-bottom: 24px;">
+        <UXFormTextArea fieldLabel="Notes"
+          value={notesAboutTask}
+          on:input={(e) => debouncedSaveNotes(e.detail)}
+          placeholder=""
+        />
+      </div>
+
+      <div style="margin-top: 0px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+        <div style="display: flex; align-items: center; width: 100%;">
+          {#if !taskObject.imageDownloadURL}
+            <MobileDetailedCardPopupPhotoUpload {taskObject}/>
+          {/if}
+
+          <span class="material-symbols-outlined" on:click|stopPropagation={confirmDelete} 
+            style="cursor: pointer; margin-left: auto; right: 0px; border: 1px solid grey; border-radius: 24px; padding: 4px;"
+          >
+            delete
           </span>
+        </div>
+      </div>
+
+        <div style="font-size: 1rem; margin-top: 16px; margin-bottom: 12px; font-weight: 400;">
+          Full ancestral tree
+        </div>
+
+        {#if taskObject.rootAncestor}
+          <div style="max-height: 500px; overflow-y: auto;">
+            <RecursiveBulletPoint
+              taskObject={taskObject.rootAncestor}
+              originalPopupTask={taskObject}
+              rootAncestor={taskObject.rootAncestor}
+              on:task-click
+              on:task-checkbox-change
+            >
+
+            </RecursiveBulletPoint>
+          </div>
         {/if}
-
-        <span class="material-symbols-outlined" on:click|stopPropagation={confirmDelete} 
-          style="cursor: pointer; margin-left: auto; right: 0px; border: 1px solid grey; border-radius: 24px; padding: 4px;"
-        >
-          delete
-        </span>
-      </div>
     </div>
-
-      <div style="font-size: 1rem; margin-top: 0px; margin-bottom: 12px; font-weight: 400;">
-        Full ancestral tree
-      </div>
-
-      {#if taskObject.rootAncestor}
-        <div style="max-height: 500px; overflow-y: auto;">
-          <RecursiveBulletPoint
-            taskObject={taskObject.rootAncestor}
-            originalPopupTask={taskObject}
-            rootAncestor={taskObject.rootAncestor}
-            on:task-click
-            on:task-checkbox-change
-          >
-
-          </RecursiveBulletPoint>
-        </div>
-      {/if}
+    <!-- End of padding container -->
   </div>
+  <!-- End of detailed-card-popup -->
 </div>
+<!-- End of modular invisible layer -->
 
 <script>
 import { createEventDispatcher, onMount, onDestroy, tick } from 'svelte'
@@ -135,22 +88,16 @@ import {
   convertDDMMYYYYToDateClassObject,
   clickOutside, 
 } from '/src/helpers.js'
-import DetailedCardPopupRepeat from '$lib/DetailedCardPopupRepeat.svelte'
-import UXFormField from '$lib/UXFormField.svelte'
 import UXFormTextArea from '$lib/UXFormTextArea.svelte'
 import ReusableRoundButton from '$lib/ReusableRoundButton.svelte'
 import ReusableCheckbox from '$lib/ReusableCheckbox.svelte'
+import DetailedCardPopupStartTimeDuration from '$lib/DetailedCardPopupStartTimeDuration.svelte'
+import MobileDetailedCardPopupPhotoUpload from '$lib/MobileDetailedCardPopupPhotoUpload.svelte'
 
 export let taskObject 
 
 let newDeadlineDate
 let newDeadlineTime
-
-let isEditingTaskStart = false
-let newStartMMDD
-let newStartHHMM
-
-let isEditingDeadline = false
 
 let TaskImageElem
 let PopupElem
@@ -164,26 +111,35 @@ let notesAboutTask = taskObject.notes || ''
 let titleOfTask = taskObject.name || ''
 let isViewingPhoto = false
 
-function isScheduled (taskObj) {
-  return taskObj.startDate && taskObj.startTime && taskObj.startYYYY
-}
-
-function hasDeadline (taskObj) {
-  return taskObj.deadlineDate && taskObject.deadlineTime
-}
-
 onMount(() => {
   if (taskObject.imageDownloadURL) {
+    // solution based on Claude
     TaskImageElem.onload = () => {
+      const marginFactor = 0.9
+      const viewportHeight = marginFactor * window.innerHeight
+      const viewportWidth = marginFactor * window.innerWidth
+
       const { naturalWidth, naturalHeight } = TaskImageElem
-      const minDimension = 400 // (given the current CSS for this popup)
-      if (naturalWidth < naturalHeight) {
-        PopupElem.style.width = minDimension + 'px'
-        PopupElem.style.height = minDimension * (naturalHeight / naturalWidth) + 'px'
+
+      const imageAspectRatio = naturalWidth / naturalHeight
+      const viewportAspectRatio = viewportWidth / viewportHeight
+
+      let maxWidth, maxHeight
+
+      if (imageAspectRatio > viewportAspectRatio) {
+        // Image is wider than the viewport, so scale based on width
+        maxWidth = viewportWidth
+        maxHeight = Math.floor(viewportWidth / imageAspectRatio)
       } else {
-        PopupElem.style.height = minDimension + 'px'
-        PopupElem.style.width = minDimension * (naturalWidth / naturalHeight) + 'px'
+        // Image is taller than the viewport, so scale based on height
+        maxHeight = viewportHeight
+        maxWidth = Math.floor(viewportHeight * imageAspectRatio)
       }
+
+      PopupElem.style.width = maxWidth + 'px'
+      PopupElem.style.height = maxHeight + 'px'
+
+      return { maxWidth, maxHeight }
     }
   }
 })
@@ -209,29 +165,6 @@ function handleCheckboxChange (e) {
 
 const debouncedSaveTitle = _.debounce(saveTitle, 800)
 const debouncedSaveNotes = _.debounce(saveNotes, 1500)
-const debouncedSaveDuration = _.debounce(saveDuration, 1000)
-
-function saveDuration (e) {
-  const newValue = e.detail.value
-  if (typeof Number(newValue) !== 'number') {
-    return 
-  }
-  dispatch('task-update', { 
-    id: taskObject.id, 
-    keyValueChanges: { 
-      duration: Number(newValue) 
-    } 
-  })
-}
-
-function saveTaskStart (MMDD, HHMM) {
-  dispatch('task-update', { id: taskObject.id, keyValueChanges: {
-    startDate: MMDD,
-    startTime: HHMM,
-    startYYYY: new Date().getFullYear()
-  }})
-  isEditingTaskStart = false
-}
 
 function saveDeadline (DDMMYYYY, HHMM) {
   const d1 = convertDDMMYYYYToDateClassObject(DDMMYYYY, HHMM)
@@ -248,18 +181,6 @@ function saveDeadline (DDMMYYYY, HHMM) {
     }
   })
   isEditingDeadline = false
-}
-
-function handleTaskStartInput (e) {
-  isEditingTaskStart = true
-  const newVal = e.detail.value
-  newStartMMDD = newVal.split(" ")[0]
-  newStartHHMM = newVal.split(" ")[1]
-
-  // quickfix for space bar causing time to be ignored (I ran into it as well, not just dad)
-  if (newVal[0] === ' ') {
-    alert('Empty space detected at the start _12/31 15:00, please delete.')
-  }
 }
 
 function handleDeadlineInput (e) {
@@ -295,6 +216,12 @@ function saveTitle (newVal) {
 </script>
 
 <style>
+  ::-webkit-scrollbar {
+    width: 0px;
+    height: 0px;
+    background: transparent;
+  }
+
   .blurred-image {
     filter: blur(6px) brightness(1.0) contrast(1.0) saturate(1.0);  z-index: -1;
   }
@@ -320,7 +247,6 @@ function saveTitle (newVal) {
     
     height: fit-content;
 
-    padding: 24px;
     border-radius: 24px;
     background-color: white;
  
@@ -328,7 +254,7 @@ function saveTitle (newVal) {
     -webkit-box-shadow:  0px 0px 0px 9999px rgba(0, 0, 0, 0.5);
   }
 
-  /* Refer to: https://stackoverflow.com/questions/3131072/how-to-change-input-text-box-style-to-line */
+  /* Refer to: https://stackoverflow.com/a/3131082/7812829 */
   input[type=text] {
     background: transparent;
     border: none;
@@ -336,7 +262,6 @@ function saveTitle (newVal) {
     outline: none;
     font-size: 23px;
     font-weight: 700;
-    /* padding: 10px 0px; */
     padding-left: 0px;
     padding-bottom: 6px;
   }
@@ -366,12 +291,5 @@ a {
   font-family: sans-serif;
   font-size: 1rem;
   height: 5px;
-}
-
-a:hover,
-a:focus {
-  border: 1px solid orange;
-  background-color: orange;
-  color: #fff;
 }
 </style>

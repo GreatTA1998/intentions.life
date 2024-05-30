@@ -11,9 +11,9 @@
   class:calendar-block={!isBulletPoint}
   style="
     position: relative;
-    height: {height}px; 
+    height: fit-content; 
     min-height: 12px;
-    opacity: {task.isDone ? '0.6' : '1'};
+    opacity: {task.isDone ? '1' : '0.7'};
     padding-left: {isBulletPoint ? '0px' : 'var(--left-padding)'};
     padding-right: var(--left-padding);
     display: flex; flex-direction: column;

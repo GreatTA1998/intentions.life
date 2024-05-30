@@ -6,7 +6,6 @@
       taskObject={clickedTask}
       on:task-update={(e) => updateTaskNode(e.detail)}
       on:task-reusable={() => createReusableTaskTemplate(clickedTask.id)}
-      on:repeating-tasks-generate={(e) => uploadGeneratedTasks(e.detail)}
       on:task-click={(e) => openDetailedCard(e.detail)}
       on:card-close={() => isDetailedCardOpen = false}
       on:task-delete={(e) => deleteTaskNode(e.detail)}
@@ -127,8 +126,8 @@
     </span>
 
     <PopupCustomerSupport let:setIsPopupOpen={setIsPopupOpen}>
-      <span on:click={() => setIsPopupOpen({ newVal: true })}  class="material-symbols-outlined mika-hover" style="font-size: 32px; cursor: pointer;">
-        support_agent
+      <span on:click={() => setIsPopupOpen({ newVal: true })}  class="material-symbols-outlined mika-hover" style="font-size: 28px; cursor: pointer;">
+        phone
       </span>
     </PopupCustomerSupport>
   </div>
@@ -216,6 +215,10 @@
 </NavbarAndContentWrapper>
 
 <script>
+  import { 
+    createNewInstancesOfWeeklyRepeatingTasks,
+    createNewInstancesOfMonthlyRepeatingTasks
+  } from '/src/helpers/periodicRepeat.js'
   import { 
     computeDayDifference, 
     getDateOfToday, 
@@ -353,8 +356,7 @@
       // RE-WRITE / INTEGRATE THIS WHEN READY
       if (isInitialFetch) {
         isInitialFetch = false
-        // TO-DO: properly DEPRECATE
-        // maintainOneWeekPreviewWindowForRepeatingTasks(allTasks)
+        maintainPreviewWindowForPeriodicTasks()
       }
     })
     // can't use `return` in reactive expression https://github.com/sveltejs/svelte/issues/2828  
@@ -365,6 +367,55 @@
   })
 
   const tasksPath = `/users/${$user.uid}/tasks/`
+
+  async function maintainPreviewWindowForPeriodicTasks () {
+    if ($user.lastRanRepeatISO && 
+      1 > computeDayDifference(new Date($user.lastRanRepeatISO), new Date())
+    ) {
+      return // already did daily check
+    }
+
+    const periodicTasks = await getFirestoreCollection(`/users/${$user.uid}/periodicTasks`)
+    handleWeekly(periodicTasks)
+    handleMonthly(periodicTasks)
+
+    updateFirestoreDoc(`/users/${$user.uid}`, {
+      lastRanRepeatISO: new Date().toISOString()
+    })
+  }
+
+  function handleMonthly (periodicTasks) {
+    const monthlyTemplates = periodicTasks.filter(t => t.repeatOnDayOfMonth)
+    for (const monthlyTemplate of monthlyTemplates) {
+      const { lastRanRepeatISO } = monthlyTemplate
+
+      // backwards compatibility
+      if (!lastRanRepeatISO) {
+        createNewInstancesOfMonthlyRepeatingTasks({ monthlyTemplate, userDoc: $user })
+      }
+
+      if (new Date(lastRanRepeatISO).getMonth() !== new Date().getMonth()) {
+        createNewInstancesOfMonthlyRepeatingTasks({ monthlyTemplate, userDoc: $user })
+      } 
+    }
+  }
+
+  function handleWeekly (periodicTasks) {
+    const weeklyTemplates = periodicTasks.filter(t => t.repeatOnDayOfWeek)
+    for (const weeklyTemplate of weeklyTemplates) {
+      const { lastRanRepeatISO, numOfWeeksInAdvance } = weeklyTemplate
+
+      // backwards compatibility
+      if (!lastRanRepeatISO) {
+        createNewInstancesOfWeeklyRepeatingTasks({weeklyTemplate, userDoc: $user })
+      }
+
+      const daysSinceLastRepeat = computeDayDifference(new Date(lastRanRepeatISO), new Date())
+      if (daysSinceLastRepeat > 7 * numOfWeeksInAdvance) {
+        createNewInstancesOfWeeklyRepeatingTasks({ weeklyTemplate, userDoc: $user })
+      } 
+    }
+  }
 
   async function createTaskNode ({ id, newTaskObj }) {
     const newTaskObjChecked = checkTaskObjSchema(newTaskObj, $user)
@@ -527,31 +578,6 @@
     })
   }
 
-  /*
-  // TODO: IMPLEMENT THIS LOGIC
-    When a task is scheduled but missed, there are 2 possibilities:
-      - It's a special i.e. non-repeating event: return it to the to-do
-      - It's a repeating event: just increment the miss count 
-  */
-  async function resetScheduledButMissedNonRepeatingTasks (taskTree) {
-    const rootNode = {
-      name: 'root 2',
-      children: taskTree
-    }
-    helperFunction({
-      node: rootNode,
-      fulfilsCriteria: (task) => task.startDate < dateOfToday,
-      applyFunc: (task) => {
-        // handle one-off tasks that isn't done - this will return to the to-do
-        if (!task.daysBeforeRepeating && !task.isDone) {
-          task.startDate = ''
-          task.startTime = ''
-          // this means the task will re-appear on the unscheduled todo-list
-        }
-      }
-    })
-  }
-
   async function changeTaskStartTime ({ id, timeOfDay, dateScheduled }) {
     updateTaskNode({ id, keyValueChanges: {
       startTime: timeOfDay,
@@ -634,54 +660,6 @@
       startDate: '',
       isDone: false
     }})
-  }
-
-  // WORK IN PROGRESS: node.children will be undefined 
-  // because `allTasks` is implicitly passed into 
-  // `traverseAndUpdateTree`, and is not yet hydrated from database
-  // 
-  // I'm considering refactor these functions into a separate file, 
-  // and also passing explicit parameters. Might deserve an explanation video. ,
-  // as mutations, pointers are a concern with these deeply nested data structures. 
-  function maintainOneWeekPreviewWindowForRepeatingTasks () {
-    const uniqueRepeatIDs = new Set()
-    traverseAndUpdateTree({
-      fulfilsCriteria: (task) => task.repeatGroupID,
-      applyFunc: (task) => { 
-        uniqueRepeatIDs.add(task.repeatGroupID)
-      }
-    })
-
-    // STEP 2: for each repeated task, check if it's necessary to extend the preview window
-    // https://www.explanations.app/KsPz7BOExANWvkaauNKE/i4udjmZVtXToD9JKyMCD
-    for (const repeatID of [...uniqueRepeatIDs]) {
-      traverseAndUpdateTree({
-        fulfilsCriteria: (task) => task.id === repeatID, 
-        applyFunc: (originalTask) => {
-          const daysWithoutRepeating = computeDayDifference(new Date(originalTask.lastRanRepeatAtIsoString), new Date())
-          if (7 <= daysWithoutRepeating || !originalTask.lastRanRepeatAtIsoString) {
-            const allGeneratedTasksToUpload = generateRepeatedTasks(originalTask)
-            uploadGeneratedTasks({ 
-              allGeneratedTasksToUpload, 
-              repeatGroupID: repeatID,
-              willRepeatOnWeekDayNumber: originalTask.willRepeatOnWeekDayNumber
-            }) 
-          }
-        }
-      })
-    }
-  }
-
-  async function uploadGeneratedTasks ({ allGeneratedTasksToUpload, repeatGroupID, willRepeatOnWeekDayNumber }) {
-    // quickfix: the generated tasks have the repeat schedule, but the original task doesn't, so add it here
-    updateTaskNode({ id: repeatGroupID, keyValueChanges: {
-      "willRepeatOnWeekDayNumber": willRepeatOnWeekDayNumber,
-      lastRanRepeatAtIsoString: new Date().toISOString()
-    }})
-
-    for (const generatedTask of allGeneratedTasksToUpload) {
-      createTaskNode({ id: generatedTask.id, newTaskObj: generatedTask })
-    }
   }
 </script>
 

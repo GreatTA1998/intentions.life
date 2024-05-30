@@ -43,20 +43,30 @@
           width: 94%;
         "
       >
-        <ReusableTaskElement
-          {task}
-          pixelsPerHour={pixelsPerMinute * 60}
-          fontSize={0.8}
-          hasCheckbox
-          on:task-click
-          on:task-update
-          on:task-checkbox-change
-        />
+        {#if task.iconDataURL}
+          <ReusableIconTaskElement
+            {task}
+            pixelsPerHour={pixelsPerMinute * 60}
+            fontSize={0.8}
+            hasCheckbox={false}
+            on:task-click
+            on:task-update
+            on:task-checkbox-change
+          />          
+        {:else}
+          <ReusableTaskElement
+            {task}
+            pixelsPerHour={pixelsPerMinute * 60}
+            fontSize={0.8}
+            hasCheckbox
+            on:task-click
+            on:task-update
+            on:task-checkbox-change
+          />          
+        {/if}
       </div>
     {/each}
       
-    <!-- This offsets the fact that the timestamp needs a -6 margin to not be cut off from the top edge of the container -->
-    <div style="margin-top: 6px;"></div>
 
     {#if isDirectlyCreatingTask}
       <div 
@@ -67,45 +77,14 @@
           width: 98%; 
           padding-left: 0px; 
           padding-right: 0px;
-          box-sizing: border-box;
         "
       >
-        <UXFormField
-          fieldLabel="Task Name"
-          value={newTaskName}
-          on:input={(e) => {
-            newTaskName = e.detail.value;
-            searchTaskTemplates();
-          }}
-          on:focus-out={() => {
-            if (newTaskName === '') {
-              isDirectlyCreatingTask = false
-            }
-          }}
-          on:task-entered={(e) => handleEnterKey(e)}
+        <ReusableCreateTaskDirectly
+          newTaskStartTime={getHHMM(resultantDateClassObject)}
+          {resultantDateClassObject}
+          on:new-root-task
+          on:reset={() => isDirectlyCreatingTask = false}
         />
-
-        <!-- Display reusable task templates here -->
-        {#key taskTemplateSearchResults}
-          {#if $user && newTaskName.length >= 1}
-            <div class="core-shadow cast-shadow" style="background-color: white; padding: 6px; border-radius: 12px">   
-              {#each taskTemplateSearchResults as taskTemplate}
-                <div class="autocomplete-option" 
-                  on:click={() => createNewInstanceOfReusableTask(taskTemplate)} 
-                  class:option-highlight={taskTemplateSearchResults.length === 1}
-                >
-                  {#if taskTemplate.iconDataURL}
-                    <img src={taskTemplate.iconDataURL} style="width: 24px; height: 24px;">
-                  {/if}
-
-                  <div style="margin-left: {taskTemplate.iconDataURL ? '0px' : '12px'}">
-                    {taskTemplate.name}
-                  </div>
-                </div>
-              {/each}
-            </div>
-          {/if}
-        {/key}
       </div> 
     {/if}
 
@@ -123,13 +102,14 @@
           })}px;
         "
       > 
+
+      <hr 
+        style="border: 2px solid var(--location-indicator-color); border-radius: 5px; width: 100%; margin-top: 0px; margin-bottom: 0px;"
+        bind:this={CurrentTimeIndicator}
+      > 
         <div style="font-size: 12px; color: var(--location-indicator-color); font-weight: 600;">
           {getTimeInHHMM({ dateClassObj: new Date() })}
         </div>
-        <hr 
-          style="border: 2px solid var(--location-indicator-color); border-radius: 5px; width: 100%; margin-top: 2px;"
-          bind:this={CurrentTimeIndicator}
-        > 
       </div>
     {/if}
   </div>
@@ -137,13 +117,19 @@
 
 <script>
   import { getFirestoreCollection } from '/src/crud.js'
-  import { getDateOfToday, getTrueY, computeMillisecsDifference, convertDDMMYYYYToDateClassObject, getTimeInHHMM } from '/src/helpers.js'
+  import { 
+    computeMillisecsDifference, 
+    convertDDMMYYYYToDateClassObject, 
+    ensureTwoDigits,
+    getTimeInHHMM, 
+    getHHMM,
+    pureNumericalHourForm
+   } from '/src/helpers.js'
   import ReusableTaskElement from '$lib/ReusableTaskElement.svelte'
+  import ReusableIconTaskElement from '$lib/ReusableIconTaskElement.svelte'
   import { onMount, beforeUpdate, afterUpdate, tick, createEventDispatcher, onDestroy } from 'svelte'
-  import { browser } from '$app/environment';
   import { user, hasInitialScrolled, yPosWithinBlock } from '/src/store.js'
-  import { pureNumericalHourForm, getDateInMMDD, getRandomID } from '/src/helpers';
-  import UXFormField from '$lib/UXFormField.svelte'
+  import ReusableCreateTaskDirectly from '$lib/ReusableCreateTaskDirectly.svelte'
 
   export let scheduledTasks = [] 
   export let timestamps = []
@@ -183,7 +169,7 @@
       setTimeout(() => {
         // the calendar is re-rendered on every task drag-and-drop, so we don't want to reset scrolling each time
         if (CurrentTimeIndicator && !$hasInitialScrolled) { 
-          CurrentTimeIndicator.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'start' })
+          CurrentTimeIndicator.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' })
           hasInitialScrolled.set(true)
         }
       }, 0) 
@@ -202,59 +188,8 @@
     console.log(...args)    
   }
 
-  function handleEnterKey (e) {
-    if (taskTemplateSearchResults.length === 1) {
-      createNewInstanceOfReusableTask(taskTemplateSearchResults[0])
-    } else {
-      createTaskDirectly(e)
-    }
-  }
-
-  function searchTaskTemplates () {
-    if (reusableTaskTemplates === null) return 
-
-    const uniqueSet = new Set()
-    const searchQuery = newTaskName
-    for (const taskTemplate of reusableTaskTemplates) {
-      if (taskTemplate.name.toLowerCase().includes(searchQuery.toLowerCase())) {
-        uniqueSet.add(taskTemplate)
-      }
-    }
-    const result = [...uniqueSet]
-    taskTemplateSearchResults = result
-    return result
-  }
-
   function copyGetTrueY (e) {
     return e.clientY + OverallContainer.scrollTop - OverallContainer.getBoundingClientRect().top - OverallContainer.style.paddingTop
-  }
-
-  async function createNewInstanceOfReusableTask (taskObj) {
-    const copy = {...taskObj}
-    copy.id = getRandomID()
-    copy.reusableTemplateID = taskObj.id
-    copy.isDone = false
-    copy.startDate = getDateInMMDD(resultantDateClassObject)
-    copy.startTime = getHHMM(resultantDateClassObject)
-    copy.startYYYY = resultantDateClassObject.getFullYear()
-    dispatch('new-root-task', copy)
-    isDirectlyCreatingTask = false
-  }
-
-  async function createTaskDirectly (e) {
-    const newTaskName = e.detail.taskName
-    if (newTaskName !== '') {
-      const newTaskObj = {
-        id: getRandomID(),
-        name: newTaskName,
-        startDate: getDateInMMDD(resultantDateClassObject),
-        // deadlineDate: getDateInDDMMYYYY(resultantDateClassObject),
-        startTime: getHHMM(resultantDateClassObject),
-        startYYYY: resultantDateClassObject.getFullYear()
-      }
-      dispatch('new-root-task', newTaskObj)
-    }
-    isDirectlyCreatingTask = false
   }
 
   // computes the physical offset, within origin based on d1
@@ -334,18 +269,6 @@
     const resultantDateClassObject = new Date(resultantTimeInMs)
     return resultantDateClassObject
   } 
-
-  // now format to hh:mm format to be compatible with old API
-  function ensureTwoDigits (number) {
-    return (number < 10 ? `0${number}` : `${number}`)
-  }
-
-  function getHHMM (dateClassObj) {
-    const d = dateClassObj
-    const hhmm = ensureTwoDigits(d.getHours()) + ':' + ensureTwoDigits(d.getMinutes())
-    return hhmm
-  }
-
 </script>
 
 <style lang="scss">
@@ -355,27 +278,6 @@
     position: absolute; 
     width: var(--calendar-day-section-width);
     pointer-events: none;
-  }
-
-  .autocomplete-option {
-    padding-top: 12px; 
-    padding-bottom: 12px; 
-    padding-left: 4px; 
-    padding-right: 12px; 
-    font-size: 12px; 
-    border-radius: 12px;
-
-    display: flex; 
-    align-items: center;
-  }
-
-  .option-highlight {
-    background-color: rgb(240, 240, 240);
-  }
-
-  // background-color: rgb(240, 240, 240);
-  .autocomplete-option:hover {
-    @extend .option-highlight
   }
 
   /* DO NOT REMOVE, BREAKS DRAG-AND-DROP AND DURATION ADJUSTMENT */
@@ -389,19 +291,9 @@
     background: rgb(82, 180, 251);
   }
 
-  /* 
-    You need the relative scrolling container to be different from `calendar-day-container`,
-    so the absolute positionings will count from the right place (no need to fully understand yet) 
-
-    height: 200% is just so it's high enough to contain all the absolute elements
-
-    without border-box, the padding on top will add ON TOP OF 100% height  
-  */
-
   .calendar-day-container {
     width: 100%;
   }
-
 
   .green-text {
     color: #0085FF;
@@ -412,19 +304,10 @@
   .timestamp-number {
     position: absolute;
     left: 5px;
-
-    /* top: -5px;  */
-    /* margin-left: -6px; */
     font-size: 0.7rem;
-
-    /* these CSS properties are copied from `.calendar-time-block`, which used to be separate */
-    /* position: absolute; */
-    /* height: 90px;
-    width: 100%; */
   }
 
   .visible-line {
     border-top: 1px solid rgb(195, 195, 195);
   }
-
 </style>

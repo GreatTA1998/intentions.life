@@ -9,7 +9,8 @@ export function checkTaskObjSchema (task, userDoc) {
   if (!task.startDate) output.startDate = '' // without it, `collectFutureScheduledTask` will run into a crashing error with `convertToISO`
   if (!task.orderValue) { 
     const newVal = (userDoc.maxOrderValue || 0) + 3
-    output.orderValue = newVal
+    const epsilon = Math.random() * 0.5
+    output.orderValue = newVal + epsilon
     updateFirestoreDoc(`/users/${userDoc.uid}`, {
       maxOrderValue: newVal
     })
@@ -182,6 +183,17 @@ export function getHH () {
   let hh = today.getHours()
   if (hh < 10) hh = '0' + hh
   return `${hh}`
+}
+
+export function getHHMM (dateClassObj) {
+  const d = dateClassObj
+  const hhmm = ensureTwoDigits(d.getHours()) + ':' + ensureTwoDigits(d.getMinutes())
+  return hhmm
+}
+
+// now format to hh:mm format to be compatible with old API
+export function ensureTwoDigits (number) {
+  return (number < 10 ? `0${number}` : `${number}`)
 }
 
 export function getRandomID () {

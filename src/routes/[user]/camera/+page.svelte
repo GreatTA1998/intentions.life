@@ -106,9 +106,8 @@
     const p1 = createImageBitmap(imageBlobFile).then(bitmap => {
       const { width, height } = bitmap 
       // these durations will display fully the portrait / landscape iPhone photos on an iPad Air 1180x820
-      if (width > height) durationForFullDisplay = 68
-      else durationForFullDisplay = 120
-      console.log("durationForFullDisplay =", durationForFullDisplay)
+      if (width > height) durationForFullDisplay = 106
+      else durationForFullDisplay = 188
     })
 
     // STEP 1: getDownloadURL()

@@ -17,70 +17,15 @@
 
     <div class="sticky-y-div flexbox">
       {#each dateClassObjects as dateClassObj}
-        <div class="day-header sticky-day-of-week-abbreviation" 
-          style="
-            height: fit-content; 
-            padding-top: var(--main-content-top-margin);
-            padding-bottom: 18px;
-          "
-          on:dragover={(e) => dragover_handler(e)}
-          on:drop={(e) => drop_handler(e, dateClassObj)}
-        >
-          <div>
-            <div 
-              class="center-flex day-name-label" 
-              class:active-day-name={getDateInDDMMYYYY(dateClassObj) === getDateInDDMMYYYY(new Date())}
-            >
-              {dateClassObj.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase()}
-            </div>
-  
-            <div 
-              class="center-flex" 
-              style="font-size: 16px; font-weight: 300" 
-            >
-              <div class="center-flex" 
-                style="padding: 8px; width: 48px; height: 36px;" 
-                class:active-date-number={getDateInDDMMYYYY(dateClassObj) === getDateInDDMMYYYY(new Date())}
-                class:highlighted-circle={getDateInDDMMYYYY(dateClassObj) === getDateInDDMMYYYY(new Date())}
-              >
-                {dateClassObj.getDate()}
-              </div>
-            </div>
-          </div>  
-
-          {#if isShowingDockingArea}
-            <div style="overflow: hidden;">
-              {#key intForTriggeringRerender}
-                {#if doodleIcons}
-                  <div style="display: flex; flex-wrap: wrap;">
-                    {#each getScheduledTasks(dateClassObj).filter(task => !task.startTime && task.iconDataURL) as iconTask}
-                      <img on:click={() => dispatch('task-click', { task: iconTask })}
-                        src={iconTask.iconDataURL} 
-                        style="width: 32px; height: 32px;"
-                        draggable="true"
-                        on:dragstart|self={(e) => startDragMove(e, iconTask.id)} 
-                      >
-                      <!-- <div style="font-size: 2px;">{iconTask.name}</div>
-                      <div style="font-size: 2px;">{iconTask.repeatGroupID}</div> -->
-                    {/each}
-                  </div>
-                {/if}
-
-                {#each getScheduledTasks(dateClassObj).filter(task => !task.startTime && !task.iconDataURL) as flexibleDayTask}
-                  <div on:click={() => dispatch('task-click', { task: flexibleDayTask })} 
-                    style="width: var(--calendar-day-section-width); font-size: 12px; display: flex; gap: 4px; margin-top: 8px; margin-left: 4px; margin-right: 4px;"
-                  >
-                    <ReusableFlexibleDayTask task={flexibleDayTask}
-                      on:task-click
-                      on:task-update
-                      on:task-checkbox-change
-                    />
-                  </div>
-                {/each}
-              {/key}
-            </div>
-          {/if}
-        </div>
+        <ReusableCalendarHeader 
+          {dateClassObj}
+          {intForTriggeringRerender}
+          {isShowingDockingArea}
+          on:task-checkbox-change
+          on:task-scheduled  
+          on:new-root-task
+          on:task-click
+        />
       {/each}
     </div>
   </div>
@@ -121,12 +66,11 @@
 </div>
 
 <script>
+import ReusableCalendarHeader from '$lib/ReusableCalendarHeader.svelte'
 import ReusableCalendarView from '$lib/ReusableCalendarView.svelte'
-import { MIKA_PIXELS_PER_HOUR, getDateInMMDD, getDateInDDMMYYYY } from '/src/helpers'
+import { MIKA_PIXELS_PER_HOUR, getDateInMMDD, getDateInDDMMYYYY, computeDayDifference } from '/src/helpers.js'
 import { onMount, createEventDispatcher } from 'svelte'
 import { tasksScheduledOn } from '/src/store.js'
-import ReusableCheckbox from '$lib/ReusableCheckbox.svelte'
-import ReusableFlexibleDayTask from '$lib/ReusableFlexibleDayTask.svelte'
 import { getFirestoreCollection } from '/src/crud.js'
 
 export let calStartDateClassObj
@@ -138,15 +82,9 @@ let numOfHourBlocksDisplayed = 24
 let dateClassObjects = []
 let intForTriggeringRerender = 0
 
-let dockingAreaHeight = 100
-let maxDockingAreaHeight = 0
-const epsilon = 5
-const spacingBetweenLabelAndCal = 36
 const topMarginEqualizer = 8 + timestampDivTopMargin // to align with the timestamps that can't be displayed at negative margins
 const timestampDivTopMargin = 24
 let isShowingDockingArea = true
-
-const dispatch = createEventDispatcher()
 
 $: {
   getDateClassObjects(calStartDateClassObj)
@@ -163,65 +101,6 @@ onMount(() => {
   fetchDoodleIcons()
 })
 
-function startDragMove (e, id) {
-   e.dataTransfer.setData("text/plain", id)
-
-   // record distance from the top of the element
-   const rect = e.target.getBoundingClientRect()
-   const y = e.clientY - rect.top // y position within el ement
-
-   whatIsBeingDraggedID.set(id)
-   whatIsBeingDragged.set('room')
-   whatIsBeingDraggedFullObj.set(task)
-
-   yPosWithinBlock.set(y)
- }
-
-async function fetchDoodleIcons () {
-  const temp = await getFirestoreCollection('/doodleIcons')
-  doodleIcons = temp
-}
-
-function toggleDockingArea () {
-  isShowingDockingArea = !isShowingDockingArea
-}
-
-function dragover_handler (e) {
-  e.preventDefault()
-  e.stopPropagation()
-  e.dataTransfer.dropEffect = "move"
-}
-
-function drop_handler (e, dateClassObj) {
-  const id = e.dataTransfer.getData('text/plain')
-  if (!id) return // it means we're adjusting the duration but it triggers a drop event, and a dragend event must be followed by a drop event
-
-  e.preventDefault()
-  e.stopPropagation()
-  
-  const mmdd = getDateInMMDD(dateClassObj)
-
-  dispatch('task-scheduled', {
-    id,
-    timeOfDay: '',
-    dateScheduled: mmdd
-  })
-}
-
-function getDateClassObjects (dateClassObj) {
-  const temp = []
-  let d = dateClassObj
-  for (let i = -7; i < 7; i++) {
-    const offset = i * (24*60*60*1000)
-    const copy = new Date()
-    copy.setTime(d.getTime() + offset)
-    // no longer start from 7 am, or else there will be missing hours
-    copy.setHours(0, 0, 0) // hours, minutes, seconds, note it's ZERO-indexed, 0-23, 0-59
-    temp.push(copy)
-  }
-  dateClassObjects = [...temp] // manually trigger reactivity)
-}
-
 function getScheduledTasks (dateClassObj) {
   const simpleISO = getSimpleISOFromDateClassObj(dateClassObj)
   return $tasksScheduledOn[simpleISO] || [] // `tasksScheduledOn` will only use
@@ -236,6 +115,29 @@ function getSimpleISOFromDateClassObj (d) {
   if (dd < 10) dd = '0' + dd
   if (mm < 10) mm = '0' + mm
   return dd + '-' + mm + '-' + yyyy;
+}
+
+async function fetchDoodleIcons () {
+  const temp = await getFirestoreCollection('/doodleIcons')
+  doodleIcons = temp
+}
+
+function toggleDockingArea () {
+  isShowingDockingArea = !isShowingDockingArea
+}
+
+function getDateClassObjects (dateClassObj) {
+  const temp = []
+  let d = dateClassObj
+  for (let i = -7; i < 7; i++) {
+    const offset = i * (24*60*60*1000)
+    const copy = new Date()
+    copy.setTime(d.getTime() + offset)
+    // no longer start from 7 am, or else there will be missing hours
+    copy.setHours(0, 0, 0) // hours, minutes, seconds, note it's ZERO-indexed, 0-23, 0-59
+    temp.push(copy)
+  }
+  dateClassObjects = [...temp] // manually trigger reactivity)
 }
 
 function getTimesOfDay () {
@@ -259,147 +161,72 @@ function getTimesOfDay () {
 </script>
 
 <style>
-.x-sticky {
-  position: sticky;
-  left: 0px;
-  z-index: 1;
-}
+  :root {
+    --pinned-div-width: 72px;
+    --timestamps-column-width: 96px;
+    --day-header-width: 120px;
+  }
 
-.timestamp-number {
-  padding-left: var(--calendar-section-left-spacing);
-  color: #6D6D6D;
 
-  /* opaque, so that shifted calendar content will go "underneath" the timestamps */
-  background-color: var(--calendar-bg-color);
-  z-index: 2;
-  font-size: 12px;
-}
+  .x-sticky {
+    position: sticky;
+    left: 0px;
+    z-index: 1;
+  }
 
-.day-name-label {
-  font-size: 16px; 
-  margin-bottom: 0px; 
-  font-weight: 500;
-}
+  .timestamp-number {
+    padding-left: var(--calendar-section-left-spacing);
+    color: #6D6D6D;
 
-.active-day-name {
-  font-weight: 600;
-  color: black;
-}
+    /* opaque, so that shifted calendar content will go "underneath" the timestamps */
+    background-color: var(--calendar-bg-color);
+    z-index: 2;
+    font-size: 12px;
+  }
 
-.active-date-number {
-  font-weight: 400;
-  color: black;
-}
+  .pinned-div {
+    width: var(--timestamps-column-width);
+    position: sticky;
+    left: 0;
+    background-color: var(--calendar-bg-color);
+    /* background-color: cyan; */
+    padding: 5px;
+    padding-left: 16px;
+    z-index: 2; /* Ensure it appears on top */
+  }
 
-.highlighted-circle {
-  border-radius: 25px;
-}
-
-.center-flex {
-  display: flex; 
-  justify-content: center;
-  align-items: center;
-}
-
-.sticky-day-of-week-abbreviation {
-  font-size: 1.4em;
-  background-color: var(--calendar-bg-color);
-  color: #6D6D6D;
-  
-  position: sticky; 
-
-  /* FIGURE THIS OUT TOMORROW */
-  top: 0px;
-  z-index: 1;
-
-  /* border-bottom: 1px solid rgb(212, 212, 212); */
-}
-
-.pinned-div {
-  width: var(--timestamps-column-width);
-  position: sticky;
-  left: 0;
-  background-color: var(--calendar-bg-color);
-  /* background-color: cyan; */
-  padding: 5px;
-  padding-left: 16px;
-  z-index: 2; /* Ensure it appears on top */
-}
-
-.sticky-y-div {
-  position: sticky;
-  top: 0;
-  color: white;
-  z-index: 1; /* Lower z-index than pinned-div */
-	/* border: 4px solid green; */
-  /* background-color: purple; */
-  background-color: var(--calendar-bg-color);
-  /* border-bottom: 2px dashed grey; */
-	width: fit-content;
-}
-
-/* This works already! */
-.sticky-x-div {
-  position: sticky;
-  left: 0;
-  background-color: orange;
-  padding: 5px;
-  width: var(--timestamps-column-width);
-}
-
-.inner-div {
-  background-color: orange;
-  padding: 5px;
-}
+  .sticky-y-div {
+    position: sticky;
+    top: 0;
+    color: white;
+    z-index: 1; /* Lower z-index than pinned-div */
+    /* border: 4px solid green; */
+    /* background-color: purple; */
+    background-color: var(--calendar-bg-color);
+    /* border-bottom: 2px dashed grey; */
+    width: fit-content;
+  }
 	
-.flexbox {
-	display: flex;
-}
+  .flexbox {
+    display: flex;
+  }
 
-.day-header {
-  width: var(--calendar-day-section-width);
-}
+  .collapse-arrow {
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    font-size: 26px;
+    cursor: pointer;
+    color: rgb(121, 121, 121);
+    font-weight: 300;
+  }
 
-.collapse-arrow {
-  position: absolute;
-  bottom: 4px;
-  right: 4px;
-  font-size: 26px;
-  cursor: pointer;
-  color: rgb(121, 121, 121);
-  font-weight: 300;
-}
-
-:root {
-  --pinned-div-width: 72px;
-  --timestamps-column-width: 96px;
-  --day-header-width: 120px;
-}
-
-.cal-day-column {
-  width: var(--day-header-width);
-  border: 2px solid blue;
-	border-top: none;
-}
-
-.top-flexbox {
-  display: flex;
-  position: static;
-  position: sticky;
-  top: 0;
-  z-index: 2;
-  width: fit-content;
-  /* outline: 4px solid red; */
-}
-
-.bot-flexbox {
-  display: flex; 
-  position: static; 
-  width: fit-content;
-  outline: 4px solid yellow;
-}
-
-.unscheduled-day-task {
-	font-size: 14px;
-}
+  .top-flexbox {
+    display: flex;
+    position: static;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    width: fit-content;
+  }
 </style>

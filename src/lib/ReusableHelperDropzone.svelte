@@ -129,14 +129,21 @@
     updateObj.startDate = ''
     updateObj.startYYYY = ''
 
-    // 3. DEADLINE DEPRECATE
-    // updateObj = correctDeadlineIfNecessary({ 
-    //   node: updateObj, 
-    //   todoListUpperBound: dueInHowManyDays, 
-    //   parentObj,
-    //   batch,
-    //   userDoc: $user
-    // })
+    // 3. KEEP CONSISTENT DEADLINE HANDLING API WITH THE ROOT TODO DROPZONE
+    // yes, this is horrific code
+    if (!isMilestoneMode) {
+      updateObj = correctDeadlineIfNecessary({ 
+        node: updateObj, 
+        todoListUpperBound: dueInHowManyDays, 
+        parentObj,
+        batch,
+        userDoc: $user
+      })
+
+
+      // THE BELOW CODE CAUSES BUGS
+      // updateObj = breakParentRelationIfNecessary(updateObj)
+    }
 
     // 4. PARENTID
     if ($whatIsBeingDragged === 'top-level-task-within-this-todo-list' && ancestorRoomIDs.length === 1) {
@@ -144,9 +151,9 @@
     } else {
       updateObj.parentID = parentID
     }
-    updateObj = breakParentRelationIfNecessary(updateObj)
 
     // 2. HANDLE SUBTREE DEADLINES
+    // NOTE: this function actually doesn't do anything
     maintainValidSubtreeDeadlines({ 
       node: $whatIsBeingDraggedFullObj, 
       todoListUpperBound: dueInHowManyDays, 
