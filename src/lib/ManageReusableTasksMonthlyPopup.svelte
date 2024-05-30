@@ -10,7 +10,7 @@
         bind:value={newTaskName} 
         on:input={(e) => debouncedRenameTemplate(e.target.value)}
         placeholder="Untitled"
-        style="margin-left: 12px; width: 100%; font-size: 24px;"
+        style="width: 100%; font-size: 24px;"
         class="title-underline-input"
       >
 

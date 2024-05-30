@@ -1,4 +1,4 @@
-<div style="display: flex; align-items: center; margin-top: 24px; gap: 8px; flex-wrap: wrap;">
+<div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
   <div style="display: flex;">
     {#each {length: 7} as _, i}
       <div 

@@ -28,53 +28,49 @@
             <ReusableSimpleDropzone on:new-order-value={(e) => updateOrderOfDraggedTemplate(e.detail)} aboveOrder={sortedWeeklyTasks[i-1].orderValue} belowOrder={sortedWeeklyTasks[i].orderValue} />
           {/if}
 
-          <div style="display: flex; align-items: center; cursor: pointer;">
-            <ManageReusableTasksWeeklyPopup 
-              let:setIsPopupOpen={setIsPopupOpen} 
-              weeklyTemplate={weeklyTask}
-            >
-              <div on:click={() => setIsPopupOpen({ newVal: true })} 
-                style="display: flex; align-items: center;"
-                draggable="true"
-                on:dragstart|self={(e) => dragstart_handler(e, weeklyTask)}  
-              > 
-                {#if weeklyTask.iconDataURL}
-                  <img src={weeklyTask.iconDataURL} style="width: 60px; height: 60px;">
-                {:else}
-                  <div style="width: 60px; height: 60px"></div>
-                {/if}
+          <ManageReusableTasksWeeklyPopup let:setIsPopupOpen={setIsPopupOpen} weeklyTemplate={weeklyTask}>
+            <div 
+              on:click={() => setIsPopupOpen({ newVal: true })} 
+              style="display: flex; align-items: center; cursor: pointer;"
+              draggable="true"
+              on:dragstart|self={(e) => dragstart_handler(e, weeklyTask)}  
+            > 
+              {#if weeklyTask.iconDataURL}
+                <img src={weeklyTask.iconDataURL} style="width: 60px; height: 60px;">
+              {:else}
+                <div style="width: 60px; height: 60px"></div>
+              {/if}
 
-                <div style="width: {weeklyTaskWidthInPx}px;">
-                  <div style="font-size: 16px; font-color: rgb(120, 120, 120)">
-                    <!-- {weeklyTask.orderValue}  -->
-                    {weeklyTask.name}
-                  </div>
-
-                  <div style="display: flex; margin-top: 4px;">
-                    {#each dayOfWeekSymbol as _, i} 
-                      <div class="day-of-week-circle" class:highlighted={weeklyTask.repeatOnDayOfWeek[i]}>
-                      </div>
-                    {/each}
-                  </div>
+              <div style="width: {weeklyTaskWidthInPx}px;">
+                <div style="font-size: 16px; font-color: rgb(120, 120, 120)">
+                  <!-- {weeklyTask.orderValue}  -->
+                  {weeklyTask.name}
                 </div>
 
-                <!-- Time spent statistics -->
-                {#if getStatsFromTaskID[weeklyTask.id]}
-                  <div style="margin-left: 8px;">
-                    <div style="display: flex; align-items: center; margin-top: 8px; margin-bottom: 0px;">
-                      {#each {length: getStatsFromTaskID[weeklyTask.id].frequency} as _, i}
-                        <div style="background: green; border-radius: 4px; 
-                          width: {getDisplayLength(weeklyTask)}px; height: 3px; margin-right: 2px;"></div>
-                      {/each}
-                    </div>      
-                    <div style="font-weight: 400; font-size: 14px;  margin-top: 8px; color: green">
-                      {getStatsFromTaskID[weeklyTask.id].hourDuration} hr
+                <div style="display: flex; margin-top: 4px;">
+                  {#each dayOfWeekSymbol as _, i} 
+                    <div class="day-of-week-circle" class:highlighted={weeklyTask.repeatOnDayOfWeek[i]}>
                     </div>
-                  </div>
-                {/if}
+                  {/each}
+                </div>
               </div>
-            </ManageReusableTasksWeeklyPopup>
-          </div>
+
+              <!-- Time spent statistics -->
+              {#if getStatsFromTaskID[weeklyTask.id]}
+                <div style="margin-left: 8px;">
+                  <div style="display: flex; align-items: center; margin-top: 8px; margin-bottom: 0px;">
+                    {#each {length: getStatsFromTaskID[weeklyTask.id].frequency} as _, i}
+                      <div style="background: green; border-radius: 4px; 
+                        width: {getDisplayLength(weeklyTask)}px; height: 3px; margin-right: 2px;"></div>
+                    {/each}
+                  </div>      
+                  <div style="font-weight: 400; font-size: 14px;  margin-top: 8px; color: green">
+                    {getStatsFromTaskID[weeklyTask.id].hourDuration} hr
+                  </div>
+                </div>
+              {/if}
+            </div>
+          </ManageReusableTasksWeeklyPopup>
 
           {#if i === sortedWeeklyTasks.length - 1}
             <ReusableSimpleDropzone on:new-order-value={(e) => updateOrderOfDraggedTemplate(e.detail)} aboveOrder={sortedWeeklyTasks[i].orderValue} belowOrder={sortedWeeklyTasks[i].orderValue + 1}/>

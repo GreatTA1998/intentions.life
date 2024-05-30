@@ -10,29 +10,29 @@
         bind:value={newTaskName} 
         on:input={(e) => debouncedRenameTask(e.target.value)}
         placeholder="Untitled"
-        style="margin-left: 12px; width: 100%; font-size: 24px;"
+        style="width: 100%; font-size: 24px;"
         class="title-underline-input"
       >
-
-      {#key weeklyTemplate}
-        <PeriodicWeeklyModule
-          {weeklyTemplate}
-          on:new-weekly-schedule={(e) => editExistingInstances(e.detail)}
-        />
-      {/key}
-
-      <ManageReusableTasksWeeklyPopupDurationStartTime
-        {weeklyTemplate}
-        on:weekly-template-update={(e) => updateWeeklyTemplate(e.detail)}
-      />
       
-      <div style="display: flex; justify-content: space-between; width: 100%; margin-top: 16px;">
+      <div style="display: flex; align-items: center; margin-top: 24px;">
+        {#key weeklyTemplate}
+          <PeriodicWeeklyModule
+            {weeklyTemplate}
+            on:new-weekly-schedule={(e) => editExistingInstances(e.detail)}
+          />
+        {/key}
+
         <span class="material-symbols-outlined" on:click|stopPropagation={properlyDeleteTemplate} 
           style="cursor: pointer; margin-left: auto; right: 0px; border: 1px solid grey; border-radius: 24px; padding: 4px;"
         >
           delete
         </span>
       </div>
+
+      <ManageReusableTasksWeeklyPopupDurationStartTime
+        {weeklyTemplate}
+        on:weekly-template-update={(e) => updateWeeklyTemplate(e.detail)}
+      />
 
       <!-- ICON SECTION -->
       {#if !$user.isSubscriber}
@@ -41,8 +41,8 @@
             forest
           </span>
          
-          <div style="font-weight: 500;">
-            Use intentions.life visual
+          <div style="font-weight: 600;">
+            Get doodle icons
           </div>
         </div>
         {#if isShowingPremiumPopup}
@@ -331,6 +331,8 @@
   .premium-intro-button {
     display: flex; align-items: center; color: #541d69;
     font-size: 16px;
+    cursor: pointer;
+    margin-top: 24px;
   }
 
   .orange-border {
