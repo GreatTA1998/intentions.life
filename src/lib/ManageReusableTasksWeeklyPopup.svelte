@@ -79,6 +79,7 @@
 {/if}
 
 <script>
+  import { createNewInstancesOfWeeklyRepeatingTasks } from '/src/helpers/periodicRepeat.js'
   import PremiumPopup from '$lib/PremiumPopup.svelte'
   import PeriodicWeeklyModule from '$lib/PeriodicWeeklyModule.svelte'
   import ManageReusableTasksWeeklyPopupDurationStartTime from '$lib/ManageReusableTasksWeeklyPopupDurationStartTime.svelte'
@@ -214,12 +215,15 @@
 
     await deleteExistingFutureInstances()
 
-    // with a clean slate, generate new ones
-    createNewInstancesOfWeeklyRepeatingTasks({
+    const updatedWeeklyTemplate = { 
+      repeatOnDayOfWeek, 
+      numOfWeeksInAdvance,
       repeatGroupID: weeklyTemplate.repeatGroupID,
-      repeatOnDayOfWeek,
-      numOfWeeksInAdvance
-    })
+      name: weeklyTemplate.name
+    }
+
+    // with a clean slate, generate new ones
+    createNewInstancesOfWeeklyRepeatingTasks({ weeklyTemplate: updatedWeeklyTemplate, userDoc: $user })
   }  
 
   function getFutureInstances () {
@@ -256,74 +260,6 @@
       await Promise.all(deleteRequests)
       resolve()
     })
-  }
-
-  // repeatOnDaysOfMonth: [0, 0, 0, 1, ... 0, 1]
-  function createNewInstancesOfWeeklyRepeatingTasks ({ repeatOnDayOfWeek, repeatGroupID, numOfWeeksInAdvance }) {
-    if (!numOfWeeksInAdvance) {
-      alert(`"Show repeats _ weeks ahead" must be filled`)
-    }
-    allGeneratedTasksToUpload = []
-
-    const d = new Date()
-    for (let i = 0; i < 7 * numOfWeeksInAdvance; i++) {
-      const weekDayNumber = mod(d.getDay() - 1, 7) // for getDay(), Sunday = 0, Monday = 1
-      if (repeatOnDayOfWeek[weekDayNumber]) {
-        const generatedTask = createRepeatedTask({ 
-          dateClassObj: new Date(d.getTime()), 
-          repeatGroupID 
-        })
-        allGeneratedTasksToUpload.push({ ...generatedTask })
-      }
-
-      d.setDate(d.getDate() + 1)
-    }
-
-    for (const task of allGeneratedTasksToUpload) {
-      setFirestoreDoc(
-        `/users/${$user.uid}/tasks/${task.id}`,
-        task
-      )
-    }
-  }
-
-  function createRepeatedTask({ dateClassObj, repeatGroupID }) {
-    const individualID = getRandomID()
-    let taskObjCopy = {
-      repeatGroupID,
-      id: individualID,
-      reusableTemplateID: repeatGroupID,
-      name: newTaskName,
-      startTime: weeklyTemplate.startTime || '',
-      startYYYY: new Date().getFullYear(),
-      iconDataURL: weeklyTemplate.iconDataURL || ''
-      // `startDate` will be hydrated later by the 2nd `if` statement
-    }
-
-    taskObjCopy.id = getRandomID()
-    taskObjCopy.repeatOnDayOfWeek = [...repeatOnDayOfWeek]
-    taskObjCopy.repeatGroupID = repeatGroupID // way to label separate tasks as essentially clones of an original repeating task
-
-    const yyyy = `${dateClassObj.getFullYear()}`
-    const mm = twoDigits(dateClassObj.getMonth() + 1) // month is 0-indexed
-    const dd = twoDigits(dateClassObj.getDate())
-
-    taskObjCopy.startDate = `${mm}/${dd}`
-
-    /// NOTE THESE IF STATEMENTS OPERATE *INDEPENDENTLY*
-    // CASE 1: DEADLINE
-    // deadline takes priority: a deadlined task that repeats but is scheduled, will STILL be treated like a deadline
-    if (taskObjCopy.deadlineDate && taskObjCopy.deadlineTime) {
-      // set new `deadlineDate` to the dd/mm/yyyy format of `dateClassObj` (but keep the deadline time the same)
-      taskObjCopy.deadlineDate = `${dd}/${mm}/${yyyy}`
-    }
-    // CASE 2: SCHEDULED 
-    if (taskObjCopy.startYYYY && taskObjCopy.startDate && taskObjCopy.startTime) {
-      taskObjCopy.startYYYY = yyyy
-      taskObjCopy.startDate = `${mm}/${dd}`
-    }
-    taskObjCopy = checkTaskObjSchema(taskObjCopy, $user)
-    return taskObjCopy
   }
 </script>
 

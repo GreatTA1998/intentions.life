@@ -38,6 +38,7 @@
 {/if}
 
 <script>
+  import { createNewInstancesOfMonthlyRepeatingTasks } from '/src/helpers/periodicRepeat.js'
   import ManageReusableTasksWeeklyPopupDurationStartTime from '$lib/ManageReusableTasksWeeklyPopupDurationStartTime.svelte'
   import PeriodicMonthlyModule from '$lib/PeriodicMonthlyModule.svelte'
   import { getRandomID, checkTaskObjSchema, getDateInMMDD, convertMMDDToDateClassObject, computeDayDifference } from '/src/helpers.js'
@@ -129,11 +130,16 @@
 
     await deleteExistingFutureInstances()
 
-    createNewInstancesOfMonthlyRepeatingTasks({
-      repeatGroupID: monthlyTemplate.repeatGroupID,
-      numOfMonthsInAdvance: 2,
+    const newMonthlyTemplate = {
       repeatOnDayOfMonth,
-      willRepeatOnLastDay 
+      willRepeatOnLastDay,
+      repeatGroupID: monthlyTemplate.repeatGroupID,
+      name: monthlyTemplate.name,
+      numOfMonthsInAdvance: 2
+    }
+    createNewInstancesOfMonthlyRepeatingTasks({ 
+      monthlyTemplate: newMonthlyTemplate,
+      userDoc: $user
     })
   }  
   
@@ -153,70 +159,6 @@
       await Promise.all(deleteRequests)
       resolve()
     })
-  }
-
-  // repeatOnDaysOfMonth: [0, 0, 0, 1, ... 0, 1]
-  function createNewInstancesOfMonthlyRepeatingTasks ({ numOfMonthsInAdvance = 2, repeatOnDayOfMonth, willRepeatOnLastDay }) {
-    const d = new Date() // base case: no need to start from beginning of month
-    for (let i = 0; i < numOfMonthsInAdvance; i++) {
-      generateRepeatingTasksForSpecificMonth(d, repeatOnDayOfMonth, willRepeatOnLastDay)
-
-      // general case: start from beginning of month
-      d.setMonth(d.getMonth() + 1)
-      d.setDate(1) 
-    }
-  }
-
-  function generateRepeatingTasksForSpecificMonth (dateClassObject, repeatOnDayOfMonth, willRepeatOnLastDay) {
-    const d = dateClassObject
-
-    // general case: first 28 days
-    while (d.getDate() < 28) {
-      if (repeatOnDayOfMonth[d.getDate() - 1]) { // getDate() is 1-indexed but `repeatOnDayOfMonth` is 0-indexed
-        generateNewTask(d.getDate(), d.getMonth())
-      }
-      d.setDate(d.getDate() + 1)
-    }
-
-    // edge case: last day (i.e. 28, 29, 30, 31 treated the same)
-    if (willRepeatOnLastDay) {
-      const lastDay = getLastDayOfMonth(d.getMonth()) // note `getMonth` is zero-indexed
-      generateNewTask(lastDay, d.getMonth())
-    }
-  }
-
-  // month is 1-indexed from 1 to 12
-  function getLastDayOfMonth (zeroIndexedMonthNumber) {
-    const d1 = new Date()
-    const d2 = new Date(d1.getFullYear(), zeroIndexedMonthNumber + 1, 0);
-    const lastDay = d2.getDate()
-    return lastDay
-  }
-
-  function generateNewTask (dayOfMonth, zeroIndexedMonthNumber) {
-    // BUG: NOT CORRECT
-    const d = new Date()
-    d.setMonth(zeroIndexedMonthNumber) // MUST set month first, otherwise it thinks the 31st day doesn't exist on the month yet
-    d.setDate(dayOfMonth)
-
-    const individualID = getRandomID()
-
-    let newObj = {
-      repeatGroupID,
-      id: individualID,
-      reusableTemplateID: repeatGroupID,
-      name: newTaskName,
-      startTime: '',
-      startDate: getDateInMMDD(d), //, MMDD
-      startYYYY: new Date().getFullYear()
-    } 
-
-    newObj = checkTaskObjSchema(newObj, $user)
-
-    setFirestoreDoc(
-      `/users/${$user.uid}/tasks/${individualID}`, 
-      newObj
-    )
   }
 </script>
 
