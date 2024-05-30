@@ -20,7 +20,7 @@
         </div>
       
         <!-- at least requires `periodicTasks` to be an `[]` i.e. loading finished, instead of null -->
-        {#each sortedWeeklyTasks as weeklyTask, i}
+        {#each sortedWeeklyTasks as weeklyTask, i (weeklyTask.id)}
           {#if i === 0}
             <ReusableSimpleDropzone on:new-order-value={(e) => updateOrderOfDraggedTemplate(e.detail)} aboveOrder={0} belowOrder={sortedWeeklyTasks[0].orderValue} />
           <!-- general case drop-zone: must be between 2 tasks-->
@@ -96,7 +96,7 @@
           </ManageReusableTasksCreateMonthly>
         </div>
 
-        {#each sortedMonthlyTasks as periodicTask, i}
+        {#each sortedMonthlyTasks as periodicTask, i (periodicTask.id)}
           {#if i === 0}
             <ReusableSimpleDropzone on:new-order-value={(e) => updateOrderOfDraggedTemplate(e.detail)} aboveOrder={0} belowOrder={periodicTasks[0].orderValue} />
             <!-- general case drop-zone: must be between 2 tasks-->
