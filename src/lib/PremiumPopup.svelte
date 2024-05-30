@@ -60,7 +60,7 @@
   })
 
   function unlockFeature () {
-    if (confirm("Thank you for being a pioneer user - I'll make sure this is one of the best decisions you've ever made. (And whenever you're willing to share brutally honest feedback, tell me without overly-polite filters so I have the best chance to make things better for you - my contact info is on the top right of the calendar :^)")) {
+    if (confirm("Thanks for being one of the earliest users in the world - I'll make sure this is one of the best decisions you've made. (And whenever you're willing to share brutally honest feedback, tell me without overly-polite filters so I have the best chance to make things better for you - my contact info is on the top right of the calendar :^)")) {
       updateFirestoreDoc(`/users/${$user.uid}`, {
         isSubscriber: true
       })
