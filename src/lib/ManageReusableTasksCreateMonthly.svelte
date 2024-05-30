@@ -58,6 +58,7 @@
       willRepeatOnLastDay: false,
       repeatGroupID: id,
       reusableTemplateID: id,
+      duration: 30,
       orderValue: defaultOrderValue + Math.random() * 0.5
     })
 

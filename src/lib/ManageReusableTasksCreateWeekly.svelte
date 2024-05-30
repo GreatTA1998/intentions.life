@@ -58,6 +58,7 @@
       numOfWeeksInAdvance: 2,
       repeatGroupID: id,
       reusableTemplateID: id,
+      duration: 5,
       orderValue: defaultOrderValue + Math.random() * 0.5
     })
 

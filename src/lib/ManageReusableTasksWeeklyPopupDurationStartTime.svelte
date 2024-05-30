@@ -3,7 +3,7 @@
     <div style="margin-left: 6px; margin-right: 6px; max-width: 80px;">
       <UXFormField
         fieldLabel="Duration"
-        value={Math.round(weeklyTemplate.duration) || 30}
+        value={Math.round(weeklyTemplate.duration)}
         willAutofocus={false}
         on:input={(e) => handleDurationInput(e)}
       >

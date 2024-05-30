@@ -215,12 +215,9 @@
 
     await deleteExistingFutureInstances()
 
-    const updatedWeeklyTemplate = { 
-      repeatOnDayOfWeek, 
-      numOfWeeksInAdvance,
-      repeatGroupID: weeklyTemplate.repeatGroupID,
-      name: weeklyTemplate.name
-    }
+    const updatedWeeklyTemplate = {...weeklyTemplate}
+    updatedWeeklyTemplate.repeatOnDayOfWeek = repeatOnDayOfWeek
+    updatedWeeklyTemplate.numOfWeeksInAdvance = numOfWeeksInAdvance
 
     // with a clean slate, generate new ones
     createNewInstancesOfWeeklyRepeatingTasks({ weeklyTemplate: updatedWeeklyTemplate, userDoc: $user })

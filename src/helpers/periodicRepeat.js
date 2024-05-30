@@ -53,12 +53,13 @@ export function createNewInstancesOfWeeklyRepeatingTasks ({ weeklyTemplate, user
 
 function createRepeatedTask({ dateClassObj, weeklyTemplate, userDoc }) {
   const individualID = getRandomID()
-  const { repeatOnDayOfWeek, repeatGroupID, name, startTime = '', iconDataURL = '' } = weeklyTemplate
+  const { repeatOnDayOfWeek, repeatGroupID, name, duration, startTime = '', iconDataURL = '' } = weeklyTemplate
   let taskObjCopy = {
     repeatGroupID,
     id: individualID,
     reusableTemplateID: repeatGroupID,
     name,
+    duration,
     startTime,
     startYYYY: new Date().getFullYear(),
     iconDataURL
