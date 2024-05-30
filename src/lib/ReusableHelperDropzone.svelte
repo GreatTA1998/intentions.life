@@ -140,15 +140,16 @@
         userDoc: $user
       })
 
-      // 4. PARENTID
-      if ($whatIsBeingDragged === 'top-level-task-within-this-todo-list' && ancestorRoomIDs.length === 1) {
-        // preserve parent relationship
-      } else {
-        updateObj.parentID = parentID
-      }
 
       // THE BELOW CODE CAUSES BUGS
       // updateObj = breakParentRelationIfNecessary(updateObj)
+    }
+
+    // 4. PARENTID
+    if ($whatIsBeingDragged === 'top-level-task-within-this-todo-list' && ancestorRoomIDs.length === 1) {
+      // preserve parent relationship
+    } else {
+      updateObj.parentID = parentID
     }
 
     // 2. HANDLE SUBTREE DEADLINES
