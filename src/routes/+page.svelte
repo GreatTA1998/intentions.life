@@ -11,7 +11,7 @@
       <!-- background: #193b19; -->
       <div slot="content" style="display: flex; flex-grow: 1; height: 100%; padding: 3%;" class="home-page-background">
         <div style="width: 90vw; min-width: 200px; height: 80vh; border-radius: 10px;">
-          <video 
+          <!-- <video 
             controls
             on:error={(error) => alert('error =', error)}
             src="https://firebasestorage.googleapis.com/v0/b/project-y-2a061.appspot.com/o/homePageDemoVideos%2Ffeature-1.mp4?alt=media&token=4bc3e4c2-778a-4ece-ae6a-604cc60e98ce#t=0.1">
@@ -21,7 +21,7 @@
             src="https://firebasestorage.googleapis.com/v0/b/project-y-2a061.appspot.com/o/homePageDemoVideos%2Ffeature-2.mp4?alt=media&token=7ca4101e-094e-474f-b373-82d1bc170791"
           >
 
-          </video>
+          </video> -->
           
           <div class="hero-title">
             A modern calendar for organizing life
@@ -150,11 +150,11 @@
         if (VideoElem) { // during `src` switching, it's not defined instantaneously
           VideoElem.playbackRate = 1.5
           // console.log('set VideoElem src ')
-          // VideoElem.src = fourAbilities[currentIdx].videoSrc
           if (window.innerWidth > 500) {
             VideoElem.controls = true
             VideoElem.controlslist="nodownload nofullscreen noremoteplayback noplaybackrate"
           }
+          VideoElem.src = fourAbilities[currentIdx].videoSrc
         }
       },
       0
