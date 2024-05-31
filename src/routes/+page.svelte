@@ -71,7 +71,7 @@
 
                 <video  
                   bind:this={VideoElem}
-                  muted={true} autoplay
+                  muted={true} autoplay playsinline
                   controls
                   controlslist="nodownload nofullscreen noremoteplayback noplaybackrate"
                   disablepictureinpicture
@@ -79,7 +79,7 @@
                   on:click|self={togglePlayPause}
                   on:loadstart={() => isVideoReady = false}
                   on:loadedmetadata={() => isVideoReady = true}
-                  style="width: 100%; height: auto; transition: width 1s, height 1s; cursor: pointer;"
+                  style="width: 100%; height: auto;"
                 >
                 </video>
 
@@ -130,7 +130,14 @@
   // when we switch "src" on <video> playback speed resets, so this is a hack
   $: if (VideoElem && (currentIdx || currentIdx === 0)) {
     setTimeout( // timeout necessary as the playback speed resets after video LOAD
-      () => VideoElem.playbackRate = 1.5, 
+      () => { 
+        if (VideoElem) { // during `src` switching, it's not defined instantaneously
+          VideoElem.playbackRate = 1.5
+          if (window.innerWidth < 500) {
+            VideoElem.controls = false
+          }
+        }
+      },
       0
     )
   }
