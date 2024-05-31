@@ -57,7 +57,7 @@
               </div>
             </div>
 
-            <div style="position: relative; justify-content: center; outline: 2px solid orange;">
+            <div style="position: relative; justify-content: center;">
               <div class="silent-video" style="display: {isVideoReady ? '' : 'none'};">
                 {#if isSoundOff}
                   <div class="unmute-btn" on:click={() => { 
