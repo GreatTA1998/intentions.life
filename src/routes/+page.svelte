@@ -36,8 +36,8 @@
           <div style="display: flex; justify-content: space-between; margin-top: 56px;">
             <div class="explanatory-card">
               <div style="display: flex; align-items: center;">
-                <div class="ability-icon" class:active-thumbnail={true}>
-                  <span class="material-symbols-outlined" style="font-size: 48px; color: white;">
+                <div class="ability-square" class:active-thumbnail={true}>
+                  <span class="material-symbols-outlined ability-icon" style="color: white;">
                     {fourAbilities[currentIdx].iconName}
                   </span>
                 </div>
@@ -57,13 +57,13 @@
               </div>
             </div>
 
-            <div style="position: relative; justify-content: center;">
+            <div style="position: relative; justify-content: center; outline: 2px solid orange;">
               <div class="silent-video" style="display: {isVideoReady ? '' : 'none'};">
                 {#if isSoundOff}
                   <div class="unmute-btn" on:click={() => { 
                     VideoElem.muted = false; isSoundOff = false
                   }} style="z-index: 1;">
-                    <div style="font-size: 0.8vw;">
+                    <div style="font-size: 1vw;">
                       Sound is off
                     </div>
                   </div>
@@ -82,13 +82,13 @@
                 >
                 </video>
 
-                <div class="ability-icons">
+                <div class="abilities-container">
                   {#each fourAbilities as ability, i}
-                    <div class="ability-icon" on:click={() => currentIdx = i}
+                    <div class="ability-square" on:click={() => currentIdx = i}
                       class:active-thumbnail={currentIdx === i}  
                       class:inactive-thumbnail={currentIdx !== i}
                     >
-                      <span class="material-symbols-outlined" style="font-size: 47px; color: white;">
+                      <span class="material-symbols-outlined ability-icon" style="color: white;">
                         {ability.iconName}
                       </span>
                     </div>
@@ -213,8 +213,8 @@
     top: 50%; /* Vertically center the button */
     left: 50%; /* Horizontally center the button */
     transform: translate(-50%, -50%); /* Adjust for the button's own dimensions */
-    width: 96px; /* Adjust the size of the button as needed */
-    height: 96px;
+    width: 9vw; /* Adjust the size of the button as needed */
+    height: 9vw;
     border-radius: 50%; /* Make the button circular */
     background-color: rgba(0, 0, 0, 0.2); /* Semi-transparent background */
     color: white; /* Text color */
@@ -246,16 +246,10 @@
 
   .silent-video {
     flex: 0 0 55%;
-
-    // outline: 2px solid red; 
-    // width: 800px; 
-    // height: 500px;
-    // background-color: grey;
     position: relative;
-    // border-top-left-radius: 16px;
   }
 
-  .ability-icons {
+  .abilities-container {
     position: absolute; 
     
     // https://stackoverflow.com/a/37413510/7812829
@@ -266,20 +260,22 @@
     margin-right: auto;
 
     top: auto;
-    outline: 0px solid purple;
-    width: 400px;
-    height: 100px;
-    bottom: -72px;
+    // outline: 4px solid purple;
+    width: 34vw;
+    bottom: -4.5vw;
 
     display: flex;
     justify-content: space-evenly;
     align-items: center;
   }
 
-  .ability-icon {
+  .ability-square {
     background-color: var(--ability-showcase-bg-color);
-    width: 80px;
-    height: 80px;
+    width: 7vw;
+    height: 7vw;
+    font-size: 48px;
+    // width: 80px;
+    // height: 80px;
     cursor: pointer;
 
     display: flex;
@@ -287,14 +283,15 @@
     justify-content: center;
   }
 
+  .ability-icon {
+    font-size: 4vw;
+  }
 
   .explanatory-card {
     flex: 0 0 45%; 
     height: auto; // 528px
     background-color: rgb(20, 20, 20);
-    padding: 24px;
-    // border-top-right-radius: 16px;
-    // border-bottom-right-radius: 16px;
+    padding: 2vw;
   }
 
   .card-title {
@@ -311,7 +308,7 @@
   .card-description {
     font-size: 1.2vw;
     margin-top: 1.8vw;
-    padding: 16px;
+    padding: 2vw;
     white-space: pre-line; // preserves line breaks
     color: rgb(200, 200, 200);
     font-weight: 400;
@@ -323,9 +320,6 @@
     .explanatory-card {
       zoom: 60%;
     }
-    .ability-icons {
-      zoom: 60%;
-    }
     .unmute-btn {
       zoom: 60%;
     }
@@ -333,12 +327,6 @@
 
   @media (max-width: 360px) {
     .explanatory-card {
-      zoom: 30%;
-    }
-    .ability-icons {
-      zoom: 30%;
-    }
-    .unmute-btn {
       zoom: 30%;
     }
     video::-webkit-media-controls-panel {
