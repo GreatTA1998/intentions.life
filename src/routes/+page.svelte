@@ -6,12 +6,6 @@
           src="/trueoutput-square-nobg.png" 
           style="width: 26px; height: 36px;"
         >
-
-        <PopupLogin let:setIsPopupOpen={setIsPopupOpen}>
-          <div on:click={() => setIsPopupOpen({ newVal: true })} style="margin-right: 0px; margin-left: auto; color: rgb(60, 60, 60); font-size: 12px;">
-            Log in
-          </div>
-        </PopupLogin>
       </div>
        -->
       <!-- background: #193b19; -->
@@ -78,7 +72,7 @@
                   src={fourAbilities[currentIdx].videoSrc}
                   bind:this={VideoElem}
                   muted playsinline
-                  controls={false}
+                  controls
                   disablepictureinpicture
              
                   on:click|self={togglePlayPause}
