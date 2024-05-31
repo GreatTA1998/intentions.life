@@ -171,11 +171,11 @@
       title: '1. Branching Todo',
       subtitle: 'No more long, messy lists',
       iconName: 'house',
-      description: `The home view is the week calendar, because everything eventually ends up here - whether it's a reusable habit, a milestone deadlines, a todo-item, or just a scheduled event.
+      description: `By default, you have a todo-list and calendar together.
 
                     The todo-list can branch indefinitely, making it easy to re-organize your to-do list into a few readable categories rather than a long linear list.
                     
-                    You can drag any task from the todo-list to the calendar. The calendar is free scrolling, making it easy to travel backwards and forwards.
+                    You can drag any task from the todo-list to the calendar.
                    `
     },
     {
@@ -183,12 +183,9 @@
       title: '2. Reusable Tasks',
       subtitle: 'Configure sustainable routines',
       iconName: 'restart_alt',
-      description: `There's a place where you can configure all your repeating tasks. Habits can repeat on specific days, without needing a specific time. 
+      description: `You can configure all your routines together, under one page. 
 
-        The reason the repeats are "flexible", is because you can even schedule a weekly habit that doesn't have a pre-designated day. Just drag it to the calendar when good timing emerges.
-        (1-minute duration is also supported.)
-        
-        In general, repeating tasks will appear as expected on the calendar.
+        Reusable tasks are better than traditional "repeating tasks" in 4 ways: they can be low duration (1 min), they can be autocompleted on calendar, they get time statistics, and they enable icon representations.
         `
     },
     {
@@ -196,9 +193,9 @@
       title: '3. UNCERTAIN GOALS',
       subtitle: "Visualize tried paths",
       iconName: 'sports_score',
-      description: `Many tasks involve many unforeseen steps and difficulties. If you're blocked on a task because you're awaiting others, it will be put to the side and de-emphasized.
-      
-      But if you don't hear back within the expected follow-up time, the task will be re-emphasized, and also copied onto the relevant calendar day.
+      description: `Many tasks involve many unforeseen steps and difficulties. By tracking the paths, not only do you not forget to follow-up with pending steps, you are more likely to persevere when you can visualize all the things you attempted. 
+
+      You can drag entire-subtrees to forge a rich, tree-like history for your most long-term endeavors.
       `
     },
     {
@@ -206,8 +203,9 @@
       title: '4. Photos',
       subtitle: "Display photos contextually",
       iconName: 'image',
-      description: `Calendar-centric photos allows you to display your favorite photos in context, giving you a delightful, visual history of your week.
+      description: `Attaching photos to tasks have practical use - they often encapsulate a lot of information. 
       
+      But more importantly, calendar-centric photos allows you revisit memories as a natural byproduct of looking at your calendar, and creates lively atmosphere. 
       `
     }
   ]
