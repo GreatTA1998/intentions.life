@@ -60,15 +60,21 @@
             <div style="position: relative; justify-content: center;">
               <div class="silent-video" style="display: {isVideoReady ? '' : 'none'};">
                 {#if isSoundOff}
-                  <div class="unmute-btn" on:click={() => isSoundOff = !isSoundOff} style="z-index: 1;">
-                    <div>Sound Off</div>
+                  <div class="unmute-btn" on:click={() => { 
+                    VideoElem.muted = false; isSoundOff = false
+                  }} style="z-index: 1;">
+                    <div style="font-size: 0.8vw;">
+                      Sound is off
+                    </div>
                   </div>
                 {/if}
 
                 <video  
                   bind:this={VideoElem}
-                  muted={isSoundOff} autoplay
+                  muted={true} autoplay
                   controls
+                  controlslist="nodownload nofullscreen noremoteplayback noplaybackrate"
+                  disablepictureinpicture
                   src={fourAbilities[currentIdx].videoSrc}
                   on:loadstart={() => isVideoReady = false}
                   on:loadedmetadata={() => isVideoReady = true}
@@ -122,9 +128,6 @@
 
   })
 
-  $: if (VideoElem) {
-    VideoElem.muted = isSoundOff
-  }
 
   // when we switch "src" on <video> playback speed resets, so this is a hack
   $: if (VideoElem && (currentIdx || currentIdx === 0)) {
