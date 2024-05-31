@@ -68,6 +68,9 @@
                     </div>
                   </div>
                 {/if}
+<!-- 
+                on:loadstart={() => isVideoReady = false}
+                on:loadedmetadata={() => isVideoReady = true} -->
 
                 <video  
                   bind:this={VideoElem}
@@ -77,8 +80,7 @@
                   disablepictureinpicture
                   src={fourAbilities[currentIdx].videoSrc}
                   on:click|self={togglePlayPause}
-                  on:loadstart={() => isVideoReady = false}
-                  on:loadedmetadata={() => isVideoReady = true}
+           
                   style="width: 100%; height: auto;"
                 >
                 </video>
