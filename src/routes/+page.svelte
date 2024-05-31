@@ -70,7 +70,7 @@
               <div class="silent-video">
                 {#if isSoundOff}
                   <div class="unmute-btn" on:click={() => { 
-                    VideoElem.muted = false; isSoundOff = false
+                    VideoElem.muted = false; isSoundOff = false; VideoElem.play();
                   }} style="z-index: 1;">
                     <div style="font-size: 1.2vw;">
                       Sound is off
@@ -114,7 +114,7 @@
           </div>
 
     
-          <div style="text-align: center; padding-top: 10vw; padding-bottom: 4vw;">
+          <div style="text-align: center; padding-top: 12vw; padding-bottom: 4vw;">
             <div style="margin-bottom: 1vw;">
               Example screenshot of an active calendar
             </div>
