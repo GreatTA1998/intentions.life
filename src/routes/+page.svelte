@@ -77,7 +77,7 @@
                   disablepictureinpicture
              
                   on:click|self|preventDefault={() => {
-                    if (isShowingControls) {
+                    if (!isShowingControls) {
                       togglePlayPause() 
                     }
                   }}
