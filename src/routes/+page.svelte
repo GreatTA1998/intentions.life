@@ -73,13 +73,13 @@
                 on:loadstart={() => isVideoReady = false}
                 on:loadedmetadata={() => isVideoReady = true} -->
 
-                <video  
+                <video src={fourAbilities[currentIdx].videoSrc}
                   bind:this={VideoElem}
-                  muted={true} autoplay playsinline
+                  muted autoplay playsinline
                   controls={false}
                   controlslist="nodownload nofullscreen noremoteplayback noplaybackrate"
                   disablepictureinpicture
-                  src={fourAbilities[currentIdx].videoSrc}
+             
                   on:click|self={togglePlayPause}
            
                   style="width: 100%; height: auto;"
