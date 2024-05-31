@@ -76,7 +76,7 @@
                   controls={false}
                   disablepictureinpicture
              
-                  on:click|self={togglePlayPause}
+                  on:click|self|preventDefault={togglePlayPause}
                   on:loadedmetadata={onVideoLoaded}
            
                   style="width: 100%; height: auto;"
@@ -143,7 +143,7 @@
         if (VideoElem) { // during `src` switching, it's not defined instantaneously
     
           // console.log('set VideoElem src ')
-          if (window.innerWidth > 500) {
+          if (window.innerWidth > 600) {
             VideoElem.controls = true
             VideoElem.controlslist="nodownload nofullscreen noremoteplayback noplaybackrate"
           }
