@@ -25,7 +25,7 @@
             <div class="secondary-description" style="line-height: 1.4">
               Google made a calendar. So did Apple, Microsoft, Notion, Motion, VimCal, cal.com...
               But only this calendar has the <b><u>4 experimental features</u></b>, so you can manage all the small things in life -
-              without losing sight of your goals and dreams
+              without losing sight of your biggest goals and dreams
             </div>
             
             <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 12px 0px;" class="action-buttons">
@@ -42,7 +42,7 @@
                   </span>
                 </div>
 
-                 <div style="padding-left: 16px;">
+                 <div style="padding-left: 1.5vw;">
                     <div class="card-title">
                       {fourAbilities[currentIdx].title}
                     </div>
@@ -63,7 +63,7 @@
                   <div class="unmute-btn" on:click={() => { 
                     VideoElem.muted = false; isSoundOff = false
                   }} style="z-index: 1;">
-                    <div style="font-size: 1vw;">
+                    <div style="font-size: 1.2vw;">
                       Sound is off
                     </div>
                   </div>
@@ -147,7 +147,7 @@
   let fourAbilities = [
     {
       videoSrc: "https://firebasestorage.googleapis.com/v0/b/project-y-2a061.appspot.com/o/homePageDemoVideos%2Ffeature-1.mp4?alt=media&token=4bc3e4c2-778a-4ece-ae6a-604cc60e98ce",
-      title: 'Branching Todo-list',
+      title: 'Branching Todo',
       subtitle: 'No more long, messy lists',
       iconName: 'house',
       description: `The home view is the week calendar, because everything eventually ends up here - whether it's a reusable habit, a milestone deadlines, a todo-item, or just a scheduled event.
@@ -160,7 +160,7 @@
     {
       videoSrc: "https://firebasestorage.googleapis.com/v0/b/project-y-2a061.appspot.com/o/homePageDemoVideos%2Ffeature-2.mp4?alt=media&token=7ca4101e-094e-474f-b373-82d1bc170791",
       title: 'Reusable Tasks',
-      subtitle: 'Efficient UX for habits & routines',
+      subtitle: 'Configure sustainable routines',
       iconName: 'restart_alt',
       description: `There's a place where you can configure all your repeating tasks. Habits can repeat on specific days, without needing a specific time. 
 
@@ -173,7 +173,7 @@
     {
       videoSrc: "https://firebasestorage.googleapis.com/v0/b/project-y-2a061.appspot.com/o/homePageDemoVideos%2Ffeature-3.mp4?alt=media&token=a453c7db-ca83-4f26-9e5d-895ed35fb66e",
       title: 'UNCERTAIN GOALS',
-      subtitle: "Visualize progress, including tried paths",
+      subtitle: "Visualize tried paths",
       iconName: 'sports_score',
       description: `Many tasks involve many unforeseen steps and difficulties. If you're blocked on a task because you're awaiting others, it will be put to the side and de-emphasized.
       
@@ -182,8 +182,8 @@
     },
     {
       videoSrc: "https://firebasestorage.googleapis.com/v0/b/project-y-2a061.appspot.com/o/homePageDemoVideos%2Ffeature-4.mp4?alt=media&token=a41910a8-043b-43a5-948a-4ee6fa9c1668",
-      title: 'Context-based Photos',
-      subtitle: "A more natural way to revisit memories",
+      title: 'Photography',
+      subtitle: "Display photos contextually",
       iconName: 'image',
       description: `Calendar-centric photos allows you to display your favorite photos in context, giving you a delightful, visual history of your week.
       
@@ -285,7 +285,6 @@
     background-color: var(--ability-showcase-bg-color);
     width: 6.5vw;
     height: 6.5vw;
-    font-size: 48px;
     cursor: pointer;
 
     display: flex;
@@ -318,7 +317,7 @@
   .card-description {
     font-size: 1.2vw;
     margin-top: 1.8vw;
-    padding: 1vw;
+    padding: 0.5vw;
     white-space: pre-line; // preserves line breaks
     color: rgb(200, 200, 200);
     font-weight: 400;
@@ -327,9 +326,6 @@
   }
 
   @media (max-width: 768px) {
-    .explanatory-card {
-      zoom: 60%;
-    }
 
     video::-webkit-media-controls-panel {
       display: none !important;
