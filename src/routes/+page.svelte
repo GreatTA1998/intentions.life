@@ -211,7 +211,7 @@
   ]
 
   function onVideoLoaded () {
-    console.log('video loaded')
+    alert('video loaded')
     VideoElem.play()
   }
 
