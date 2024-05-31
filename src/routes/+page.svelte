@@ -72,7 +72,7 @@
                   src={fourAbilities[currentIdx].videoSrc}
                   bind:this={VideoElem}
                   muted playsinline
-                  controls
+                  controls={false}
                   disablepictureinpicture
              
                   on:click|self={togglePlayPause}
