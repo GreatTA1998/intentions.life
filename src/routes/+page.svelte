@@ -21,51 +21,19 @@
             A modern calendar for organizing life
           </div>
     
-          <div style="display: flex; margin-top: 24px; flex-wrap: wrap;">
-            <div class="secondary-description">
-              Google made a calendar. So did Apple, Microsoft, Notion, Motion, VimCal, cal.com... the list goes on.
-              <br><br>
-              But only this calendar has these <b>4 features</b>, so you can effectively manage all the small, important things in life,
-              without losing sight of your long-term goals and dreams.
+          <div style="display: flex; margin-top: 24px; flex-wrap: wrap; gap: 24px;">
+            <div class="secondary-description" style="line-height: 1.4">
+              Google made a calendar. So did Apple, Microsoft, Notion, Motion, VimCal, cal.com...
+              But only this calendar has the <b><u>4 experimental features</u></b>, so you can manage all the small things in life -
+              without losing sight of your goals and dreams
             </div>
             
             <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 12px 0px;" class="action-buttons">
-              <!-- <div
-                on:click={createTemporaryDemoAccount}
-                style="cursor: pointer; border-radius: 24px; background-color: rgb(160, 160, 160); display: flex; align-items: center; justify-content: center; height: 40px; color: white; padding: 6px 24px; margin-right: 12px;">
-                <span class="material-symbols-outlined" style="margin-right: 4px;">
-                  play_arrow
-                  </span> 
-                  <div>
-                    Try demo
-                  </div>
-              </div> -->
-    
               <LoginGoogle/>
             </div>
           </div>
     
           <div style="display: flex; justify-content: space-between; margin-top: 56px;">
-            
-            <div style="position: relative; justify-content: center;">
-              <div class="silent-video">
-                <img src="/default-calendar-view-screenshot.png" style="width: 100%; height: 100%; box-shadow: 0 4px 8px rgba(148, 90, 35, 0.4);">
-              </div>
-
-              <div class="ability-icons">
-                {#each fourAbilities as ability, i}
-                  <div class="ability-icon" on:click={() => currentIdx = i}
-                    class:active-thumbnail={currentIdx === i}  
-                    class:inactive-thumbnail={currentIdx !== i}
-                  >
-                    <span class="material-symbols-outlined" style="font-size: 47px; color: white;">
-                      {ability.iconName}
-                    </span>
-                  </div>
-                {/each}
-              </div>
-            </div>
-
             <div class="explanatory-card">
               <div style="display: flex; align-items: center;">
                 <div class="ability-icon" class:active-thumbnail={true}>
@@ -78,7 +46,7 @@
                     <div class="card-title">
                       {fourAbilities[currentIdx].title}
                     </div>
-                    <div style="font-size: 24px; color: rgb(240, 240, 240);">
+                    <div class="card-subtitle">
                       {fourAbilities[currentIdx].subtitle}
                     </div>
                  </div>
@@ -88,14 +56,46 @@
                 {fourAbilities[currentIdx].description}
               </div>
             </div>
+
+            <div style="position: relative; justify-content: center;">
+              <div class="silent-video" style="display: {isVideoReady ? '' : 'none'};">
+                {#if isSoundOff}
+                  <div class="unmute-btn" on:click={() => isSoundOff = !isSoundOff} style="z-index: 1;">
+                    <div>Sound Off</div>
+                  </div>
+                {/if}
+
+                <video  
+                  bind:this={VideoElem}
+                  muted={isSoundOff} autoplay
+                  controls
+                  src={fourAbilities[currentIdx].videoSrc}
+                  on:loadstart={() => isVideoReady = false}
+                  on:loadedmetadata={() => isVideoReady = true}
+                  style="width: 100%; height: auto; transition: width 1s, height 1s; cursor: pointer;"
+                >
+                </video>
+
+                <div class="ability-icons">
+                  {#each fourAbilities as ability, i}
+                    <div class="ability-icon" on:click={() => currentIdx = i}
+                      class:active-thumbnail={currentIdx === i}  
+                      class:inactive-thumbnail={currentIdx !== i}
+                    >
+                      <span class="material-symbols-outlined" style="font-size: 47px; color: white;">
+                        {ability.iconName}
+                      </span>
+                    </div>
+                  {/each}
+                </div>
+              </div>
+
+            </div>
           </div>
 
-          <!-- <div style="display: flex; justify-content: center; margin-top: 48px;">
-            <div class="demo-video-container">
-              <div style="position: relative; padding-bottom: 56.25%; height: 0;"><iframe src="https://www.loom.com/embed/5d5b7edd67534940a26268d0331d9671?sid=293776fa-384c-4e96-946a-2db2caabb412" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe></div>
-            </div>
-          </div> -->
-
+          <div style="text-align: center; padding-top: 10vw; padding-bottom: 4vw;">
+            <img style="max-width: 80%; height: auto;" src="https://firebasestorage.googleapis.com/v0/b/project-y-2a061.appspot.com/o/homePageDemoVideos%2Fmy-screenshot-for-showcase.png?alt=media&token=9800c22f-875b-4df7-b364-2a122e22c842">
+          </div>
 
         </div>
       </div>
@@ -111,17 +111,34 @@
   import { getAuth, signInAnonymously } from "firebase/auth";
   import NavbarAndContentWrapper from '$lib/NavbarAndContentWrapper.svelte'
 
+  let isSoundOff = true
+
+  let VideoElem
+
   let isSigningIn
+  let isVideoReady = false
 
   onMount(() => {
 
   })
 
+  $: if (VideoElem) {
+    VideoElem.muted = isSoundOff
+  }
+
+  // when we switch "src" on <video> playback speed resets, so this is a hack
+  $: if (VideoElem && (currentIdx || currentIdx === 0)) {
+    setTimeout( // timeout necessary as the playback speed resets after video LOAD
+      () => VideoElem.playbackRate = 1.5, 
+      0
+    )
+  }
+
   let currentIdx = 0
 
   let fourAbilities = [
     {
-      videoSrc: '',
+      videoSrc: "https://firebasestorage.googleapis.com/v0/b/project-y-2a061.appspot.com/o/homePageDemoVideos%2Ffeature-1.mp4?alt=media&token=4bc3e4c2-778a-4ece-ae6a-604cc60e98ce",
       title: 'Branching Todo-list',
       subtitle: 'No more long, messy lists',
       iconName: 'house',
@@ -133,7 +150,7 @@
                    `
     },
     {
-      videoSrc: '',
+      videoSrc: "https://firebasestorage.googleapis.com/v0/b/project-y-2a061.appspot.com/o/homePageDemoVideos%2Ffeature-2.mp4?alt=media&token=7ca4101e-094e-474f-b373-82d1bc170791",
       title: 'Reusable Tasks',
       subtitle: 'Efficient UX for habits & routines',
       iconName: 'restart_alt',
@@ -146,9 +163,9 @@
         `
     },
     {
-      videoSrc: '',
+      videoSrc: "https://firebasestorage.googleapis.com/v0/b/project-y-2a061.appspot.com/o/homePageDemoVideos%2Ffeature-3.mp4?alt=media&token=a453c7db-ca83-4f26-9e5d-895ed35fb66e",
       title: 'UNCERTAIN GOALS',
-      subtitle: "Visualize progress, including tried failures",
+      subtitle: "Visualize progress, including tried paths",
       iconName: 'sports_score',
       description: `Many tasks involve many unforeseen steps and difficulties. If you're blocked on a task because you're awaiting others, it will be put to the side and de-emphasized.
       
@@ -156,7 +173,7 @@
       `
     },
     {
-      videoSrc: '',
+      videoSrc: "https://firebasestorage.googleapis.com/v0/b/project-y-2a061.appspot.com/o/homePageDemoVideos%2Ffeature-4.mp4?alt=media&token=a41910a8-043b-43a5-948a-4ee6fa9c1668",
       title: 'Context-based Photos',
       subtitle: "A more natural way to revisit memories",
       iconName: 'image',
@@ -188,6 +205,24 @@
 </script>
 
 <style lang="scss">
+  .unmute-btn {
+    position: absolute; /* Position the button absolutely within the container */
+    top: 50%; /* Vertically center the button */
+    left: 50%; /* Horizontally center the button */
+    transform: translate(-50%, -50%); /* Adjust for the button's own dimensions */
+    width: 96px; /* Adjust the size of the button as needed */
+    height: 96px;
+    border-radius: 50%; /* Make the button circular */
+    background-color: rgba(0, 0, 0, 0.2); /* Semi-transparent background */
+    color: white; /* Text color */
+    border: none;
+    outline: none;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
   :root {
     --ability-showcase-bg-color: rgb(0, 0, 0);
   }
@@ -207,10 +242,13 @@
 
 
   .silent-video {
+    flex: 0 0 55%;
+
     // outline: 2px solid red; 
-    width: 800px; 
-    height: 500px;
-    background-color: grey;
+    // width: 800px; 
+    // height: 500px;
+    // background-color: grey;
+    position: relative;
     // border-top-left-radius: 16px;
   }
 
@@ -228,7 +266,7 @@
     outline: 0px solid purple;
     width: 400px;
     height: 100px;
-    bottom: -24px;
+    bottom: -72px;
 
     display: flex;
     justify-content: space-evenly;
@@ -248,31 +286,63 @@
 
 
   .explanatory-card {
-    width: 620px;
-    height: 540px;
-    background-color: var(--ability-showcase-bg-color);
+    flex: 0 0 45%; 
+    height: auto; // 528px
+    background-color: rgb(20, 20, 20);
     padding: 24px;
     // border-top-right-radius: 16px;
     // border-bottom-right-radius: 16px;
   }
 
-
   .card-title {
-    font-size: 34px;
-    font-weight: 600;
+    font-size: 2.4vw;
+    font-weight: 500;
     color: white;
     text-transform: uppercase;
   }
 
+  .card-subtitle {
+    font-size: 1.7vw; font-weight: 300; color: rgb(240, 240, 240);
+  }
+
   .card-description {
-    margin-top: 48px;
+    font-size: 1.2vw;
+    margin-top: 1.8vw;
     padding: 16px;
-    white-space: pre-line;
-    color: rgb(250, 250, 250);
-    font-size: 18px;
+    white-space: pre-line; // preserves line breaks
+    color: rgb(200, 200, 200);
+    font-weight: 400;
+    line-height: 1.4;
     font-style: italic;
   }
 
+  @media (max-width: 768px) {
+    .explanatory-card {
+      zoom: 60%;
+    }
+    .ability-icons {
+      zoom: 60%;
+    }
+    .unmute-btn {
+      zoom: 60%;
+    }
+  }
+
+  @media (max-width: 360px) {
+    .explanatory-card {
+      zoom: 30%;
+    }
+    .ability-icons {
+      zoom: 30%;
+    }
+    .unmute-btn {
+      zoom: 30%;
+    }
+    video::-webkit-media-controls-panel {
+      display: none !important;
+      opacity: 1 !important;
+    }
+  }
 
   .transparent-glow-navbar {
     background-color: rgba(150, 150, 150, 0.1);
@@ -323,10 +393,6 @@
     font-weight: 600;
   }
 
-  .demo-video-container {
-    height: 80vh; width: 90vw
-  }
-
   // note there will be a 1px boundary condition that causes an error, however, 
   // Kevin Powell's inequality syntax doesn't work for now https://youtube.com/shorts/mrzA2B5gUmI?si=J4yAzq1EQO-BwlN9
 
@@ -350,13 +416,6 @@
     .hero-title {
       margin-top: 12px;
       font-size: 10vw;
-    }
-
-    .demo-video-container {
-      width: 100vw; 
-      height: calc(100vw * 3/4);
-      margin-left: -4%; 
-      margin-right: -4%;
     }
   }
 

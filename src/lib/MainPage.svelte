@@ -186,7 +186,7 @@
         
         <!-- 2nd flex child -->
         <div class="the-only-scrollable-container calendar-section-flex-child"> 
-          {#if allTasks.length > 0}    
+          {#if allTasks}    
             <NewCalendarThisWeek
               {calStartDateClassObj}
               on:calendar-shifted={(e) => incrementDateClassObj({ days: e.detail.days})}
@@ -285,24 +285,29 @@
   let currentJournalEntryMMDD = getDateOfToday()
   let dateOfToday = getDateOfToday()
 
-  let allTasks = []
+  let allTasks = null
   let futureScheduledTasks = [] // AF([])
 
   let clickedTask = {}
   let isInitialFetch = true
   let unsub
 
-  $: if (allTasks.length > 0) {
+  $: if (allTasks) {
     computeDataStructuresFromAllTasks(allTasks)
   }
 
   function handleLogoClick (setIsPopupOpen) {
-    if (!$user.email && !$user.phoneNumber) {
+    if (confirm('Log out and return to home page tutorials?')) {
       signOutOnFirebase();
       goto('/');
-    } else {
-      setIsPopupOpen({ newVal: true })
     }
+
+    // if (!$user.email && !$user.phoneNumber) {
+    //   signOutOnFirebase();
+    //   goto('/');
+    // } else {
+    //   setIsPopupOpen({ newVal: true })
+    // }
   }
 
   function signOutOnFirebase () {
