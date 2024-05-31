@@ -73,14 +73,15 @@
                 on:loadstart={() => isVideoReady = false}
                 on:loadedmetadata={() => isVideoReady = true} -->
 
-                <video src={fourAbilities[currentIdx].videoSrc}
+                <!-- src={fourAbilities[currentIdx].videoSrc} -->
+                <video 
                   bind:this={VideoElem}
-                  muted autoplay playsinline
+                  muted playsinline
                   controls={false}
                   disablepictureinpicture
              
                   on:click|self={togglePlayPause}
-                  on:loadedmetadata={() => VideoElem.play()}
+                  on:loadedmetadata={onVideoLoaded}
            
                   style="width: 100%; height: auto;"
                 >
@@ -131,11 +132,18 @@
 
 
   // when we switch "src" on <video> playback speed resets, so this is a hack
-  $: if (VideoElem && (currentIdx || currentIdx === 0)) {
+  $: if ((currentIdx || currentIdx === 0)) {
+    initializeVideo()
+  }
+
+  function initializeVideo () {
     setTimeout( // timeout necessary as the playback speed resets after video LOAD
       () => { 
+        console.log('set timeout')
         if (VideoElem) { // during `src` switching, it's not defined instantaneously
           VideoElem.playbackRate = 1.5
+          console.log('set VideoElem src ')
+          VideoElem.src = fourAbilities[currentIdx].videoSrc
           if (window.innerWidth < 500) {
             VideoElem.controls = false // redundant
           } else {
@@ -197,6 +205,11 @@
     }
   ]
 
+  function onVideoLoaded () {
+    console.log('video loaded')
+    VideoElem.play()
+  }
+
   function togglePlayPause () {
     const video = VideoElem
     if (video.paused || video.ended) {
@@ -212,6 +225,11 @@
 </script>
 
 <style lang="scss">
+  // https://stackoverflow.com/a/31838091/7812829
+  video::-webkit-media-controls-start-playback-button {
+    display: none !important;
+  }
+
   .unmute-btn {
     position: absolute; /* Position the button absolutely within the container */
     top: 50%; /* Vertically center the button */
