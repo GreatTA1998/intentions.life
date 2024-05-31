@@ -56,7 +56,7 @@
               <!-- style="display: {isVideoReady ? '' : 'none'};" -->
               <div class="silent-video">
                 {#if isSoundOff}
-                  <div class="unmute-btn" on:click={() => { 
+                  <div class="unmute-btn" on:click|stopPropagation={() => { 
                     VideoElem.muted = false; isSoundOff = false; VideoElem.play();
                   }} style="z-index: 1;">
                     <div style="font-size: 1.2vw;">
