@@ -76,7 +76,7 @@
                 <video  
                   bind:this={VideoElem}
                   muted={true} autoplay playsinline
-                  controls
+                  controls={false}
                   controlslist="nodownload nofullscreen noremoteplayback noplaybackrate"
                   disablepictureinpicture
                   src={fourAbilities[currentIdx].videoSrc}
@@ -137,7 +137,9 @@
         if (VideoElem) { // during `src` switching, it's not defined instantaneously
           VideoElem.playbackRate = 1.5
           if (window.innerWidth < 500) {
-            VideoElem.controls = false
+            VideoElem.controls = false // redundant
+          } else {
+            VideoElem.controls = true
           }
         }
       },
