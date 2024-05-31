@@ -118,11 +118,8 @@
   import NavbarAndContentWrapper from '$lib/NavbarAndContentWrapper.svelte'
 
   let isSoundOff = true
-
   let VideoElem
-
-  let isSigningIn
-  let isVideoReady = false
+  let isVideoReady = true
 
   onMount(() => {
 
@@ -271,11 +268,9 @@
 
   .ability-square {
     background-color: var(--ability-showcase-bg-color);
-    width: 7vw;
-    height: 7vw;
+    width: 6.5vw;
+    height: 6.5vw;
     font-size: 48px;
-    // width: 80px;
-    // height: 80px;
     cursor: pointer;
 
     display: flex;
@@ -308,7 +303,7 @@
   .card-description {
     font-size: 1.2vw;
     margin-top: 1.8vw;
-    padding: 2vw;
+    padding: 1vw;
     white-space: pre-line; // preserves line breaks
     color: rgb(200, 200, 200);
     font-weight: 400;
