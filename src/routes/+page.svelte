@@ -75,6 +75,7 @@
 
                 <!-- src={fourAbilities[currentIdx].videoSrc} -->
                 <video 
+                  src={fourAbilities[currentIdx].videoSrc}
                   bind:this={VideoElem}
                   muted playsinline
                   controls={false}
@@ -142,11 +143,9 @@
         console.log('set timeout')
         if (VideoElem) { // during `src` switching, it's not defined instantaneously
           VideoElem.playbackRate = 1.5
-          console.log('set VideoElem src ')
-          VideoElem.src = fourAbilities[currentIdx].videoSrc
-          if (window.innerWidth < 500) {
-            VideoElem.controls = false // redundant
-          } else {
+          // console.log('set VideoElem src ')
+          // VideoElem.src = fourAbilities[currentIdx].videoSrc
+          if (window.innerWidth > 500) {
             VideoElem.controls = true
             VideoElem.controlslist="nodownload nofullscreen noremoteplayback noplaybackrate"
           }
@@ -337,13 +336,13 @@
 
   @media (max-width: 768px) {
 
-    video::-webkit-media-controls-panel {
-      display: none !important;
-      opacity: 1 !important;
-    } 
-    video::-webkit-media-controls {
-      display: none;
-    }
+    // video::-webkit-media-controls-panel {
+    //   display: none !important;
+    //   opacity: 1 !important;
+    // } 
+    // video::-webkit-media-controls {
+    //   display: none;
+    // }
   }
 
   @media (max-width: 360px) {
