@@ -76,6 +76,7 @@
                   controlslist="nodownload nofullscreen noremoteplayback noplaybackrate"
                   disablepictureinpicture
                   src={fourAbilities[currentIdx].videoSrc}
+                  on:click|self={togglePlayPause}
                   on:loadstart={() => isVideoReady = false}
                   on:loadedmetadata={() => isVideoReady = true}
                   style="width: 100%; height: auto; transition: width 1s, height 1s; cursor: pointer;"
@@ -183,7 +184,14 @@
     }
   ]
 
-
+  function togglePlayPause () {
+    const video = VideoElem
+    if (video.paused || video.ended) {
+      video.play();
+    } else {
+      video.pause();
+    }
+  }
 
   function createTemporaryDemoAccount () {
     const auth = getAuth();
@@ -315,18 +323,19 @@
     .explanatory-card {
       zoom: 60%;
     }
-    .unmute-btn {
-      zoom: 60%;
+
+    video::-webkit-media-controls-panel {
+      display: none !important;
+      opacity: 1 !important;
+    } 
+    video::-webkit-media-controls {
+      display: none;
     }
   }
 
   @media (max-width: 360px) {
     .explanatory-card {
       zoom: 30%;
-    }
-    video::-webkit-media-controls-panel {
-      display: none !important;
-      opacity: 1 !important;
     }
   }
 
