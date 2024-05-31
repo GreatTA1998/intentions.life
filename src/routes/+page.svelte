@@ -77,10 +77,10 @@
                   bind:this={VideoElem}
                   muted autoplay playsinline
                   controls={false}
-                  controlslist="nodownload nofullscreen noremoteplayback noplaybackrate"
                   disablepictureinpicture
              
                   on:click|self={togglePlayPause}
+                  on:loadedmetadata={() => VideoElem.play()}
            
                   style="width: 100%; height: auto;"
                 >
@@ -140,6 +140,7 @@
             VideoElem.controls = false // redundant
           } else {
             VideoElem.controls = true
+            VideoElem.controlslist="nodownload nofullscreen noremoteplayback noplaybackrate"
           }
         }
       },
@@ -203,20 +204,6 @@
     } else {
       video.pause();
     }
-  }
-
-  function createTemporaryDemoAccount () {
-    const auth = getAuth();
-    signInAnonymously(auth)
-      .then(() => {
-        alert("Welcome! You are about to be redirected to the demo. If the website seems broken, try reloading the page. If at any point you want to return to the home page, just click the tree logo on the top left.")
-        // Signed in..
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        // ...
-      });
   }
 
   function getRandomInt(max) {
@@ -439,5 +426,4 @@
       width: 30vw; 
     }
   }
-
 </style>
