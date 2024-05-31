@@ -76,7 +76,11 @@
                   controls={false}
                   disablepictureinpicture
              
-                  on:click|self|preventDefault={togglePlayPause}
+                  on:click|self|preventDefault={() => {
+                    if (isShowingControls) {
+                      togglePlayPause() 
+                    }
+                  }}
                   on:loadedmetadata={onVideoLoaded}
            
                   style="width: 100%; height: auto;"
@@ -125,6 +129,7 @@
   let isSoundOff = true
   let VideoElem
   let isVideoReady = true
+  let isShowingControls = false
 
   onMount(() => {
 
@@ -144,6 +149,7 @@
     
           // console.log('set VideoElem src ')
           if (window.innerWidth > 600) {
+            isShowingControls = true
             VideoElem.controls = true
             VideoElem.controlslist="nodownload nofullscreen noremoteplayback noplaybackrate"
           }
