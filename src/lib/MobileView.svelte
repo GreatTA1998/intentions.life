@@ -1,6 +1,6 @@
 {#key clickedTask}
   {#if isDetailedCardOpen}
-    <MobileDetailedCardPopup 
+    <DetailedCardPopup 
       taskObject={clickedTask}
       on:card-close={() => isDetailedCardOpen = false}
       on:task-delete={(e) => deleteTaskNode(e.detail)}
@@ -8,6 +8,15 @@
       on:task-update={(e) => updateTaskNode(e.detail)}
       on:task-checkbox-change={(e) => updateTaskNode({ id: e.detail.id, keyValueChanges: { isDone: e.detail.isDone }})} 
     />
+
+    <!-- <MobileDetailedCardPopup 
+      taskObject={clickedTask}
+      on:card-close={() => isDetailedCardOpen = false}
+      on:task-delete={(e) => deleteTaskNode(e.detail)}
+      on:task-click={(e) => openDetailedCard(e.detail)}
+      on:task-update={(e) => updateTaskNode(e.detail)}
+      on:task-checkbox-change={(e) => updateTaskNode({ id: e.detail.id, keyValueChanges: { isDone: e.detail.isDone }})} 
+    /> -->
   {/if}
 {/key}
 
@@ -159,6 +168,7 @@
   import db from '/src/db.js'
   import VoiceKeywordDetect from '$lib/VoiceKeywordDetect.svelte'
   import MobileDetailedCardPopup from '$lib/MobileDetailedCardPopup.svelte'
+  import DetailedCardPopup from '$lib/DetailedCardPopup.svelte'
 
   let allTasks = []
   let todayScheduledTasks = []

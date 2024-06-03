@@ -234,6 +234,9 @@ function saveTitle (newVal) {
   }
 
   .detailed-card-popup {
+    /* mobile restriction */
+    max-height: 80%;
+
     position: fixed;
     font-size: 14px;
     top: 50%;
@@ -250,8 +253,8 @@ function saveTitle (newVal) {
     border-radius: 24px;
     background-color: white;
  
-  /*    border: 1px solid #000; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);*/
-    -webkit-box-shadow:  0px 0px 0px 9999px rgba(0, 0, 0, 0.5);
+    /* border: 1px solid #000; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);*/
+    box-shadow:  0px 0px 0px 9999px rgba(0, 0, 0, 0.5);
   }
 
   /* Refer to: https://stackoverflow.com/a/3131082/7812829 */
