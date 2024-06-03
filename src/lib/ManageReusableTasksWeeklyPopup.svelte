@@ -233,7 +233,13 @@
       const allRepeatInstances = await getFirestoreQuery(q)
       const currAndFutureInstances = allRepeatInstances.filter(instance => {
         const d1 = new Date()
-        const d2 = convertMMDDToDateClassObject(instance.startDate, instance.startYYYY)
+
+        const dockingAreaDefaultTime = '23:59' // i.e. maximize the chance of unscheduled tasks to be updated
+        const d2 = convertMMDDToDateClassObject(
+          instance.startDate, 
+          instance.startYYYY, 
+          instance.startTime || dockingAreaDefaultTime
+        )
         const dayDiff = computeDayDifference(d1, d2) // dayDiff := d2 - d1 
         return dayDiff >= 0
       })
