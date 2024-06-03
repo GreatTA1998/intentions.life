@@ -8,15 +8,6 @@
       on:task-update={(e) => updateTaskNode(e.detail)}
       on:task-checkbox-change={(e) => updateTaskNode({ id: e.detail.id, keyValueChanges: { isDone: e.detail.isDone }})} 
     />
-
-    <!-- <MobileDetailedCardPopup 
-      taskObject={clickedTask}
-      on:card-close={() => isDetailedCardOpen = false}
-      on:task-delete={(e) => deleteTaskNode(e.detail)}
-      on:task-click={(e) => openDetailedCard(e.detail)}
-      on:task-update={(e) => updateTaskNode(e.detail)}
-      on:task-checkbox-change={(e) => updateTaskNode({ id: e.detail.id, keyValueChanges: { isDone: e.detail.isDone }})} 
-    /> -->
   {/if}
 {/key}
 
@@ -140,7 +131,7 @@
 
 <script>
   import { getFirestore, onSnapshot, collection, arrayUnion, arrayRemove } from 'firebase/firestore'
-  import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage"
+  import { getStorage, ref, deleteObject, uploadBytes, getDownloadURL } from "firebase/storage"
   import { setFirestoreDoc, updateFirestoreDoc, deleteFirestoreDoc } from '/src/crud.js'
   import { 
     getRandomID, 
@@ -167,7 +158,6 @@
   import MobileTodayTodo from '$lib/MobileTodayTodo.svelte'
   import db from '/src/db.js'
   import VoiceKeywordDetect from '$lib/VoiceKeywordDetect.svelte'
-  import MobileDetailedCardPopup from '$lib/MobileDetailedCardPopup.svelte'
   import DetailedCardPopup from '$lib/DetailedCardPopup.svelte'
 
   let allTasks = []
