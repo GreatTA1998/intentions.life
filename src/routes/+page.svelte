@@ -31,8 +31,8 @@
           <div style="display: flex; justify-content: space-between; margin-top: 56px;">
             <div class="explanatory-card">
               <div style="display: flex; align-items: center;">
-                <div class="ability-square" class:active-thumbnail={true}>
-                  <span class="material-symbols-outlined ability-icon" style="color: white;">
+                <div class="ability-square" class:active-thumbnail={true} style="cursor: default;">
+                  <span class="material-symbols-outlined ability-icon">
                     {fourAbilities[currentIdx].iconName}
                   </span>
                 </div>
@@ -52,9 +52,8 @@
               </div>
             </div>
 
-            <div style="position: relative; justify-content: center;">
               <!-- style="display: {isVideoReady ? '' : 'none'};" -->
-              <div class="silent-video">
+              <div class="video-container">
                 {#if isSoundOff}
                   <div class="unmute-btn" on:click|stopPropagation={() => { 
                     VideoElem.muted = false; isSoundOff = false; VideoElem.play();
@@ -64,11 +63,10 @@
                     </div>
                   </div>
                 {/if}
-<!-- 
-                on:loadstart={() => isVideoReady = false}
-                on:loadedmetadata={() => isVideoReady = true} -->
 
-                <!-- src={fourAbilities[currentIdx].videoSrc} -->
+                <!-- on:loadstart={() => isVideoReady = false}
+                     on:loadedmetadata={() => isVideoReady = true} -->
+
                 <video 
                   src={fourAbilities[currentIdx].videoSrc}
                   bind:this={VideoElem}
@@ -93,15 +91,13 @@
                       class:active-thumbnail={currentIdx === i}  
                       class:inactive-thumbnail={currentIdx !== i}
                     >
-                      <span class="material-symbols-outlined ability-icon" style="color: white;">
+                      <span class="material-symbols-outlined ability-icon">
                         {ability.iconName}
                       </span>
                     </div>
                   {/each}
                 </div>
               </div>
-
-            </div>
           </div>
 
     
@@ -257,12 +253,12 @@
   }
 
   .active-thumbnail {
-    border: 1px solid var(--logo-twig-color);
-    box-shadow: 0 8px 16px rgba(148, 90, 35, 1);
+    border: 0.2vw solid var(--logo-twig-color);
+    box-shadow: 0 1.5vw 3vw 0.5vw rgba(148, 90, 35, 1);
   }
 
   .inactive-thumbnail {
-    filter: opacity(0.7) blur(2px);
+    box-shadow: 0 1.5vw 3vw 0.5vw rgb(143, 143, 143);
   }
 
   .home-page-background {
@@ -270,8 +266,9 @@
   }
 
 
-  .silent-video {
+  .video-container {
     flex: 0 0 55%;
+    width: 100%;
     position: relative;
   }
 
@@ -296,7 +293,8 @@
   }
 
   .ability-square {
-    background-color: var(--ability-showcase-bg-color);
+    // background-color: var(--ability-showcase-bg-color);
+    background-color: white;
     width: 6.5vw;
     height: 6.5vw;
     cursor: pointer;
@@ -307,7 +305,7 @@
   }
 
   .ability-icon {
-    font-size: 4vw;
+    font-size: 4.8vw;
   }
 
   .explanatory-card {
@@ -325,7 +323,7 @@
   }
 
   .card-subtitle {
-    font-size: 1.7vw; font-weight: 300; color: rgb(240, 240, 240);
+    font-size: 1.7vw; font-weight: 300; color: rgb(250, 250, 250);
   }
 
   .card-description {
@@ -333,7 +331,7 @@
     margin-top: 1.8vw;
     padding: 0.5vw;
     white-space: pre-line; // preserves line breaks
-    color: rgb(200, 200, 200);
+    color: rgb(255, 255, 255);
     font-weight: 400;
     line-height: 1.4;
     font-style: italic;
