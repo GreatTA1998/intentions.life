@@ -87,56 +87,12 @@
   }
 
   function interpretTranscript (transcript) {
-    const newTaskCommands = transcript.split(" and ")
+    const newTaskCommands = transcript.split(" plus ")
     for (const newTaskCommand of newTaskCommands) {
-      // exact substring match 
-      if (newTaskCommand.includes(" at ")) {
-        const [taskName, scheduledTime] = newTaskCommand.split(" at ")
-
-        let startTime
-        if (scheduledTime.includes('a.m.') || scheduledTime.includes('AM')) { // iOS is capitalized
-          if (scheduledTime.includes(':')) {
-            // windows: play golf at 10 a.m.
-            const [hh, mm] = scheduledTime.split(':')
-            startTime = twoDigits(hh) + ':' + mm
-          } 
-          else if (scheduledTime.length === 4 || scheduledTime.length === 5) {
-            // play golf at 10 AM
-            const [hh, AM] = scheduledTime.split(' ')
-            startTime = twoDigits(hh) + ':' + '00'
-          }
-          else {
-            alert('Cannot parse timing after AT keyword =', scheduledTime)
-          }
-        } 
-        else if (scheduledTime.includes('p.m.') || scheduledTime.includes('PM')) { // iOS is capitalized
-          if (scheduledTime.includes(':')) {
-            const [hhmm, pm] = scheduledTime.split(" ")
-            const [hh, mm] = hhmm.split(':')
-            const militaryTime = Number(hh) + 12             
-            startTime = twoDigits(militaryTime) + ':' + mm
-          } 
-          else if (scheduledTime.length === 4 || scheduledTime.length === 5) { // 9 am, 10 am (no `mm` suffixes)
-            // play golf at 10 PM
-            const [hh, PM] = scheduledTime.split(' ')
-            const militaryTime = Number(hh) + 12
-            startTime = twoDigits(militaryTime) + ':' + '00'
-          } 
-          else {
-            alert('Cannot parse timing after AT keyword =', scheduledTime)
-          }
-        }
-        else {
-          alert('Need to specify "a.m." or "p.m." such as "7 pm"')
-          return
-        }
-        if (taskName === '') alert('No task name detected')
-        dispatch('new-event-today', { name: taskName, startTime })
+      if (newTaskCommand === '') {
+        alert('No task name detected') // because I got empty ghosts on my to-do list
       }
-      else {
-        if (newTaskCommand === '') alert('No task name detected') // because I got empty ghosts on my to-do list
-        dispatch('new-todo', { name: newTaskCommand })
-      }
+      dispatch('new-todo', { name: newTaskCommand })
     }
   }
 </script>
