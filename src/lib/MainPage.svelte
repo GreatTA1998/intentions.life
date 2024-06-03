@@ -132,85 +132,77 @@
     </PopupCustomerSupport>
   </div>
 
-  <!-- position: relative; -->
   <div slot="content" style="display: flex; flex-grow: 1; height: 100%;">
-      {#if currentMode === 'ManageRepeats'}
-        <ManageReusableTasks {allTasks}/>
-      {:else if currentMode === 'Day'}
-        <!-- Show daytime art from 5 am - 7 pm, note `.getHours()` is 0-indexed from 0 to 23 -->
-        {#if new Date().getHours() > 5 && new Date().getHours() < 18} 
-          <BedtimePopupMaplestoryMusic willMusicAutoplay={$user.willMusicAutoplay}/>
-        {:else} 
-          <BackgroundRainScene willMusicAutoplay={$user.willMusicAutoplay}/>
-        {/if}
+    {#if currentMode === 'ManageRepeats'}
+      <ManageReusableTasks {allTasks}/>
+    {:else if currentMode === 'Day'}
+      <!-- Show daytime art from 5 am - 7 pm, note `.getHours()` is 0-indexed from 0 to 23 -->
+      {#if new Date().getHours() > 5 && new Date().getHours() < 18} 
+        <BedtimePopupMaplestoryMusic willMusicAutoplay={$user.willMusicAutoplay}/>
+      {:else} 
+        <BackgroundRainScene willMusicAutoplay={$user.willMusicAutoplay}/>
+      {/if}
 
-        <div class="container-for-float-cards">
-          <div class="glow-card-hover-effect rounded-card" style="width: 36%;">
-            <ZenJournalLeftNavigation 
-              journal={$user.journal} 
-              journalTitleFromMMDD={$user.journalTitleFromMMDD}
-              {currentJournalEntryMMDD}
-              on:toggle-music-autoplay={(e) => updateMusicAutoplay(e)}
-              on:journal-entry-select={(e) => currentJournalEntryMMDD = e.detail.newMMDD}
-            />
-          </div>
-
-          <div class="glow-card-hover-effect rounded-card" style="margin-left: 4%; width: 60%;">
-            {#key currentJournalEntryMMDD}
-              <ZenJournal 
-                journal={$user.journal}
-                journalTitleFromMMDD={$user.journalTitleFromMMDD}
-                {currentJournalEntryMMDD}
-                willMusicAutoplay={$user.willMusicAutoplay}
-                on:toggle-music-autoplay={(e) => updateMusicAutoplay(e)}
-                on:journal-update={(e) => changeJournal(e.detail)}
-                on:journal-entry-title-update={(e) => updateJournalEntryTitle(e.detail)}
-              />
-            {/key}
-          </div>
-        </div>
-      
-      <!-- WEEK MODE -->
-      {:else if (currentMode === 'Week')}
-        <!-- 1st flex child -->
-        <div class="todo-container">
-          <NewThisWeekTodo
-            on:new-root-task={(e) => createNewRootTask(e.detail)}
-            on:task-unscheduled={(e) => putTaskToThisWeekTodo(e)}
-            on:task-click={(e) => openDetailedCard(e.detail)}
-            on:subtask-create={(e) => createSubtask(e.detail)}
-            on:task-dragged={(e) => changeTaskDeadline(e.detail)}
-            on:task-checkbox-change={(e) => updateTaskNode({ id: e.detail.id, keyValueChanges: { isDone: e.detail.isDone }})}
+      <div class="container-for-float-cards">
+        <div class="glow-card-hover-effect rounded-card" style="width: 36%;">
+          <ZenJournalLeftNavigation 
+            journal={$user.journal} 
+            journalTitleFromMMDD={$user.journalTitleFromMMDD}
+            {currentJournalEntryMMDD}
+            on:toggle-music-autoplay={(e) => updateMusicAutoplay(e)}
+            on:journal-entry-select={(e) => currentJournalEntryMMDD = e.detail.newMMDD}
           />
         </div>
-        
-        <!-- 2nd flex child -->
-        <div class="the-only-scrollable-container calendar-section-flex-child"> 
-          {#if allTasks}    
-            <NewCalendarThisWeek
-              {calStartDateClassObj}
-              on:calendar-shifted={(e) => incrementDateClassObj({ days: e.detail.days})}
-              on:new-root-task={(e) => createNewRootTask(e.detail)}
-              on:task-click={(e) => openDetailedCard(e.detail)}
-              on:task-update={(e) => updateTaskNode({ id: e.detail.id, keyValueChanges: e.detail.keyValueChanges })}
-              on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
-              on:task-dragged={(e) => changeTaskDeadline(e.detail)}
-              on:task-checkbox-change={(e) => updateTaskNode({ id: e.detail.id, keyValueChanges: { isDone: e.detail.isDone }})} 
-            /> 
-          {/if}
-        </div>
-      <!-- END OF WEEK MODE SECTION -->
-      
-      {:else if currentMode === 'Year'}
-        <UncertainMilestones/>
 
-        <!-- <YearView 
-          {futureScheduledTasks}
-          on:task-click={(e) => openDetailedCard(e.detail)}
+        <div class="glow-card-hover-effect rounded-card" style="margin-left: 4%; width: 60%;">
+          {#key currentJournalEntryMMDD}
+            <ZenJournal 
+              journal={$user.journal}
+              journalTitleFromMMDD={$user.journalTitleFromMMDD}
+              {currentJournalEntryMMDD}
+              willMusicAutoplay={$user.willMusicAutoplay}
+              on:toggle-music-autoplay={(e) => updateMusicAutoplay(e)}
+              on:journal-update={(e) => changeJournal(e.detail)}
+              on:journal-entry-title-update={(e) => updateJournalEntryTitle(e.detail)}
+            />
+          {/key}
+        </div>
+      </div>
+    
+    <!-- WEEK MODE -->
+    {:else if (currentMode === 'Week')}
+      <!-- 1st flex child -->
+      <div class="todo-container">
+        <NewThisWeekTodo
           on:new-root-task={(e) => createNewRootTask(e.detail)}
+          on:task-unscheduled={(e) => putTaskToThisWeekTodo(e)}
+          on:task-click={(e) => openDetailedCard(e.detail)}
           on:subtask-create={(e) => createSubtask(e.detail)}
-        /> -->
-      {/if}
+          on:task-dragged={(e) => changeTaskDeadline(e.detail)}
+          on:task-checkbox-change={(e) => updateTaskNode({ id: e.detail.id, keyValueChanges: { isDone: e.detail.isDone }})}
+        />
+      </div>
+      
+      <!-- 2nd flex child -->
+      <div class="the-only-scrollable-container calendar-section-flex-child"> 
+        {#if allTasks}    
+          <NewCalendarThisWeek
+            {calStartDateClassObj}
+            on:calendar-shifted={(e) => incrementDateClassObj({ days: e.detail.days})}
+            on:new-root-task={(e) => createNewRootTask(e.detail)}
+            on:task-click={(e) => openDetailedCard(e.detail)}
+            on:task-update={(e) => updateTaskNode({ id: e.detail.id, keyValueChanges: e.detail.keyValueChanges })}
+            on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
+            on:task-dragged={(e) => changeTaskDeadline(e.detail)}
+            on:task-checkbox-change={(e) => updateTaskNode({ id: e.detail.id, keyValueChanges: { isDone: e.detail.isDone }})} 
+          /> 
+        {/if}
+      </div>
+    <!-- END OF WEEK MODE SECTION -->
+    
+    {:else if currentMode === 'Year'}
+      <UncertainMilestones/>
+    {/if}
   </div>
 </NavbarAndContentWrapper>
 
@@ -783,18 +775,17 @@
   } */
   
   @media (max-width: 1279.99px) {
-    .todo-container {
-      min-width: 280px;
-    }
+
   }
 
+  /* anything below this minimum tablet width is considered a phone */
   @media (max-width: 767.99px) {
-    .todo-container {
-      min-width: 200px;
+    .the-only-scrollable-container {
+      overflow: visible;
     }
 
-    .hide-for-mobile {
-      display: none;
+    .todo-container {
+      overflow: visible;
     }
   }
 </style>
