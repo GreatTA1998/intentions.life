@@ -780,6 +780,7 @@
 
   /* anything below this minimum tablet width is considered a phone */
   @media (max-width: 767.99px) {
+    /* i.e. flatten all the scrolling onto one massive plane, instead of lots of separate scrolling contexts */
     .the-only-scrollable-container {
       overflow: visible;
     }
