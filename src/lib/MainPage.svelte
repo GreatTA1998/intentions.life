@@ -775,7 +775,10 @@
   } */
   
   @media (max-width: 1279.99px) {
-
+    .todo-container {
+      /* reduce todo-list width by 60px for tablets */
+      min-width: 300px; 
+    }
   }
 
   /* anything below this minimum tablet width is considered a phone */
