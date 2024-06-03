@@ -3,6 +3,7 @@
   allTasksDue={$inclusiveWeekTodo}
   dueInHowManyDays={7}
   style="padding-top: var(--main-content-top-margin); background-color: var(--todo-list-bg-color); border-radius: 16px; outline: 0px solid red; height: 100%;"
+  willShowCheckbox={false}
   on:new-root-task
   on:task-unscheduled
   on:subtask-create
