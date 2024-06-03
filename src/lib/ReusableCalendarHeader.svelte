@@ -17,7 +17,7 @@
     >
       <div class="center-flex" 
         style="padding: 8px; width: 48px; height: 36px;" 
-        class:active-date-number={getDateInDDMMYYYY(dateClassObj) === getDateInDDMMYYYY(new Date())}
+        class:active-date-number={!isFuture(dateClassObj)}
         class:highlighted-circle={getDateInDDMMYYYY(dateClassObj) === getDateInDDMMYYYY(new Date())}
       >
         {dateClassObj.getDate()}
