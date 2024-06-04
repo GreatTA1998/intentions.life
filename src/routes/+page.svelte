@@ -121,6 +121,7 @@
   import { onMount } from 'svelte'
   import { getAuth, signInAnonymously } from "firebase/auth";
   import NavbarAndContentWrapper from '$lib/NavbarAndContentWrapper.svelte'
+  import posthog from 'posthog-js'
 
   let isSoundOff = true
   let VideoElem
@@ -128,7 +129,13 @@
   let isShowingControls = false
 
   onMount(() => {
-
+    // see how new visitors interacts with home page demos
+    posthog.init('phc_Cm2c1eB0MCZLTjJDYHklZ7GUp0Ar7p5bIpF5hkCJPdo',
+        {
+            api_host: 'https://us.i.posthog.com',
+            person_profiles: 'always' // or 'always' to create profiles for anonymous users as well
+        }
+    )
   })
 
 
@@ -140,7 +147,6 @@
   function initializeVideo () {
     setTimeout( // timeout necessary as the playback speed resets after video LOAD
       () => { 
-        console.log('set timeout')
         if (VideoElem) { // during `src` switching, it's not defined instantaneously
     
           // console.log('set VideoElem src ')
