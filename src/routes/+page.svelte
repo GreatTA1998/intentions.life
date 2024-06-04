@@ -19,8 +19,8 @@
           <div style="display: flex; margin-top: 24px; flex-wrap: wrap; gap: 24px;">
             <div class="secondary-description" style="line-height: 1.4">
               Google made a calendar. So did Apple, Microsoft, Notion, Motion, VimCal, cal.com...
-              But only this calendar has the <b><u>4 experimental features</u></b>, so you can manage all the small things in life -
-              without losing sight of your biggest goals and dreams
+              But only this calendar has the <b><u>4 features below</u></b>, so you can manage all the small things in life
+              without losing sight of your dreams:
             </div>
             
             <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 12px 0px;" class="action-buttons">
@@ -196,12 +196,12 @@
     },
     {
       videoSrc: "https://firebasestorage.googleapis.com/v0/b/project-y-2a061.appspot.com/o/homePageDemoVideos%2Ffeature-4.mp4?alt=media&token=a41910a8-043b-43a5-948a-4ee6fa9c1668",
-      title: '4. Photos',
-      subtitle: "Display photos contextually",
+      title: '4. TIMELY PHOTOS',
+      subtitle: "Enjoy the scenery",
       iconName: 'image',
       description: `Attaching photos to tasks have practical use - they often encapsulate a lot of information. 
       
-      But more importantly, calendar-centric photos allows you revisit memories as a natural byproduct of looking at your calendar, and creates lively atmosphere. 
+      But more importantly, the calendar provides more context to the photos, and your favorite memories become your calendar's scenery.
       `
     }
   ]
