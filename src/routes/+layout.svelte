@@ -29,6 +29,7 @@
   import { getFirestore, doc, deleteDoc, getDoc, setDoc, updateDoc, increment, snapshotEqual, onSnapshot } from 'firebase/firestore'
   import { onDestroy, onMount } from 'svelte'
   import { updateFirestoreDoc } from "/src/crud.js"
+  import posthog from 'posthog-js'
 
   let unsubUserSnapListener = null
 
@@ -38,6 +39,14 @@
       if (!resultUser) {
         user.set({})
         goto('/')
+
+        // see how new visitors interacts with home page demos
+        posthog.init('phc_Cm2c1eB0MCZLTjJDYHklZ7GUp0Ar7p5bIpF5hkCJPdo',
+            {
+                api_host: 'https://us.i.posthog.com',
+                person_profiles: 'always' // or 'always' to create profiles for anonymous users as well
+            }
+        )
       } 
       
       else { // USER IS LOGGED INTO FIREBASE AUTH
