@@ -74,12 +74,8 @@
                 <span class="material-symbols-outlined" style="font-size: 8vw;">
                   play_circle
                 </span>
-                <div style="font-size: 1.2vw;">
-                  
-                </div>
               </div>
             {/if}
-
 
             <!-- I learnt to not f*ck with <video>'s default behaviors -->
             <!-- #key is a quickfix as video works on initial load, but not on subsequent `src` changes -->
@@ -175,7 +171,7 @@
                    `
     },
     {
-      videoSrc: "https://firebasestorage.googleapis.com/v0/b/project-y-2a061.appspot.com/o/homePageDemoVideos%2Ffeature-2.mp4?alt=media&token=7ca4101e-094e-474f-b373-82d1bc170791",
+      videoSrc: "https://firebasestorage.googleapis.com/v0/b/project-y-2a061.appspot.com/o/homePageDemoVideos%2Ffeature-2.mp4?alt=media&token=7ca4101e-094e-474f-b373-82d1bc170791#t=0.1",
       title: '2. Reusable Tasks',
       subtitle: 'Configure sustainable routines',
       iconName: 'restart_alt',
@@ -185,7 +181,7 @@
         `
     },
     {
-      videoSrc: "https://firebasestorage.googleapis.com/v0/b/project-y-2a061.appspot.com/o/homePageDemoVideos%2Ffeature-3.mp4?alt=media&token=a453c7db-ca83-4f26-9e5d-895ed35fb66e",
+      videoSrc: "https://firebasestorage.googleapis.com/v0/b/project-y-2a061.appspot.com/o/homePageDemoVideos%2Ffeature-3.mp4?alt=media&token=a453c7db-ca83-4f26-9e5d-895ed35fb66e#t=0.1",
       title: '3. UNCERTAIN GOALS',
       subtitle: "Visualize tried paths",
       iconName: 'sports_score',
@@ -195,7 +191,7 @@
       `
     },
     {
-      videoSrc: "https://firebasestorage.googleapis.com/v0/b/project-y-2a061.appspot.com/o/homePageDemoVideos%2Ffeature-4.mp4?alt=media&token=a41910a8-043b-43a5-948a-4ee6fa9c1668",
+      videoSrc: "https://firebasestorage.googleapis.com/v0/b/project-y-2a061.appspot.com/o/homePageDemoVideos%2Ffeature-4.mp4?alt=media&token=a41910a8-043b-43a5-948a-4ee6fa9c1668#t=0.1",
       title: '4. TIMELY PHOTOS',
       subtitle: "Enjoy the scenery",
       iconName: 'image',
