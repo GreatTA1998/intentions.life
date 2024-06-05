@@ -80,19 +80,14 @@
               </div>
             {/if}
 
-            <!--  
-              on:click|self|preventDefault={() => {
-                togglePlayPause() 
-              }} -->
 
+            <!-- I learnt to not f*ck with <video>'s default behaviors -->
             <video 
               src={fourAbilities[currentIdx].videoSrc}
               bind:this={VideoElem}
               playsinline
-              controls={true}
+              controls controlslist="nodownload noremoteplayback"
               disablepictureinpicture
-          
-  
 
               on:play={() => isPlaying = true}
               on:pause={() => isPlaying = false}
@@ -129,8 +124,6 @@
 
   let isSoundOff = true
   let VideoElem
-  let isVideoReady = true
-  let isShowingControls = false
   let isPlaying = false
   let hasMobilePlayButtonAlready = true
 
@@ -148,19 +141,13 @@
     setTimeout( // timeout necessary as the playback speed resets after video LOAD
       () => { 
         if (VideoElem) { // during `src` switching, it's not defined instantaneously
-    
-          // console.log('set VideoElem src ')
           const maxMobilePxWidth = 768
           if (window.innerWidth > maxMobilePxWidth) {
             // iOS will have a play button overlay automatically, so no need to show
             hasMobilePlayButtonAlready = false
-
-            isShowingControls = true
-            VideoElem.controls = true
-            VideoElem.controlslist="nodownload noremoteplayback" // nofullscreen // noplaybackrate
           }
         
-          VideoElem.src = fourAbilities[currentIdx].videoSrc
+          // VideoElem.src = fourAbilities[currentIdx].videoSrc
           VideoElem.playbackRate = 1.5 // playback rate MUST come after `src`
           
         }
