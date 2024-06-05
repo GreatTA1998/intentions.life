@@ -16,7 +16,7 @@
             A modern calendar for organizing life
           </div>
     
-          <div style="display: flex; margin-top: 3vw; flex-wrap: wrap; gap: 2vw;">
+          <div style="display: flex; margin-top: 0.5vw; flex-wrap: wrap; gap: 2vw;">
             <div class="secondary-description">
               intentions.life is a calendar app that helps you sustain small habits towards large, uncertain goals.
             </div>
@@ -26,7 +26,7 @@
             </div>
           </div>
 
-          <div style="display: flex; margin-top: 3vw;">
+          <div class="my-tab-container">
             <div class="my-tab-item" on:click={() => currentIdx = 0} class:my-active-tab={currentIdx === 0}>
               <span class="material-symbols-outlined my-tab-icon">
                 park
@@ -292,6 +292,10 @@
     font-weight: 600;
   }
 
+  .my-tab-container {
+    display: flex; 
+    margin-top: 3vw;
+  }
 
   .my-tab-icon {
     font-size: 2.5vw;
@@ -381,7 +385,7 @@
   .feature-showcase-container {
     display: flex; 
     justify-content: space-between; 
-    margin-top: 1vw;
+    // margin-top: 1vw;
   }
 
   .video-container {
@@ -414,7 +418,7 @@
     padding: 0.5vw;
     white-space: pre-line; // preserves line breaks
     // color: rgb(255, 255, 255);
-    font-weight: 400;
+    font-weight: 500;
     line-height: 1.4;
     // font-style: italic;
   }
@@ -465,7 +469,7 @@
   .secondary-description {
     font-weight: 500; 
     display: inline; 
-    color: rgb(90, 90, 90);
+    color: rgb(100, 100, 100);
     font-size: 1.8vw;
     max-width: 800px;
     line-height: 1.3;
@@ -488,7 +492,7 @@
     }
 
     .action-buttons {
-      margin-top: 2vw;
+      margin-top: 3vw;
     }
   }
 
@@ -496,11 +500,16 @@
   @media (max-width: 767.99px) {
     .secondary-description {
       font-size: 16px;
+      margin-top: 8px;
     }
 
     .hero-title {
-      margin-top: 0px;
+      margin-top: 8px;
       font-size: 10vw;
+    }
+
+    .my-tab-container {
+      margin-top: 16px;  
     }
 
     .my-tab-item {
@@ -515,6 +524,10 @@
 
     .my-tab-icon {
       font-size: 24px;
+    }
+
+    .my-tab-item {
+      border-bottom: 3px solid rgb(219, 219, 219);
     }
 
     .my-active-tab {
