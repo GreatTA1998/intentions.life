@@ -5,9 +5,6 @@
   </span>
 </div>
 
-<audio id="voiceStartSound" preload="auto" src="/hero_simple-celebration-03.wav"></audio>
-<audio id="voiceEndSound" preload="auto" src="/hero_simple-celebration-02.wav"></audio>
-
 <div id="output"></div>
 
 <script>
@@ -21,27 +18,13 @@
 
   let iconName = 'mic'
 
-  let voiceStartSound = new Audio('/hero_simple-celebration-03.wav')
-  let voiceEndSound = new Audio('/hero_simple-celebration-02.wav')
-
   function handleClick () {
     if (iconName === 'settings_voice') {
       recognition.abort() // even though `.stop()` works on windows, it doesn't work on Safari, so we keep the behavior consistent
     } else {
       dispatch('new-mic-result', '')
       recognition.start()
-      // playSound()
     }
-  }
-
-  function playSound () {
-    const audioElem = document.getElementById('voiceStartSound')
-    audioElem.play()
-  }
-
-  function playFinishedSound () {
-    const audioElem = document.getElementById('voiceEndSound')
-    audioElem.play()
   }
 
   onMount(() => {
