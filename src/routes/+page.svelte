@@ -157,6 +157,7 @@
 
   let currentIdx = 0
 
+  // notice the `#t=0.1` trick we use to solve the iOS not previewing video issue
   let fourAbilities = [
     {
       videoSrc: "https://firebasestorage.googleapis.com/v0/b/project-y-2a061.appspot.com/o/homePageDemoVideos%2Ffeature-1.mp4?alt=media&token=4bc3e4c2-778a-4ece-ae6a-604cc60e98ce#t=0.1",
