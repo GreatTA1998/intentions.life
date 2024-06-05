@@ -16,7 +16,7 @@
             A modern calendar for organizing life
           </div>
     
-          <div style="display: flex; margin-top: 2vw; flex-wrap: wrap; gap: 24px;">
+          <div style="display: flex; margin-top: 3vw; flex-wrap: wrap; gap: 2vw;">
             <div class="secondary-description">
               intentions.life is a calendar app that helps you sustain small habits towards large, uncertain goals.
             </div>
@@ -26,7 +26,7 @@
             </div>
           </div>
 
-          <div style="display: flex; margin-top: 2vw;">
+          <div style="display: flex; margin-top: 3vw;">
             <div class="my-tab-item" on:click={() => currentIdx = 0} class:my-active-tab={currentIdx === 0}>
               <span class="material-symbols-outlined my-tab-icon">
                 park
@@ -87,7 +87,7 @@
 
               <!-- style="display: {isVideoReady ? '' : 'none'};" -->
               <div class="video-container">
-                {#if !isPlaying}
+                {#if !isPlaying && !hasMobilePlayButtonAlready}
                   <div class="unmute-btn" on:click|stopPropagation={() => { 
                     VideoElem.muted = false; isSoundOff = false; VideoElem.play();
                   }} style="z-index: 1;">
@@ -167,6 +167,7 @@
   let isVideoReady = true
   let isShowingControls = false
   let isPlaying = false
+  let hasMobilePlayButtonAlready = true
 
   onMount(() => {
   
@@ -184,7 +185,11 @@
         if (VideoElem) { // during `src` switching, it's not defined instantaneously
     
           // console.log('set VideoElem src ')
-          if (window.innerWidth > 600) {
+          const maxMobilePxWidth = 768
+          if (window.innerWidth > maxMobilePxWidth) {
+            // iOS will have a play button overlay automatically, so no need to show
+            hasMobilePlayButtonAlready = false
+
             isShowingControls = true
             VideoElem.controls = true
             VideoElem.controlslist="nodownload noremoteplayback" // nofullscreen // noplaybackrate
@@ -494,7 +499,7 @@
     }
 
     .hero-title {
-      margin-top: 12px;
+      margin-top: 0px;
       font-size: 10vw;
     }
 
@@ -505,6 +510,7 @@
     .my-tab-name {
       font-size: 12px;
       text-align: center;
+      margin-top: 2px;
     }
 
     .my-tab-icon {
