@@ -16,22 +16,55 @@
             A modern calendar for organizing life
           </div>
     
-          <div style="display: flex; margin-top: 24px; flex-wrap: wrap; gap: 24px;">
-            <div class="secondary-description" style="line-height: 1.4">
-              Google made a calendar. So did Apple, Microsoft, Notion, Motion, VimCal, cal.com...
-              But only this calendar has the <b><u>4 features below</u></b>, so you can manage all the small things in life
-              without losing sight of your dreams:
+          <div style="display: flex; margin-top: 2vw; flex-wrap: wrap; gap: 24px;">
+            <div class="secondary-description">
+              intentions.life is a calendar app that helps you sustain small habits towards large, uncertain goals.
             </div>
             
             <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 12px 0px;" class="action-buttons">
               <LoginGoogle/>
             </div>
           </div>
+
+          <div style="display: flex; margin-top: 2vw;">
+            <div class="my-tab-item" on:click={() => currentIdx = 0} class:my-active-tab={currentIdx === 0}>
+              <span class="material-symbols-outlined my-tab-icon">
+                park
+              </span>
+              <div class="my-tab-name">
+                Branching to-do
+              </div>
+            </div>
+            <div class="my-tab-item" on:click={() => currentIdx = 1} class:my-active-tab={currentIdx === 1}>
+              <span class="material-symbols-outlined my-tab-icon">
+                restart_alt
+              </span>
+              <div class="my-tab-name">
+                Reusable tasks
+              </div>
+            </div>
+            <div class="my-tab-item" on:click={() => currentIdx = 2} class:my-active-tab={currentIdx === 2}>
+              <span class="material-symbols-outlined my-tab-icon">
+                sports_score
+              </span>
+              <div class="my-tab-name">
+                Uncertain goals
+              </div>
+            </div>
+            <div class="my-tab-item" on:click={() => currentIdx = 3} class:my-active-tab={currentIdx === 3}>
+              <span class="material-symbols-outlined my-tab-icon">
+                Photo
+              </span>
+              <div class="my-tab-name">
+                Contextual photos
+              </div>
+            </div>
+          </div>
     
-          <div style="display: flex; justify-content: space-between; margin-top: 56px;">
+          <div style="display: flex; justify-content: space-between; margin-top: 1vw;">
             <div class="explanatory-card">
               <div style="display: flex; align-items: center;">
-                <div class="ability-square" class:active-thumbnail={true} style="cursor: default;">
+                <!-- <div class="ability-square" class:active-thumbnail={true} style="cursor: default;">
                   <span class="material-symbols-outlined ability-icon">
                     {fourAbilities[currentIdx].iconName}
                   </span>
@@ -44,7 +77,7 @@
                     <div class="card-subtitle">
                       {fourAbilities[currentIdx].subtitle}
                     </div>
-                 </div>
+                 </div> -->
               </div>
 
               <div class="card-description">
@@ -54,12 +87,15 @@
 
               <!-- style="display: {isVideoReady ? '' : 'none'};" -->
               <div class="video-container">
-                {#if isSoundOff}
+                {#if !isPlaying}
                   <div class="unmute-btn" on:click|stopPropagation={() => { 
                     VideoElem.muted = false; isSoundOff = false; VideoElem.play();
                   }} style="z-index: 1;">
+                    <span class="material-symbols-outlined" style="font-size: 8vw;">
+                      play_circle
+                    </span>
                     <div style="font-size: 1.2vw;">
-                      Sound is off
+                      
                     </div>
                   </div>
                 {/if}
@@ -70,22 +106,26 @@
                 <video 
                   src={fourAbilities[currentIdx].videoSrc}
                   bind:this={VideoElem}
-                  muted playsinline
-                  controls={false}
+                  playsinline
+                  controls={true}
                   disablepictureinpicture
              
                   on:click|self|preventDefault={() => {
-                    if (!isShowingControls) {
+                    // if (!isShowingControls) {
                       togglePlayPause() 
-                    }
+                    // }
                   }}
+
+                  on:play={() => isPlaying = true}
+                  on:pause={() => isPlaying = false}
+                  on:ended={() => isPlaying = false}
                   on:loadedmetadata={onVideoLoaded}
            
                   style="width: 100%; height: auto;"
                 >
                 </video>
 
-                <div class="abilities-container">
+                <!-- <div class="abilities-container">
                   {#each fourAbilities as ability, i}
                     <div class="ability-square" on:click={() => currentIdx = i}
                       class:active-thumbnail={currentIdx === i}  
@@ -96,7 +136,7 @@
                       </span>
                     </div>
                   {/each}
-                </div>
+                </div> -->
               </div>
           </div>
 
@@ -126,6 +166,7 @@
   let VideoElem
   let isVideoReady = true
   let isShowingControls = false
+  let isPlaying = false
 
   onMount(() => {
   
@@ -178,9 +219,9 @@
       title: '2. Reusable Tasks',
       subtitle: 'Configure sustainable routines',
       iconName: 'restart_alt',
-      description: `You can configure all your routines together, under one page. 
+      description: `You can visualize all your periodic routines under one page. 
 
-        Reusable tasks are better than traditional "repeating tasks" in 4 ways: they can be low duration (1 min), they can be autocompleted on calendar, they get time statistics, and they enable icon representations.
+        Reusable tasks can be typed quickly with autocomplete, be displayed as clear, compact icons (premium feature) and be tracked with time-spent statistics.
         `
     },
     {
@@ -206,7 +247,7 @@
   ]
 
   function onVideoLoaded () {
-    VideoElem.play()
+    isPlaying = false
   }
 
   function togglePlayPause () {
@@ -224,6 +265,38 @@
 </script>
 
 <style lang="scss">
+  .my-inactive-tab {
+    border-bottom: 1vw solid grey;
+  }
+
+  .my-tab-item {
+    // outline: 2px solid red; 
+    border-bottom: 0.3vw solid rgb(219, 219, 219);
+    display: flex; 
+    flex-wrap: wrap; 
+    justify-content: center; 
+    align-items: center; 
+    max-width: 16vw;
+    padding: 1vw;
+    cursor: pointer;
+  }
+  
+  .my-active-tab {
+    border-bottom: 0.3vw solid var(--logo-twig-color);
+    color: var(--logo-twig-color);
+    font-weight: 600;
+  }
+
+
+  .my-tab-icon {
+    font-size: 2.5vw;
+  }
+
+  .my-tab-name {
+    margin-left: 0.2vw;
+    font-size: 1.2vw;
+  }
+
   // https://stackoverflow.com/a/31838091/7812829
   // video::-webkit-media-controls-start-playback-button {
   //   display: none !important;
@@ -237,7 +310,7 @@
     width: 9vw; /* Adjust the size of the button as needed */
     height: 9vw;
     border-radius: 50%; /* Make the button circular */
-    background-color: rgba(0, 0, 0, 0.2); /* Semi-transparent background */
+    background-color: rgba(0, 0, 0, 0.1); /* Semi-transparent background */
     color: white; /* Text color */
     border: none;
     outline: none;
@@ -310,7 +383,8 @@
   .explanatory-card {
     flex: 0 0 45%; 
     height: auto; // 528px
-    background-color: rgb(20, 20, 20);
+    // background-color: rgb(20, 20, 20);
+    background-color: rgb(252, 243, 235);
     padding: 2vw;
   }
 
@@ -326,14 +400,14 @@
   }
 
   .card-description {
-    font-size: 1.2vw;
-    margin-top: 1.8vw;
+    font-size: 1.5vw;
+    // margin-top: 1.8vw;
     padding: 0.5vw;
     white-space: pre-line; // preserves line breaks
-    color: rgb(255, 255, 255);
+    // color: rgb(255, 255, 255);
     font-weight: 400;
     line-height: 1.4;
-    font-style: italic;
+    // font-style: italic;
   }
 
   @media (max-width: 768px) {
@@ -393,11 +467,14 @@
   .secondary-description {
     font-weight: 500; 
     display: inline; 
-    color: rgb(80, 80, 80);
+    color: rgb(90, 90, 90);
+    font-size: 1.8vw;
+    max-width: 800px;
+    line-height: 1.3;
   }
 
   .hero-title {
-    color: rgb(80, 80, 80);
+    color: rgb(60, 60, 60);
     font-size: 3rem; 
     font-weight: 600;
   }
@@ -408,10 +485,6 @@
 
   // less than or equal to 768px
   @media (max-width: 1279.99px) {
-    .secondary-description {
-      width: 90vw;
-    }
-
     .hero-title {
       font-size: 7vw;
     }
@@ -434,11 +507,6 @@
     .hero-title {
       margin-left: -6px;
       font-size: 80px;
-    }
-
-    .secondary-description {
-      width: 54vw; 
-      font-size: 20px;
     }
 
     .action-buttons {
