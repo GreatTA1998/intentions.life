@@ -61,7 +61,7 @@
             </div>
           </div>
     
-          <div style="display: flex; justify-content: space-between; margin-top: 1vw;">
+          <div class="feature-showcase-container">
             <div class="explanatory-card">
               <div style="display: flex; align-items: center;">
                 <!-- <div class="ability-square" class:active-thumbnail={true} style="cursor: default;">
@@ -187,7 +187,7 @@
           if (window.innerWidth > 600) {
             isShowingControls = true
             VideoElem.controls = true
-            VideoElem.controlslist="nodownload nofullscreen noremoteplayback noplaybackrate"
+            VideoElem.controlslist="nodownload noremoteplayback" // nofullscreen // noplaybackrate
           }
         
           VideoElem.src = fourAbilities[currentIdx].videoSrc
@@ -337,13 +337,6 @@
     background-color: rgb(250, 250, 250);
   }
 
-
-  .video-container {
-    flex: 0 0 55%;
-    width: 100%;
-    position: relative;
-  }
-
   .abilities-container {
     position: absolute; 
     
@@ -379,11 +372,22 @@
   .ability-icon {
     font-size: 4.8vw;
   }
+  
+  .feature-showcase-container {
+    display: flex; 
+    justify-content: space-between; 
+    margin-top: 1vw;
+  }
+
+  .video-container {
+    flex: 0 0 55%;
+    width: 100%;
+    position: relative;
+  }
 
   .explanatory-card {
     flex: 0 0 45%; 
     height: auto; // 528px
-    // background-color: rgb(20, 20, 20);
     background-color: rgb(252, 243, 235);
     padding: 2vw;
   }
@@ -408,17 +412,6 @@
     font-weight: 400;
     line-height: 1.4;
     // font-style: italic;
-  }
-
-  @media (max-width: 768px) {
-
-    // video::-webkit-media-controls-panel {
-    //   display: none !important;
-    //   opacity: 1 !important;
-    // } 
-    // video::-webkit-media-controls {
-    //   display: none;
-    // }
   }
 
   @media (max-width: 360px) {
@@ -490,14 +483,52 @@
     }
 
     .action-buttons {
-      margin-top: 24px;
+      margin-top: 2vw;
     }
   }
 
+  // Anything below 768 is considered a mobile device
   @media (max-width: 767.99px) {
+    .secondary-description {
+      font-size: 16px;
+    }
+
     .hero-title {
       margin-top: 12px;
       font-size: 10vw;
+    }
+
+    .my-tab-item {
+      max-width: 80px;
+    }
+
+    .my-tab-name {
+      font-size: 12px;
+      text-align: center;
+    }
+
+    .my-tab-icon {
+      font-size: 24px;
+    }
+
+    .my-active-tab {
+      border-bottom: 3px solid var(--logo-twig-color);
+    }
+
+    .feature-showcase-container {
+      flex-direction: column;
+    }
+
+    .video-container {
+      width: 100%;
+    }
+
+    .explanatory-card {
+      width: 100%;
+    }
+
+    .card-description {
+      font-size: 12px;
     }
   }
 
