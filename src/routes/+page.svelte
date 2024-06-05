@@ -80,6 +80,11 @@
               </div>
             {/if}
 
+            <!--  
+              on:click|self|preventDefault={() => {
+                togglePlayPause() 
+              }} -->
+
             <video 
               src={fourAbilities[currentIdx].videoSrc}
               bind:this={VideoElem}
@@ -87,9 +92,7 @@
               controls={true}
               disablepictureinpicture
           
-              on:click|self|preventDefault={() => {
-                togglePlayPause() 
-              }}
+  
 
               on:play={() => isPlaying = true}
               on:pause={() => isPlaying = false}
