@@ -1,7 +1,7 @@
 <div class="sign-in-button"
   on:click={signInWithGoogle}
 >
-  Google Sign-in
+  Sign-in with Google
   <span class="material-symbols-outlined" style="font-size: 32px; margin-left: 4px;">
     arrow_right_alt
   </span>
@@ -58,7 +58,8 @@
     color: var(--logo-twig-color);
     background-color: white;
     margin-bottom: 2px;
-    width: 200px;
+    width: 208px;
+    padding-left: 8px;
     padding-top: 6px;
     padding-bottom: 6px;
     border-radius: 24px;

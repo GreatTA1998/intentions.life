@@ -1,156 +1,118 @@
 {#if hasFetchedUser}
-  <!-- <div id="background-image-holder" style="height: 100vh; display: flex; justify-content: center; align-items: center;"> -->
-    <NavbarAndContentWrapper>
-      <!-- <div slot="navbar" class="top-navbar transparent-glow-navbar" style="background: transparent; border-bottom: 1px solid lightgrey; padding-left: 4%; padding-right: 4%;">
-        <img 
-          src="/trueoutput-square-nobg.png" 
-          style="width: 26px; height: 36px;"
-        >
-      </div>
-       -->
-      <!-- background: #193b19; -->
-      <div slot="content" style="display: flex; flex-grow: 1; height: 100%; padding: 3%;" class="home-page-background">
-        <div style="width: 90vw; min-width: 200px; height: 80vh; border-radius: 10px;">
-          
-          <div class="hero-title">
-            A modern calendar for organizing life
-          </div>
-    
-          <div style="display: flex; margin-top: 0.5vw; flex-wrap: wrap; gap: 2vw;">
-            <div class="secondary-description">
-              intentions.life is a calendar app that helps you sustain small habits towards large, uncertain goals.
-            </div>
-            
-            <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 12px 0px;" class="action-buttons">
-              <LoginGoogle/>
-            </div>
-          </div>
-
-          <div class="my-tab-container">
-            <div class="my-tab-item" on:click={() => currentIdx = 0} class:my-active-tab={currentIdx === 0}>
-              <span class="material-symbols-outlined my-tab-icon">
-                park
-              </span>
-              <div class="my-tab-name">
-                Branching to-do
-              </div>
-            </div>
-            <div class="my-tab-item" on:click={() => currentIdx = 1} class:my-active-tab={currentIdx === 1}>
-              <span class="material-symbols-outlined my-tab-icon">
-                restart_alt
-              </span>
-              <div class="my-tab-name">
-                Reusable tasks
-              </div>
-            </div>
-            <div class="my-tab-item" on:click={() => currentIdx = 2} class:my-active-tab={currentIdx === 2}>
-              <span class="material-symbols-outlined my-tab-icon">
-                sports_score
-              </span>
-              <div class="my-tab-name">
-                Uncertain goals
-              </div>
-            </div>
-            <div class="my-tab-item" on:click={() => currentIdx = 3} class:my-active-tab={currentIdx === 3}>
-              <span class="material-symbols-outlined my-tab-icon">
-                Photo
-              </span>
-              <div class="my-tab-name">
-                Contextual photos
-              </div>
-            </div>
-          </div>
-    
-          <div class="feature-showcase-container">
-            <div class="explanatory-card">
-              <div style="display: flex; align-items: center;">
-                <!-- <div class="ability-square" class:active-thumbnail={true} style="cursor: default;">
-                  <span class="material-symbols-outlined ability-icon">
-                    {fourAbilities[currentIdx].iconName}
-                  </span>
-                </div>
-
-                 <div style="padding-left: 1.5vw;">
-                    <div class="card-title">
-                      {fourAbilities[currentIdx].title}
-                    </div>
-                    <div class="card-subtitle">
-                      {fourAbilities[currentIdx].subtitle}
-                    </div>
-                 </div> -->
-              </div>
-
-              <div class="card-description">
-                {fourAbilities[currentIdx].description}
-              </div>
-            </div>
-
-              <!-- style="display: {isVideoReady ? '' : 'none'};" -->
-              <div class="video-container">
-                {#if !isPlaying && !hasMobilePlayButtonAlready}
-                  <div class="unmute-btn" on:click|stopPropagation={() => { 
-                    VideoElem.muted = false; isSoundOff = false; VideoElem.play();
-                  }} style="z-index: 1;">
-                    <span class="material-symbols-outlined" style="font-size: 8vw;">
-                      play_circle
-                    </span>
-                    <div style="font-size: 1.2vw;">
-                      
-                    </div>
-                  </div>
-                {/if}
-
-                <!-- on:loadstart={() => isVideoReady = false}
-                     on:loadedmetadata={() => isVideoReady = true} -->
-
-                <video 
-                  src={fourAbilities[currentIdx].videoSrc}
-                  bind:this={VideoElem}
-                  playsinline
-                  controls={true}
-                  disablepictureinpicture
-             
-                  on:click|self|preventDefault={() => {
-                    // if (!isShowingControls) {
-                      togglePlayPause() 
-                    // }
-                  }}
-
-                  on:play={() => isPlaying = true}
-                  on:pause={() => isPlaying = false}
-                  on:ended={() => isPlaying = false}
-                  on:loadedmetadata={onVideoLoaded}
-           
-                  style="width: 100%; height: auto;"
-                >
-                </video>
-
-                <!-- <div class="abilities-container">
-                  {#each fourAbilities as ability, i}
-                    <div class="ability-square" on:click={() => currentIdx = i}
-                      class:active-thumbnail={currentIdx === i}  
-                      class:inactive-thumbnail={currentIdx !== i}
-                    >
-                      <span class="material-symbols-outlined ability-icon">
-                        {ability.iconName}
-                      </span>
-                    </div>
-                  {/each}
-                </div> -->
-              </div>
-          </div>
-
-    
-          <div style="text-align: center; padding-top: 12vw; padding-bottom: 4vw;">
-            <div style="margin-bottom: 1vw; font-size: 1vw">
-              Example screenshot of an active calendar
-            </div>
-            <img style="max-width: 80%; opacity: 1; filter: blur(0px); height: auto;" src="https://firebasestorage.googleapis.com/v0/b/project-y-2a061.appspot.com/o/homePageDemoVideos%2Fmy-screenshot-for-showcase.png?alt=media&token=9800c22f-875b-4df7-b364-2a122e22c842">
-          </div>
-
+  <NavbarAndContentWrapper>
+    <!-- <div slot="navbar" class="top-navbar transparent-glow-navbar" style="background: transparent; border-bottom: 1px solid lightgrey; padding-left: 4%; padding-right: 4%;">
+      <img 
+        src="/trueoutput-square-nobg.png" 
+        style="width: 26px; height: 36px;"
+      >
+    </div>
+      -->
+    <div slot="content" style="display: flex; flex-grow: 1; height: 100%; padding: 3%;" class="home-page-background">
+      <div style="width: 90vw; min-width: 200px; height: 80vh; border-radius: 10px;">
+        
+        <div class="hero-title">
+          A modern calendar for organizing life
         </div>
+  
+        <div style="display: flex; margin-top: 0.5vw; flex-wrap: wrap; gap: 2vw;">
+          <div class="secondary-description">
+            intentions.life is a calendar app that helps you sustain small habits towards large, uncertain goals.
+          </div>
+          
+          <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 12px 0px;" class="action-buttons">
+            <LoginGoogle/>
+          </div>
+        </div>
+
+        <div class="my-tab-container">
+          <div class="my-tab-item" on:click={() => currentIdx = 0} class:my-active-tab={currentIdx === 0}>
+            <span class="material-symbols-outlined my-tab-icon">
+              park
+            </span>
+            <div class="my-tab-name">
+              Branching to-do
+            </div>
+          </div>
+          <div class="my-tab-item" on:click={() => currentIdx = 1} class:my-active-tab={currentIdx === 1}>
+            <span class="material-symbols-outlined my-tab-icon">
+              restart_alt
+            </span>
+            <div class="my-tab-name">
+              Reusable tasks
+            </div>
+          </div>
+          <div class="my-tab-item" on:click={() => currentIdx = 2} class:my-active-tab={currentIdx === 2}>
+            <span class="material-symbols-outlined my-tab-icon">
+              sports_score
+            </span>
+            <div class="my-tab-name">
+              Uncertain goals
+            </div>
+          </div>
+          <div class="my-tab-item" on:click={() => currentIdx = 3} class:my-active-tab={currentIdx === 3}>
+            <span class="material-symbols-outlined my-tab-icon">
+              Photo
+            </span>
+            <div class="my-tab-name">
+              Contextual photos
+            </div>
+          </div>
+        </div>
+  
+        <div class="feature-showcase-container">
+          <div class="explanatory-card">
+            <div class="card-description">
+              {fourAbilities[currentIdx].description}
+            </div>
+          </div>
+
+          <div class="video-container">
+            {#if !isPlaying && !hasMobilePlayButtonAlready}
+              <div class="unmute-btn" on:click|stopPropagation={() => { 
+                VideoElem.muted = false; isSoundOff = false; VideoElem.play();
+              }} style="z-index: 1;">
+                <span class="material-symbols-outlined" style="font-size: 8vw;">
+                  play_circle
+                </span>
+                <div style="font-size: 1.2vw;">
+                  
+                </div>
+              </div>
+            {/if}
+
+            <video 
+              src={fourAbilities[currentIdx].videoSrc}
+              bind:this={VideoElem}
+              playsinline
+              controls={true}
+              disablepictureinpicture
+          
+              on:click|self|preventDefault={() => {
+                togglePlayPause() 
+              }}
+
+              on:play={() => isPlaying = true}
+              on:pause={() => isPlaying = false}
+              on:ended={() => isPlaying = false}
+              on:loadedmetadata={onVideoLoaded}
+        
+              style="width: 100%; height: auto;"
+            >
+            </video>
+          </div>
+        </div>
+
+  
+        <div style="text-align: center; padding-top: 12vw; padding-bottom: 4vw;">
+          <div style="margin-bottom: 1vw; font-size: 1vw">
+            Example screenshot of an active calendar
+          </div>
+          <img style="max-width: 80%; opacity: 1; filter: blur(0px); height: auto;" src="https://firebasestorage.googleapis.com/v0/b/project-y-2a061.appspot.com/o/homePageDemoVideos%2Fmy-screenshot-for-showcase.png?alt=media&token=9800c22f-875b-4df7-b364-2a122e22c842">
+        </div>
+
       </div>
-    </NavbarAndContentWrapper>
+    </div>
+  </NavbarAndContentWrapper>
 {/if}
 
 <script>
@@ -305,11 +267,6 @@
     margin-left: 0.2vw;
     font-size: 1.2vw;
   }
-
-  // https://stackoverflow.com/a/31838091/7812829
-  // video::-webkit-media-controls-start-playback-button {
-  //   display: none !important;
-  // }
 
   .unmute-btn {
     position: absolute; /* Position the button absolutely within the container */
@@ -506,6 +463,10 @@
     .hero-title {
       margin-top: 8px;
       font-size: 10vw;
+    }
+
+    .action-buttons {
+      margin-top: 16px;
     }
 
     .my-tab-container {
