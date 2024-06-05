@@ -82,21 +82,24 @@
 
 
             <!-- I learnt to not f*ck with <video>'s default behaviors -->
-            <video 
-              src={fourAbilities[currentIdx].videoSrc}
-              bind:this={VideoElem}
-              playsinline
-              controls controlslist="nodownload noremoteplayback"
-              disablepictureinpicture
+            <!-- #key is a quickfix as video works on initial load, but not on subsequent `src` changes -->
+            {#key currentIdx}
+              <video 
+                src={fourAbilities[currentIdx].videoSrc}
+                bind:this={VideoElem}
+                playsinline
+                controls controlslist="nodownload noremoteplayback"
+                disablepictureinpicture
 
-              on:play={() => isPlaying = true}
-              on:pause={() => isPlaying = false}
-              on:ended={() => isPlaying = false}
-              on:loadedmetadata={onVideoLoaded}
-        
-              style="width: 100%; height: auto;"
-            >
-            </video>
+                on:play={() => isPlaying = true}
+                on:pause={() => isPlaying = false}
+                on:ended={() => isPlaying = false}
+                on:loadedmetadata={onVideoLoaded}
+          
+                style="width: 100%; height: auto;"
+              >
+              </video>
+            {/key}
           </div>
         </div>
 
