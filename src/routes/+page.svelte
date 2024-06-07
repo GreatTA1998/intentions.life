@@ -213,9 +213,9 @@
       title: '4. TIMELY PHOTOS',
       subtitle: "Enjoy the scenery",
       iconName: 'image',
-      description: `Attaching photos to tasks have practical use - they often encapsulate a lot of information. 
+      description: `Display photos directly on your calendar - they often encapsulate a lot of practical information. 
       
-      But more importantly, the calendar provides more context to the photos, and your favorite memories become your calendar's scenery.
+      More importantly, the calendar provides context - what were you doing before and after, what did you write about this photo at the time. These memories become your calendar's scenery.
       `
     }
   ]
