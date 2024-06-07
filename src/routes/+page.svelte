@@ -246,13 +246,13 @@
   }
 
   .my-tab-item {
+    width: 16vw;
     border-bottom: 0.3vw solid rgb(219, 219, 219);
     font-weight: 500;
     display: flex; 
     flex-wrap: wrap; 
     justify-content: center; 
     align-items: center; 
-    max-width: 9vw;
     padding: 0.5vw;
     cursor: pointer;
     color: rgb(120, 120, 120);
