@@ -487,7 +487,7 @@
     }
 
     .my-tab-item {
-      max-width: 80px;
+      width: 120px;
     }
 
     .my-tab-name {
