@@ -76,8 +76,8 @@
   height: var(--navbar-height);
   display: flex; 
   align-items: center; 
-  padding-left: 24px; 
-  padding-right: 24px; 
+  padding-left: 2vw; 
+  padding-right: 2vw;
   border-bottom: 1px solid lightgrey;
   background-color: var(--navbar-bg-color);
 

@@ -1,13 +1,26 @@
 {#if hasFetchedUser}
   <NavbarAndContentWrapper>
-    <!-- <div slot="navbar" class="top-navbar transparent-glow-navbar" style="background: transparent; border-bottom: 1px solid lightgrey; padding-left: 4%; padding-right: 4%;">
+    <div slot="navbar" class="top-navbar transparent-glow-navbar" style="background: rgb(250, 250, 250); border-bottom: 1px solid lightgrey;">
       <img 
         src="/trueoutput-square-nobg.png" 
-        style="width: 26px; height: 36px;"
+        style="margin-left: 0vw; width: 38px; height: 38px;"
       >
+
+      <div style="margin-left: auto; margin-right: 12px;">
+        <a href="https://github.com/GreatTA1998/intentions.life" target="_blank" rel="noreferrer" 
+          style="color: black; background-color: transparent; text-decoration-color: transparent; border: 0px solid black;"
+          
+        >
+          Github
+        </a>
+      </div>
+
+      <div>
+        (mobile version coming soon)
+      </div>
     </div>
-      -->
-    <div slot="content" style="display: flex; flex-grow: 1; height: 100%; padding: 3%;" class="home-page-background">
+     
+    <div slot="content" style="display: flex; flex-grow: 1; height: 100%; padding: 2.5%; padding-top: 1%;" class="home-page-background">
       <div style="width: 90vw; min-width: 200px; height: 80vh; border-radius: 10px;">
         
         <div class="hero-title">
@@ -30,7 +43,7 @@
               park
             </span>
             <div class="my-tab-name">
-              Branching to-do
+              Branching To-do
             </div>
           </div>
           <div class="my-tab-item" on:click={() => currentIdx = 1} class:my-active-tab={currentIdx === 1}>
@@ -38,7 +51,7 @@
               restart_alt
             </span>
             <div class="my-tab-name">
-              Reusable tasks
+              Reusable Tasks
             </div>
           </div>
           <div class="my-tab-item" on:click={() => currentIdx = 2} class:my-active-tab={currentIdx === 2}>
@@ -46,7 +59,7 @@
               sports_score
             </span>
             <div class="my-tab-name">
-              Uncertain goals
+              Uncertain Goals
             </div>
           </div>
           <div class="my-tab-item" on:click={() => currentIdx = 3} class:my-active-tab={currentIdx === 3}>
@@ -54,18 +67,12 @@
               Photo
             </span>
             <div class="my-tab-name">
-              Contextual photos
+              Contextual Photos
             </div>
           </div>
         </div>
   
         <div class="feature-showcase-container">
-          <div class="explanatory-card">
-            <div class="card-description">
-              {fourAbilities[currentIdx].description}
-            </div>
-          </div>
-
           <div class="video-container">
             {#if !isPlaying && !hasMobilePlayButtonAlready}
               <div class="unmute-btn" on:click|stopPropagation={() => { 
@@ -82,6 +89,7 @@
             {#key currentIdx}
               <video 
                 src={fourAbilities[currentIdx].videoSrc}
+                poster={fourAbilities[currentIdx].poster}
                 bind:this={VideoElem}
                 playsinline
                 controls controlslist="nodownload noremoteplayback"
@@ -97,12 +105,17 @@
               </video>
             {/key}
           </div>
-        </div>
 
+          <div class="explanatory-card">
+            <div class="card-description">
+              {fourAbilities[currentIdx].description}
+            </div>
+          </div>
+        </div>
   
         <div style="text-align: center; padding-top: 12vw; padding-bottom: 4vw;">
-          <div style="margin-bottom: 1vw; font-size: 1vw">
-            Example screenshot of an active calendar
+          <div class="screenshot-caption">
+            Example screenshot of my calendar
           </div>
           <img style="max-width: 80%; opacity: 1; filter: blur(0px); height: auto;" src="https://firebasestorage.googleapis.com/v0/b/project-y-2a061.appspot.com/o/homePageDemoVideos%2Fmy-screenshot-for-showcase.png?alt=media&token=9800c22f-875b-4df7-b364-2a122e22c842">
         </div>
@@ -113,13 +126,13 @@
 {/if}
 
 <script>
-  import { goto } from '$app/navigation'
   import LoginGoogle from '$lib/LoginGoogle.svelte'
-  import PopupLogin from '$lib/PopupLogin.svelte'
   import { hasFetchedUser } from '/src/store.js'
   import { onMount } from 'svelte'
-  import { getAuth, signInAnonymously } from "firebase/auth";
   import NavbarAndContentWrapper from '$lib/NavbarAndContentWrapper.svelte'
+  import PopupLogin from '$lib/PopupLogin.svelte'
+  import { getAuth, signInAnonymously } from "firebase/auth"
+  import { goto } from '$app/navigation'
 
   let isSoundOff = true
   let VideoElem
@@ -160,7 +173,8 @@
   // notice the `#t=0.1` trick we use to solve the iOS not previewing video issue
   let fourAbilities = [
     {
-      videoSrc: "https://firebasestorage.googleapis.com/v0/b/project-y-2a061.appspot.com/o/homePageDemoVideos%2Ffeature-1.mp4?alt=media&token=4bc3e4c2-778a-4ece-ae6a-604cc60e98ce#t=0.1",
+      videoSrc: "https://firebasestorage.googleapis.com/v0/b/project-y-2a061.appspot.com/o/homePageDemoVideos%2Ffeature-1.mp4?alt=media&token=4bc3e4c2-778a-4ece-ae6a-604cc60e98ce",
+      poster: "https://firebasestorage.googleapis.com/v0/b/project-y-2a061.appspot.com/o/homePageDemoVideos%2Fthumbnail%201%20of%204.png?alt=media&token=cd74d9c6-4a97-4919-b7c3-77525499f7d5",
       title: '1. Branching Todo',
       subtitle: 'No more long, messy lists',
       iconName: 'house',
@@ -172,17 +186,19 @@
                    `
     },
     {
-      videoSrc: "https://firebasestorage.googleapis.com/v0/b/project-y-2a061.appspot.com/o/homePageDemoVideos%2Ffeature-2.mp4?alt=media&token=7ca4101e-094e-474f-b373-82d1bc170791#t=0.1",
+      videoSrc: "https://firebasestorage.googleapis.com/v0/b/project-y-2a061.appspot.com/o/homePageDemoVideos%2Ffeature-2.mp4?alt=media&token=7ca4101e-094e-474f-b373-82d1bc170791",
+      poster: "https://firebasestorage.googleapis.com/v0/b/project-y-2a061.appspot.com/o/homePageDemoVideos%2Fthumbnail%202%20of%204.png?alt=media&token=2b681735-89dc-4e28-921d-5a9a6767cf91",
       title: '2. Reusable Tasks',
       subtitle: 'Configure sustainable routines',
       iconName: 'restart_alt',
-      description: `You can visualize all your periodic routines under one page. 
+      description: `You can configure all your routines on the same page. 
 
-        Reusable tasks can be typed quickly with autocomplete, be displayed as clear, compact icons (premium feature) and be tracked with time-spent statistics.
+        Once configured, reusable tasks can be created quickly with autocomplete, be displayed as compact icons (paid feature) and be tracked with time-spent statistics.
         `
     },
     {
-      videoSrc: "https://firebasestorage.googleapis.com/v0/b/project-y-2a061.appspot.com/o/homePageDemoVideos%2Ffeature-3.mp4?alt=media&token=a453c7db-ca83-4f26-9e5d-895ed35fb66e#t=0.1",
+      videoSrc: "https://firebasestorage.googleapis.com/v0/b/project-y-2a061.appspot.com/o/homePageDemoVideos%2Ffeature-3.mp4?alt=media&token=a453c7db-ca83-4f26-9e5d-895ed35fb66e",
+      poster: "https://firebasestorage.googleapis.com/v0/b/project-y-2a061.appspot.com/o/homePageDemoVideos%2Fthumbnail%203%20of%204.png?alt=media&token=a8175152-e626-4113-858c-ab8e46fa2ec0",
       title: '3. UNCERTAIN GOALS',
       subtitle: "Visualize tried paths",
       iconName: 'sports_score',
@@ -192,7 +208,8 @@
       `
     },
     {
-      videoSrc: "https://firebasestorage.googleapis.com/v0/b/project-y-2a061.appspot.com/o/homePageDemoVideos%2Ffeature-4.mp4?alt=media&token=a41910a8-043b-43a5-948a-4ee6fa9c1668#t=0.1",
+      videoSrc: "https://firebasestorage.googleapis.com/v0/b/project-y-2a061.appspot.com/o/homePageDemoVideos%2Ffeature-4.mp4?alt=media&token=a41910a8-043b-43a5-948a-4ee6fa9c1668",
+      poster: "https://firebasestorage.googleapis.com/v0/b/project-y-2a061.appspot.com/o/homePageDemoVideos%2Fthumbnail%204%20of%204.png?alt=media&token=0d6e2f82-668a-44fa-9f84-1780d9711de8",
       title: '4. TIMELY PHOTOS',
       subtitle: "Enjoy the scenery",
       iconName: 'image',
@@ -222,26 +239,35 @@
 </script>
 
 <style lang="scss">
-  .my-inactive-tab {
-    border-bottom: 1vw solid grey;
+  .screenshot-caption {
+    margin-bottom: 1vw; 
+    font-size: 1.2vw;
+    font-weight: 500;
   }
 
   .my-tab-item {
-    // outline: 2px solid red; 
     border-bottom: 0.3vw solid rgb(219, 219, 219);
+    font-weight: 500;
     display: flex; 
     flex-wrap: wrap; 
     justify-content: center; 
     align-items: center; 
-    max-width: 16vw;
-    padding: 1vw;
+    max-width: 9vw;
+    padding: 0.5vw;
     cursor: pointer;
+    color: rgb(120, 120, 120);
   }
-  
+
   .my-active-tab {
     border-bottom: 0.3vw solid var(--logo-twig-color);
     color: var(--logo-twig-color);
     font-weight: 600;
+  }
+  
+  .my-tab-name {
+    margin-left: 0.2vw;
+    font-size: 1.3vw;
+    text-align: center;
   }
 
   .my-tab-container {
@@ -251,11 +277,7 @@
 
   .my-tab-icon {
     font-size: 2.5vw;
-  }
-
-  .my-tab-name {
-    margin-left: 0.2vw;
-    font-size: 1.2vw;
+    font-weight: 600;
   }
 
   .unmute-btn {
@@ -332,7 +354,7 @@
   .feature-showcase-container {
     display: flex; 
     justify-content: space-between; 
-    // margin-top: 1vw;
+    margin-top: 1vw;
   }
 
   .video-container {
@@ -360,12 +382,12 @@
   }
 
   .card-description {
-    font-size: 1.5vw;
+    font-size: 1.3vw;
     // margin-top: 1.8vw;
     padding: 0.5vw;
     white-space: pre-line; // preserves line breaks
     // color: rgb(255, 255, 255);
-    font-weight: 500;
+    font-weight: 400;
     line-height: 1.4;
     // font-style: italic;
   }
@@ -420,6 +442,7 @@
     font-size: 1.8vw;
     max-width: 800px;
     line-height: 1.3;
+    margin-top: 1vw;
   }
 
   .hero-title {
@@ -468,7 +491,7 @@
     }
 
     .my-tab-name {
-      font-size: 12px;
+      font-size: 14px;
       text-align: center;
       margin-top: 2px;
     }
@@ -487,6 +510,7 @@
 
     .feature-showcase-container {
       flex-direction: column;
+      margin-top: 12px;
     }
 
     .video-container {
@@ -498,6 +522,10 @@
     }
 
     .card-description {
+      font-size: 12px;
+    }
+
+    .screenshot-caption {
       font-size: 12px;
     }
   }
