@@ -8,10 +8,11 @@
     "preview": "vite preview"
   },
   "devDependencies": {
-    "@sveltejs/adapter-auto": "next",
+    "@sveltejs/adapter-auto": "^3.0.0",
     "@sveltejs/adapter-vercel": "^4.0.0",
     "@sveltejs/kit": "^2.0.1",
     "@sveltejs/vite-plugin-svelte": "^3.0.0",
+    "@vite-pwa/sveltekit": "^0.5.0",
     "sass": "^1.63.5",
     "svelte": "^4.0.0",
     "svelte-preprocess": "^5.0.4"
