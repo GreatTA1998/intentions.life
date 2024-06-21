@@ -263,7 +263,7 @@
   import { doc, collection, getFirestore, updateDoc, arrayUnion, onSnapshot, arrayRemove, increment } from 'firebase/firestore'
   import { setFirestoreDoc, updateFirestoreDoc, deleteFirestoreDoc, getFirestoreCollection } from '/src/crud.js'
   import NewThisWeekTodo from '$lib/NewThisWeekTodo.svelte'
-  import { garbageCollectInvalidTasks } from '/src/scripts.js'
+  import { garbageCollectInvalidTasks, findActiveUsers } from '/src/scripts.js'
   import { deleteObject, getStorage, ref } from 'firebase/storage'
   
   let currentMode = 'Week' // weekMode hourMode monthMode
@@ -337,6 +337,8 @@
   }
 
   onMount(async () => {
+    // SCRIPTS
+    // findActiveUsers()
     // garbageCollectInvalidTasks($user)
     // return
     const ref = collection(getFirestore(), `/users/${$user.uid}/tasks`)

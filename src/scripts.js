@@ -10,6 +10,22 @@ import {
 import { reconstructTreeInMemory} from '/src/helpers/dataStructures.js'
 
 
+export async function findActiveUsers () {
+  const allUsers = await getFirestoreCollection(`/users`)
+  for (const user of allUsers) {
+    const userTasks = await getFirestoreCollection(`/users/${user.uid}/tasks`)
+    let dateOfMostRecent = ''
+    for (const task of userTasks) {
+      if (task.startDate) {
+        if (task.startDate > dateOfMostRecent) {
+          dateOfMostRecent = task.startDate
+        }
+      }
+    } 
+    console.log(user.email + ': ' + userTasks.length + ': ' + dateOfMostRecent)
+  }
+}
+
 export async function migrateUserDataToGoogleAccount (currentUID, googleUID) {
   console.log('ran script')
   const newAccountPath = `/users/${googleUID}/`
