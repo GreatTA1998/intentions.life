@@ -129,7 +129,8 @@
       startTime: getTimeInHHMM({ dateClassObj }),
       startDate: getDateInMMDD(dateClassObj), // MMDD is a legacy function so doesn't use destructuring
       startYYYY: `${dateClassObj.getFullYear()}`, // year needs to be a string for some reason
-      duration: durationForFullDisplay
+      duration: durationForFullDisplay,
+      isDone: true // so the image isn't blurred
     }
     newTaskObj = checkTaskObjSchema(newTaskObj, $user)
 

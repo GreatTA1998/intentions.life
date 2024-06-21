@@ -44,6 +44,7 @@
         "
       >
         {#if task.iconDataURL}
+          <!-- TO-DO: think about how attaching photos to icon tasks work -->
           <ReusableIconTaskElement
             {task}
             pixelsPerHour={pixelsPerMinute * 60}
@@ -53,6 +54,16 @@
             on:task-update
             on:task-checkbox-change
           />          
+        {:else if task.imageDownloadURL}
+          <ReusablePhotoTaskElement
+            {task}
+            pixelsPerHour={pixelsPerMinute * 60}
+            fontSize={0.8}
+            hasCheckbox
+            on:task-click
+            on:task-update
+            on:task-checkbox-change
+          /> 
         {:else}
           <ReusableTaskElement
             {task}
@@ -62,7 +73,7 @@
             on:task-click
             on:task-update
             on:task-checkbox-change
-          />          
+          /> 
         {/if}
       </div>
     {/each}
@@ -126,6 +137,7 @@
     pureNumericalHourForm
    } from '/src/helpers.js'
   import ReusableTaskElement from '$lib/ReusableTaskElement.svelte'
+  import ReusablePhotoTaskElement from '$lib/ReusablePhotoTaskElement.svelte'
   import ReusableIconTaskElement from '$lib/ReusableIconTaskElement.svelte'
   import { onMount, beforeUpdate, afterUpdate, tick, createEventDispatcher, onDestroy } from 'svelte'
   import { user, hasInitialScrolled, yPosWithinBlock } from '/src/store.js'

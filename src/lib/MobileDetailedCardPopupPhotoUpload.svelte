@@ -69,9 +69,8 @@
       duration: durationForFullDisplay,
       imageDownloadURL,
       imageFullPath: fullPath, // for easy garbage collection
-      startTime: getTimeInHHMM({ dateClassObj }),
-      startDate: getDateInMMDD(dateClassObj), // MMDD is a legacy function so doesn't use destructuring
-      startYYYY: `${dateClassObj.getFullYear()}` // year needs to be a string for some reason
+      isDone: true
+      // note we do NOT change the task's timing based on the photo
     })
   }
 

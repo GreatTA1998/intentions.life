@@ -121,12 +121,12 @@
       </span>
     </div> -->
 
-    <span on:click={() => goto(`/${$user.uid}/camera`)} class="material-symbols-outlined mika-hover" style="margin-right: 32px; font-size: 30px; cursor: pointer;">
+    <span on:click={() => goto(`/${$user.uid}/camera`)} class="material-symbols-outlined mika-hover" style="margin-right: 32px; font-size: 30px; cursor: pointer; color: rgb(120, 120, 120);">
       photo
     </span>
 
     <PopupCustomerSupport let:setIsPopupOpen={setIsPopupOpen}>
-      <span on:click={() => setIsPopupOpen({ newVal: true })}  class="material-symbols-outlined mika-hover" style="font-size: 28px; cursor: pointer;">
+      <span on:click={() => setIsPopupOpen({ newVal: true })}  class="material-symbols-outlined mika-hover" style="font-size: 28px; cursor: pointer; color: rgb(120, 120, 120);">
         phone
       </span>
     </PopupCustomerSupport>
