@@ -45,19 +45,21 @@
    {#if task.iconDataURL}
      <img src={task.iconDataURL} style="pointer-events: none; width: 32px; height: 32px;">
    {:else}
-      <div style="position: relative; width: 100%;">
-        <div class="text-overlay" style="position: relative;">
-            
-        </div>
-      
+      <div style="position: relative; width: 100%; padding-left: 6px; padding-top: 4px;">
         <div 
           class="task-name truncate-to-one-line" 
           style="
             color: {isBulletPoint ? '' : 'black'}; 
-            position: absolute; top: 6px; left: 8px;"
+            position: relative;
+            width: 100%;
+          "
         >
           {task.name}
         </div>
+
+        <div class="text-overlay" style="position: absolute; top: 0; left: 0; z-index: -1">
+            
+        </div>   
      </div>
    {/if}
  </div>
@@ -161,11 +163,11 @@
 
  .text-overlay {
    width: 100%;
-   height: 28px;
-   background: rgba(240, 240, 240, 0.7);  
-   border-radius: 4px;
+   margin-top: 0px;
+   height: 24px;
+   background: rgba(255, 255, 255, 0.3);
    padding: 4px 6px;
-   filter: blur(4px);
+   filter: blur(0px); 
 }
 
  .calendar-block {

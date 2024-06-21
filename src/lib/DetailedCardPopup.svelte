@@ -229,14 +229,15 @@ function saveTitle (newVal) {
     z-index: 1;
   }
 
-  .half-invisible {
-    opacity: 0.5;
-  }
-
   .detailed-card-popup {
-    /* mobile restriction */
-    max-height: 80%;
-
+    /* 
+      Default sizing so mobile popup doesn't engulf the entire screen
+      but doesn't affect subsequent image aspect ratio computations
+        - height: fit-content; would exceed width of mobile screen 
+        - max-height: 80%; would affect subsequent image dimension changes 
+    */
+    height: 50%;
+    width: 80%;
     position: fixed;
     font-size: 14px;
     top: 50%;
@@ -246,9 +247,7 @@ function saveTitle (newVal) {
     z-index: 4;
     min-width: 400px;
     min-height: 400px;
-    width: 80%;
     
-    height: fit-content;
 
     border-radius: 24px;
     background-color: white;
@@ -290,7 +289,7 @@ a {
   text-align: center;
   text-decoration: none;
   transition: all 0.2s ease-out;
-   border: 1px solid #F4F4F4;
+  border: 1px solid #F4F4F4;
   font-family: sans-serif;
   font-size: 1rem;
   height: 5px;
