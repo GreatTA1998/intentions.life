@@ -236,6 +236,8 @@ function saveTitle (newVal) {
         - height: fit-content; would exceed width of mobile screen 
         - max-height: 80%; would affect subsequent image dimension changes 
     */
+    /* min-width: 400px;
+       min-height: 400px; */
     height: 50%;
     width: 80%;
     position: fixed;
@@ -245,8 +247,6 @@ function saveTitle (newVal) {
     transform: translate(-50%, -50%);
     overflow-y: auto;
     z-index: 4;
-    min-width: 400px;
-    min-height: 400px;
     
 
     border-radius: 24px;
