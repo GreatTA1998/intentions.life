@@ -48,7 +48,7 @@
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
-          color: {taskObj.startDate && taskObj.startTime ? 'rgb(160, 160, 160)' : ''};
+          color: {taskObj.startDate && taskObj.startTime ? 'rgb(160, 160, 160)' : 'rgb(80, 80, 80)'};
           display: flex;
           align-items: center;
         "

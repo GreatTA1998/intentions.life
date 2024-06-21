@@ -1,6 +1,6 @@
 
 <div on:click={handleClick} class="floating-button" class:highlighted-button={iconName === 'settings_voice'}>
-  <span id="startButton" class="material-symbols-outlined" class:bold-icon={iconName === 'settings_voice'} style="font-size: 48px;">
+  <span id="startButton" class="material-symbols-outlined" class:bold-icon={iconName === 'settings_voice'} style="font-size: 48px; font-weight: 600;">
     {iconName}
   </span>
 </div>
@@ -86,7 +86,6 @@
     right: 16px;
     bottom: calc(var(--bottom-navbar-height) + 16px);
 
-    /* border: 2px solid var(--logo-twig-color); */
     border: 4px solid black;
     height: 72px;
     width: 72px;

@@ -6,11 +6,11 @@
 > 
   <div class="first-column" style="height: 100%; display: flex; flex-direction: column;">
     <div style="display: flex; align-items: center; margin-bottom: 12px;">
-      <div style="font-weight: 600; font-size: 18px; margin-left: 2px;">
+      <div style="font-weight: 600; font-size: 18px; margin-left: 2px; color: rgb(80, 80, 80)">
         {listTitle} 
       </div> 
       
-      <span on:click={() => isTypingNewRootTask = true} 
+      <span on:click={startTypingNewTask} 
         class="new-task-icon material-icons" 
         style="margin-left: 10px; margin-bottom: 10px"
       >
@@ -87,7 +87,7 @@
     </div>
   </div>
 
-  <slot>
+  <slot {startTypingNewTask}>
 
   </slot>
 </div>
@@ -139,6 +139,10 @@
   // svelte reactive statements are order sensitive
   $: if (allTasksDue.length > 0) {
     computeTasksToDisplay()
+  }
+
+  function startTypingNewTask () {
+    isTypingNewRootTask = true
   }
 
   function computeTasksToDisplay () {

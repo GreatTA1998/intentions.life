@@ -18,9 +18,22 @@
      class:voice-active-highlight={isUsingVoice}
      style="height: 100dvh; position: relative; display: flex; flex-direction: column;"
 >
-  {#if activeTabName === 'TODAY_VIEW'}
-    <div style="font-size: 48px; margin-left: 6px; color: darkgreen;">{speechResult}</div>
+  {#if activeTabName === 'TODO_VIEW'}
+    <div style="font-size: 48px; margin-left: 6px; color: darkgreen;">
+      {speechResult}
+    </div>
 
+    <div style="overflow-y: auto;">
+      <MobileTodayTodo
+        on:task-click={(e) => openDetailedCard(e.detail)}
+        on:task-checkbox-change={(e) => updateTaskNode({ id: e.detail.id, keyValueChanges: { isDone: e.detail.isDone }})}
+
+        on:new-root-task={(e) => createNewRootTask(e.detail)}
+        on:subtask-create={(e) => createSubtask(e.detail)}
+      />
+    </div>
+    <!-- TO-DO: display completed tasks below -->
+  {:else if activeTabName === 'TODAY_VIEW'}
     <div style="padding: 0px; overflow-y: auto;">
       {#each todayScheduledTasks as eventToday, i}
         {#if i === idxOfTimeIndicator}
@@ -67,17 +80,7 @@
             {/if}
           </div>
         {/if}
-      {/each}
-
-      <MobileTodayTodo
-        on:task-click={(e) => openDetailedCard(e.detail)}
-        on:task-checkbox-change={(e) => updateTaskNode({ id: e.detail.id, keyValueChanges: { isDone: e.detail.isDone }})}
-
-        on:new-root-task={(e) => createNewRootTask(e.detail)}
-        on:subtask-create={(e) => createSubtask(e.detail)}
-      />
-      
-      <!-- TO-DO: display completed tasks below -->
+      {/each}      
     </div>
   {:else if activeTabName === 'FUTURE_OVERVIEW'}
     <!-- <FutureOverview
@@ -96,34 +99,38 @@
     on:new-todo={(e) => createNewTodo(e.detail)}
   />
 
-  <div style="
-    position: absolute; 
-    bottom: 0; 
-    width: 100%; 
-    height: var(--bottom-navbar-height); 
-    display: flex; 
-    align-items: center; 
-    justify-content: space-between; 
-    border: 2px solid black;
-    background-color: grey;
-    "  
-  >
-    <div on:click={() => activeTabName = 'TODAY_VIEW'} class="bottom-nav-tab" style="border-right: 2px solid black;">
-      <span class="material-symbols-outlined nav-tab-icon">
-        sunny
-      </span>
-      <div class="nav-tab-desc">
-        Today
+  <div class="bottom-navbar">
+    <div on:click={() => activeTabName = 'TODO_VIEW'} class="bottom-nav-tab" class:active-nav-tab={activeTabName === 'TODO_VIEW'}>
+      <div style="text-align: center;">
+        <span class="material-symbols-outlined nav-tab-icon">
+          summarize
+        </span>
+        <div class="nav-tab-desc">
+          To-do
+        </div>
+      </div>
+    </div>
+
+    <div on:click={() => activeTabName = 'TODAY_VIEW'} class="bottom-nav-tab" class:active-nav-tab={activeTabName === 'TODAY_VIEW'}>
+      <div style="text-align: center;">
+        <span class="material-symbols-outlined nav-tab-icon">
+          sunny
+        </span>
+        <div class="nav-tab-desc">
+          Today
+        </div>
       </div>
     </div>
 
     <!-- on:click={() => activeTabName = 'FUTURE_OVERVIEW'}  -->
-    <div class="bottom-nav-tab" style="border-left: 2px solid black;">
-      <span class=" material-icons nav-tab-icon">
-        upcoming
-      </span>
-      <div class="nav-tab-desc">
-        Future
+    <div class="bottom-nav-tab" on:click={() => activeTabName = 'FUTURE_VIEW'} class:active-nav-tab={activeTabName === 'FUTURE_VIEW'}>
+      <div style="text-align: center;">
+        <span class=" material-icons nav-tab-icon">
+          upcoming
+        </span>
+        <div class="nav-tab-desc">
+          Future
+        </div>
       </div>
     </div>
   </div>
@@ -164,7 +171,7 @@
   let todayScheduledTasks = []
   let isTesting = false
   let futureScheduledTasks = null
-  let activeTabName = 'TODAY_VIEW'
+  let activeTabName = 'TODO_VIEW'
   let unsub
   let idxOfTimeIndicator = 0
   
@@ -431,6 +438,18 @@
     height: 100vh; 
   }
 
+  .bottom-navbar {
+    position: absolute; 
+    bottom: 0; 
+    width: 100%; 
+    height: var(--bottom-navbar-height); 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+    background-color: white;
+    border-top: 1px solid lightgrey;
+  }
+
   .bottom-nav-tab {
     display: flex; 
     align-items: center;
@@ -441,16 +460,19 @@
     flex-grow: 1;
     flex-shrink: 1;
 
-    color: white;
+    color: rgb(120, 120, 120);
+  }
+
+  .active-nav-tab {
+    color: rgb(0, 0, 0);
+    font-weight: 600;
   }
 
   .nav-tab-desc {
-    margin-left: 8px;
-
-    font-size: 20px;
+    font-size: 12px;
   }
 
   .nav-tab-icon {
-    font-size: 32px;
+    font-size: 24px;
   }
 </style>
