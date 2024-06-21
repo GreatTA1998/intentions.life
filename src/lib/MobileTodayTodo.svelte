@@ -11,6 +11,7 @@
   "
   willShowCheckbox={false}
   isLargeFont={true}
+  isRecursive={false}
   on:new-root-task
   on:task-unscheduled
   on:subtask-create

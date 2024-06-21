@@ -48,6 +48,7 @@
           {dueInHowManyDays}
           {willShowCheckbox}
           {isLargeFont}
+          {isRecursive}
           on:task-click
           on:task-checkbox-change
           on:task-node-update
@@ -118,6 +119,7 @@
   export let hasMaxWidth = false // quickfix to prevent complicated flexbox layout ordering issues
   export let willShowCheckbox = true
   export let isLargeFont = false
+  export let isRecursive = true
 
   let defaultDeadline
   let tasksToDisplay = []
@@ -188,13 +190,20 @@
     // to be consistent with the API of <ReusableHelperDropzone {parentObj}/>
     const parentObj = { subtreeDeadlineInMsElapsed: Infinity }
 
-    const initialNumericalDifference = 3
-    let newVal = $user.maxOrderValue || initialNumericalDifference
-    batch.update(
-      doc(db, `/users/${$user.uid}/`), {
-        maxOrderValue: increment(initialNumericalDifference)
-      }
-    )
+    // put task to the bottom of to-do list, if it wasn't already on the to-do list
+    let newVal
+    if ($whatIsBeingDraggedFullObj.startDate) {
+      const initialNumericalDifference = 3
+      newVal = $user.maxOrderValue || initialNumericalDifference
+      batch.update(
+        doc(db, `/users/${$user.uid}/`), {
+          maxOrderValue: increment(initialNumericalDifference)
+        }
+      )
+    } 
+    else { // don't re-position the todo-task if it's already on the list, leave it as it is
+      newVal = $whatIsBeingDraggedFullObj.orderValue
+    }
 
     // 1. ORDER VALUE (and startTime)
     // only applies to the subtree's root

@@ -62,10 +62,14 @@
           </div>
         {/if}
 
+        <span class="material-symbols-outlined new-task-icon" style="cursor: pointer; font-size: 22px;">
+          drag_indicator
+        </span>
+
         <div on:click={() => dispatch('task-click', { task: taskObj })}
           class="truncate-to-one-line" 
           class:cross-out-todo={taskObj.isDone} 
-          style="margin-top: -1px; margin-left: 4px; cursor: pointer; min-width: 16px; min-height: 16px;"
+          style="margin-top: -1px; margin-left: 0px; cursor: pointer; min-width: 16px; min-height: 16px;"
         >
           <!-- {taskObj.orderValue}  -->
           {taskObj.name}
@@ -91,6 +95,7 @@
           {dueInHowManyDays}
           {isMilestoneMode}
           {isLargeFont}
+          {isRecursive}
           on:task-click
           on:subtask-create
           on:task-checkbox-change
@@ -111,17 +116,21 @@
           </div>
         </RecursiveTaskElement>
       {/each}
-      
-      <ReusableHelperDropzone
-        ancestorRoomIDs={[taskObj.id, ...ancestorRoomIDs]}
-        roomsInThisLevel={taskObj.children}
-        idxInThisLevel={taskObj.children.length}
-        parentID={taskObj.id}
-        parentObj={taskObj}
-        {colorForDebugging}
-        {dueInHowManyDays}
-        {isMilestoneMode}
-      /> 
+
+      <!-- If no subtasks, this is the only way to create a sub-task -->
+      <!-- Rename to: can create sub-task when it isn't already a subtask -->
+      {#if isRecursive}
+        <ReusableHelperDropzone
+          ancestorRoomIDs={[taskObj.id, ...ancestorRoomIDs]}
+          roomsInThisLevel={taskObj.children}
+          idxInThisLevel={taskObj.children.length}
+          parentID={taskObj.id}
+          parentObj={taskObj}
+          {colorForDebugging}
+          {dueInHowManyDays}
+          {isMilestoneMode}
+        /> 
+      {/if}
       
       <!-- 
         If this task level has a deadline, new sub-tasks should also be 
@@ -179,6 +188,7 @@
   export let dueInHowManyDays // very relevant for todo list tasks
   export let isMilestoneMode = false
   export let isLargeFont = false
+  export let isRecursive = true
 
   let newSubtaskStringValue = ''
   let isTypingNewSubtask = false
