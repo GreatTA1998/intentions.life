@@ -1,10 +1,10 @@
 <div>
   <input 
     value={value} 
-    on:input={(e) => selectTime(e.target.value)} 
+    on:input={(e) => dispatch('input', { typedHHMM: e.target.value })} 
     on:click={() => isMenuDisplayed = !isMenuDisplayed} 
     style="
-      width: 64px; 
+      width: 54px; 
       font-size: 16px; 
       text-align: center; 
       height: 30px; 
@@ -22,8 +22,9 @@
         {#each hourChoices as hourChoice}
           <div on:click={() => selectTime(hourChoice)}
             class="time-option" 
-            class:autoscroll={value === hourChoice}
+            class:selected={Number(hourChoice.split(':')[0]) === new Date().getHours()}
             class:highlighted-option={value === hourChoice}
+            class:closest-to-current-time={Number(hourChoice.split(':')[0]) === new Date().getHours()}
           >
             {hourChoice}
           </div>
@@ -34,9 +35,15 @@
 </div>
 
 <script>
-  import { createEventDispatcher } from 'svelte'
+  import { createEventDispatcher, onMount, tick } from 'svelte'
 
   export let value = ''
+
+  $: if (isMenuDisplayed) {
+    tick().then(() => {
+      scrollToSelected()
+    })
+  }
 
   const dispatch = createEventDispatcher()
   let isMenuDisplayed = false
@@ -51,6 +58,14 @@
     hourChoices.push(hh + ':' + '30')
   }
 
+  function scrollToSelected () {
+    const elements = document.getElementsByClassName('selected')
+    const el = elements[0]
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }
+
   function selectTime (hourChoice) {
     dispatch('time-selected', { selectedHHMM: hourChoice })
     isMenuDisplayed = false
@@ -60,28 +75,12 @@
 
 
 <style lang="scss">
-  .option-highlight {
-    background-color: rgb(240, 240, 240);
-  }
-
-  .time-option:hover {
-    @extend .option-highlight
-  }
-
-  .highlighted-option {
-    background-color: rgb(240, 211, 157);
-  }
-
-  .invisible {
-    display: none;
-  }
-
   .my-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     width: fit-content;
     overflow-y: auto;
-    height: 280px;
+    height: 240px;
   }
 
   .time-option {
@@ -95,5 +94,28 @@
 
     border: 1px solid lightgrey; 
     border-radius: 0px; 
+  }
+
+  .option-highlight {
+    background-color: rgb(240, 240, 240);
+  }
+
+  .time-option:hover {
+    @extend .option-highlight
+  }
+
+  .closest-to-current-time {
+    // color: var(--logo-twig-color);
+    border-top: 4 px solid var(--logo-twig-color);
+  }
+
+  .highlighted-option {
+    background-color: rgb(37, 37, 37);
+    color: white;
+    font-weight: 600;
+  }
+
+  .invisible {
+    display: none;
   }
 </style>

@@ -14,7 +14,14 @@
     </div>
 
     <div>
-      <MyTimePicker value={newStartHHMM} on:time-selected={(e) => newStartHHMM = e.detail.selectedHHMM }/>
+      <MyTimePicker value={newStartHHMM} 
+        on:input={(e) => newStartHHMM = e.detail.typedHHMM}
+        on:time-selected={(e) => {
+          newStartHHMM = e.detail.selectedHHMM;
+          taskObject.startTime = newStartHHMM; // quick-fix to not show the save button, additional click
+          saveStartTime(e.detail.selectedHHMM);
+        }}
+      />
       
       <div style="margin-top: 4px;"></div>
 
@@ -61,18 +68,6 @@
   let newDuration 
 
   const dispatch = createEventDispatcher()
-
-  function handleTaskStartInput (e) {
-    isEditingTaskStart = true
-    const newVal = e.detail.value
-    newStartMMDD = newVal.split(" ")[0]
-    newStartHHMM = newVal.split(" ")[1]
-
-    // quickfix for space bar causing time to be ignored (I ran into it as well, not just dad)
-    if (newVal[0] === ' ') {
-      alert('Empty space detected at the start _12/31 15:00, please delete.')
-    }
-  }
 
   function saveStartTime (hhmm) {
     dispatch('task-update', { id: taskObject.id, keyValueChanges: {
