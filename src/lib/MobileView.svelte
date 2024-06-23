@@ -83,11 +83,13 @@
       {/each}      
     </div>
   {:else if activeTabName === 'FUTURE_VIEW'}
-    <FutureOverview
-      {futureScheduledTasks}
-      on:task-duration-adjusted
-      on:task-click={(e) => openDetailedCard(e.detail)}
-    />
+    <div style="height: 100%; overflow-y: auto;">
+      <FutureOverview
+        {futureScheduledTasks}
+        on:task-duration-adjusted
+        on:task-click={(e) => openDetailedCard(e.detail)}
+      />
+    </div>
   {/if}
   
   {#if activeTabName === 'TODO_VIEW'}
