@@ -2,7 +2,7 @@
   <!-- style="height: {dockingAreaHeight + 96}px" -->
   <div class="top-flexbox" style="border-bottom: 1px solid lightgrey;">
     <div class="pinned-div">
-      <div style="font-size: 16px; margin-top: 32px;">
+      <div style="font-size: 16px; margin-top: var(--main-content-top-margin);">
         <div style="color: rgb(0, 0, 0); font-weight: 400;">
           {calStartDateClassObj.toLocaleString('en-US', { month: 'short'})}
         </div>
@@ -190,8 +190,7 @@ function getTimesOfDay () {
     position: sticky;
     left: 0;
     background-color: var(--calendar-bg-color);
-    padding: 5px;
-    padding-left: var(--calendar-left-padding);
+    padding: 0px 5px 5px var(--calendar-left-padding);
     z-index: 2; /* Ensure it appears on top */
   }
 
