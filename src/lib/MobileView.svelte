@@ -83,7 +83,7 @@
       {/each}      
     </div>
   {:else if activeTabName === 'FUTURE_VIEW'}
-    <div style="height: 100%; overflow-y: auto;">
+    <div style="height: 90%; overflow-y: auto;">
       <FutureOverview
         {futureScheduledTasks}
         on:task-duration-adjusted

@@ -27,11 +27,11 @@
               style="display: flex; align-items: center; flex-wrap: nowrap; padding: 2px;"
             >
               <div 
-                style="font-size: 16px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"
+                style="font-size: 16px; white-space: nowrap; text-overflow: ellipsis;"
                 class:grey-text={task.daysBeforeRepeating}
                 class:purple-text={!task.daysBeforeRepeating}
               > 
-                <span style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: rgb(40, 40, 40); font-weight: 400; display: flex;">
+                <span style="white-space: nowrap; text-overflow: ellipsis; color: rgb(40, 40, 40); font-weight: 400; display: flex;">
                   - <div style="color: rgb(90, 90, 90); font-weight: 300; margin-right: 4px;">{task.startTime}</div> {' ' + task.name + ' '}
                 </span>
               </div>
@@ -118,7 +118,6 @@ const minimumContainerHeight = 20
   }
 
   #future-overview-scroll-parent {
-    overflow-y: scroll; 
     overflow-x: hidden;
   }
 
