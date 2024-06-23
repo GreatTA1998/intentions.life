@@ -54,17 +54,17 @@
         "
       >   
         {#if willShowCheckbox}
-          <div style="margin-left: 2px;">
+          <div style="margin-left: 2px; margin-right: 4px;">
             <ReusableCheckbox 
               value={taskObj.isDone}
               on:change={(e) => handleCheckboxChange(e)}
             />
           </div>
+        {:else}
+          <span class="material-symbols-outlined new-task-icon" style="cursor: pointer; font-size: 22px;">
+            drag_indicator
+          </span>
         {/if}
-
-        <span class="material-symbols-outlined new-task-icon" style="cursor: pointer; font-size: 22px;">
-          drag_indicator
-        </span>
 
         <div on:click={() => dispatch('task-click', { task: taskObj })}
           class="truncate-to-one-line" 

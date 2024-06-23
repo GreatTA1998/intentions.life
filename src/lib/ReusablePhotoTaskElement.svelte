@@ -66,7 +66,7 @@
  <!-- End of task name flexbox -->
 
  {#if !isBulletPoint}
-   <div style="flex-grow: 1; overflow: hidden; margin-top: 6px;">
+   <div style="flex-grow: 1; overflow: hidden; margin-left: var(--left-padding); margin-top: 6px;">
      <div style="font-size: 12px; font-weight: 300; color: {isBulletPoint ? '' : 'white'};">
        {task.notes || ''}
      </div>
