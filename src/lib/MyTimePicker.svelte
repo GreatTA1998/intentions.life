@@ -12,7 +12,7 @@
       border: 1px solid lightgrey;
     "
     on:focusout={() => {
-      setTimeout(() => isMenuDisplayed = false, 1000)
+      setTimeout(() => isMenuDisplayed = false, 500)
     }}
   >
 
