@@ -82,12 +82,12 @@
         {/if}
       {/each}      
     </div>
-  {:else if activeTabName === 'FUTURE_OVERVIEW'}
-    <!-- <FutureOverview
+  {:else if activeTabName === 'FUTURE_VIEW'}
+    <FutureOverview
       {futureScheduledTasks}
       on:task-duration-adjusted
-      on:task-click
-    /> -->
+      on:task-click={(e) => openDetailedCard(e.detail)}
+    />
   {/if}
 
   <VoiceKeywordDetect
@@ -141,6 +141,7 @@
   import { getStorage, ref, deleteObject, uploadBytes, getDownloadURL } from "firebase/storage"
   import { setFirestoreDoc, updateFirestoreDoc, deleteFirestoreDoc } from '/src/crud.js'
   import { 
+    convertToISO8061,
     getRandomID, 
     getDateInMMDD, 
     getDateInDDMMYYYY,
@@ -335,7 +336,7 @@
 
   function computeDataStructuresFromAllTasks (allTasks) {
     // future overview
-    // collectFutureScheduledTasksToArray()
+    collectFutureScheduledTasksToArray()
     
     collectTodayScheduledTasksToArray()
 
@@ -349,6 +350,37 @@
 
     // simple week todo
     inclusiveWeekTodo.set(computeInclusiveWeekTodo(allTasks))
+  }
+
+  // quick-fix for NaN/NaN bug
+  function collectFutureScheduledTasksToArray () {
+    const yearNumber = new Date().getFullYear()
+    futureScheduledTasks = [] // reset 
+    traverseAndUpdateTree({
+      fulfilsCriteria: (task) => { 
+        if (!task.startTime || !task.startDate) return 
+        if (task.willRepeatOnWeekDayNumber) return
+        const d1 = new Date(convertToISO8061({ mmdd: task.startDate }))
+        
+        // setHours(hoursValue 0 - 23, minutesValue 0 - 59)
+        // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/setHours
+        const [hh, mm] = task.startTime.split(":")
+        d1.setHours(Number(hh), Number(mm))
+        return (task.startDate && task.startDate !== 'NaN/NaN') && 
+                (!task.willRepeatOnWeekDayNumber) &&
+                  (task.startTime) &&
+                    (d1.getTime() >= new Date().getTime()) && 
+                      (Number(task.startYYYY) === Number(yearNumber.toString())) // this line is a quickfix because we don't store YYYY values in legacy versions
+      }, // 'NaN' quick-fix bug
+      applyFunc: (task) => futureScheduledTasks = [...futureScheduledTasks, task]
+    })
+
+    // TO-DO: don't include all the tasks in the future, only if it is bounded by < 7 days for the week view, and < 30 days for the month view
+    futureScheduledTasks.sort((task1, task2) => {
+      const d1 = new Date(task1.startDate)
+      const d2 = new Date(task2.startDate)
+      return d1.getTime() - d2.getTime() // most recent to the top??
+    })
   }
 
   function collectTodayScheduledTasksToArray () {
