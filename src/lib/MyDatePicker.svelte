@@ -2,7 +2,7 @@
   {getReadableDate(MMDD)}
 </div>
 
-<input type="date" name="dateofbirth" id="dateofbirth" style="width: 1px; height: 1px; opacity: 0;"
+<input type="date" name="dateofbirth" id="dateofbirth" style="width: 1px; height: 1px;"
   on:input={(e) => handleInput(e)}
 >
 
