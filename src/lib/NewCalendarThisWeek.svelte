@@ -2,11 +2,11 @@
   <!-- style="height: {dockingAreaHeight + 96}px" -->
   <div class="top-flexbox" style="border-bottom: 1px solid lightgrey;">
     <div class="pinned-div">
-      <div style="display: flex; font-size: 14px; margin-top: 32px;">
-        <div style="color: rgb(80, 80, 80); font-weight: 400;">
+      <div style="font-size: 16px; margin-top: 32px;">
+        <div style="color: rgb(0, 0, 0); font-weight: 400;">
           {calStartDateClassObj.toLocaleString('en-US', { month: 'short'})}
         </div>
-        <div style="margin-left: 6px; font-weight: 300; color: rgb(80, 80, 80)">
+        <div style="font-weight: 200; margin-top: 2px;">
           {calStartDateClassObj.toLocaleString('en-US', { year: 'numeric'})}
         </div>
       </div>
@@ -163,8 +163,9 @@ function getTimesOfDay () {
 <style>
   :root {
     --pinned-div-width: 72px;
-    --timestamps-column-width: 96px;
+    --timestamps-column-width: 64px; /* was 96px */
     --day-header-width: 120px;
+    --calendar-left-padding: 16px;
   }
 
 
@@ -175,7 +176,7 @@ function getTimesOfDay () {
   }
 
   .timestamp-number {
-    padding-left: var(--calendar-section-left-spacing);
+    padding-left: var(--calendar-left-padding);
     color: #6D6D6D;
 
     /* opaque, so that shifted calendar content will go "underneath" the timestamps */
@@ -189,9 +190,8 @@ function getTimesOfDay () {
     position: sticky;
     left: 0;
     background-color: var(--calendar-bg-color);
-    /* background-color: cyan; */
     padding: 5px;
-    padding-left: 16px;
+    padding-left: var(--calendar-left-padding);
     z-index: 2; /* Ensure it appears on top */
   }
 
@@ -200,10 +200,7 @@ function getTimesOfDay () {
     top: 0;
     color: white;
     z-index: 1; /* Lower z-index than pinned-div */
-    /* border: 4px solid green; */
-    /* background-color: purple; */
     background-color: var(--calendar-bg-color);
-    /* border-bottom: 2px dashed grey; */
     width: fit-content;
   }
 	

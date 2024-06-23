@@ -62,7 +62,7 @@
       on:task-dragged={(e) => changeTaskDeadline(e.detail)}
       on:task-checkbox-change={(e) => updateTaskNode({ id: e.detail.id, keyValueChanges: { isDone: e.detail.isDone }})}
     > 
-      <img slot="button-slot" on:click={() => handleLogoClick(setIsPopupOpen)}
+      <img slot="button-slot" on:click={() => handleLogoClick()}
         src="trueoutput-square-nobg.png" 
         style="width: 38px; height: 38px; margin-right: 6px; margin-left: -4px; cursor: pointer;"
       >

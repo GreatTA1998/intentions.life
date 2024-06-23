@@ -1,8 +1,8 @@
 <div class="sign-in-button"
   on:click={signInWithGoogle}
 >
-  Sign-in with Google
-  <span class="material-symbols-outlined" style="font-size: 32px; margin-left: 4px;">
+  Create your calendar
+  <span class="material-symbols-outlined" style="font-size: 24px; margin-left: 4px;">
     arrow_right_alt
   </span>
 </div>
@@ -53,17 +53,15 @@
 
 <style>
   .sign-in-button {
-    border: 2px solid var(--logo-twig-color);
+    background: var(--logo-twig-color);
     font-weight: 600;
-    color: var(--logo-twig-color);
-    background-color: white;
+    color: white;
     margin-bottom: 2px;
     width: 208px;
     padding-left: 8px;
     padding-top: 6px;
     padding-bottom: 6px;
     border-radius: 24px;
-    align-text: center;
     display: flex;
     justify-content: center;
     align-items: center;
