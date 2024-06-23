@@ -89,15 +89,17 @@
       on:task-click={(e) => openDetailedCard(e.detail)}
     />
   {/if}
-
-  <VoiceKeywordDetect
-    on:voice-start={() => isUsingVoice = true}
-    on:voice-end={() => isUsingVoice = false}
-    on:new-mic-result={(e) => speechResult = e.detail}
-    
-    on:new-event-today={(e) => createNewEvent(e.detail)}
-    on:new-todo={(e) => createNewTodo(e.detail)}
-  />
+  
+  {#if activeTabName === 'TODO_VIEW'}
+    <VoiceKeywordDetect
+      on:voice-start={() => isUsingVoice = true}
+      on:voice-end={() => isUsingVoice = false}
+      on:new-mic-result={(e) => speechResult = e.detail}
+      
+      on:new-event-today={(e) => createNewEvent(e.detail)}
+      on:new-todo={(e) => createNewTodo(e.detail)}
+    />
+  {/if}
 
   <div class="bottom-navbar">
     <div on:click={() => activeTabName = 'TODO_VIEW'} class="bottom-nav-tab" class:active-nav-tab={activeTabName === 'TODO_VIEW'}>
