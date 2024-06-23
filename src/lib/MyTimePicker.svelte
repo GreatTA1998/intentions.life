@@ -4,7 +4,7 @@
     on:input={(e) => dispatch('input', { typedHHMM: e.target.value })} 
     on:click={() => isMenuDisplayed = !isMenuDisplayed} 
     style="
-      width: 54px; 
+      width: 64px; 
       font-size: 16px; 
       text-align: center; 
       height: 30px; 
