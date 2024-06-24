@@ -7,7 +7,7 @@
 <div 
   on:click={() => dispatch('task-click', { task })}
   draggable="true" 
-  on:dragstart|self={(e) => startDragMove(e, task.id)} 
+  on:dragstart|self|preventDefault={(e) => startDragMove(e, task.id)} 
   class="claude-draggable-item"
   class:calendar-block={!isBulletPoint}
   style="
@@ -167,13 +167,13 @@
     --experimental-red: hsla(0, 100%, 50%, 0.6);
   }
 
-  .claude-draggable-item {
+  /* .claude-draggable-item {
     touch-action: none;
     -webkit-user-select: none;
     user-select: none;
     -webkit-touch-callout: none;
     -webkit-tap-highlight-color: transparent;
-  }
+  } */
 
   .calendar-block {
     width: 100%;
