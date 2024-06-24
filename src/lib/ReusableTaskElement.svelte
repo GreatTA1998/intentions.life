@@ -182,11 +182,9 @@
     // crt.style.display = "none";
     // document.body.removeChild(crt)
 
-
     // empty image
     // const emptyImage = createImage(24, 24)
     // e.dataTransfer.setDragImage(emptyImage, 0, 0);
-
 
     console.log("TaskElem =", TaskElem)
     console.log("TaskElem.style.top =", TaskElem.style.top)

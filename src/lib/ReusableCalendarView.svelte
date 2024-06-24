@@ -11,6 +11,7 @@
   "
 >
   <!-- NOTE: this is a tall rectangular container that only encompasses the timestamps -->
+  <!-- on:dragenter={(e) => dragover_handler(e)} -->
   <div 
     class="calendar-day-container" 
     style="height: {timestamps.length * timeBlockDurationInMinutes * pixelsPerMinute}px; 
@@ -18,7 +19,6 @@
       color: #6D6D6D;
     "
     on:drop={(e) => drop_handler(e)}
-    on:dragenter={(e) => dragover_handler(e)}
     on:dragover={(e) => dragover_handler(e)}
     on:click|self={(e) => {
       isDirectlyCreatingTask = true
