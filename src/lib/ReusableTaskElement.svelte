@@ -1,9 +1,3 @@
-<!-- 
-  mika blue color: '#0085FF'
-  experimental green: '#509c13'
-  Note, the HTML checkbox tick color literally cannot be changed, but it will be automatically white if it "decides" that our chosen background color is dark enough, 
-  or vice versa
- -->
 <div 
   bind:this={TaskElem}
   on:click={() => dispatch('task-click', { task })}
@@ -144,10 +138,15 @@
     }
 
   function startDragMove (e, id) {
+    const rect = e.target.getBoundingClientRect()
+    TaskElem.style.width = rect.width + 'px'
+    console.log("TaskElem.style.width =", TaskElem.style.width)
+    // TaskElem.style.height = rect.height + 'px'
+
+
     e.dataTransfer.setData("text/plain", id)
 
     // record distance from the top of the element
-    const rect = e.target.getBoundingClientRect()
     const y = e.clientY - rect.top // y position within el ement
 
     whatIsBeingDraggedID.set(id)
@@ -156,26 +155,24 @@
 
     yPosWithinBlock.set(y)
 
-    initialX = e.clientX
-    initialY = e.clientY
-
-    TaskElem.style.width = rect.width + 'px'
-    TaskElem.style.height = rect.height + 'px'
+    // initialX = e.clientX
+    // initialY = e.clientY
 
 
-    var crt = TaskElem.cloneNode(true);
-    crt.style.backgroundColor = "red";
-    console.log('crt =', crt)
-    console.log('rect.width =', rect.width)
-    console.log("rect =", rect)
-    crt.style.width = rect.width + 'px'
-    crt.style.height = rect.height + 'px'
+
+    // var crt = TaskElem.cloneNode(true);
+    // crt.style.backgroundColor = "red";
+    // console.log('crt =', crt)
+    // console.log('rect.width =', rect.width)
+    // console.log("rect =", rect)
+    // crt.style.width = rect.width + 'px'
+    // crt.style.height = rect.height + 'px'
 
 
     // console.log("crt.style.width =", crt.style.width)
     // console.log("crt.style.jheight =", crt.style.height)
     // crt.style.display = 'none';
-    document.body.appendChild(crt);
+    // document.body.appendChild(crt);
     // document.body.appendChild(crt);
     // const rect = TaskElem.getBoundingClientRect();
 
@@ -255,8 +252,8 @@
   }
 
   .calendar-block {
-    /* width: 100%; */
-    width: 80px;
+    width: 100%;
+    /* width: 80px; */
     padding-top: var(--left-padding);
     cursor: pointer;
     border-radius: var(--left-padding);
