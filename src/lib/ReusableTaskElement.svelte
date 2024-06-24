@@ -7,8 +7,7 @@
 <div 
   on:click={() => dispatch('task-click', { task })}
   draggable="true" 
-  on:dragstart|self|preventDefault={(e) => startDragMove(e, task.id)} 
-  on:dragmove|preventDefault={() => {}}
+  on:dragstart|self={(e) => startDragMove(e, task.id)} 
   class="claude-draggable-item"
   class:calendar-block={!isBulletPoint}
   style="
