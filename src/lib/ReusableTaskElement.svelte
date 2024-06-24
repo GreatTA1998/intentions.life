@@ -199,11 +199,12 @@
       
       Tried 120px (GOOD)
       Tried 154px (GOOD)
-      Tried 180px 
+      Tried 167px
+      Tried 180px (FAIL)
       Tried 187px (FAIL)
       Tried 188px (FAIL)
     */
-    width: 180px; 
+    width: 167px; 
     padding-top: var(--left-padding);
     cursor: pointer;
     border-radius: var(--left-padding);
