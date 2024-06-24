@@ -197,9 +197,11 @@
     /* 
       hard-coded to be 188px = 94% width of parent, so iOS doesn't shrink the element during drag-and-drop
       
-      Tried 120px
+      Tried 120px (GOOD)
+      Tried 154px (GOOD)
+      Tried 188px (FAIL)
     */
-    width: 154px; 
+    width: 187px; 
     padding-top: var(--left-padding);
     cursor: pointer;
     border-radius: var(--left-padding);
