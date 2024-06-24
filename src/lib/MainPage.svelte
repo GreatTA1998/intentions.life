@@ -291,7 +291,7 @@
   }
 
   function handleDragStart (e) {
-    // e.dataTransfer.setData("text/plain", id)
+    e.dataTransfer.setData("text/plain", 'abc123')
   }
 
   function handleLogoClick (setIsPopupOpen) {
