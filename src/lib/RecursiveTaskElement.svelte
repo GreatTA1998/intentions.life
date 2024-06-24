@@ -37,8 +37,9 @@
       align-items: center; 
       opacity: {taskObj.isDone ? '0.6' : '1'};
     ">
-      <!--  no more fixed width: width: calc(100% - 30px); 
-          min-width and height to make it easy to delete legacy tasks with no titles
+      <!--  
+        no more fixed width: width: calc(100% - 30px); 
+        min-width and height to make it easy to delete legacy tasks with no titles
       -->
       <div 
         style="
@@ -61,7 +62,7 @@
             />
           </div>
         {:else}
-          <span class="material-symbols-outlined new-task-icon" style="cursor: pointer; font-size: 22px;">
+          <span class="material-symbols-outlined new-task-icon" style="cursor: grab; font-size: 22px;">
             drag_indicator
           </span>
         {/if}

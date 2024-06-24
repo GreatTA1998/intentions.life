@@ -5,10 +5,11 @@
   or vice versa
  -->
 <div 
+  bind:this={TaskElem}
   on:click={() => dispatch('task-click', { task })}
   draggable="true" 
-  on:dragstart|self|preventDefault={(e) => startDragMove(e, task.id)} 
-  on:dragmove|preventDefault={() => {}}
+  on:dragstart|self={(e) => startDragMove(e, task.id)} 
+  on:drag={(e) => preventResizing(e)}
   class="claude-draggable-item"
   class:calendar-block={!isBulletPoint}
   style="
@@ -113,11 +114,31 @@
 
   export let fontSize = 1
 
+  let TaskElem
+  let initialX, initialY
+  let realX, realY
+
   $: height = (pixelsPerHour / 60) * task.duration
   $: isBulletPoint = height < 24 // 24px is exactly enough to not crop the checkbox and the task name
 
   const dispatch = createEventDispatcher()
   let startY = 0
+
+  const createImage = (width, height) => {
+
+      const canvas = document.createElement('canvas')
+      canvas.width = width
+      canvas.height = height
+
+      const ctx = canvas.getContext('2d')
+      ctx.fillStyle = 'rgba(0, 0, 0, 0)'
+      ctx.fillRect(0, 0, width, height)
+
+      const img = new Image(width, height)
+      img.src = canvas.toDataURL()
+
+      return img
+    }
 
   function startDragMove (e, id) {
     e.dataTransfer.setData("text/plain", id)
@@ -131,7 +152,47 @@
     whatIsBeingDraggedFullObj.set(task)
 
     yPosWithinBlock.set(y)
+
+    initialX = e.clientX
+    initialY = e.clientY
+
+
+    var crt = TaskElem.cloneNode(true);
+    crt.style.backgroundColor = "red";
+    console.log('crt =', crt)
+    console.log('rect.width =', rect.width)
+    console.log("rect =", rect)
+    crt.style.width = rect.width + 'px'
+    crt.style.height = rect.height + 'px'
+    console.log("crt.style.width =", crt.style.width)
+    console.log("crt.style.jheight =", crt.style.height)
+    document.body.appendChild(crt);
+    // crt.style.display = "none";
+    // document.body.appendChild(crt);
+    // const rect = TaskElem.getBoundingClientRect();
+
+
+    e.dataTransfer.setDragImage(crt, rect.width, rect.height);
+
+
+    // empty image
+    // const emptyImage = createImage(24, 24)
+    // e.dataTransfer.setDragImage(emptyImage, 0, 0);
+
+
+    console.log("TaskElem =", TaskElem)
+    console.log("TaskElem.style.top =", TaskElem.style.top)
   }
+
+  function preventResizing (e) {
+    realX = e.clientX - initialX;
+    realY = e.clientY - initialY;
+    TaskElem.style.opacity = 0.5;
+    // TaskElem.style.transform = `translate(${realX}px, ${realY}px)`;
+    // console.log("realx, realY =", realX, realY)
+    // e.preventDefault()
+  }
+
 
   function startAdjustingDuration (e) {
     startY = getTrueY(e)
@@ -168,13 +229,12 @@
     --experimental-red: hsla(0, 100%, 50%, 0.6);
   }
 
-  /* .claude-draggable-item {
-    touch-action: none;
-    -webkit-user-select: none;
-    user-select: none;
-    -webkit-touch-callout: none;
-    -webkit-tap-highlight-color: transparent;
-  } */
+  .claude-draggable-item {
+    border: 2px solid red;
+    touch-action: none; /* Prevent default touch behaviors */
+    user-select: none; /* Prevent text selection */
+    will-change: transform; /* Gives browser a heads-up for optimization */
+  }
 
   .calendar-block {
     width: 100%;
