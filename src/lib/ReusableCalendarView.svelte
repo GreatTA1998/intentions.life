@@ -42,6 +42,7 @@
           margin-left: auto;
           margin-right: auto;
           width: 94%;
+          outline: 2px solid purple;
         "
       >
         {#if task.iconDataURL}
