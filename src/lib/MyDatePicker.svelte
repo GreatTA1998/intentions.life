@@ -17,8 +17,8 @@
 
   function getReadableDate () {
     const [MM, DD] = MMDD.split('/')
-
-    const dateStr = new Date(2020, MM, DD).toDateString(); // 'Fri Apr 10 2020'
+    const monthIndex = Number(MM) - 1 // Date() constructor takes 0 - 11 month indices
+    const dateStr = new Date(2020, monthIndex, DD).toDateString(); // 'Fri Apr 10 2020'
     const dateStrArr = dateStr.split(' '); // ['Fri', 'Apr', '10', '2020']
     const [dayOfWeek, month, dayOfMonth, year] = dateStr.split(' ')
     console.log(dateStrArr[1], dateStrArr[2]); // 'Apr'
