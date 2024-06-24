@@ -255,7 +255,8 @@
   }
 
   .calendar-block {
-    width: 100%;
+    /* width: 100%; */
+    width: 80px;
     padding-top: var(--left-padding);
     cursor: pointer;
     border-radius: var(--left-padding);
