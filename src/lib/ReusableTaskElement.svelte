@@ -208,9 +208,9 @@
 
   .calendar-block {
     /* 
-      hard-coded to be 94% width of parent, so iOS doesn't shrink the element during drag-and-drop
+      hard-coded to be 188px = 94% width of parent, so iOS doesn't shrink the element during drag-and-drop
      */
-    width: 188px; 
+    width: 88px; 
     padding-top: var(--left-padding);
     cursor: pointer;
     border-radius: var(--left-padding);
