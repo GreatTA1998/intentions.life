@@ -17,7 +17,7 @@
  class:calendar-block={!isBulletPoint}
  class:graph-paper-texture={!isBulletPoint}
  class:clear-border={!isBulletPoint}
- class="graph-paper-texture"
+ class="graph-paper-texture prevent-long-press"
  style="
    position: relative;
    height: {height}px; 
@@ -161,30 +161,34 @@
 </script> 
 
 <style>
- :root {
-   --left-padding: 6px;
-   --default-task-color: hsla(210, 20%, 36%, 0.6);
+  :root {
+    --left-padding: 6px;
+    --default-task-color: hsla(210, 20%, 36%, 0.6);
 
-   --experimental-black: hsla(0, 100%, 0%, 0.6);
-   --experimental-purple: hsla(248, 53%, 58%, 0.6);
-   --experimental-red: hsla(0, 100%, 50%, 0.6);
- }
+    --experimental-black: hsla(0, 100%, 0%, 0.6);
+    --experimental-purple: hsla(248, 53%, 58%, 0.6);
+    --experimental-red: hsla(0, 100%, 50%, 0.6);
+  }
 
- .calendar-block {
-   width: 100%;
-   /* padding-top: var(--left-padding); */
-   cursor: pointer;
-   border-radius: var(--left-padding);
- }
+  .prevent-long-press {
+    user-select: none; 
+  }
 
- .clear-border {
-  border: 1px solid var(--experimental-black);
- }
+  .calendar-block {
+    width: 100%;
+    /* padding-top: var(--left-padding); */
+    cursor: pointer;
+    border-radius: var(--left-padding);
+  }
 
- .graph-paper-texture {
+  .clear-border {
+    border: 1px solid var(--experimental-black);
+  }
+
+  .graph-paper-texture {
     background-image: 
       linear-gradient(90deg, rgba(200,200,200,0.8) 1px, transparent 0), 
       linear-gradient(180deg, rgba(200,200,200,0.8) 1px, transparent 0);
     background-size: 24px 24px; /* Adjust the size of the pattern */
- }
+  }
 </style>
