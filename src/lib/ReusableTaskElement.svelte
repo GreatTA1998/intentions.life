@@ -183,6 +183,8 @@
   }
 
   .claude-draggable-item {
+
+    -webkit-transform: none !important;
     border: 2px solid red;
     touch-action: none; /* Prevent default touch behaviors */
     user-select: none; /* Prevent text selection */
@@ -199,12 +201,12 @@
       
       Tried 120px (GOOD)
       Tried 154px (GOOD)
-      Tried 167px
+      Tried 167px (DOESN'T SHRINK BUT UNPREDICTABLE OFFSET)
       Tried 180px (FAIL)
       Tried 187px (FAIL)
       Tried 188px (FAIL)
     */
-    width: 167px; 
+    width: 154px; 
     padding-top: var(--left-padding);
     cursor: pointer;
     border-radius: var(--left-padding);
