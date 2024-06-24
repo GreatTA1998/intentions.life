@@ -143,7 +143,8 @@
   }
 
   function preventResizing (e) {
-    TaskElem.style.opacity = 0.5;
+    // 40% according to web.dev
+    TaskElem.style.opacity = 0.4;
   }
 
 
@@ -202,7 +203,7 @@
       
       Tried 120px (GOOD)
       Tried 154px (GOOD)
-      Tried 157.25px 
+      Tried 157.25px (GOOD)
       Tried 160.5px (DOESN'T SHRINK BUT AFFECTED BY PRESS)
       Tried 167px (DOESN'T SHRINK BUT UNPREDICTABLE OFFSET)
       Tried 180px (FAIL)
