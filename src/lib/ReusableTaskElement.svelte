@@ -11,7 +11,7 @@
   on:dragstart|self={(e) => startDragMove(e, task.id)} 
   on:drag={(e) => preventResizing(e)}
 
-  on:touchstart|preventDefault={() => {}}
+  on:touchstart={() => {}}
   on:touchmove|preventDefault={() => {}}
   class="claude-draggable-item"
   class:calendar-block={!isBulletPoint}
