@@ -124,6 +124,9 @@
   function startDragMove (e, id) {
     const rect = e.target.getBoundingClientRect()
     TaskElem.style.width = rect.width + 'px'
+    // IT TURNS OUT BOTH ARE NECESSARY
+    // INITIAL WIDTH: 188PX
+    // FINAL WIDTH: 188PX
     console.log("TaskElem.style.width =", TaskElem.style.width)
     // TaskElem.style.height = rect.height + 'px'
 
@@ -194,7 +197,7 @@
     /* 
       hard-coded to be 188px = 94% width of parent, so iOS doesn't shrink the element during drag-and-drop
      */
-    width: 88px; 
+    width: 188px; 
     padding-top: var(--left-padding);
     cursor: pointer;
     border-radius: var(--left-padding);
