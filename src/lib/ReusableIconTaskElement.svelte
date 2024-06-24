@@ -171,7 +171,8 @@
   }
 
   .prevent-long-press {
-    user-select: none; 
+    /* https://stackoverflow.com/a/67714499/7812829 */
+    -webkit-touch-callout: none;
   }
 
   .calendar-block {
