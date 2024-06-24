@@ -121,26 +121,10 @@
   const dispatch = createEventDispatcher()
   let startY = 0
 
-  const createImage = (width, height) => {
-
-      const canvas = document.createElement('canvas')
-      canvas.width = width
-      canvas.height = height
-
-      const ctx = canvas.getContext('2d')
-      ctx.fillStyle = 'rgba(0, 0, 0, 0)'
-      ctx.fillRect(0, 0, width, height)
-
-      const img = new Image(width, height)
-      img.src = canvas.toDataURL()
-
-      return img
-    }
-
   function startDragMove (e, id) {
-    const rect = e.target.getBoundingClientRect()
-    TaskElem.style.width = rect.width + 'px'
-    console.log("TaskElem.style.width =", TaskElem.style.width)
+    // const rect = e.target.getBoundingClientRect()
+    // TaskElem.style.width = rect.width + 'px'
+    // console.log("TaskElem.style.width =", TaskElem.style.width)
     // TaskElem.style.height = rect.height + 'px'
 
     e.dataTransfer.setData("text/plain", id)
