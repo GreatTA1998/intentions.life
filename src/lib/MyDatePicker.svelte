@@ -27,7 +27,10 @@
 
   function handleInput (e) {
     const [yyyy, mm, dd] = e.target.value.split('-')
-    dispatch('date-selected', { selectedDate: mm + '/' + dd })
+    dispatch('date-selected', { 
+      selectedDate: mm + '/' + dd, 
+      selectedYear: yyyy
+    })
   }
 
   function manualClick () {

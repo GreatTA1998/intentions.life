@@ -3,13 +3,21 @@
     <div>
       <MyDatePicker 
         MMDD={newStartMMDD}
-        on:date-selected={(e) => newStartMMDD = e.detail.selectedDate}
+        on:date-selected={(e) => { 
+          newStartMMDD = e.detail.selectedDate
+          newStartYYYY = e.detail.selectedYear
+        }}
       />
         
       <div style="margin-top: 4px;"></div>
 
       {#if isEditingStartDate}
-        <ReusableRoundButton on:click={() => saveStartDate(newStartMMDD)} backgroundColor="rgb(0, 89, 125)" textColor="white">Save</ReusableRoundButton>
+        <ReusableRoundButton 
+          on:click={() => saveStartDateAndYear(newStartMMDD, newStartYYYY)}
+          backgroundColor="rgb(0, 89, 125)" textColor="white"
+        >
+          Save
+        </ReusableRoundButton>
       {/if}
     </div>
 
@@ -63,6 +71,7 @@
 
   let newStartMMDD = taskObject.startDate || ''
   let newStartHHMM = taskObject.startTime || ''
+  let newStartYYYY = taskObject.startYYYY || ''
 
   let isEditingDuration = false
   let newDuration 
@@ -76,9 +85,10 @@
     isEditingTaskStart = false
   }
 
-  function saveStartDate (MMDD) {
+  function saveStartDateAndYear (MMDD, YYYY) {
     dispatch('task-update', { id: taskObject.id, keyValueChanges: {
       startDate: MMDD,
+      startYYYY: YYYY
     }})
     isEditingStartDate = false
   }
