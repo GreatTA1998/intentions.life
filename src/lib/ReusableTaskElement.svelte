@@ -159,6 +159,9 @@
     initialX = e.clientX
     initialY = e.clientY
 
+    TaskElem.style.width = rect.width + 'px'
+    TaskElem.style.height = rect.height + 'px'
+
 
     var crt = TaskElem.cloneNode(true);
     crt.style.backgroundColor = "red";
@@ -167,8 +170,10 @@
     console.log("rect =", rect)
     crt.style.width = rect.width + 'px'
     crt.style.height = rect.height + 'px'
-    console.log("crt.style.width =", crt.style.width)
-    console.log("crt.style.jheight =", crt.style.height)
+
+
+    // console.log("crt.style.width =", crt.style.width)
+    // console.log("crt.style.jheight =", crt.style.height)
     // crt.style.display = 'none';
     document.body.appendChild(crt);
     // document.body.appendChild(crt);
