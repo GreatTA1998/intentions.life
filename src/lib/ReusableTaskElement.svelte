@@ -122,9 +122,9 @@
   let startY = 0
 
   function startDragMove (e, id) {
-    // const rect = e.target.getBoundingClientRect()
-    // TaskElem.style.width = rect.width + 'px'
-    // console.log("TaskElem.style.width =", TaskElem.style.width)
+    const rect = e.target.getBoundingClientRect()
+    TaskElem.style.width = rect.width + 'px'
+    console.log("TaskElem.style.width =", TaskElem.style.width)
     // TaskElem.style.height = rect.height + 'px'
 
     e.dataTransfer.setData("text/plain", id)
