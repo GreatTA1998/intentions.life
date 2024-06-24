@@ -143,7 +143,6 @@
     console.log("TaskElem.style.width =", TaskElem.style.width)
     // TaskElem.style.height = rect.height + 'px'
 
-
     e.dataTransfer.setData("text/plain", id)
 
     // record distance from the top of the element
@@ -154,54 +153,10 @@
     whatIsBeingDraggedFullObj.set(task)
 
     yPosWithinBlock.set(y)
-
-    // initialX = e.clientX
-    // initialY = e.clientY
-
-
-
-    // var crt = TaskElem.cloneNode(true);
-    // crt.style.backgroundColor = "red";
-    // console.log('crt =', crt)
-    // console.log('rect.width =', rect.width)
-    // console.log("rect =", rect)
-    // crt.style.width = rect.width + 'px'
-    // crt.style.height = rect.height + 'px'
-
-
-    // console.log("crt.style.width =", crt.style.width)
-    // console.log("crt.style.jheight =", crt.style.height)
-    // crt.style.display = 'none';
-    // document.body.appendChild(crt);
-    // document.body.appendChild(crt);
-    // const rect = TaskElem.getBoundingClientRect();
-
-    const offsetX = 0
-    const offsetY = 0
-    // e.dataTransfer.setDragImage(crt, offsetX, offsetY);
-
-    // hide the cloned element
-    // crt.style.display = "none";
-    // document.body.removeChild(crt)
-
-    // empty image
-    // const emptyImage = createImage(24, 24)
-    // e.dataTransfer.setDragImage(emptyImage, 0, 0);
-
-    console.log("TaskElem =", TaskElem)
-    console.log("TaskElem.style.top =", TaskElem.style.top)
   }
 
   function preventResizing (e) {
-    // e.preventDefault()
-    // e.stopPropagation()
-
-    // realX = e.clientX - initialX;
-    // realY = e.clientY - initialY;
     TaskElem.style.opacity = 0.5;
-    // TaskElem.style.transform = `translate(${realX}px, ${realY}px)`;
-    // console.log("realx, realY =", realX, realY)
-    // e.preventDefault()
   }
 
 
@@ -252,8 +207,10 @@
   }
 
   .calendar-block {
-    width: 100%;
-    /* width: 80px; */
+    /* 
+      hard-coded to be 94% width of parent, so iOS doesn't shrink the element during drag-and-drop
+     */
+    width: 188px; 
     padding-top: var(--left-padding);
     cursor: pointer;
     border-radius: var(--left-padding);
