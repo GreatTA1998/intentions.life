@@ -194,7 +194,7 @@
 
   function preventResizing (e) {
     // e.preventDefault()
-    e.stopPropagation()
+    // e.stopPropagation()
 
     // realX = e.clientX - initialX;
     // realY = e.clientY - initialY;
