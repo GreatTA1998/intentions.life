@@ -183,7 +183,8 @@
   }
 
   .claude-draggable-item {
-
+    /* prevent the long press behavior */
+    -webkit-touch-callout: none;
     -webkit-transform: none !important;
     border: 2px solid red;
     touch-action: none; /* Prevent default touch behaviors */
@@ -210,6 +211,7 @@
     padding-top: var(--left-padding);
     cursor: pointer;
     border-radius: var(--left-padding);
+    
   }
 
   .task-name {
