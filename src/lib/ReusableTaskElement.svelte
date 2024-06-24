@@ -193,9 +193,9 @@
   }
 
   function preventResizing (e) {
-    e.preventDefault()
+    // e.preventDefault()
     e.stopPropagation()
-    
+
     // realX = e.clientX - initialX;
     // realY = e.clientY - initialY;
     TaskElem.style.opacity = 0.5;
