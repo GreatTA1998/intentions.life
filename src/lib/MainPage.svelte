@@ -79,6 +79,8 @@
         class="ux-tab-item" 
         class:active-ux-tab={currentMode === 'Week'} 
         class:transparent-inactive-tab={currentMode === 'Day'}
+        draggable="true" on:dragstart={(e) => handleDragStart(e)}
+        style="user-select: none;"
       >
        <span class="material-symbols-outlined" style="font-size: 32px;">
         house
@@ -286,6 +288,10 @@
 
   $: if (allTasks) {
     computeDataStructuresFromAllTasks(allTasks)
+  }
+
+  function handleDragStart (e) {
+    // e.dataTransfer.setData("text/plain", id)
   }
 
   function handleLogoClick (setIsPopupOpen) {
