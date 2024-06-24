@@ -171,13 +171,16 @@
     console.log("crt.style.jheight =", crt.style.height)
     // crt.style.display = 'none';
     document.body.appendChild(crt);
-    // crt.style.display = "none";
     // document.body.appendChild(crt);
     // const rect = TaskElem.getBoundingClientRect();
 
     const offsetX = 0
     const offsetY = 0
-    e.dataTransfer.setDragImage(crt, offsetX, offsetY);
+    // e.dataTransfer.setDragImage(crt, offsetX, offsetY);
+
+    // hide the cloned element
+    // crt.style.display = "none";
+    // document.body.removeChild(crt)
 
 
     // empty image
@@ -190,8 +193,11 @@
   }
 
   function preventResizing (e) {
-    realX = e.clientX - initialX;
-    realY = e.clientY - initialY;
+    e.preventDefault()
+    e.stopPropagation()
+    
+    // realX = e.clientX - initialX;
+    // realY = e.clientY - initialY;
     TaskElem.style.opacity = 0.5;
     // TaskElem.style.transform = `translate(${realX}px, ${realY}px)`;
     // console.log("realx, realY =", realX, realY)
@@ -239,6 +245,10 @@
     touch-action: none; /* Prevent default touch behaviors */
     user-select: none; /* Prevent text selection */
     will-change: transform; /* Gives browser a heads-up for optimization */
+  }
+
+  .claude-draggable-item:active {
+    cursor: grabbing; 
   }
 
   .calendar-block {

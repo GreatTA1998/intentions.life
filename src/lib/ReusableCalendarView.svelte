@@ -18,6 +18,7 @@
       color: #6D6D6D;
     "
     on:drop={(e) => drop_handler(e)}
+    on:dragenter={(e) => dragover_handler(e)}
     on:dragover={(e) => dragover_handler(e)}
     on:click|self={(e) => {
       isDirectlyCreatingTask = true
