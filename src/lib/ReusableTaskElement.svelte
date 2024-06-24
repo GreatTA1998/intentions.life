@@ -10,6 +10,9 @@
   draggable="true" 
   on:dragstart|self={(e) => startDragMove(e, task.id)} 
   on:drag={(e) => preventResizing(e)}
+
+  on:touchstart|preventDefault={() => {}}
+  on:touchmove|preventDefault={() => {}}
   class="claude-draggable-item"
   class:calendar-block={!isBulletPoint}
   style="
@@ -166,13 +169,15 @@
     crt.style.height = rect.height + 'px'
     console.log("crt.style.width =", crt.style.width)
     console.log("crt.style.jheight =", crt.style.height)
+    // crt.style.display = 'none';
     document.body.appendChild(crt);
     // crt.style.display = "none";
     // document.body.appendChild(crt);
     // const rect = TaskElem.getBoundingClientRect();
 
-
-    e.dataTransfer.setDragImage(crt, rect.width, rect.height);
+    const offsetX = 0
+    const offsetY = 0
+    e.dataTransfer.setDragImage(crt, offsetX, offsetY);
 
 
     // empty image
