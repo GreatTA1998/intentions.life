@@ -65,13 +65,22 @@
     if (imageBlobFile.lastModified) dateClassObj = new Date(imageBlobFile.lastModified)
     else dateClassObj = new Date(timeCreated) // otherwise we set the time to right now.
 
-    updateFirestoreDoc(`/users/${$user.uid}/tasks/${taskObject.id}`, {
+    const updateObj = {
       duration: durationForFullDisplay,
       imageDownloadURL,
       imageFullPath: fullPath, // for easy garbage collection
       isDone: true
       // note we do NOT change the task's timing based on the photo
-    })
+    }
+
+    // only auto-hydrate the time if the task isn't already on the calendar
+    if (!taskObject.startDate) { 
+      updateObj.startTime = getTimeInHHMM({ dateClassObj })
+      updateObj.startDate = getDateInMMDD(dateClassObj)
+      updateObj.startYYYY = `${dateClassObj.getFullYear()}`
+    }
+
+    updateFirestoreDoc(`/users/${$user.uid}/tasks/${taskObject.id}`, updateObj)
   }
 
   async function uploadImageBlobToFirebase (blobFile, id) {
