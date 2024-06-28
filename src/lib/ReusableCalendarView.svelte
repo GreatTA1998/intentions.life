@@ -106,11 +106,7 @@
     <!-- A red line that indicates the current time -->
     {#if calendarBeginningDateClassObject.getDate() === new Date().getDate()}
       <div class="current-time-indicator-container" style="
-          top: {computeOffsetGeneral({ 
-            d1: calendarBeginningDateClassObject, 
-            d2: new Date(), 
-            pixelsPerMinute 
-          })}px;
+          top: {computeTimeIndicatorOffset()}px;
         "
       > 
 
@@ -119,7 +115,7 @@
         bind:this={CurrentTimeIndicator}
       > 
         <div style="font-size: 12px; color: var(--location-indicator-color); font-weight: 600;">
-          {getTimeInHHMM({ dateClassObj: new Date() })}
+          {DateTime.now().toLocaleString(DateTime.TIME_24_SIMPLE)}
         </div>
       </div>
     {/if}
@@ -127,6 +123,7 @@
 </div>
 
 <script>
+  import { DateTime, Interval } from 'luxon'
   import { getFirestoreCollection } from '/src/crud.js'
   import { 
     computeMillisecsDifference, 
@@ -195,6 +192,14 @@
   onDestroy(() => {
 
   })
+
+  function computeTimeIndicatorOffset () {
+    const now = DateTime.now()
+    const startOfDay = now.startOf('day')
+    const i = Interval.fromDateTimes(startOfDay, now)
+    const minutesDifference = i.length() / (1000 * 60)
+    return minutesDifference * pixelsPerMinute
+  } 
 
   function p (...args) {
     console.log(...args)    

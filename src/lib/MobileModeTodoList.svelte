@@ -27,6 +27,8 @@
   </div>
 </GrandTreeTodoReusableList>
 
+<!-- TO-DO: display completed tasks here -->
+
 <script>
   import GrandTreeTodoReusableList from '$lib/GrandTreeTodoReusableList.svelte'
   import { inclusiveWeekTodo } from '/src/store.js'

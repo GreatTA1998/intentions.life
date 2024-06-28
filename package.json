@@ -19,6 +19,7 @@
   "dependencies": {
     "firebase": "^9.6.5",
     "lodash": "^4.17.21",
+    "luxon": "^3.4.4",
     "posthog-js": "^1.136.5",
     "svelte-portal": "^2.2.0"
   }

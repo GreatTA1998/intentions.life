@@ -12,7 +12,7 @@
 {/key}
 
 <!-- Reason for 100dvh: https://stackoverflow.com/a/75648985/7812829 -->
-<!--   style="padding: 6px; background-color: white; display: flex; align-items: center; justify-content: center;" -->
+<!-- style="padding: 6px; background-color: white; display: flex; align-items: center; justify-content: center;" -->
 <div class:iphone-se-size={isTesting} 
      class:general-mobile-size={!isTesting}
      class:voice-active-highlight={isUsingVoice}
@@ -24,7 +24,7 @@
     </div>
 
     <div style="overflow-y: auto;">
-      <MobileTodayTodo
+      <MobileModeTodoList
         on:task-click={(e) => openDetailedCard(e.detail)}
         on:task-checkbox-change={(e) => updateTaskNode({ id: e.detail.id, keyValueChanges: { isDone: e.detail.isDone }})}
 
@@ -32,58 +32,12 @@
         on:subtask-create={(e) => createSubtask(e.detail)}
       />
     </div>
-    <!-- TO-DO: display completed tasks below -->
   {:else if activeTabName === 'TODAY_VIEW'}
-    <div style="padding: 0px; overflow-y: auto;">
-      {#each todayScheduledTasks as eventToday, i}
-        {#if i === idxOfTimeIndicator}
-          <div style="border: 4px solid var(--location-indicator-color); border-radius: 0px;
-          width: 100%; margin-top: 8px; margin-bottom: 8px;">
-
-          </div>
-        {/if}
-
-        {#if eventToday.iconDataURL}
-          <div on:click={() => openDetailedCard({ task: eventToday })}
-            class="today-event"
-            class:has-already-happened={hasAlreadyHappened(eventToday)} 
-            class:night-time={isNightTime(eventToday)}
-            style="display: flex; align-items: center; margin-bottom: 0px;"
-          >
-            <div class="event-scheduled-time">
-              {eventToday.startTime} 
-            </div>
-
-            <img src={eventToday.iconDataURL} style="width: 48px; height: 48px;">
-          </div>
-        {:else}
-          <div on:click={() => openDetailedCard({ task: eventToday })}
-            class="today-event"
-            class:has-already-happened={hasAlreadyHappened(eventToday)} 
-            class:night-time={isNightTime(eventToday)}
-            style="
-              margin-bottom: 0px;
-              background-image: {eventToday.imageDownloadURL ? `url(${eventToday.imageDownloadURL})` : ''};
-              background-size: contain;
-              background-repeat: no-repeat;
-            "
-          >
-            {#if !eventToday.imageDownloadURL}
-              <div class="event-scheduled-time">
-                {eventToday.startTime} 
-              </div>
-              <div style="font-size: 32px; display: flex; align-items: center; flex-wrap: no-wrap;">
-                {eventToday.name}
-              </div>
-            {:else}
-              <div style="width: 100%; height: 240px;"></div>
-            {/if}
-          </div>
-        {/if}
-      {/each}      
-    </div>
+    <MobileModeTodayView
+      on:task-click={(e) => openDetailedCard(e.detail)}
+    />
   {:else if activeTabName === 'FUTURE_VIEW'}
-    <div style="height: 90%; overflow-y: auto;">
+    <div style="overflow-y: auto;">
       <FutureOverview
         {futureScheduledTasks}
         on:task-duration-adjusted
@@ -149,8 +103,6 @@
     getRandomID, 
     getDateInMMDD, 
     getDateInDDMMYYYY,
-    getTimeInHHMM,
-    pureNumericalHourForm,
     checkTaskObjSchema,
     sortByUnscheduledThenByOrderValue
   } from '/src/helpers.js'
@@ -167,18 +119,17 @@
   import { goto } from '$app/navigation'
   import { onDestroy, onMount } from 'svelte'
   import FutureOverview from '$lib/FutureOverview.svelte'
-  import MobileTodayTodo from '$lib/MobileTodayTodo.svelte'
+  import MobileModeTodoList from '$lib/MobileModeTodoList.svelte'
+  import MobileModeTodayView from '$lib/MobileModeTodayView.svelte'
   import db from '/src/db.js'
   import VoiceKeywordDetect from '$lib/VoiceKeywordDetect.svelte'
   import DetailedCardPopup from '$lib/DetailedCardPopup.svelte'
 
   let allTasks = []
-  let todayScheduledTasks = []
   let isTesting = false
   let futureScheduledTasks = null
   let activeTabName = 'TODO_VIEW'
   let unsub
-  let idxOfTimeIndicator = 0
   
   let isUsingVoice = false
   let speechResult = ''
@@ -280,6 +231,7 @@
   function updateTaskNode ({ id, keyValueChanges }) {
     updateFirestoreDoc(tasksPath + id, keyValueChanges)
     // very useful for debugging
+    // console.log("updateTaskNode(), keyValueChanges =", keyValueChanges)
   }
 
   function createNewEvent ({ name, startTime }) {
@@ -326,31 +278,9 @@
     )
   }
 
-  function isNightTime (eventTask) {
-    const sevenPM = new Date()
-    sevenPM.setHours(19) // 7 pm
-    const nightHHMM = getTimeInHHMM({ dateClassObj: sevenPM })
-    return pureNumericalHourForm(eventTask.startTime) > pureNumericalHourForm(nightHHMM) 
-  }
-
-  function hasAlreadyHappened (eventTask) {
-    const nowHHMM = getTimeInHHMM({ dateClassObj: new Date() })
-    return pureNumericalHourForm(nowHHMM) > pureNumericalHourForm(eventTask.startTime)
-  }
-
   function computeDataStructuresFromAllTasks (allTasks) {
     // future overview
     collectFutureScheduledTasksToArray()
-    
-    collectTodayScheduledTasksToArray()
-
-    // grand tree todo
-    // const todoMemoryTrees = computeTodoMemoryTrees(allTasks)
-    // allTasksDueToday.set(todoMemoryTrees[0])
-    // allTasksDueThisWeek.set(todoMemoryTrees[1])
-    // allTasksDueThisMonth.set(todoMemoryTrees[2])
-    // allTasksDueThisYear.set(todoMemoryTrees[3])
-    // allTasksDueThisLife.set(todoMemoryTrees[4])
 
     // simple week todo
     inclusiveWeekTodo.set(computeInclusiveWeekTodo(allTasks))
@@ -362,17 +292,18 @@
     futureScheduledTasks = [] // reset 
     traverseAndUpdateTree({
       fulfilsCriteria: (task) => { 
-        if (!task.startTime || !task.startDate) return 
+        if (!task.startDate) return 
         if (task.willRepeatOnWeekDayNumber) return
         const d1 = new Date(convertToISO8061({ mmdd: task.startDate }))
         
         // setHours(hoursValue 0 - 23, minutesValue 0 - 59)
         // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/setHours
-        const [hh, mm] = task.startTime.split(":")
-        d1.setHours(Number(hh), Number(mm))
+        if (task.startTime) {
+          const [hh, mm] = task.startTime.split(":")
+          d1.setHours(Number(hh), Number(mm))
+        }
         return (task.startDate && task.startDate !== 'NaN/NaN') && 
                 (!task.willRepeatOnWeekDayNumber) &&
-                  (task.startTime) &&
                     (d1.getTime() >= new Date().getTime()) && 
                       (Number(task.startYYYY) === Number(yearNumber.toString())) // this line is a quickfix because we don't store YYYY values in legacy versions
       }, // 'NaN' quick-fix bug
@@ -385,34 +316,6 @@
       const d2 = new Date(task2.startDate)
       return d1.getTime() - d2.getTime() // most recent to the top??
     })
-  }
-
-  function collectTodayScheduledTasksToArray () {
-    todayScheduledTasks = [] // reset 
-    traverseAndUpdateTree({
-      fulfilsCriteria: (task) => { 
-        const todayMMDD = getDateInMMDD(new Date())
-        return task.startDate === todayMMDD && task.startTime
-      }, 
-      applyFunc: (task) => todayScheduledTasks = [...todayScheduledTasks, task]
-    })
-
-    // TO-DO: don't include all the tasks in the future, only if it is bounded by < 7 days for the week view, and < 30 days for the month view
-    todayScheduledTasks.sort((task1, task2) => {
-      return pureNumericalHourForm(task1.startTime) - pureNumericalHourForm(task2.startTime)
-      // const d1 = new Date(task1.startTime)
-      // const d2 = new Date(task2.startTime)
-      // return d1.getTime() - d2.getTime() // most recent to the top??
-    })
-
-
-    // bonus: display current time (brown line)
-    for (let i = 0; i < todayScheduledTasks.length; i++) {
-      if (!hasAlreadyHappened(todayScheduledTasks[i])) {
-        idxOfTimeIndicator = i
-        return
-      }
-    }
   }
 
   function traverseAndUpdateTree ({ fulfilsCriteria, applyFunc }) {
@@ -440,28 +343,8 @@
     --bottom-navbar-height: 48px;
   }
 
-  .today-event {
-    padding: 8px;
-    /* border-radius: 8px; */
-    border: 1px solid grey;
-  }
-
-  .night-time {
-    background-color: rgb(40, 40, 40);
-    color: white;
-  }
-
   .voice-active-highlight {
     background-color: rgb(180, 238, 221);
-  }
-
-  .event-scheduled-time {
-    font-size: 32px; 
-    font-weight: 600;
-  }
-
-  .has-already-happened {
-    opacity: 0.5;
   }
 
   .iphone-se-size {
@@ -475,8 +358,7 @@
   }
 
   .bottom-navbar {
-    position: absolute; 
-    bottom: 0; 
+    margin-top: auto;
     width: 100%; 
     height: var(--bottom-navbar-height); 
     display: flex; 
@@ -502,6 +384,7 @@
   .active-nav-tab {
     color: rgb(0, 0, 0);
     font-weight: 600;
+    border-top: 2px solid rgb(0, 0, 0);
   }
 
   .nav-tab-desc {
