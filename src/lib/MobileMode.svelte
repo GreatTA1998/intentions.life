@@ -24,7 +24,7 @@
     </div>
 
     <div style="overflow-y: auto;">
-      <MobileTodayTodo
+      <MobileModeTodoList
         on:task-click={(e) => openDetailedCard(e.detail)}
         on:task-checkbox-change={(e) => updateTaskNode({ id: e.detail.id, keyValueChanges: { isDone: e.detail.isDone }})}
 
@@ -121,7 +121,7 @@
   import { goto } from '$app/navigation'
   import { onDestroy, onMount } from 'svelte'
   import FutureOverview from '$lib/FutureOverview.svelte'
-  import MobileTodayTodo from '$lib/MobileTodayTodo.svelte'
+  import MobileModeTodoList from '$lib/MobileModeTodoList.svelte'
   import MobileModeTodayView from '$lib/MobileModeTodayView.svelte'
   import db from '/src/db.js'
   import VoiceKeywordDetect from '$lib/VoiceKeywordDetect.svelte'
