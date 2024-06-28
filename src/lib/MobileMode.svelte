@@ -32,10 +32,8 @@
         on:subtask-create={(e) => createSubtask(e.detail)}
       />
     </div>
-    <!-- TO-DO: display completed tasks below -->
   {:else if activeTabName === 'TODAY_VIEW'}
     <MobileModeTodayView
-      {allTasks}
       on:task-click={(e) => openDetailedCard(e.detail)}
     />
   {:else if activeTabName === 'FUTURE_VIEW'}
@@ -233,6 +231,7 @@
   function updateTaskNode ({ id, keyValueChanges }) {
     updateFirestoreDoc(tasksPath + id, keyValueChanges)
     // very useful for debugging
+    // console.log("updateTaskNode(), keyValueChanges =", keyValueChanges)
   }
 
   function createNewEvent ({ name, startTime }) {
