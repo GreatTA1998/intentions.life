@@ -121,15 +121,21 @@
       </span>
     </div> -->
 
-    <span on:click={() => goto(`/${$user.uid}/camera`)} class="material-symbols-outlined mika-hover" style="margin-right: 32px; font-size: 30px; cursor: pointer; color: rgb(120, 120, 120);">
-      photo
-    </span>
-
-    <PopupCustomerSupport let:setIsPopupOpen={setIsPopupOpen}>
-      <span on:click={() => setIsPopupOpen({ newVal: true })}  class="material-symbols-outlined mika-hover" style="font-size: 28px; cursor: pointer; color: rgb(120, 120, 120);">
-        phone
+    <div style="display: flex; gap: 24px;">
+      <span on:click={() => goto(`/${$user.uid}/mobile`)} class="material-symbols-outlined mika-hover responsive-icon-size">
+        smartphone
       </span>
-    </PopupCustomerSupport>
+  
+      <span on:click={() => goto(`/${$user.uid}/camera`)} class="material-symbols-outlined mika-hover responsive-icon-size">
+        photo
+      </span>
+  
+      <PopupCustomerSupport let:setIsPopupOpen={setIsPopupOpen}>
+        <span on:click={() => setIsPopupOpen({ newVal: true })}  class="material-symbols-outlined mika-hover responsive-icon-size">
+          contact_support
+        </span>
+      </PopupCustomerSupport>
+    </div>
   </div>
 
   <div slot="content" style="display: flex; flex-grow: 1; height: 100%;">
@@ -663,6 +669,12 @@
 </script>
 
 <style>  
+  .responsive-icon-size {
+    font-size: clamp(1rem, 4vw, 1.5rem);  /* font-size: 24px;  */
+    cursor: pointer; 
+    color: rgb(120, 120, 120);
+  }
+
   .todo-container {
     min-width: 360px; 
     background-color: var(--todo-list-bg-color);
