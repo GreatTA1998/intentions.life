@@ -192,7 +192,7 @@
       <!-- 2nd flex child -->
       <div class="the-only-scrollable-container calendar-section-flex-child"> 
         {#if allTasks}    
-          <NewCalendarThisWeek
+          <CalendarThisWeek
             {calStartDateClassObj}
             on:calendar-shifted={(e) => incrementDateClassObj({ days: e.detail.days})}
             on:new-root-task={(e) => createNewRootTask(e.detail)}
@@ -250,7 +250,7 @@
   import FinancePopup from '$lib/FinancePopup.svelte'
   import BedtimePopupMaplestoryMusic from '$lib/BedtimePopupMaplestoryMusic.svelte'
   import TheSnackbar from '$lib/TheSnackbar.svelte'
-  import NewCalendarThisWeek from '$lib/NewCalendarThisWeek.svelte'
+  import CalendarThisWeek from '$lib/CalendarThisWeek.svelte'
   import BackgroundRainScene from '$lib/BackgroundRainScene.svelte'
   import GrandTreeTodoPopupButton from '$lib/GrandTreeTodoPopupButton.svelte'
   import PopupCustomerSupport from '$lib/PopupCustomerSupport.svelte'

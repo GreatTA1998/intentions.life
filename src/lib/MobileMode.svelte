@@ -393,6 +393,7 @@
   .active-nav-tab {
     color: rgb(0, 0, 0);
     font-weight: 600;
+    border-top: 2px solid rgb(0, 0, 0);
   }
 
   .nav-tab-desc {
