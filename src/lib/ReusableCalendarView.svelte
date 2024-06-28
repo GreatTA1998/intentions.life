@@ -115,7 +115,7 @@
         bind:this={CurrentTimeIndicator}
       > 
         <div style="font-size: 12px; color: var(--location-indicator-color); font-weight: 600;">
-          {getTimeInHHMM({ dateClassObj: new Date() })}
+          {DateTime.now().toLocaleString(DateTime.TIME_24_SIMPLE)}
         </div>
       </div>
     {/if}
