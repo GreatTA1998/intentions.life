@@ -14,7 +14,7 @@
 
     {#each flexibleNormalTasks as flexibleDayTask}
       <div on:click={() => dispatch('task-click', { task: flexibleDayTask })} 
-        style="width: var(--calendar-day-section-width); font-size: 12px; display: flex; gap: 4px; margin-top: 8px; margin-left: 4px; margin-right: 4px;"
+        style="width: var(--calendar-day-section-width); font-size: 12px; display: flex; gap: 4px; margin-bottom: 4px; margin-left: 4px; margin-right: 4px;"
       >
         <ReusableFlexibleDayTask task={flexibleDayTask}
           on:task-click
@@ -80,7 +80,7 @@
   import FunctionalDoodleIcon from '$lib/FunctionalDoodleIcon.svelte'
 
   let idxOfTimeIndicator = 0
-  let todayScheduledTasks = []
+  let todayTasks = []
   let flexibleIconTasks = []
   let flexibleNormalTasks = []
   let scheduledEvents = []
@@ -100,10 +100,10 @@
   }
 
   function computeDataStructures () {
-    todayScheduledTasks = getScheduledTasks()
-    flexibleIconTasks = todayScheduledTasks.filter(task => !task.startTime && task.iconDataURL)
-    flexibleNormalTasks = todayScheduledTasks.filter(task => !task.startTime && !task.iconDataURL)
-    scheduledEvents = todayScheduledTasks.filter(t => t.startTime).sort((task1, task2) => {
+    todayTasks = getScheduledTasks()
+    flexibleIconTasks = todayTasks.filter(task => !task.startTime && task.iconDataURL)
+    flexibleNormalTasks = todayTasks.filter(task => !task.startTime && !task.iconDataURL)
+    scheduledEvents = todayTasks.filter(t => t.startTime).sort((task1, task2) => {
       return pureNumericalHourForm(task1.startTime) - pureNumericalHourForm(task2.startTime)
     })
   }

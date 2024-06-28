@@ -37,7 +37,7 @@
       on:task-click={(e) => openDetailedCard(e.detail)}
     />
   {:else if activeTabName === 'FUTURE_VIEW'}
-    <div style="height: 90%; overflow-y: auto;">
+    <div style="overflow-y: auto;">
       <FutureOverview
         {futureScheduledTasks}
         on:task-duration-adjusted
@@ -282,14 +282,6 @@
     // future overview
     collectFutureScheduledTasksToArray()
 
-    // grand tree todo
-    // const todoMemoryTrees = computeTodoMemoryTrees(allTasks)
-    // allTasksDueToday.set(todoMemoryTrees[0])
-    // allTasksDueThisWeek.set(todoMemoryTrees[1])
-    // allTasksDueThisMonth.set(todoMemoryTrees[2])
-    // allTasksDueThisYear.set(todoMemoryTrees[3])
-    // allTasksDueThisLife.set(todoMemoryTrees[4])
-
     // simple week todo
     inclusiveWeekTodo.set(computeInclusiveWeekTodo(allTasks))
   }
@@ -300,17 +292,18 @@
     futureScheduledTasks = [] // reset 
     traverseAndUpdateTree({
       fulfilsCriteria: (task) => { 
-        if (!task.startTime || !task.startDate) return 
+        if (!task.startDate) return 
         if (task.willRepeatOnWeekDayNumber) return
         const d1 = new Date(convertToISO8061({ mmdd: task.startDate }))
         
         // setHours(hoursValue 0 - 23, minutesValue 0 - 59)
         // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/setHours
-        const [hh, mm] = task.startTime.split(":")
-        d1.setHours(Number(hh), Number(mm))
+        if (task.startTime) {
+          const [hh, mm] = task.startTime.split(":")
+          d1.setHours(Number(hh), Number(mm))
+        }
         return (task.startDate && task.startDate !== 'NaN/NaN') && 
                 (!task.willRepeatOnWeekDayNumber) &&
-                  (task.startTime) &&
                     (d1.getTime() >= new Date().getTime()) && 
                       (Number(task.startYYYY) === Number(yearNumber.toString())) // this line is a quickfix because we don't store YYYY values in legacy versions
       }, // 'NaN' quick-fix bug
@@ -365,8 +358,7 @@
   }
 
   .bottom-navbar {
-    position: absolute; 
-    bottom: 0; 
+    margin-top: auto;
     width: 100%; 
     height: var(--bottom-navbar-height); 
     display: flex; 
