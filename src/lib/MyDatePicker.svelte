@@ -21,7 +21,6 @@
     const dateStr = new Date(2020, monthIndex, DD).toDateString(); // 'Fri Apr 10 2020'
     const dateStrArr = dateStr.split(' '); // ['Fri', 'Apr', '10', '2020']
     const [dayOfWeek, month, dayOfMonth, year] = dateStr.split(' ')
-    console.log(dateStrArr[1], dateStrArr[2]); // 'Apr'
     return month + ' ' + dayOfMonth
   }
 
