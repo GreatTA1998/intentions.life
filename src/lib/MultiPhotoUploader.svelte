@@ -1,5 +1,5 @@
-<!-- `height: 16px` is a quickfix related to mystery height, probably from the invisible input -->
-<div style="height: 16px;">
+<!-- `align-items: center` is a quickfix related to mystery height, probably from the invisible input -->
+<div style="display: flex; align-items: center;">
   <span on:click={openFolderInput} class="material-symbols-outlined responsive-icon-size">
     photo_library
   </span>
