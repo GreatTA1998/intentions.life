@@ -121,14 +121,12 @@
       </span>
     </div> -->
 
-    <div style="display: flex; gap: 24px;">
+    <div style="display: flex; gap: 24px; align-items: center;">
       <span on:click={() => goto(`/${$user.uid}/mobile`)} class="material-symbols-outlined mika-hover responsive-icon-size">
         smartphone
       </span>
-  
-      <span on:click={() => goto(`/${$user.uid}/camera`)} class="material-symbols-outlined mika-hover responsive-icon-size">
-        photo
-      </span>
+
+      <MultiPhotoUploader/>
   
       <PopupCustomerSupport let:setIsPopupOpen={setIsPopupOpen}>
         <span on:click={() => setIsPopupOpen({ newVal: true })}  class="material-symbols-outlined mika-hover responsive-icon-size">
@@ -261,6 +259,7 @@
   import ZenJournalLeftNavigation from '$lib/ZenJournaLeftNavigation.svelte'
   import ManageReusableTasks from '$lib/ManageReusableTasks.svelte'
   import UncertainMilestones from '$lib/UncertainMilestones.svelte'
+  import MultiPhotoUploader from '$lib/MultiPhotoUploader.svelte'
 
   import { onDestroy, onMount, tick } from 'svelte'
   import { goto } from '$app/navigation';

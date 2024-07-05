@@ -91,6 +91,17 @@
         </div>
       </div>
     </div>
+
+    <div on:click={() => goto(`/${$user.uid}`)} class="bottom-nav-tab">
+      <div style="text-align: center;">
+        <span class="material-symbols-outlined nav-tab-icon">
+          house
+        </span>
+        <div class="nav-tab-desc">
+          Calendar
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
