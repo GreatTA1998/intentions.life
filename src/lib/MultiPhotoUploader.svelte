@@ -1,10 +1,9 @@
-<div>
-  <div on:click={openFolderInput} class="circular-icon-button">
-    <span class="material-symbols-outlined responsive-icon-size">
-      photo_library
-    </span>
-  </div>
-  
+<!-- `height: 16px` is a quickfix related to mystery height, probably from the invisible input -->
+<div style="height: 16px;">
+  <span on:click={openFolderInput} class="material-symbols-outlined responsive-icon-size">
+    photo_library
+  </span>
+
   <input style="display: none;" 
     bind:this={FolderInput}
     on:change={(e) =>  handleFileChange(e)} 
@@ -24,16 +23,11 @@
 
   const storage = getStorage()
 
-  let CameraInput
   let FolderInput
 
   onMount(() => {
 
   })
-
-  function openCameraInput () {
-    CameraInput.click()
-  }
 
   function openFolderInput () {
     FolderInput.click()
@@ -111,16 +105,6 @@
 </script>
 
 <style>
-  .circular-icon-button {
-    background-color: var(--navbar-bg-color);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 30px;
-    width: 60px;
-    height: 60px;
-  }
-
   .responsive-icon-size {
     font-size: clamp(1rem, 4vw, 1.5rem);  /* font-size: 24px;  */
     cursor: pointer; 
