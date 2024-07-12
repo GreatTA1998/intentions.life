@@ -1,36 +1,32 @@
 
 <!-- 
-  mika blue color: '#0085FF'
-  experimental green: '#509c13'
   Note, the HTML checkbox tick color literally cannot be changed, but it will be automatically white if it "decides" that our chosen background color is dark enough, 
   or vice versa
  -->
 
- <!--    background-image: {task.imageDownloadURL ? `url(${task.imageDownloadURL})` : ''};
-   background-size: contain;
-   background-repeat: no-repeat; -->
+<div 
+  on:click={() => dispatch('task-click', { task })}
+  on:dragstart|self={(e) => startDragMove(e, task.id)} 
+  draggable="true" 
+  class:calendar-block={!isBulletPoint}
+  class:clear-border={!isBulletPoint}
+  class:graph-paper-texture={!isBulletPoint && !task.imageDownloadURL}
+  class:full-photo-texture={!isBulletPoint && task.imageDownloadURL}
 
- <div 
- on:click={() => dispatch('task-click', { task })}
- draggable="true" 
- on:dragstart|self={(e) => startDragMove(e, task.id)} 
- class:calendar-block={!isBulletPoint}
- class:graph-paper-texture={!isBulletPoint}
- class:clear-border={!isBulletPoint}
- class="graph-paper-texture"
- style="
-   position: relative;
-   height: {height}px; 
-   min-height: 32px;
-   font-size: {fontSize}rem;
-   opacity: {task.isDone ? '0.9' : '0.7'};
-   background-color: {isBulletPoint ? '' : '#f8f8f2;'};
-   padding-left: {isBulletPoint ? '0px' : 'var(--left-padding)'};
-   padding-right: var(--left-padding);
-
-   display: flex; flex-direction: column;
- " 
- on:keydown={() => {}}
+  style="
+    --image-download-url: url({task.imageDownloadURL});
+    position: relative;
+    height: {height}px; 
+    min-height: {iconMinPixelHeight}px;
+    font-size: {fontSize}rem;
+    opacity: {task.isDone ? '0.9' : '0.7'};
+    background-color: {isBulletPoint ? '' : '#f8f8f2;'};
+    padding-left: {isBulletPoint ? '0px' : 'var(--left-padding)'};
+    padding-right: var(--left-padding);
+    display: flex; 
+    flex-direction: column;
+  " 
+  on:keydown={() => {}}
 >
  <!-- As long as this parent div is correctly sized, the duration adjusting area 
    will be positioned correctly (it's glued to the bottom of this parent div)
@@ -73,7 +69,7 @@
  </div>
  <!-- End of task name flexbox -->
 
-  {#if !isBulletPoint}
+  {#if !isBulletPoint && !task.imageDownloadURL}
     <div style="flex-grow: 1; overflow: hidden; margin-left: 4px;">
       <div style="font-size: 12px; font-weight: 400; color: rgb(20, 20, 20);">
         {task.notes || ''}
@@ -106,17 +102,17 @@
  import { createEventDispatcher } from 'svelte'
  import { getTrueY } from '/src/helpers.js'
  import { yPosWithinBlock, whatIsBeingDragged, whatIsBeingDraggedID, whatIsBeingDraggedFullObj } from '/src/store.js'
- import ReusableCheckbox from '$lib/ReusableCheckbox.svelte'
  import FunctionalDoodleIcon from '$lib/FunctionalDoodleIcon.svelte'
 
  export let task = null
  export let pixelsPerHour = null
- export let hasCheckbox = false
 
  export let fontSize = 1
 
+ const iconMinPixelHeight = 32
+
  $: height = (pixelsPerHour / 60) * task.duration
- $: isBulletPoint = height < 20
+ $: isBulletPoint = height < iconMinPixelHeight
 
  const dispatch = createEventDispatcher()
  let startY = 0
@@ -161,30 +157,35 @@
 </script> 
 
 <style>
- :root {
-   --left-padding: 6px;
-   --default-task-color: hsla(210, 20%, 36%, 0.6);
+  :root {
+    --left-padding: 6px;
+    --default-task-color: hsla(210, 20%, 36%, 0.6);
 
-   --experimental-black: hsla(0, 100%, 0%, 0.6);
-   --experimental-purple: hsla(248, 53%, 58%, 0.6);
-   --experimental-red: hsla(0, 100%, 50%, 0.6);
- }
+    --experimental-black: hsla(0, 100%, 0%, 0.6);
+    --experimental-purple: hsla(248, 53%, 58%, 0.6);
+    --experimental-red: hsla(0, 100%, 50%, 0.6);
+  }
 
- .calendar-block {
-   width: 100%;
-   /* padding-top: var(--left-padding); */
-   cursor: pointer;
-   border-radius: var(--left-padding);
- }
+  .calendar-block {
+    width: 100%;
+    cursor: pointer;
+    border-radius: var(--left-padding);
+  }
 
- .clear-border {
-  border: 1px solid var(--experimental-black);
- }
+  .clear-border {
+    border: 1px solid var(--experimental-black);
+  }
 
- .graph-paper-texture {
-    background-image: 
-      linear-gradient(90deg, rgba(200,200,200,0.8) 1px, transparent 0), 
-      linear-gradient(180deg, rgba(200,200,200,0.8) 1px, transparent 0);
-    background-size: 24px 24px; /* Adjust the size of the pattern */
- }
+  .graph-paper-texture {
+      background-image: 
+        linear-gradient(90deg, rgba(200,200,200,0.8) 1px, transparent 0), 
+        linear-gradient(180deg, rgba(200,200,200,0.8) 1px, transparent 0);
+      background-size: 24px 24px; /* Adjust the size of the pattern */
+  }
+
+  .full-photo-texture {
+    background-image: var(--image-download-url);
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
 </style>
