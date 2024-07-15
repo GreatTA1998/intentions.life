@@ -19,7 +19,7 @@
     </div>
 
     <div 
-      style="flex-grow: 1;"
+      style="flex-grow: 1; padding: 0px 6px;"
       class:has-max-width={hasMaxWidth}
       class:enable-scrolling={enableScrolling} 
     >
