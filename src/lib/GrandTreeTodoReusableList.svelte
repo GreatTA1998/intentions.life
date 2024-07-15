@@ -251,6 +251,10 @@
     batch.commit()
 
     batch = writeBatch(db)
+
+    whatIsBeingDraggedFullObj.set(null)
+    whatIsBeingDraggedID.set('')
+    whatIsBeingDragged.set('')
   }
 
   function dragover_handler (e) {

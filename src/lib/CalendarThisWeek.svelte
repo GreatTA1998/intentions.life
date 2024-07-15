@@ -16,7 +16,7 @@
 
   <div class="sticky-y-div flexbox">
     {#each dateClassObjects as dateClassObj}
-      <ReusableCalendarHeader 
+      <ReusableCalendarHeader
         {dateClassObj}
         {intForTriggeringRerender}
         {isShowingDockingArea}

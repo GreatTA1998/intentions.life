@@ -24,6 +24,12 @@
       yPosition = copyGetTrueY(e)
     }}
   >
+    {#if $whatIsBeingDraggedFullObj}
+      {#each timestamps as _}
+        <div class="my-helper-gridline" style="height: 1px; margin-bottom: {(pixelsPerMinute * 60) - 1}px;"></div>
+      {/each}
+    {/if}
+
     {#each sortedScheduledTasks as task, i}
       <div
         style="
@@ -137,7 +143,13 @@
   import ReusablePhotoTaskElement from '$lib/ReusablePhotoTaskElement.svelte'
   import ReusableIconTaskElement from '$lib/ReusableIconTaskElement.svelte'
   import { onMount, beforeUpdate, afterUpdate, tick, createEventDispatcher, onDestroy } from 'svelte'
-  import { user, hasInitialScrolled, yPosWithinBlock } from '/src/store.js'
+  import { user, 
+    hasInitialScrolled, 
+    yPosWithinBlock, 
+    whatIsBeingDraggedFullObj,
+    whatIsBeingDraggedID,
+    whatIsBeingDragged
+  } from '/src/store.js'
   import ReusableCreateTaskDirectly from '$lib/ReusableCreateTaskDirectly.svelte'
 
   export let scheduledTasks = [] 
@@ -273,6 +285,10 @@
       timeOfDay: hhmm,
       dateScheduled: mmdd
     })
+
+    whatIsBeingDraggedFullObj.set(null)
+    whatIsBeingDraggedID.set('')
+    whatIsBeingDragged.set('')
   }
 
   function getResultantDateClassObject (trueY) {
@@ -289,6 +305,12 @@
 </script>
 
 <style lang="scss">
+  .my-helper-gridline {
+    // ChatGPT suggested this maximal contrast
+    border-bottom: 1px solid hsl(210, 100%, 40%); 
+    width: 100%; 
+  }
+
   .current-time-indicator-container {
     display: block; 
     align-items: center;

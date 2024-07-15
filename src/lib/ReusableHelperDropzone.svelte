@@ -173,5 +173,9 @@
     batch.update(ref, updateObj)
 
     batch.commit()
+
+    whatIsBeingDraggedFullObj.set(null)
+    whatIsBeingDraggedID.set('')
+    whatIsBeingDragged.set('')
   }
 </script>
