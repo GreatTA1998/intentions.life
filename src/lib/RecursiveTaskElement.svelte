@@ -60,10 +60,6 @@
               on:change={(e) => handleCheckboxChange(e)}
             />
           </div>
-        {:else}
-          <span class="material-symbols-outlined new-task-icon" style="cursor: pointer; font-size: 22px;">
-            drag_indicator
-          </span>
         {/if}
 
         <div on:click={() => dispatch('task-click', { task: taskObj })}
@@ -82,7 +78,7 @@
     </div>
 
     <!-- the 6px compensates for the fact there is only 1 dropzone for the first child but 2 dropzones (reorder + sub-reorder) for the 2nd child onwards -->
-    <div style="margin-left: 24px; padding-top: 6px;">
+    <div style="margin-left: {indentationAmount}px; padding-top: 0px;">
       {#each taskObj.children as subtaskObj, i (subtaskObj.id)}
         <RecursiveTaskElement 
           taskObj={subtaskObj}
@@ -116,21 +112,6 @@
           </div>
         </RecursiveTaskElement>
       {/each}
-
-      <!-- If no subtasks, this is the only way to create a sub-task -->
-      <!-- Rename to: can create sub-task when it isn't already a subtask -->
-      {#if isRecursive}
-        <ReusableHelperDropzone
-          ancestorRoomIDs={[taskObj.id, ...ancestorRoomIDs]}
-          roomsInThisLevel={taskObj.children}
-          idxInThisLevel={taskObj.children.length}
-          parentID={taskObj.id}
-          parentObj={taskObj}
-          {colorForDebugging}
-          {dueInHowManyDays}
-          {isMilestoneMode}
-        /> 
-      {/if}
       
       <!-- 
         If this task level has a deadline, new sub-tasks should also be 
@@ -150,6 +131,28 @@
         />
       {/if}
     </div>
+
+    {#if isRecursive && taskObj.children.length === 0}
+      <!-- 
+        This is the only way to create a sub-task, and it will be displayed
+        EVEN IF children.length === 0.
+        
+        `float: right` is the magic, that takes it out of the document so 
+        it collapses with the dropzone of the nearest ancestor below
+      -->
+      <div style="float: right; width: {200 - (indentationAmount * depth)}px; margin-left: auto; margin-right: 0;">
+        <ReusableHelperDropzone
+          ancestorRoomIDs={[taskObj.id, ...ancestorRoomIDs]}
+          roomsInThisLevel={taskObj.children}
+          idxInThisLevel={taskObj.children.length}
+          parentID={taskObj.id}
+          parentObj={taskObj}
+          {colorForDebugging}
+          {dueInHowManyDays}
+          {isMilestoneMode}
+        /> 
+      </div>
+    {/if}
   </div>
 {/if}
 
@@ -190,6 +193,7 @@
   export let isLargeFont = false
   export let isRecursive = true
 
+  const indentationAmount = 48
   let newSubtaskStringValue = ''
   let isTypingNewSubtask = false
   let isTaskDueSoonOrOverdue = false

@@ -1,8 +1,9 @@
 <div
   bind:this={ReorderDropzone} 
-  style="height: 6px; border-radius: 2px; border: 0px solid {colorForDebugging};" 
+  style="height: 18px; border-radius: 9px; border: 0px solid {colorForDebugging};" 
   on:dragenter={() => {
-    if (!isInvalidReorderDrop()) {
+    // quickfix as even if it's an invalid operation it's unintuitive to not see the drag area highlight
+    if (!isInvalidReorderDrop() || true) {
       ReorderDropzone.style.background = 'rgb(87, 172, 247)' 
     }
   }}
@@ -54,7 +55,10 @@
   async function onReorderDrop (e) {
     e.preventDefault()
     e.stopPropagation()
-    if (isInvalidReorderDrop()) return
+    if (isInvalidReorderDrop()) {
+      alert('A parent task cannot become its own descendant')
+      return
+    }
     ReorderDropzone.style.background = ''
 
     batch = writeBatch(db)

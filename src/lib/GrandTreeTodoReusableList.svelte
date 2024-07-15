@@ -6,7 +6,7 @@
 > 
   <div class="first-column" style="height: 100%; display: flex; flex-direction: column;">
     <div style="display: flex; align-items: center; margin-bottom: 12px;">
-      <div style="font-weight: 600; font-size: 18px; margin-left: 2px; color: rgb(80, 80, 80)">
+      <div style="font-weight: 600; font-size: 18px; color: rgb(80, 80, 80)">
         {listTitle} 
       </div> 
       
