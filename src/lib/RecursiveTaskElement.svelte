@@ -262,8 +262,7 @@
     const subtaskObj = {
       id: newTaskID,
       parentID: taskObj.id, 
-      name,
-      duration: 1
+      name
     }
 
     // we're creating a sub-task, so the sub-task's deadline
