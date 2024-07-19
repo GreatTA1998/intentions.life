@@ -80,7 +80,12 @@
   import ReusableFlexibleDayTask from '$lib/ReusableFlexibleDayTask.svelte'
   import FunctionalDoodleIcon from '$lib/FunctionalDoodleIcon.svelte'
   import { onMount, createEventDispatcher } from 'svelte'
-  import { tasksScheduledOn } from '/src/store.js'
+  import { 
+    tasksScheduledOn, 
+    whatIsBeingDraggedFullObj, 
+    whatIsBeingDragged, 
+    whatIsBeingDraggedID 
+  } from '/src/store.js'
   import { computeDayDifference, getDateInDDMMYYYY, getDateInMMDD } from '/src/helpers.js'
   import { getFirestoreCollection } from '/src/crud.js'
 
@@ -116,6 +121,10 @@
       timeOfDay: '',
       dateScheduled: getDateInMMDD(dateClassObj)
     })
+
+    whatIsBeingDraggedFullObj.set(null)
+    whatIsBeingDraggedID.set('')
+    whatIsBeingDragged.set('')
   }
 
   function getScheduledTasks (dateClassObj) {
