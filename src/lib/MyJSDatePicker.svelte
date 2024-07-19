@@ -1,5 +1,6 @@
 <input bind:this={AttachTarget}
   style="width: 100px; font-size: 16px;"
+  on:click|preventDefault={openMiniCalendar}
 >
 
 <script>
@@ -13,9 +14,10 @@
 
   let AttachTarget
   const dispatch = createEventDispatcher()
+  let picker
   
   onMount(() => {
-    const picker = datepicker(AttachTarget, {
+    picker = datepicker(AttachTarget, {
       onSelect: (instance, date) => {
         const newMMDD = getDateInMMDD(date)
         dispatch('date-selected', {
@@ -33,4 +35,8 @@
     // initialize the picker to today's date
     picker.setDate(convertMMDDToDateClassObject(MMDD, YYYY), true)
   })
+
+  function openMiniCalendar () {
+    picker.show()
+  }
 </script>

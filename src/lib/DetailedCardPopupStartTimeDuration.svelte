@@ -62,7 +62,6 @@
   import ReusableRoundButton from '$lib/ReusableRoundButton.svelte'
   import UXFormField from '$lib/UXFormField.svelte'
   import { createEventDispatcher } from 'svelte'
-  import SvelteDatePicker from '$lib/SvelteDatePicker.svelte'
   import MyJSDatePicker from '$lib/MyJSDatePicker.svelte'
   import MyTimePicker from '$lib/MyTimePicker.svelte'
 
