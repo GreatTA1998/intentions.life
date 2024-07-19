@@ -1,4 +1,8 @@
-<!--on:click|preventDefault={openMiniCalendar} -->
+
+<!-- To prevent the iOS keyboard from showing 
+     inputmode='none'
+     https://stackoverflow.com/a/65358992/7812829 
+-->
 <input bind:this={AttachTarget}
   class="my-date-field"
   inputmode='none'
@@ -36,10 +40,6 @@
     // initialize the picker to today's date
     picker.setDate(convertMMDDToDateClassObject(MMDD, YYYY), true)
   })
-
-  function openMiniCalendar () {
-    picker.show()
-  }
 </script>
 
 <style>

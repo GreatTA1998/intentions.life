@@ -67,6 +67,9 @@
 
   export let taskObject
 
+  // NOTE: this has an edge case where you can't "save changes" if you switch back to your previous date
+  // because `taskObject.startTime` has a reactivity caveat
+  // QUICKFIX: just close the popup and do it again
   $: isEditingTaskStart = taskObject.startTime !== newStartHHMM
   $: isEditingStartDate = taskObject.startDate !== newStartMMDD
 
