@@ -1,6 +1,7 @@
+<!--on:click|preventDefault={openMiniCalendar} -->
 <input bind:this={AttachTarget}
   class="my-date-field"
-  on:click|preventDefault={openMiniCalendar}
+  inputmode='none'
 >
 
 <script>
