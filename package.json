@@ -19,6 +19,7 @@
   "type": "module",
   "dependencies": {
     "firebase": "^9.6.5",
+    "js-datepicker": "^5.18.2",
     "lodash": "^4.17.21",
     "luxon": "^3.4.4",
     "posthog-js": "^1.136.5",
