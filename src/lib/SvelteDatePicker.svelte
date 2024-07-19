@@ -2,7 +2,7 @@
   bind:value={dateClassObj}
   format="MM/dd"
   closeOnSelection={true}
-  placeholder={getReadableDate(MMDD)}
+  placeholder="Date"
 />
 
 <script>
@@ -13,16 +13,23 @@
   export let MMDD
   export let YYYY
 
-  let dateClassObj = convertMMDDToDateClassObject(MMDD, YYYY)
+  let dateClassObj = initDateClassObj()
 
   const dispatch = createEventDispatcher()
 
   $: { 
-    const newMMDD = getDateInMMDD(dateClassObj)
-    dispatch('date-selected', {
-      selectedDate: newMMDD,
-      selectedYear: dateClassObj.getFullYear()
-    })
+    if (dateClassObj) {
+      const newMMDD = getDateInMMDD(dateClassObj)
+      dispatch('date-selected', {
+        selectedDate: newMMDD,
+        selectedYear: dateClassObj.getFullYear()
+      })
+    }
+  }
+
+  function initDateClassObj () {
+    if (MMDD && YYYY) return convertMMDDToDateClassObject(MMDD, YYYY)
+    else return null
   }
   
   function getReadableDate () {

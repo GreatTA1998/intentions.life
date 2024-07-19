@@ -22,7 +22,6 @@
       on:focusout={() => isFocused = false}
       {placeholder}
       class="ux-input-text" 
-      style="width: 100%; border: 0px solid grey;"
       resetDefaultStyling={true}
       numberOfInitialRowsIfEmpty={2}
     />
