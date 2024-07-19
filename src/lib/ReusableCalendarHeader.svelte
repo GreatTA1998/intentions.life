@@ -3,7 +3,7 @@
   on:dragover={(e) => dragover_handler(e)}
   on:drop={(e) => drop_handler(e, dateClassObj)}
   >
-  <div>
+  <div style="user-select: none;">
     <div 
       class="center-flex day-name-label" 
       class:active-day-name={!isFuture(dateClassObj)}
