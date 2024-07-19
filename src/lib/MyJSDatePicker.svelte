@@ -1,5 +1,5 @@
 <input bind:this={AttachTarget}
-  style="width: 100px; font-size: 16px;"
+  class="my-date-field"
   on:click|preventDefault={openMiniCalendar}
 >
 
@@ -40,3 +40,13 @@
     picker.show()
   }
 </script>
+
+<style>
+  .my-date-field {
+    height: 30px;
+    border-radius: 4px;
+    border: 1px solid lightgrey;
+    width: 64px; 
+    font-size: 16px; 
+  }
+</style>
