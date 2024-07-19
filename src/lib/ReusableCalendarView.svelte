@@ -55,7 +55,6 @@
             {task}
             pixelsPerHour={pixelsPerMinute * 60}
             fontSize={0.8}
-            hasCheckbox={false}
             on:task-click
             on:task-update
             on:task-checkbox-change
