@@ -6,10 +6,10 @@
 <input bind:this={AttachTarget}
   class="my-date-field"
   inputmode='none'
+  readonly
 >
 
 <script>
-  import datepicker from 'js-datepicker'
   import 'js-datepicker/dist/datepicker.min.css'
   import { onMount, createEventDispatcher } from 'svelte'
   import { getDateInMMDD, convertMMDDToDateClassObject } from '/src/helpers.js'
@@ -21,14 +21,18 @@
   const dispatch = createEventDispatcher()
   let picker
   
-  onMount(() => {
-    picker = datepicker(AttachTarget, {
+  onMount(async () => {
+    const datepicker = await import('js-datepicker')
+
+    picker = datepicker.default(AttachTarget, {
       onSelect: (instance, date) => {
-        const newMMDD = getDateInMMDD(date)
-        dispatch('date-selected', {
-          selectedDate: newMMDD,
-          selectedYear: date.getFullYear()
-        })
+        if (date) {// sometimes `date` is undefined after selection for some reason
+          const newMMDD = getDateInMMDD(date)
+          dispatch('date-selected', {
+            selectedDate: newMMDD,
+            selectedYear: date.getFullYear()
+          })
+        }
       },
       formatter: (input, date, instance) => {
         const options = { month: 'short', day: 'numeric' };
@@ -38,7 +42,9 @@
     })
   
     // initialize the picker to today's date
-    picker.setDate(convertMMDDToDateClassObject(MMDD, YYYY), true)
+    if (MMDD && YYYY) {
+      picker.setDate(convertMMDDToDateClassObject(MMDD, YYYY), true)
+    }
   })
 </script>
 
