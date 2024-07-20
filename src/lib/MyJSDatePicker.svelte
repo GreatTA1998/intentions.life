@@ -26,11 +26,16 @@
 
     picker = datepicker.default(AttachTarget, {
       onSelect: (instance, date) => {
-        if (date) {// sometimes `date` is undefined after selection for some reason
+        if (date) {// the 2nd click on the same date will cancel it
           const newMMDD = getDateInMMDD(date)
           dispatch('date-selected', {
             selectedDate: newMMDD,
             selectedYear: date.getFullYear()
+          })
+        } else {
+          dispatch('date-selected', {
+            selectedDate: '',
+            selectedYear: ''
           })
         }
       },
