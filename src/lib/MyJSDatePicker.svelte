@@ -37,6 +37,9 @@
             selectedDate: '',
             selectedYear: ''
           })
+          // selecting a real date will close the datepicker, 
+          // but unselecting doesn't so we do it manually here
+          picker.hide() 
         }
       },
       formatter: (input, date, instance) => {
