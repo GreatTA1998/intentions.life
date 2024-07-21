@@ -346,7 +346,7 @@
     // findActiveUsers()
     // garbageCollectInvalidTasks($user)
     // return
-    const ref = collection(getFirestore(), `/users/${$user.uid}/tasks`)
+    const ref = collection(db, `/users/${$user.uid}/tasks`)
     unsub = onSnapshot(ref, (querySnapshot) => {
       const result = [] 
       querySnapshot.forEach((doc) => {

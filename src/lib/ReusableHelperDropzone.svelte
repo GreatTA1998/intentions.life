@@ -27,6 +27,7 @@
     user 
   } from '/src/store.js'
   import { getFirestore, increment, writeBatch, doc } from 'firebase/firestore'
+  import db from '/src/db.js'
 
   export let ancestorRoomIDs
   export let roomsInThisLevel
@@ -38,7 +39,6 @@
   export let isMilestoneMode = false
 
   let ReorderDropzone
-  const db = getFirestore()
   let batch = writeBatch(db)
 
   $: n = roomsInThisLevel.length

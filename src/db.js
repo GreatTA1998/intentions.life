@@ -18,4 +18,4 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-export default getFirestore();
+export default getFirestore(app) // `app` technically only necessary if we have multiple projects associated with one app
