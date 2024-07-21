@@ -17,6 +17,7 @@
   },
   "type": "module",
   "dependencies": {
+    "@sentry/sveltekit": "^8.19.0",
     "firebase": "^9.6.5",
     "js-datepicker": "^5.18.2",
     "lodash": "^4.17.21",
