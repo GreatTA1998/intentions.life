@@ -99,6 +99,7 @@ import { user } from '/src/store.js'
 import FinancePopupLoadingIndicator from './FinancePopupLoadingIndicator.svelte'
 import FinancePopupTransactionsUI from './FinancePopupTransactionsUI.svelte'
 import { dev } from '$app/environment';
+import db from '/src/db.js'
 
 export let isOpen = false
 
@@ -226,7 +227,7 @@ async function preparePlaidLinkUI (access_token = '') {
       // [{ type: , account_id } ...]
       // should see credit, debit, account_id, and store it with access token
 
-      const userRef = doc(getFirestore(), '/users/' + $user.uid)
+      const userRef = doc(db, '/users/' + $user.uid)
 
       for (const account of accounts) {
         // skip over accounts we already saved
