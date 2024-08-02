@@ -34,6 +34,7 @@
   let unsubUserSnapListener = null
 
   onMount(() => {
+    // fetching user takes around 300 - 500 ms
     onAuthStateChanged(getAuth(), async (resultUser) => {
       // user not logged in
       if (!resultUser) {
