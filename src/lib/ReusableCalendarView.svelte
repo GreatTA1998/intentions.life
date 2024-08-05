@@ -110,7 +110,11 @@
 
     <!-- A red line that indicates the current time -->
     {#if calendarBeginningDateClassObject.getDate() === new Date().getDate()}
-      <div class="current-time-indicator-container" style="
+      <ReusableCalendarViewCurrentTimeIndicator
+        {pixelsPerMinute}
+      />
+    
+      <!-- <div class="current-time-indicator-container" style="
           top: {computeTimeIndicatorOffset()}px;
         "
       > 
@@ -122,12 +126,13 @@
         <div style="font-size: 12px; color: var(--location-indicator-color); font-weight: 600;">
           {DateTime.now().toLocaleString(DateTime.TIME_24_SIMPLE)}
         </div>
-      </div>
+      </div> -->
     {/if}
   </div>
 </div>
 
 <script>
+  import ReusableCalendarViewCurrentTimeIndicator from '$lib/ReusableCalendarViewCurrentTimeIndicator.svelte'
   import { DateTime, Interval } from 'luxon'
   import { getFirestoreCollection } from '/src/crud.js'
   import { 
@@ -184,16 +189,16 @@
   })
 
   onMount(async () => {
-    // scrolling
-    if (CurrentTimeIndicator) {
-      setTimeout(() => {
-        // the calendar is re-rendered on every task drag-and-drop, so we don't want to reset scrolling each time
-        if (CurrentTimeIndicator && !$hasInitialScrolled) { 
-          CurrentTimeIndicator.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' })
-          hasInitialScrolled.set(true)
-        }
-      }, 0) 
-    }
+    // // scrolling
+    // if (CurrentTimeIndicator) {
+    //   setTimeout(() => {
+    //     // the calendar is re-rendered on every task drag-and-drop, so we don't want to reset scrolling each time
+    //     if (CurrentTimeIndicator && !$hasInitialScrolled) { 
+    //       CurrentTimeIndicator.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' })
+    //       hasInitialScrolled.set(true)
+    //     }
+    //   }, 0) 
+    // }
 
     // task template dropdown
     const temp = await getFirestoreCollection(`/users/${$user.uid}/periodicTasks`)
