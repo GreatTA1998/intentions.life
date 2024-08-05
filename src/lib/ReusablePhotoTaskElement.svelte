@@ -4,25 +4,25 @@
   Note, the HTML checkbox tick color literally cannot be changed, but it will be automatically white if it "decides" that our chosen background color is dark enough, 
   or vice versa
  -->
- <div 
- on:click={() => dispatch('task-click', { task })}
- draggable="true" 
- on:dragstart|self={(e) => startDragMove(e, task.id)} 
- class:calendar-block={!isBulletPoint}
- style="
-   position: relative;
-   height: {height}px; 
-   min-height: 12px;
-   font-size: {fontSize}rem;
-   opacity: {task.isDone ? '0.9' : '0.7'};
-   background-color: {isBulletPoint ? '' : 'var(--experimental-black)'};
-   background-image: url({task.imageDownloadURL});
-   background-size: contain;
-   background-repeat: no-repeat;
-
-   display: flex; flex-direction: column;
- " 
- on:keydown={() => {}}
+<div 
+  on:click={() => dispatch('task-click', { task })}
+  draggable="true" 
+  on:dragstart|self={(e) => startDragMove(e, task.id)} 
+  use:lazyCallable={() => hasIntersected = true}
+  class:calendar-block={!isBulletPoint}
+  style="
+    position: relative;
+    height: {height}px; 
+    min-height: 12px;
+    font-size: {fontSize}rem;
+    opacity: {task.isDone ? '0.9' : '0.7'};
+    background-color: {isBulletPoint ? '' : 'var(--experimental-black)'};
+    background-image: url({hasIntersected ? task.imageDownloadURL : ''});
+    background-size: contain;
+    background-repeat: no-repeat;
+    display: flex; flex-direction: column;
+  " 
+  on:keydown={() => {}}
 >
  <!-- As long as this parent div is correctly sized, the duration adjusting area 
    will be positioned correctly (it's glued to the bottom of this parent div)
@@ -99,6 +99,7 @@
  import { getTrueY } from '/src/helpers.js'
  import { yPosWithinBlock, whatIsBeingDragged, whatIsBeingDraggedID, whatIsBeingDraggedFullObj } from '/src/store.js'
  import ReusableCheckbox from '$lib/ReusableCheckbox.svelte'
+ import { lazyCallable } from '/src/helpers/actions.js'
 
  export let task = null
  export let pixelsPerHour = null
@@ -111,6 +112,7 @@
 
  const dispatch = createEventDispatcher()
  let startY = 0
+ let hasIntersected = false
 
  function startDragMove (e, id) {
    e.dataTransfer.setData("text/plain", id)
