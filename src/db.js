@@ -20,4 +20,4 @@ const firebaseConfig = {
 //TODO: implement env
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-export default getFirestore(app, 'tokyo-db');
+export default getFirestore(app) // `app` technically only necessary if we have multiple projects associated with one app

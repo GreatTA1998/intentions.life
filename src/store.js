@@ -19,7 +19,7 @@ export const userInfoFromAuthProvider = writable({})
 
 export const whatIsBeingDragged = writable("")
 export const whatIsBeingDraggedID = writable("")
-export const whatIsBeingDraggedFullObj = writable("")
+export const whatIsBeingDraggedFullObj = writable(null)
 
 export const allTasksDueToday = writable([])
 export const allTasksDueThisWeek = writable([])

@@ -16,7 +16,7 @@
 
   <div class="sticky-y-div flexbox">
     {#each dateClassObjects as dateClassObj}
-      <ReusableCalendarHeader 
+      <ReusableCalendarHeader
         {dateClassObj}
         {intForTriggeringRerender}
         {isShowingDockingArea}
@@ -43,11 +43,11 @@
   {#each dateClassObjects as dateClassObj, i (dateClassObj.getTime())}
    <!-- margin-left: 0.5vw;  -->
    <div style="margin-top: {topMarginEqualizer}px;" class="unselectable">
-      {#key intForTriggeringRerender}
+      <RenderlessMaryusState {dateClassObj} let:ourReactiveState={ourReactiveState}>
         {#if timesOfDay.length !== 0}
           <ReusableCalendarView
             calendarBeginningDateClassObject={dateClassObj}
-            scheduledTasks={getScheduledTasks(dateClassObj).filter(task => task.startTime)}
+            scheduledTasks={ourReactiveState}
             timestamps={timesOfDay}
             pixelsPerHour={MIKA_PIXELS_PER_HOUR}
             timeBlockDurationInMinutes={60}
@@ -58,7 +58,7 @@
             on:task-checkbox-change
           />
         {/if}
-      {/key}
+      </RenderlessMaryusState>
     </div>
   {/each}
 </div>
@@ -70,6 +70,7 @@
   import { onMount, createEventDispatcher } from 'svelte'
   import { tasksScheduledOn } from '/src/store.js'
   import { getFirestoreCollection } from '/src/crud.js'
+  import RenderlessMaryusState from '$lib/RenderlessMaryusState.svelte'
 
   export let calStartDateClassObj
 
@@ -127,7 +128,7 @@
   function getDateClassObjects (dateClassObj) {
     const temp = []
     let d = dateClassObj
-    for (let i = -8; i < 8; i++) {
+    for (let i = -7; i < 7; i++) {
       const offset = i * (24*60*60*1000)
       const copy = new Date()
       copy.setTime(d.getTime() + offset)

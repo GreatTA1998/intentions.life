@@ -1,14 +1,15 @@
 <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; row-gap: 24px; margin-top: 24px; font-size: 1.2em;">
   <div style="display: flex; align-items: start; gap: 16px;" class:half-invisible={!isScheduled(taskObject)}>
     <div>
-      <MyDatePicker 
+      <MyJSDatePicker
         MMDD={newStartMMDD}
+        YYYY={newStartYYYY}
         on:date-selected={(e) => { 
           newStartMMDD = e.detail.selectedDate
           newStartYYYY = e.detail.selectedYear
         }}
       />
-        
+
       <div style="margin-top: 4px;"></div>
 
       {#if isEditingStartDate}
@@ -61,17 +62,21 @@
   import ReusableRoundButton from '$lib/ReusableRoundButton.svelte'
   import UXFormField from '$lib/UXFormField.svelte'
   import { createEventDispatcher } from 'svelte'
-  import MyDatePicker from '$lib/MyDatePicker.svelte'
+  import MyJSDatePicker from '$lib/MyJSDatePicker.svelte'
   import MyTimePicker from '$lib/MyTimePicker.svelte'
 
   export let taskObject
 
+  // NOTE: this has an edge case where you can't "save changes" if you switch back to your previous date
+  // because `taskObject.startTime` has a reactivity caveat
+  // QUICKFIX: just close the popup and do it again
   $: isEditingTaskStart = taskObject.startTime !== newStartHHMM
   $: isEditingStartDate = taskObject.startDate !== newStartMMDD
 
   let newStartMMDD = taskObject.startDate || ''
-  let newStartHHMM = taskObject.startTime || ''
   let newStartYYYY = taskObject.startYYYY || ''
+
+  let newStartHHMM = taskObject.startTime || ''
 
   let isEditingDuration = false
   let newDuration 

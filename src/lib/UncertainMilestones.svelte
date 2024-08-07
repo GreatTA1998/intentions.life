@@ -109,6 +109,7 @@
   import RecursiveTaskElement from '$lib/RecursiveTaskElement.svelte'
   import ReusableHelperDropzone from '$lib/ReusableHelperDropzone.svelte'
   import DetailedCardPopup from '$lib/DetailedCardPopup.svelte'
+  import db from '/src/db.js'
 
   let unsub = null 
   let allMilestones = [] // don't worry about AF
@@ -119,7 +120,7 @@
   const milestonesPath = `/users/${$user.uid}/milestones/`
 
   onMount(() => {
-    const ref = collection(getFirestore(), `/users/${$user.uid}/milestones`)
+    const ref = collection(db, `/users/${$user.uid}/milestones`)
     unsub = onSnapshot(ref, (querySnapshot) => {
       const result = [] 
       querySnapshot.forEach((doc) => {

@@ -10,14 +10,16 @@
   "devDependencies": {
     "@sveltejs/adapter-auto": "next",
     "@sveltejs/adapter-vercel": "^1.0.0-next.40",
-    "@sveltejs/kit": "next",
+    "@sveltejs/kit": "^1.0.0",
     "sass": "^1.63.5",
     "svelte": "^3.44.0",
     "svelte-preprocess": "^5.0.4"
   },
   "type": "module",
   "dependencies": {
+    "@sentry/sveltekit": "^8.19.0",
     "firebase": "^9.6.5",
+    "js-datepicker": "^5.18.2",
     "lodash": "^4.17.21",
     "luxon": "^3.4.4",
     "posthog-js": "^1.136.5",

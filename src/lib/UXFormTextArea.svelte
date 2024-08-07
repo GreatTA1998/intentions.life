@@ -21,8 +21,6 @@
       on:focusin={() => isFocused = true}
       on:focusout={() => isFocused = false}
       {placeholder}
-      class="ux-input-text" 
-      style="width: 100%; border: 0px solid grey;"
       resetDefaultStyling={true}
       numberOfInitialRowsIfEmpty={2}
     />
@@ -67,10 +65,11 @@
     line-height: 16px;
   }
 
+  /* Don't touch these for now */
   .ux-input-text {
     margin-bottom: 9px;
     font-weight: 500;
-    font-size: 16px;
+    font-size: 24px;
     font-family: 'Inter';
     line-height: 18px;
   }

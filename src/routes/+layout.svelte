@@ -34,6 +34,7 @@
   let unsubUserSnapListener = null
 
   onMount(() => {
+    // fetching user takes around 300 - 500 ms
     onAuthStateChanged(getAuth(), async (resultUser) => {
       // user not logged in
       if (!resultUser) {
@@ -51,9 +52,14 @@
       
       else { // USER IS LOGGED INTO FIREBASE AUTH
         const urlParts = $page.url.pathname.split("/")
+
         // for a full path, urlParts is ['', 'PfxP5N71jQVzDejF9tYwTgrVtGz2', 'camera']
         if (urlParts.length === 3 && urlParts[2] === 'camera' || urlParts[2] === 'mobile') {
           // don't redirect
+        }
+        // ['', 'sentry-example']
+        else if (urlParts.length === 2 && urlParts[1] === 'sentry-example') {
+          // don't redirect either
         }
         else {
           goto('/' + resultUser.uid)

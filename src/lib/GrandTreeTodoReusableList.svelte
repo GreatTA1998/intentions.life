@@ -6,7 +6,7 @@
 > 
   <div class="first-column" style="height: 100%; display: flex; flex-direction: column;">
     <div style="display: flex; align-items: center; margin-bottom: 12px;">
-      <div style="font-weight: 600; font-size: 18px; margin-left: 2px; color: rgb(80, 80, 80)">
+      <div style="font-weight: 600; font-size: 18px; color: rgb(80, 80, 80)">
         {listTitle} 
       </div> 
       
@@ -19,7 +19,7 @@
     </div>
 
     <div 
-      style="flex-grow: 1;"
+      style="flex-grow: 1; padding: 0px 6px;"
       class:has-max-width={hasMaxWidth}
       class:enable-scrolling={enableScrolling} 
     >
@@ -111,6 +111,7 @@
   } from '/src/helpers/subtreeDragDrop.js'
   import { user, whatIsBeingDraggedFullObj, whatIsBeingDragged, whatIsBeingDraggedID } from '/src/store.js'
   import { getFirestore, writeBatch, doc, increment } from 'firebase/firestore'
+  import db from '/src/db.js'
 
   export let dueInHowManyDays = null // AF(null) means it's a life todo, otherwise it should be a number
   export let allTasksDue = []
@@ -126,7 +127,6 @@
   let isTypingNewRootTask = false
   let newRootTaskStringValue = ''
   const dispatch = createEventDispatcher()
-  const db = getFirestore()
   let batch = writeBatch(db)
 
   // COMPUTE DEFAULT DEADLINE 
@@ -251,6 +251,10 @@
     batch.commit()
 
     batch = writeBatch(db)
+
+    whatIsBeingDraggedFullObj.set(null)
+    whatIsBeingDraggedID.set('')
+    whatIsBeingDragged.set('')
   }
 
   function dragover_handler (e) {
