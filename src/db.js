@@ -13,9 +13,11 @@ const firebaseConfig = {
   storageBucket: "project-y-2a061.appspot.com",
   messagingSenderId: "132745397287",
   appId: "1:132745397287:web:b34052fb4683bc85e73a02",
-  measurementId: "G-EZSLE84PYQ"
+  measurementId: "G-EZSLE84PYQ",
 };
 
+
+//TODO: implement env
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-export default getFirestore();
+export default getFirestore(app, 'tokyo-db');
