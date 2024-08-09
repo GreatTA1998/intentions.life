@@ -52,7 +52,7 @@ function convert(dataArray) {
 
     return {
       ...nesseryProperties.reduce(
-        (a, prop) => ({ ...a, [prop]: task[prop] || "" }),
+        (a, prop) => ({ ...a, [prop]: task[prop] ? task[prop] : prop === "isDone" ? false :  ""  }),
         {}
       ),
       ...newStartDate,
