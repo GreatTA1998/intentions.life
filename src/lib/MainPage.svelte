@@ -289,6 +289,35 @@
   let isInitialFetch = true
   let unsub
 
+
+
+  onMount(async () => {
+    // SCRIPTS
+    // findActiveUsers()
+    // garbageCollectInvalidTasks($user)
+    // return
+    const ref = quary(collection(db, `/users/${$user.uid}/tasks`), where('startDateISO', '=>' ,currentEarliestVisibleDate))
+    unsub = onSnapshot(ref, (querySnapshot) => {
+      const result = [] 
+      querySnapshot.forEach((doc) => {
+        result.push({ id: doc.id, ...doc.data()})
+      })
+
+      allTasks = reconstructTreeInMemory(result)
+
+      tasksScheduledOn.set(computeDateToTasksDict(allTasks))
+
+      // RE-WRITE / INTEGRATE THIS WHEN READY
+      if (isInitialFetch) {
+        isInitialFetch = false
+        maintainPreviewWindowForPeriodicTasks()
+      }
+    })
+    // can't use `return` in reactive expression https://github.com/sveltejs/svelte/issues/2828  
+  })
+
+
+  
   $: if (allTasks) {
     computeDataStructuresFromAllTasks(allTasks)
   }
@@ -340,31 +369,6 @@
     // year timeline view
     longHorizonTasks.set(computeYearViewTimelines(allTasks))
   }
-
-  onMount(async () => {
-    // SCRIPTS
-    // findActiveUsers()
-    // garbageCollectInvalidTasks($user)
-    // return
-    const ref = collection(db, `/users/${$user.uid}/tasks`)
-    unsub = onSnapshot(ref, (querySnapshot) => {
-      const result = [] 
-      querySnapshot.forEach((doc) => {
-        result.push({ id: doc.id, ...doc.data()})
-      })
-
-      allTasks = reconstructTreeInMemory(result)
-
-      tasksScheduledOn.set(computeDateToTasksDict(allTasks))
-
-      // RE-WRITE / INTEGRATE THIS WHEN READY
-      if (isInitialFetch) {
-        isInitialFetch = false
-        maintainPreviewWindowForPeriodicTasks()
-      }
-    })
-    // can't use `return` in reactive expression https://github.com/sveltejs/svelte/issues/2828  
-  })
 
   onDestroy(() => {
     if (unsub) unsub()
