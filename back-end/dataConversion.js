@@ -1,9 +1,4 @@
 const user = "6uIcMMsBEkQ85OINCDADtrygzZx1";
-import {
-  getObjectSizeInBytes,
-  buildRamdomTask,
-  getRandomID,
-} from "./helpers.js";
 import db from "./connection.js";
 import {
   writeBatch,
