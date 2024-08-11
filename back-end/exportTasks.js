@@ -14,7 +14,7 @@ export async function exportTasks(user, fileName){
         if (err) {
           console.error(err);
         } else {
-         console.log('written succesfully');
+         console.log('written succesfully to ', path.join(__dirname, 'data', fileName + '.txt'));
         }
       });
 }
