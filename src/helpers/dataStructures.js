@@ -11,9 +11,7 @@ import {
 export function incorporateNewWeekIntoCalendarTree (newWeekTasksArray) {
   const newWeekMemoryTree = reconstructTreeInMemory(newWeekTasksArray) 
   const newSection = computeDateToTasksDict(newWeekMemoryTree)
-  console.log('newSection =', newSection)
   tasksScheduledOn.set({ ...$tasksScheduledOn, ...newSection })
-  console.log('updated $tasksScheduledOn =', $tasksScheduledOn)
 }
 
 // recursively mutate this monolith data structure until its correct
@@ -68,7 +66,6 @@ export function updateSubtreeDeadlineInMsElapsed (node, oldVal) {
 
     if (d.toString() === "Invalid Date") {
       // useful test logs for detecting tasks to be garbage collected
-
       // console.log('dd, MM, yyyy =', dd, MM, yyyy)
       // console.log('hh, mm =', hh, mm)
       // console.log('iso8061 =', iso8061)
@@ -122,19 +119,19 @@ export function computeYearViewTimelines (allTasks) {
 // theoretically faster (by a factor 'k' where k is the # of days shown on calendar)
 // more importantly, it allows us to inject a reference to `rootAncestor`
 export function computeDateToTasksDict (taskTrees) {
+  console.log('task trees are', taskTrees)
   const tasksScheduledOn = {}
   for (const root of taskTrees) {
     myHelper({ node: root, rootAncestor: root, tasksScheduledOn })
   }
-  return tasksScheduledOn 
+  return tasksScheduledOn;
 }
 
 function myHelper ({ node, rootAncestor, tasksScheduledOn }) {
-  if (node.startDate) {
-    const [MM, dd] = node.startDate.split('/')
-    const simpleISO = dd + '-' + MM + '-' + node.startYYYY
-    if (!tasksScheduledOn[simpleISO]) tasksScheduledOn[simpleISO] = []
-    tasksScheduledOn[simpleISO].push({ rootAncestor, ...node })
+  const {startDateISO} = node;
+  if (startDateISO) {
+    if (!tasksScheduledOn[startDateISO]) tasksScheduledOn[startDateISO] = []
+    tasksScheduledOn[startDateISO].push({ rootAncestor, ...node })
   }
 
   for (const child of node.children) {
@@ -228,76 +225,4 @@ export function computeTodoMemoryTrees (allTasks) {
 
   // console.log('# of recursion should be at most the total number of tasks', i)
   return [allTasksDueToday, allTasksDueThisWeek, allTasksDueThisMonth, allTasksDueThisYear, allTasksDueThisLife]
-}
-
-// parent category is 'DAY', 'WEEK', 'MONTH', 'YEAR'
-// recursively scan the ORIGINAL tree, so we separate the scanning tree from the editing tree
-//   - node is for scanning 
-//   - node is for mutating
-let i = 0
-
-
-// try it, reasons; 
-//   1. I think it's correct.
-// then fix layout
-// then fix-and-drop. 
-// then you are done. 
-
-// literally copied and pasted from above
-export function computeInclusiveWeekTodo (allTasks) {
-  const allTasksDueThisWeek = [] // this is disjoint
-
-  for (const parentlessTask of allTasks) {
-    helper({ node: parentlessTask, rootAncestor: parentlessTask })
-  }
-
-  // use VS code's collpase feature
-  // this is so the function can access the arrays we define above
-  function helper ({ node, parentCategory = '', parentObjReference = null, rootAncestor }) {
-    const shallowCopy = {...node}
-    shallowCopy.children = []
-    shallowCopy.rootAncestor = rootAncestor
-    
-    // if (node.isDone) return
-    // don't do optimizations with node.isDone, or the checkbox behavior becomes buggy
-    
-    // if you process node.isDone as a node, basically, if the parent is completed,
-    // it will be hidden by the todo list, and 
-    // its children will be hidden even though they should be top level nodes
-    if (!node.deadlineDate || node.isDone) {
-      // continue scanning for a todo's top-level task
-      for (const child of node.children) {
-        helper({ node: child, rootAncestor }) // NOTE: the `rootAncestor` is not based on deadlines
-      }
-    }
-
-    else {
-      const dueInHowManyDays = computeDayDifference(
-        new Date(),
-        convertDDMMYYYYToDateClassObject(node.deadlineDate)
-      )
-
-      if (dueInHowManyDays <= 7) {
-        if (parentCategory === 'WEEK' && parentObjReference !== null) {
-          parentObjReference.children.push(shallowCopy)
-        }
-        else allTasksDueThisWeek.push(shallowCopy)
-  
-        // notice we iterate on the original tree that still has a `.children` array preserved
-        for (const child of node.children) {
-          i += 1
-          helper({ node: child, parentCategory: 'WEEK', parentObjReference: shallowCopy, rootAncestor })
-        }
-      }
-      else {
-        // continue scanning for a todo's top-level task
-        for (const child of node.children) {
-          helper({ node: child, rootAncestor }) // NOTE: the `rootAncestor` is not based on deadlines
-        }
-      }
-    }
-  }
-
-  const inclusiveWeekTodo = allTasksDueThisWeek
-  return inclusiveWeekTodo
 }

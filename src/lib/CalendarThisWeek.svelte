@@ -99,7 +99,7 @@
   import RenderlessMaryusState from '$lib/RenderlessMaryusState.svelte'
   import { lazyCallable } from '/src/helpers/actions.js'
   import { incorporateNewWeekIntoCalendarTree } from '/src/helpers/dataStructures.js'
-  import Tasks from '/back-end/Tasks.js'
+  import Tasks from '../back-end/Tasks'
 
   export let calStartDateClassObj
 

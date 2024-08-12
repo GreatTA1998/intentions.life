@@ -189,7 +189,7 @@
       
       <!-- 2nd flex child -->
       <div class="the-only-scrollable-container calendar-section-flex-child"> 
-        {#if allTasks}    
+        {#if $tasksScheduledOn}   
           <CalendarThisWeek
             {calStartDateClassObj}
             on:calendar-shifted={(e) => incrementDateClassObj({ days: e.detail.days})}
@@ -270,7 +270,7 @@
   import NewThisWeekTodo from '$lib/NewThisWeekTodo.svelte'
   import { garbageCollectInvalidTasks, findActiveUsers } from '/src/scripts.js'
   import { deleteObject, getStorage, ref } from 'firebase/storage'
-  import Tasks from '/back-end/Tasks.js'
+  import Tasks from '../back-end/Tasks'
 
 
   let currentMode = 'Week' // weekMode hourMode monthMode
@@ -292,7 +292,6 @@
   let unsub
 
 
-
   onMount(async () => {
     // fetch unscheduled tasks
     // get tasks between 2 days ago, 1 week, and 2 days in the future
@@ -300,8 +299,7 @@
     // today is 08-09-2024
     // start is 2024-08-07
     // end is 2024-08-17
-    const scheduledCalendarTasks = Tasks.getByDateRange('2024-08-07', '2024-08-17')
-    console.log("scheduledCalendarTasks =", scheduledCalendarTasks)
+    const scheduledCalendarTasks = await Tasks.getByDateRange($user.uid,'2024-08-07', '2024-08-17')
 
     // build the tree from these 
     const calendarMemoryTree = reconstructTreeInMemory(scheduledCalendarTasks)
@@ -310,9 +308,9 @@
     tasksScheduledOn.set(computeDateToTasksDict(calendarMemoryTree))
 
     ////  SEPARATE BUT SIMILAR PROCESS FOR THE TODO-LIST
-    // const unscheduledTodoTasks = getUnscheduledTask()
-    // const todoMemoryTree = reconstructTreeInMemory(unscheduledTodoTasks)
-    // inclusiveWeekTodo.set(computeInclusiveWeekTodo(todoMemoryTree))
+    const unscheduledTodoTasks = await Tasks.getUnscheduled($user.uid)
+    const todoMemoryTree = reconstructTreeInMemory(unscheduledTodoTasks)
+    inclusiveWeekTodo.set(todoMemoryTree)
 
     // fetch scheduledTasks (and build it)
 
@@ -370,9 +368,7 @@
   function incorporateNewWeekIntoCalendarTree (newWeekTasksArray) {
     const newWeekMemoryTree = reconstructTreeInMemory(newWeekTasksArray) 
     const newSection = computeDateToTasksDict(newWeekMemoryTree)
-    console.log('newSection =', newSection)
     tasksScheduledOn.set({ ...$tasksScheduledOn, ...newSection })
-    console.log('updated $tasksScheduledOn =', $tasksScheduledOn)
   }
 
   function handleLogoClick (setIsPopupOpen) {

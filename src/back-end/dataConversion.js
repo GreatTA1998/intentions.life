@@ -32,7 +32,6 @@ const test = async () => {
   const querySnapshot = await getDocs(q);
   const tasksArray = querySnapshot.docs.map((doc) => doc.data());
   const IdArray = querySnapshot.docs.map((doc) => doc.id);
-  //   console.log(tasksArray);
   const results = await updateDB(convert(tasksArray), IdArray);
   console.log(results)
 };
@@ -59,12 +58,6 @@ function convert(dataArray) {
     };
   });
 }
-
-const trace = (x, y) => {
-  console.log(x, y);
-  return y;
-};
-
 
 const updateDB = async (dataArray, idArray) => {
     try{
