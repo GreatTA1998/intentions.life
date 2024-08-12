@@ -16,15 +16,41 @@
 
   <div class="sticky-y-div flexbox">
     {#each dateClassObjects as dateClassObj}
-      <ReusableCalendarHeader
-        {dateClassObj}
-        {intForTriggeringRerender}
-        {isShowingDockingArea}
-        on:task-checkbox-change
-        on:task-scheduled  
-        on:new-root-task
-        on:task-click
-      />
+      {#if getSimpleISO(dateClassObj) === $leftMostDateForNewFetch}
+        <div use:lazyCallable={fetchNewWeekOfPastTasks}>
+          <ReusableCalendarHeader
+            {dateClassObj}
+            {intForTriggeringRerender}
+            {isShowingDockingArea}
+            on:task-checkbox-change
+            on:task-scheduled  
+            on:new-root-task
+            on:task-click
+          />
+        </div>
+      {:else if getSimpleISO(dateClassObj) === $rightMostDateForNewFetch}
+        <div use:lazyCallable={fetchNewWeekOfFutureTasks}>
+          <ReusableCalendarHeader
+            {dateClassObj}
+            {intForTriggeringRerender}
+            {isShowingDockingArea}
+            on:task-checkbox-change
+            on:task-scheduled  
+            on:new-root-task
+            on:task-click
+          />
+        </div>
+      {:else}
+        <ReusableCalendarHeader
+          {dateClassObj}
+          {intForTriggeringRerender}
+          {isShowingDockingArea}
+          on:task-checkbox-change
+          on:task-scheduled  
+          on:new-root-task
+          on:task-click
+        />
+      {/if}
     {/each}
   </div>
 </div>
@@ -68,9 +94,12 @@
   import ReusableCalendarView from '$lib/ReusableCalendarView.svelte'
   import { MIKA_PIXELS_PER_HOUR, getDateInMMDD, getDateInDDMMYYYY, computeDayDifference } from '/src/helpers.js'
   import { onMount, createEventDispatcher } from 'svelte'
-  import { tasksScheduledOn } from '/src/store.js'
+  import { tasksScheduledOn, leftMostDateForNewFetch, rightMostDateForNewFetch } from '/src/store.js'
   import { getFirestoreCollection } from '/src/crud.js'
   import RenderlessMaryusState from '$lib/RenderlessMaryusState.svelte'
+  import { lazyCallable } from '/src/helpers/actions.js'
+  import { incorporateNewWeekIntoCalendarTree } from '/src/helpers/dataStructures.js'
+  import Tasks from '/back-end/Tasks.js'
 
   export let calStartDateClassObj
 
@@ -99,6 +128,50 @@
 
     fetchDoodleIcons()
   })
+
+  function fetchNewWeekOfPastTasks (intersectedDate) {
+    const dt = DateTime.fromISO(intersectedDate)
+    // now we work backwards 
+    const start = dt.minus({ days: 2 })
+    const end = start.minus({ days: 7 })
+
+    const newWeekTasksArray = Tasks.getByDateRange(
+      start.toISODate(), // '2024-07-31', 
+      end.toISODate()
+    )
+    incorporateNewWeekIntoCalendarTree(newWeekTasksArray)
+
+    const newLeftMostDate = start.plus(1).toISODate()
+    leftMostDateForNewFetch.set(newLeftMostDate) // do a 1 day padding from 07-31 for slightly smoother pre-loading
+  }
+
+  function fetchNewWeekOfFutureTasks (intersectedDate) {
+    const dt = DateTime.fromISO(intersectedDate)
+    // now we work forwards
+    const start = dt.plus({ days: 2 })
+    const end = start.plus({ days: 7 })
+  
+    // note each new loaded intervals should not be overlapping
+    const newWeekTasksArray = getTasksByDateRange(
+      start.toISODate(), // '2024-08-18', 
+      end.toISODate() // '2024-08-24'
+    )
+    incorporateNewWeekIntoCalendarTree(newWeekTasksArray)
+
+    const newRightMostDate = end.minus(1).toISODate() // do a 1 day padding from 07-31 for slightly smoother pre-loading
+    rightMostDateForNewFetch.set(newRightMostDate) // '2024-08-23'
+  }
+
+  function getSimpleISO (dateClassObject) {
+    const date = dateClassObject
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based, so add 1
+    const day = String(date.getDate()).padStart(2, '0');
+
+    const formattedDate = `${year}-${month}-${day}`;
+    return formattedDate
+  }
 
   function getScheduledTasks (dateClassObj) {
     const simpleISO = getSimpleISOFromDateClassObj(dateClassObj)

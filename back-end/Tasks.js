@@ -1,5 +1,5 @@
 import db from "./connection.js";
-import {getRandomID} from '../src/helpers.js'
+import {getRandomID} from '/src/helpers.js'
 import {
   doc,
   getDocs,
@@ -39,7 +39,7 @@ const update = (userUID, taskID,  keyValueChanges) => {
   return updateDoc(doc(db,users, userUID, taskID), keyValueChanges);
 } 
 
-export default Tasks = {
+export default {
     getByDateRange, 
     getUnschedueled,
     post,
