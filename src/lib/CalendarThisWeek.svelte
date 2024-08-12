@@ -29,8 +29,8 @@
 
   export let calStartDateClassObj;
 
-  const x = 20;
-  const y = 15;
+  const size = 4
+  const cushion = 2
 
   let doodleIcons = null;
   // NOTE: timesOfDay should start from 00:00, so dateClassObjects also need to start from 00:00 military time
@@ -49,22 +49,16 @@
   }
 
   onMount(() => {
-    leftMostDateForNewFetch.set("2024-08-07");
-    rightMostDateForNewFetch.set("2024-08-16");
-
-    getDateClassObjects(calStartDateClassObj);
-    daysToRender = [
-      ...daysToRender,
-      ...buildDates(
-        DateTime.now().minus({days:(x + y)}),
-        2 *(x + y)
-      ),
-    ];
-    // Default start date is today, if left, you shift calStartDateClassObj
-    getTimesOfDay();
-
-    fetchDoodleIcons();
-  });
+    const today = DateTime.now()
+    daysToRender = buildDates(
+      // today.minus({ days: -365 }),
+      // 365
+      today.minus({ days: size + cushion }), 
+      2 * (size + cushion) + 1 // +1 means because today's date column counts as the midpoint and is an additional column
+    )
+    getTimesOfDay()
+    fetchDoodleIcons()
+  })
 
   function incorporateNewWeekIntoCalendarTree(newWeekTasksArray) {
     const newWeekMemoryTree = reconstructTreeInMemory(newWeekTasksArray);
@@ -73,71 +67,38 @@
   }
 
   async function fetchPastTasks(ISODate) {
-    console.log("------------------------------fetchNewWeekOfPastTasks");
+    // console.log('intersector should be August 8 =', ISODate)
     const dt = DateTime.fromISO(ISODate);
-    // now we work backwards
-    const left = dt.minus({
-      days: lazyLoadingBatchSize + lazyLoadingCushion * 2,
-    });
-    const right = end.minus({
-      days: lazyLoadingBatchSize + lazyLoadingCushion,
-    });
+  
+    const right = dt.minus({ days: cushion + 1 })
+    const left = dt.minus({ days: cushion + size + cushion })
+    // console.log("right should be August 5 =", right)
+    // console.log('left should be July 31', left)
 
-    daysToRender = [...buildDates(left, lazyLoadingBatchSize), ...daysToRender];
-
-    console.log("after days to render =", daysToRender);
+    // from left
+    daysToRender = [...buildDates(left, size + cushion), ...daysToRender];
 
     const newWeekTasksArray = await Tasks.getByDateRange(
       $user.uid,
       left.toISODate(), // '2024-07-31',
       right.toISODate()
-    );
-    console.log(
-      "fetching query =",
-      left.toISODate(), // '2024-07-31',
-      right.toISODate()
-    );
+    )
     incorporateNewWeekIntoCalendarTree(newWeekTasksArray);
-
-    const newLeftMostDate = start.plus(1).toISODate();
-    leftMostDateForNewFetch.set(newLeftMostDate); // do a 1 day padding from 07-31 for slightly smoother pre-loading
-    addToDateClassObjects(start.toJSDate());
   }
 
   async function fetchNewWeekOfFutureTasks(intersectedDate) {
     const dt = DateTime.fromISO(intersectedDate);
-    // now we work forwards
-    const start = dt.plus({ days: lazyLoadingCushion });
-    const end = start.plus({ days: lazyLoadingBatchSize });
+    const left = dt.plus({ days: cushion + 1 });
+    const right = left.plus({ days: size + cushion });
+    daysToRender = [...daysToRender, ...buildDates(left, size + cushion)];
 
     // note each new loaded intervals should not be overlapping
     const newWeekTasksArray = await Tasks.getByDateRange(
       $user.uid,
-      start.toISODate(), // '2024-08-18',
-      end.toISODate() // '2024-08-24'
-    );
-
-    daysToRender = [...daysToRender, ...buildDates(dt, 14)];
+      left.toISODate(), // '2024-08-18',
+      right.toISODate() // '2024-08-24'
+    )
     incorporateNewWeekIntoCalendarTree(newWeekTasksArray);
-
-    const newRightMostDate = end.minus(1).toISODate(); // do a 1 day padding from 07-31 for slightly smoother pre-loading
-    rightMostDateForNewFetch.set(newRightMostDate); // '2024-08-23'
-  }
-
-  function getSimpleISO(dateClassObject) {
-    const date = dateClassObject;
-
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-based, so add 1
-    const day = String(date.getDate()).padStart(2, "0");
-
-    const formattedDate = `${year}-${month}-${day}`;
-    return formattedDate;
-  }
-
-  function getScheduledTasks(dateClassObj) {
-    const simpleISO = getSimpleISOFromDateClassObj(dateClassObj);
-    return $tasksScheduledOn[simpleISO] || []; // `tasksScheduledOn` will only use
   }
 
   // dd-mm-yyyy format
@@ -185,16 +146,17 @@
     }
     dateClassObjects = [...temp]; // manually trigger reactivity)
   }
-
-  function buildDates(start, numToRender) {
-    console.log("num to render: ", numToRender);
-    console.log("start ", start);
-
+  
+  // totalNumber
+  function buildDates(start, totalNumber) {
     const dates = [];
-    for (let i = 0; i <= numToRender; i++) {
-      console.log("days", start.plus({ days: i }).toISO());
-      dates.push(start.plus({ days: i }).toISO());
+    console.log("numToRender =", totalNumber)
+    for (let i = 0; i < totalNumber; i++) {
+      dates.push(
+        start.plus({ days: i }).toFormat('yyyy-MM-dd')
+      )
     }
+    console.log('build more dates =', dates)
     return dates;
   }
 
@@ -238,9 +200,12 @@
 
   <div class="sticky-y-div flexbox">
     {#each daysToRender.sort((a, b) => a - b) as ISODate, i (ISODate)}
-      {#if i === lazyLoadingCushion}
+      {#if i === cushion}
         <div
-          use:lazyCallable={() => fetchPastTasks(ISODate)}
+          use:lazyCallable={() => setTimeout(()=>{
+            console.log('we are loading more past')
+            fetchPastTasks(ISODate)}
+            , 3000)}
           style="outline: 2px solid red;"
         >
           <ReusableCalendarHeader
@@ -253,7 +218,7 @@
             on:task-click
           />
         </div>
-      {:else if i === daysToRender.length - 2}
+      {:else if i === daysToRender.length - 1 - cushion}
         <div
           use:lazyCallable={() => fetchNewWeekOfFutureTasks(ISODate)}
           style="outline: 2px solid blue;"
@@ -295,13 +260,13 @@
     {/each}
   </div>
 
-  {#each dateClassObjects as dateClassObj, i}
+  {#each  daysToRender.sort((a, b) => a - b) as ISODate, i}
     <!-- margin-left: 0.5vw;  -->
     <div style="margin-top: {topMarginEqualizer}px;" class="unselectable">
-      <RenderlessMaryusState {dateClassObj} let:ourReactiveState>
+      <RenderlessMaryusState dateClassObj={DateTime.fromISO(ISODate).toJSDate()} let:ourReactiveState>
         {#if timesOfDay.length !== 0}
           <ReusableCalendarView
-            calendarBeginningDateClassObject={dateClassObj}
+            calendarBeginningDateClassObject={DateTime.fromISO(ISODate).toJSDate()}
             scheduledTasks={ourReactiveState}
             timestamps={timesOfDay}
             pixelsPerHour={MIKA_PIXELS_PER_HOUR}

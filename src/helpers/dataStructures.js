@@ -17,7 +17,6 @@ export function reconstructTreeInMemory(firestoreTaskDocs) {
   // first, do an O(n) operation, so we don't perform a O(n^2) operation constantly traversing trees
   // build a dictionary that maps a task to its children ([] if no children)
   const memo = { "": [] };
-  console.log("firestoreTaskDocs", firestoreTaskDocs);
   for (const taskDoc of firestoreTaskDocs) {
     if (!memo[taskDoc.parentID]) memo[taskDoc.parentID] = [];
     memo[taskDoc.parentID].push(taskDoc);
@@ -130,7 +129,6 @@ export function computeYearViewTimelines(allTasks) {
 // theoretically faster (by a factor 'k' where k is the # of days shown on calendar)
 // more importantly, it allows us to inject a reference to `rootAncestor`
 export function computeDateToTasksDict(taskTrees) {
-  console.log("task trees are", taskTrees);
   const tasksScheduledOn = {};
   for (const root of taskTrees) {
     myHelper({ node: root, rootAncestor: root, tasksScheduledOn });

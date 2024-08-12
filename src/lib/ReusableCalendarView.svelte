@@ -67,19 +67,20 @@
 
   onMount(async () => {
     // scrolling
-    if (CurrentTimeIndicator) {
-      setTimeout(() => {
-        // the calendar is re-rendered on every task drag-and-drop, so we don't want to reset scrolling each time
-        if (CurrentTimeIndicator && !$hasInitialScrolled) {
-          CurrentTimeIndicator.scrollIntoView({
-            behavior: "smooth",
-            block: "center",
-            inline: "center",
-          });
-          hasInitialScrolled.set(true);
-        }
-      }, 0);
-    }
+    
+    // if (CurrentTimeIndicator) {
+    //   setTimeout(() => {
+    //     // the calendar is re-rendered on every task drag-and-drop, so we don't want to reset scrolling each time
+    //     if (CurrentTimeIndicator && !$hasInitialScrolled) {
+    //       CurrentTimeIndicator.scrollIntoView({
+    //         behavior: "smooth",
+    //         block: "center",
+    //         inline: "center",
+    //       });
+    //       hasInitialScrolled.set(true);
+    //     }
+    //   }, 0);
+    // }
 
     // task template dropdown
     const temp = await getFirestoreCollection(
