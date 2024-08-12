@@ -5,6 +5,17 @@ import {
   computeDayDifference
 } from "/src/helpers.js"
 
+// FOR HANDLING A WEEK WORTH OF NEW TASKS
+// NOTE: by definition of these tasks being located on a different week, this will not 
+// affect the existing dates and their task trees
+export function incorporateNewWeekIntoCalendarTree (newWeekTasksArray) {
+  const newWeekMemoryTree = reconstructTreeInMemory(newWeekTasksArray) 
+  const newSection = computeDateToTasksDict(newWeekMemoryTree)
+  console.log('newSection =', newSection)
+  tasksScheduledOn.set({ ...$tasksScheduledOn, ...newSection })
+  console.log('updated $tasksScheduledOn =', $tasksScheduledOn)
+}
+
 // recursively mutate this monolith data structure until its correct
 export function reconstructTreeInMemory (firestoreTaskDocs) {
   const output = []

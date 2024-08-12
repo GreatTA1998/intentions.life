@@ -270,7 +270,9 @@
   import NewThisWeekTodo from '$lib/NewThisWeekTodo.svelte'
   import { garbageCollectInvalidTasks, findActiveUsers } from '/src/scripts.js'
   import { deleteObject, getStorage, ref } from 'firebase/storage'
-  
+  import Tasks from '/back-end/Tasks.js'
+
+
   let currentMode = 'Week' // weekMode hourMode monthMode
   const userDocPath = `users/${$user.uid}`
 
@@ -292,34 +294,85 @@
 
 
   onMount(async () => {
+    // fetch unscheduled tasks
+    // get tasks between 2 days ago, 1 week, and 2 days in the future
+
+    // today is 08-09-2024
+    // start is 2024-08-07
+    // end is 2024-08-17
+    const scheduledCalendarTasks = Tasks.getByDateRange('2024-08-07', '2024-08-17')
+    console.log("scheduledCalendarTasks =", scheduledCalendarTasks)
+
+    // build the tree from these 
+    const calendarMemoryTree = reconstructTreeInMemory(scheduledCalendarTasks)
+
+    // compute the state that calendar uses
+    tasksScheduledOn.set(computeDateToTasksDict(calendarMemoryTree))
+
+    ////  SEPARATE BUT SIMILAR PROCESS FOR THE TODO-LIST
+    // const unscheduledTodoTasks = getUnscheduledTask()
+    // const todoMemoryTree = reconstructTreeInMemory(unscheduledTodoTasks)
+    // inclusiveWeekTodo.set(computeInclusiveWeekTodo(todoMemoryTree))
+
+    // fetch scheduledTasks (and build it)
+
     // SCRIPTS
     // findActiveUsers()
     // garbageCollectInvalidTasks($user)
     // return
-    const ref = quary(collection(db, `/users/${$user.uid}/tasks`), where('startDateISO', '=>' ,currentEarliestVisibleDate))
-    unsub = onSnapshot(ref, (querySnapshot) => {
-      const result = [] 
-      querySnapshot.forEach((doc) => {
-        result.push({ id: doc.id, ...doc.data()})
-      })
 
-      allTasks = reconstructTreeInMemory(result)
 
-      tasksScheduledOn.set(computeDateToTasksDict(allTasks))
+    // const ref = quary(collection(db, `/users/${$user.uid}/tasks`), where('startDateISO', '=>' ,currentEarliestVisibleDate))
+    // unsub = onSnapshot(ref, (querySnapshot) => {
+    //   const result = [] 
+    //   querySnapshot.forEach((doc) => {
+    //     result.push({ id: doc.id, ...doc.data()})
+    //   })
 
-      // RE-WRITE / INTEGRATE THIS WHEN READY
-      if (isInitialFetch) {
-        isInitialFetch = false
-        maintainPreviewWindowForPeriodicTasks()
-      }
-    })
+    //   allTasks = reconstructTreeInMemory(result)
+
+    //   tasksScheduledOn.set(computeDateToTasksDict(allTasks))
+
+    //   // RE-WRITE / INTEGRATE THIS WHEN READY
+    //   if (isInitialFetch) {
+    //     isInitialFetch = false
+    //     maintainPreviewWindowForPeriodicTasks()
+    //   }
+    // })
     // can't use `return` in reactive expression https://github.com/sveltejs/svelte/issues/2828  
   })
 
+  // $: if (allTasks) {
+  //   computeDataStructuresFromAllTasks(allTasks)
+  // }
 
-  
-  $: if (allTasks) {
-    computeDataStructuresFromAllTasks(allTasks)
+  // FOR HANDLING A SINGLE NODE
+  function handleUpdatedNode () {
+    // search through the todo list memory tree
+    // search through the calendar memory tree
+    // update it
+    // manually trigger reativity via reassignment
+  }
+
+  function handleCreatedNode () {
+    // find the right subtree, then insert it in the right location based on `orderValue`
+    // manually trigger reactivity
+  }
+
+  function handleDeletedNode () {
+    // find the node, and delete it
+    // manually trigger reactivity
+  }
+
+  // FOR HANDLING A WEEK WORTH OF NEW TASKS
+  // NOTE: by definition of these tasks being located on a different week, this will not 
+  // affect the existing dates and their task trees
+  function incorporateNewWeekIntoCalendarTree (newWeekTasksArray) {
+    const newWeekMemoryTree = reconstructTreeInMemory(newWeekTasksArray) 
+    const newSection = computeDateToTasksDict(newWeekMemoryTree)
+    console.log('newSection =', newSection)
+    tasksScheduledOn.set({ ...$tasksScheduledOn, ...newSection })
+    console.log('updated $tasksScheduledOn =', $tasksScheduledOn)
   }
 
   function handleLogoClick (setIsPopupOpen) {

@@ -1,4 +1,5 @@
 import db from "./connection.js";
+import { getRandomID } from '/src/helpers.js'
 import {
   doc,
   getDocs,
@@ -20,7 +21,7 @@ const getByDateRange = (userUID, startDate, endDate) => {
   return getDocs(q).then((snapshot) => snapshot.docs.map((doc) => doc.data()));
 };
 
-const getUnschedueled = (userUID) => {
+const getUnscheduled = (userUID) => {
   const q = query(
     collection(db, "users", userUID, "tasks"),
     where("startDateISO", "==", ""),
@@ -38,8 +39,6 @@ const update = (userUID, taskID, keyValueChanges) => {
   return updateDoc(doc(db, users, userUID, taskID), keyValueChanges);
 };
 
-export default { getByDateRange, getUnschedueled, post, update };
-
 function getRandomID() {
   const chars =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -48,4 +47,10 @@ function getRandomID() {
     autoId += chars.charAt(Math.floor(Math.random() * chars.length));
   }
   return autoId;
+}
+export default {
+  getByDateRange, 
+  getUnscheduled,
+  post,
+  update
 }

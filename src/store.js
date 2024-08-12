@@ -34,3 +34,6 @@ export const longHorizonTasks = writable([])
 export const tasksScheduledOn = writable({})
 
 export const yPosWithinBlock = writable(0)
+
+export const leftMostDateForNewFetch = writable('')
+export const rightMostDateForNewFetch = writable('')
