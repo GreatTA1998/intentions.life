@@ -62,9 +62,6 @@
 
   afterUpdate(() => {
     if (ScrollingParent && hasFetchedNewPastTasks) {
-      console.log('correctign scrolling')
-      // const dayColumnWidth = 200
-      // const correctionAmount = 1340 // dayColumnWidth * (size + cushion)  
       ScrollingParent.scrollLeft = newScrollLeft
       hasFetchedNewPastTasks = false
     }
@@ -91,7 +88,6 @@
  
       const oldScrollLeft = ScrollingParent.scrollLeft
       newScrollLeft = correctionAmount + oldScrollLeft
-      console.log("saveScrollPosition =", newScrollLeft)
       hasFetchedNewPastTasks = true
     }
   }

@@ -117,14 +117,11 @@
 
   // computes the physical offset, within origin based on d1
   function computeOffsetGeneral({ d1, d2, pixelsPerMinute }) {
-    console.log("d1 =", d1)
-    console.log("d2 =", d2)
     const millisecsDifference = computeMillisecsDifference(d1, d2);
 
     // translate time difference to a physical distance
     const minutesDifference = millisecsDifference / (1000 * 60);
     const offset = minutesDifference * pixelsPerMinute;
-    console.log("offset =", offset)
     return offset;
   }
 
@@ -203,10 +200,7 @@
 
   function getJSDateFromTask (task) {
     const dateTimeString = task.startDateISO + 'T' + task.startTime
-    console.log('dateTimeSTring =', dateTimeString)
-    const result = new Date(dateTimeString)
-    console.log("result =", result)
-    return result 
+    return new Date(dateTimeString)
   }
 </script>
 
