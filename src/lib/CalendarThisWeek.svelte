@@ -14,7 +14,7 @@
   import {
     user,
     tasksScheduledOn,
-    hasFirstLoaded,
+    isInitialRender,
     leftMostDateForNewFetch,
     rightMostDateForNewFetch,
   } from "/src/store.js";
@@ -71,8 +71,6 @@
   })
 
   onMount(() => {
-    console.time('mounting')
-
     const today = DateTime.now()
     const temp = buildDates(
       // today.minus({ days: -180 }),
@@ -109,8 +107,6 @@
   
     const right = dt.minus({ days: cushion + 1 })
     const left = dt.minus({ days: cushion + size + cushion })
-
-  
 
     const newWeekTasksArray = await Tasks.getByDateRange(
       $user.uid,
@@ -218,7 +214,16 @@
     {#each daysToRender as ISODate, i (ISODate)}
       {#if i === cushion}
         <div
-          use:lazyCallable={fetchPastTasks(ISODate)}
+          use:lazyCallable={() => {
+            if ($isInitialRender) {
+              isInitialRender.set(false)
+              return false
+            }
+            else {
+              fetchPastTasks(ISODate)
+              return true
+            }
+          }}
           style="outline: 2px solid red;"
         >
           <ReusableCalendarHeader

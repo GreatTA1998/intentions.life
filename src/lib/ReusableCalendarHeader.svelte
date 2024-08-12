@@ -97,7 +97,7 @@
         class:active-date-number={DateTime.now().toISODate < ISODate}
         class:highlighted-circle={DateTime.now().toISODate == ISODate}
       >
-        {DateTime.fromISO(ISODate).toFormat("MM dd")}
+        {DateTime.fromISO(ISODate).toFormat("dd")}
       </div>
     </div>
   </div>
