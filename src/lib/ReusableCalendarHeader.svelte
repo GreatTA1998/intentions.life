@@ -85,7 +85,7 @@
   <div class="unselectable">
     <div
       class="center-flex day-name-label"
-      class:active-day-name={DateTime.now().toISODate < ISODate}
+      class:active-day-name={ISODate <= DateTime.now().toFormat('yyyy-MM-dd')}
     >
       {DateTime.fromISO(ISODate).toFormat("ccc")}
     </div>
@@ -94,8 +94,8 @@
       <div
         class="center-flex"
         style="padding: 8px; width: 48px; height: 36px;"
-        class:active-date-number={DateTime.now().toISODate < ISODate}
-        class:highlighted-circle={DateTime.now().toISODate == ISODate}
+        class:active-date-number={ISODate <= DateTime.now().toFormat('yyyy-MM-dd')}
+        class:highlighted-circle={false}
       >
         {DateTime.fromISO(ISODate).toFormat("dd")}
       </div>
