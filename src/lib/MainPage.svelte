@@ -227,8 +227,7 @@
     computeYearViewTimelines, 
     reconstructTreeInMemory,
     computeDateToTasksDict,
-    computeTodoMemoryTrees,
-    computeInclusiveWeekTodo
+    computeTodoMemoryTrees
   } from '/src/helpers/dataStructures.js'
   import { 
     mostRecentlyCompletedTaskID, 
