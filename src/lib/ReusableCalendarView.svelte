@@ -117,11 +117,14 @@
 
   // computes the physical offset, within origin based on d1
   function computeOffsetGeneral({ d1, d2, pixelsPerMinute }) {
+    console.log("d1 =", d1)
+    console.log("d2 =", d2)
     const millisecsDifference = computeMillisecsDifference(d1, d2);
 
     // translate time difference to a physical distance
     const minutesDifference = millisecsDifference / (1000 * 60);
     const offset = minutesDifference * pixelsPerMinute;
+    console.log("offset =", offset)
     return offset;
   }
 
@@ -197,6 +200,14 @@
     const resultantDateClassObject = new Date(resultantTimeInMs);
     return resultantDateClassObject;
   }
+
+  function getJSDateFromTask (task) {
+    const dateTimeString = task.startDateISO + 'T' + task.startTime
+    console.log('dateTimeSTring =', dateTimeString)
+    const result = new Date(dateTimeString)
+    console.log("result =", result)
+    return result 
+  }
 </script>
 
 <!-- https://github.com/sveltejs/svelte/issues/6016 -->
@@ -243,7 +254,7 @@
           position: absolute; 
           top: {computeOffsetGeneral({
           d1: calendarBeginningDateClassObject,
-          d2: new Date(task.startDateISO),
+          d2: getJSDateFromTask(task),
           pixelsPerMinute,
         })}px;
           left: 0;

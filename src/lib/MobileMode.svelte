@@ -123,7 +123,6 @@
     inclusiveWeekTodo
   } from '/src/store.js'
   import { 
-    computeInclusiveWeekTodo,
     reconstructTreeInMemory,
     computeDateToTasksDict
   } from '/src/helpers/dataStructures.js'
@@ -294,7 +293,7 @@
     collectFutureScheduledTasksToArray()
 
     // simple week todo
-    inclusiveWeekTodo.set(computeInclusiveWeekTodo(allTasks))
+    // inclusiveWeekTodo.set(computeInclusiveWeekTodo(allTasks))
   }
 
   // quick-fix for NaN/NaN bug
