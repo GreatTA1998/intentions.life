@@ -29,6 +29,12 @@
   font-family: 'Inter', sans-serif;
 }
 
+/* prevent accidental going back page */
+/* https://stackoverflow.com/questions/30636930/disable-web-page-navigation-on-swipeback-and-forward?rq=1 */
+html, body {
+  overscroll-behavior-x: none;
+}
+
 .simple-flex {
   display: flex;
   align-items: center;

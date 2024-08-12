@@ -52,18 +52,21 @@
   let reusableTaskTemplates = null;
   let taskTemplateSearchResults = [];
 
-  $: pixelsPerMinute = pixelsPerHour / 60;
-  $: resultantDateClassObject = getResultantDateClassObject(yPosition);
+  let pixelsPerMinute = pixelsPerHour / 60;
+  // $: resultantDateClassObject = getResultantDateClassObject(yPosition);
+
 
   // Put tasks in ascending order of `startTime`, so newer tasks are above older tasks
   // this is important because when a big task swallows a small task,
   // you need to be able to drag the small task out easily (and the small task is BELOW the big task by definition)
-  $: sortedScheduledTasks = scheduledTasks.sort((task1, task2) => {
-    return (
-      pureNumericalHourForm(task1.startTime) -
-      pureNumericalHourForm(task2.startTime)
-    );
-  });
+
+  let sortedScheduledTasks = scheduledTasks
+  // $: sortedScheduledTasks = scheduledTasks.sort((task1, task2) => {
+  //   return (
+  //     pureNumericalHourForm(task1.startTime) -
+  //     pureNumericalHourForm(task2.startTime)
+  //   );
+  // });
 
   onMount(async () => {
     // scrolling

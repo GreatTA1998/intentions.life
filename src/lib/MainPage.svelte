@@ -188,7 +188,7 @@
       </div>
       
       <!-- 2nd flex child -->
-      <div class="the-only-scrollable-container calendar-section-flex-child"> 
+      <div id="the-only-scrollable-container" class="calendar-section-flex-child"> 
         {#if $tasksScheduledOn}   
           <CalendarThisWeek
             {calStartDateClassObj}
@@ -753,7 +753,7 @@
     display: flex;
   }
 
-  .the-only-scrollable-container {
+  #the-only-scrollable-container {
     position: relative;
     overflow: auto; 
   }
@@ -849,7 +849,7 @@
   /* anything below this minimum tablet width is considered a phone */
   @media (max-width: 767.99px) {
     /* i.e. flatten all the scrolling onto one massive plane, instead of lots of separate scrolling contexts */
-    .the-only-scrollable-container {
+    #the-only-scrollable-container {
       overflow: visible;
     }
 

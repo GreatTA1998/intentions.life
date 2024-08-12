@@ -1,3 +1,5 @@
+
+
 export function lazyCallable(node, callback) {
   let observer = new IntersectionObserver(
     (entries) => {
@@ -21,5 +23,5 @@ export function lazyCallable(node, callback) {
   setTimeout(() => {
     // console.log("mounting observer in the past");
     observer.observe(node);
-  }, 4000);
+  }, 1000);
 }

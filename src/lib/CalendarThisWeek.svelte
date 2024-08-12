@@ -7,10 +7,14 @@
     getDateInDDMMYYYY,
     computeDayDifference,
   } from "/src/helpers.js";
-  import { onMount, createEventDispatcher } from "svelte";
+  import { onMount, createEventDispatcher, tick ,
+    beforeUpdate, afterUpdate
+
+  } from "svelte";
   import {
     user,
     tasksScheduledOn,
+    hasFirstLoaded,
     leftMostDateForNewFetch,
     rightMostDateForNewFetch,
   } from "/src/store.js";
@@ -30,7 +34,7 @@
   export let calStartDateClassObj;
 
   const size = 4
-  const cushion = 2
+  const cushion = 1 // tested with cushion = 2
 
   let doodleIcons = null;
   // NOTE: timesOfDay should start from 00:00, so dateClassObjects also need to start from 00:00 military time
@@ -43,22 +47,56 @@
   const topMarginEqualizer = 8 + timestampDivTopMargin; // to align with the timestamps that can't be displayed at negative margins
   const timestampDivTopMargin = 24;
   let isShowingDockingArea = true;
+  
+  let newScrollLeft = 0
+  let ScrollingParent
+  let hasFetchedNewPastTasks = false
 
   $: if ($tasksScheduledOn) {
     intForTriggeringRerender += 1;
   }
 
+  beforeUpdate(() => {
+
+  })
+
+  afterUpdate(() => {
+    if (ScrollingParent && hasFetchedNewPastTasks) {
+      console.log('correctign scrolling')
+      // const dayColumnWidth = 200
+      // const correctionAmount = 1340 // dayColumnWidth * (size + cushion)  
+      ScrollingParent.scrollLeft = newScrollLeft
+      hasFetchedNewPastTasks = false
+    }
+  })
+
   onMount(() => {
+    console.time('mounting')
+
     const today = DateTime.now()
-    daysToRender = buildDates(
-      // today.minus({ days: -365 }),
+    const temp = buildDates(
+      // today.minus({ days: -180 }),
       // 365
       today.minus({ days: size + cushion }), 
       2 * (size + cushion) + 1 // +1 means because today's date column counts as the midpoint and is an additional column
     )
+    daysToRender = temp
     getTimesOfDay()
     fetchDoodleIcons()
   })
+
+  function saveScrollPosition () {
+    ScrollingParent = document.getElementById('the-only-scrollable-container')
+    if (ScrollingParent) {
+      const dayColumnWidth = 200
+      const correctionAmount = dayColumnWidth * (size + cushion)  
+ 
+      const oldScrollLeft = ScrollingParent.scrollLeft
+      newScrollLeft = correctionAmount + oldScrollLeft
+      console.log("saveScrollPosition =", newScrollLeft)
+      hasFetchedNewPastTasks = true
+    }
+  }
 
   function incorporateNewWeekIntoCalendarTree(newWeekTasksArray) {
     const newWeekMemoryTree = reconstructTreeInMemory(newWeekTasksArray);
@@ -67,23 +105,27 @@
   }
 
   async function fetchPastTasks(ISODate) {
-    // console.log('intersector should be August 8 =', ISODate)
     const dt = DateTime.fromISO(ISODate);
   
     const right = dt.minus({ days: cushion + 1 })
     const left = dt.minus({ days: cushion + size + cushion })
-    // console.log("right should be August 5 =", right)
-    // console.log('left should be July 31', left)
 
-    // from left
-    daysToRender = [...buildDates(left, size + cushion), ...daysToRender];
+  
 
     const newWeekTasksArray = await Tasks.getByDateRange(
       $user.uid,
       left.toISODate(), // '2024-07-31',
       right.toISODate()
     )
-    incorporateNewWeekIntoCalendarTree(newWeekTasksArray);
+
+    hasFetchedNewPastTasks = true
+
+    saveScrollPosition()
+    // from left
+    daysToRender = [...buildDates(left, size + cushion), ...daysToRender];
+
+    // now update state
+    incorporateNewWeekIntoCalendarTree(newWeekTasksArray)
   }
 
   async function fetchNewWeekOfFutureTasks(intersectedDate) {
@@ -99,17 +141,6 @@
       right.toISODate() // '2024-08-24'
     )
     incorporateNewWeekIntoCalendarTree(newWeekTasksArray);
-  }
-
-  // dd-mm-yyyy format
-  function getSimpleISOFromDateClassObj(d) {
-    let dd = d.getDate();
-    let mm = d.getMonth() + 1;
-    let yyyy = d.getFullYear();
-
-    if (dd < 10) dd = "0" + dd;
-    if (mm < 10) mm = "0" + mm;
-    return dd + "-" + mm + "-" + yyyy;
   }
 
   async function fetchDoodleIcons() {
@@ -133,30 +164,15 @@
     }
     dateClassObjects = [...temp, ...dateClassObjects]; // ma
   }
-  function getDateClassObjects(dateClassObj) {
-    const temp = [];
-    let d = dateClassObj;
-    for (let i = -7; i < 7; i++) {
-      const offset = i * (24 * 60 * 60 * 1000);
-      const copy = new Date();
-      copy.setTime(d.getTime() + offset);
-      // no longer start from 7 am, or else there will be missing hours
-      copy.setHours(0, 0, 0); // hours, minutes, seconds, note it's ZERO-indexed, 0-23, 0-59
-      temp.push(copy);
-    }
-    dateClassObjects = [...temp]; // manually trigger reactivity)
-  }
-  
+
   // totalNumber
   function buildDates(start, totalNumber) {
     const dates = [];
-    console.log("numToRender =", totalNumber)
     for (let i = 0; i < totalNumber; i++) {
       dates.push(
         start.plus({ days: i }).toFormat('yyyy-MM-dd')
       )
     }
-    console.log('build more dates =', dates)
     return dates;
   }
 
@@ -199,13 +215,10 @@
   </div>
 
   <div class="sticky-y-div flexbox">
-    {#each daysToRender.sort((a, b) => a - b) as ISODate, i (ISODate)}
+    {#each daysToRender as ISODate, i (ISODate)}
       {#if i === cushion}
         <div
-          use:lazyCallable={() => setTimeout(()=>{
-            console.log('we are loading more past')
-            fetchPastTasks(ISODate)}
-            , 3000)}
+          use:lazyCallable={fetchPastTasks(ISODate)}
           style="outline: 2px solid red;"
         >
           <ReusableCalendarHeader
@@ -260,7 +273,7 @@
     {/each}
   </div>
 
-  {#each  daysToRender.sort((a, b) => a - b) as ISODate, i}
+  {#each daysToRender.sort((a, b) => a - b) as ISODate, i (ISODate)}
     <!-- margin-left: 0.5vw;  -->
     <div style="margin-top: {topMarginEqualizer}px;" class="unselectable">
       <RenderlessMaryusState dateClassObj={DateTime.fromISO(ISODate).toJSDate()} let:ourReactiveState>
