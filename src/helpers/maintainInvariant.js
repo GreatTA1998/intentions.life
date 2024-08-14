@@ -32,11 +32,8 @@ export function newUpdateLocalState ({ id, keyValueChanges }) {
   for (const [key, value] of Object.entries(keyValueChanges)) {
     copy[key] = value
   }
-  console.log('keyValueChanges =', keyValueChanges)
 
   // for simpler logic (even if inefficient) always delete the node
-  const oldTodoSize = get(todoTasks).length
-  const oldCalendarSize = get(calendarTasks).length
   if (updatedTask.startDateISO) {
     calendarTasks.set(
       get(calendarTasks).filter(task => task.id !== id)
