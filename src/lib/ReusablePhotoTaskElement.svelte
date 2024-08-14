@@ -18,7 +18,8 @@
     opacity: {task.isDone ? '0.9' : '0.7'};
     background-color: {isBulletPoint ? '' : 'var(--experimental-black)'};
     background-image: url({hasIntersected ? task.imageDownloadURL : ''});
-    background-size: contain;
+    background-size: cover;
+    background-position: center;
     background-repeat: no-repeat;
     display: flex; flex-direction: column;
   " 
