@@ -270,7 +270,8 @@
   import { garbageCollectInvalidTasks, findActiveUsers } from '/src/scripts.js'
   import { deleteObject, getStorage, ref } from 'firebase/storage'
   import Tasks from '../back-end/Tasks'
-
+  import { size, cushion } from '/src/helpers/constants.js'
+  import { DateTime } from 'luxon'
 
   let currentMode = 'Week' // weekMode hourMode monthMode
   const userDocPath = `users/${$user.uid}`
@@ -290,15 +291,16 @@
   let isInitialFetch = true
   let unsub
 
-
   onMount(async () => {
-    // fetch unscheduled tasks
-    // get tasks between 2 days ago, 1 week, and 2 days in the future
+    const today = DateTime.now()
+    const left = today.minus({ days: size + cushion })
+    const right = today.plus({ days: size + cushion })
 
-    // today is 08-09-2024
-    // start is 2024-08-07
-    // end is 2024-08-17
-    const scheduledCalendarTasks = await Tasks.getByDateRange($user.uid,'2024-08-07', '2024-08-17')
+    const scheduledCalendarTasks = await Tasks.getByDateRange(
+      $user.uid, 
+      left.toFormat('yyyy-MM-dd'), 
+      right.toFormat('yyyy-MM-dd')
+    )
 
     // build the tree from these 
     const calendarMemoryTree = reconstructTreeInMemory(scheduledCalendarTasks)
@@ -310,33 +312,17 @@
     const unscheduledTodoTasks = await Tasks.getUnscheduled($user.uid)
     const todoMemoryTree = reconstructTreeInMemory(unscheduledTodoTasks)
     inclusiveWeekTodo.set(todoMemoryTree)
-
-    // fetch scheduledTasks (and build it)
-
-    // SCRIPTS
-    // findActiveUsers()
-    // garbageCollectInvalidTasks($user)
-    // return
-
-
-    // const ref = quary(collection(db, `/users/${$user.uid}/tasks`), where('startDateISO', '=>' ,currentEarliestVisibleDate))
-    // unsub = onSnapshot(ref, (querySnapshot) => {
-    //   const result = [] 
-    //   querySnapshot.forEach((doc) => {
-    //     result.push({ id: doc.id, ...doc.data()})
-    //   })
-
-    //   allTasks = reconstructTreeInMemory(result)
-
-    //   tasksScheduledOn.set(computeDateToTasksDict(allTasks))
-
+ 
     //   // RE-WRITE / INTEGRATE THIS WHEN READY
     //   if (isInitialFetch) {
     //     isInitialFetch = false
     //     maintainPreviewWindowForPeriodicTasks()
     //   }
-    // })
-    // can't use `return` in reactive expression https://github.com/sveltejs/svelte/issues/2828  
+
+    // SCRIPTS
+    // findActiveUsers()
+    // garbageCollectInvalidTasks($user)
+    // return
   })
 
   // $: if (allTasks) {

@@ -27,14 +27,12 @@
     reconstructTreeInMemory,
     computeDateToTasksDict,
   } from "../helpers/dataStructures";
+  import { size, cushion } from '/src/helpers/constants.js'
   import { getRandomID } from "../helpers.js";
   import BackgroundRainScene from "./BackgroundRainScene.svelte";
   import BasicWhiteboard from "./BasicWhiteboard.svelte";
 
   export let calStartDateClassObj;
-
-  const size = 4
-  const cushion = 1 // tested with cushion = 2
 
   let doodleIcons = null;
   // NOTE: timesOfDay should start from 00:00, so dateClassObjects also need to start from 00:00 military time
