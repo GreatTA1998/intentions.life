@@ -15,6 +15,7 @@
 </div>
 
 <script>
+  import { updateLocalState } from '/src/helpers/maintainInvariant.js'
   import {
     breakParentRelationIfNecessary,
     maintainValidSubtreeDeadlines,
@@ -129,9 +130,8 @@
     }
     
     // 2. UNSCHEDULE: when you drag to the to-do list, it always unschedules it from the calendar
-    updateObj.startTime = '' 
-    updateObj.startDate = ''
-    updateObj.startYYYY = ''
+    // updateObj.startDateISO = ''
+    // updateObj.startTime = ''
 
     // 3. KEEP CONSISTENT DEADLINE HANDLING API WITH THE ROOT TODO DROPZONE
     // yes, this is horrific code
@@ -149,11 +149,19 @@
       // updateObj = breakParentRelationIfNecessary(updateObj)
     }
 
+    // NOTE `updateObj` will be deprecated and unused
+    const betaUpdateObj = {
+      orderValue: newVal,
+      startDateISO: '',
+      startTime: ''
+    }
+
     // 4. PARENTID
     if ($whatIsBeingDragged === 'top-level-task-within-this-todo-list' && ancestorRoomIDs.length === 1) {
       // preserve parent relationship
     } else {
       updateObj.parentID = parentID
+      betaUpdateObj.parentID = parentID
     }
 
     // 2. HANDLE SUBTREE DEADLINES
@@ -174,9 +182,12 @@
       ref = doc(db, `users/${$user.uid}/tasks/${$whatIsBeingDraggedID}`)
     }
 
-    batch.update(ref, updateObj)
-
-    batch.commit()
+    batch.update(ref, betaUpdateObj) // updateObj
+    await batch.commit()
+    updateLocalState({ 
+      id, 
+      keyValueChanges: betaUpdateObj
+    })
 
     whatIsBeingDraggedFullObj.set(null)
     whatIsBeingDraggedID.set('')

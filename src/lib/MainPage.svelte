@@ -56,9 +56,9 @@
   <div slot="navbar" class="top-navbar" class:transparent-glow-navbar={currentMode === 'Day'}>
     <GrandTreeTodoPopupButton let:setIsPopupOpen={setIsPopupOpen}
       on:new-root-task={(e) => createNewRootTask(e.detail)}
+      on:subtask-create={(e) => createSubtask(e.detail)}
       on:task-unscheduled={(e) => unscheduleTask(e)}
       on:task-click={(e) => openDetailedCard(e.detail)}
-      on:subtask-create={(e) => createSubtask(e.detail)}
       on:task-dragged={(e) => changeTaskDeadline(e.detail)}
       on:task-checkbox-change={(e) => updateTaskNode({ id: e.detail.id, keyValueChanges: { isDone: e.detail.isDone }})}
     > 
@@ -182,7 +182,6 @@
           on:task-unscheduled={(e) => putTaskToThisWeekTodo(e)}
           on:task-click={(e) => openDetailedCard(e.detail)}
           on:subtask-create={(e) => createSubtask(e.detail)}
-          on:task-dragged={(e) => changeTaskDeadline(e.detail)}
           on:task-checkbox-change={(e) => updateTaskNode({ id: e.detail.id, keyValueChanges: { isDone: e.detail.isDone }})}
         />
       </div>
@@ -241,7 +240,10 @@
     longHorizonTasks,
     tasksScheduledOn,
     inclusiveWeekTodo,
-    hasInitialScrolled
+    hasInitialScrolled,
+    calendarMemoryTree,
+    todoTasks,
+    calendarTasks
   } from '/src/store.js'
   import JournalPopup from '$lib/JournalPopup.svelte'
   import FinancePopup from '$lib/FinancePopup.svelte'
@@ -265,12 +267,25 @@
   import { getAuth, signOut } from 'firebase/auth'
   import db from '/src/db.js'
   import { doc, collection, getFirestore, updateDoc, arrayUnion, onSnapshot, arrayRemove, increment } from 'firebase/firestore'
-  import { setFirestoreDoc, updateFirestoreDoc, deleteFirestoreDoc, getFirestoreCollection } from '/src/crud.js'
+  import { 
+    setFirestoreDoc, 
+    updateFirestoreDoc, 
+    deleteFirestoreDoc, 
+    getFirestoreCollection,
+  } from '/src/crud.js'
   import NewThisWeekTodo from '$lib/NewThisWeekTodo.svelte'
   import { garbageCollectInvalidTasks, findActiveUsers } from '/src/scripts.js'
   import { deleteObject, getStorage, ref } from 'firebase/storage'
   import Tasks from '../back-end/Tasks'
-
+  import { size, cushion } from '/src/helpers/constants.js'
+  import { DateTime } from 'luxon'
+  import { 
+    createOnLocalState,
+    updateLocalState,
+    deleteFromLocalState,
+    buildCalendarDataStructures,
+    buildTodoDataStructures
+  } from '/src/helpers/maintainInvariant.js'
 
   let currentMode = 'Week' // weekMode hourMode monthMode
   const userDocPath = `users/${$user.uid}`
@@ -290,75 +305,57 @@
   let isInitialFetch = true
   let unsub
 
-
   onMount(async () => {
-    // fetch unscheduled tasks
-    // get tasks between 2 days ago, 1 week, and 2 days in the future
+    const today = DateTime.now()
+    const left = today.minus({ days: size + cushion })
+    const right = today.plus({ days: size + cushion })
 
-    // today is 08-09-2024
-    // start is 2024-08-07
-    // end is 2024-08-17
-    const scheduledCalendarTasks = await Tasks.getByDateRange($user.uid,'2024-08-07', '2024-08-17')
-
-    // build the tree from these 
-    const calendarMemoryTree = reconstructTreeInMemory(scheduledCalendarTasks)
-
-    // compute the state that calendar uses
-    tasksScheduledOn.set(computeDateToTasksDict(calendarMemoryTree))
+    const scheduledTasks = await Tasks.getByDateRange(
+      $user.uid, 
+      left.toFormat('yyyy-MM-dd'), 
+      right.toFormat('yyyy-MM-dd')
+    )
+    calendarTasks.set(scheduledTasks)
+    buildCalendarDataStructures()
 
     ////  SEPARATE BUT SIMILAR PROCESS FOR THE TODO-LIST
-    const unscheduledTodoTasks = await Tasks.getUnscheduled($user.uid)
-    const todoMemoryTree = reconstructTreeInMemory(unscheduledTodoTasks)
-    inclusiveWeekTodo.set(todoMemoryTree)
-
-    // fetch scheduledTasks (and build it)
+    const unscheduledTasks = await Tasks.getUnscheduled($user.uid)
+    todoTasks.set(unscheduledTasks)
+    buildTodoDataStructures()
+ 
+    //   TO-DO: fix repeating tasks not getting pre-generated on time
+    //   if (isInitialFetch) {
+    //     isInitialFetch = false
+    //     maintainPreviewWindowForPeriodicTasks()
+    //   }
 
     // SCRIPTS
     // findActiveUsers()
     // garbageCollectInvalidTasks($user)
     // return
-
-
-    // const ref = quary(collection(db, `/users/${$user.uid}/tasks`), where('startDateISO', '=>' ,currentEarliestVisibleDate))
-    // unsub = onSnapshot(ref, (querySnapshot) => {
-    //   const result = [] 
-    //   querySnapshot.forEach((doc) => {
-    //     result.push({ id: doc.id, ...doc.data()})
-    //   })
-
-    //   allTasks = reconstructTreeInMemory(result)
-
-    //   tasksScheduledOn.set(computeDateToTasksDict(allTasks))
-
-    //   // RE-WRITE / INTEGRATE THIS WHEN READY
-    //   if (isInitialFetch) {
-    //     isInitialFetch = false
-    //     maintainPreviewWindowForPeriodicTasks()
-    //   }
-    // })
-    // can't use `return` in reactive expression https://github.com/sveltejs/svelte/issues/2828  
   })
 
-  // $: if (allTasks) {
-  //   computeDataStructuresFromAllTasks(allTasks)
-  // }
-
-  // FOR HANDLING A SINGLE NODE
-  function handleUpdatedNode () {
-    // search through the todo list memory tree
-    // search through the calendar memory tree
-    // update it
-    // manually trigger reativity via reassignment
+  function search ({ memoryTree, id }) {
+    // memory tree is an array of tree nodes
+    for (const rootNode of memoryTree) {
+      if (rootNode.id === id) return rootNode 
+      else {
+        for (const child of rootNode.children) {
+          const out = helper({ node: child, id })
+          if (out) return out
+        }
+      }
+    }
   }
 
-  function handleCreatedNode () {
-    // find the right subtree, then insert it in the right location based on `orderValue`
-    // manually trigger reactivity
-  }
-
-  function handleDeletedNode () {
-    // find the node, and delete it
-    // manually trigger reactivity
+  function helper ({ node, id }) {
+    if (node.id === id) return node 
+    else {
+      for (const child of node.children) {
+        const out = helper({ node: child, id })
+        if (out) return out
+      }
+    }
   }
 
   // FOR HANDLING A WEEK WORTH OF NEW TASKS
@@ -475,19 +472,37 @@
 
   async function createTaskNode ({ id, newTaskObj }) {
     const newTaskObjChecked = checkTaskObjSchema(newTaskObj, $user)
-    setFirestoreDoc(tasksPath + id, newTaskObjChecked)
+    
+    try {
+      setFirestoreDoc(tasksPath + id, newTaskObjChecked)
+      
+      // this below operation is redundant because checkTaskObjSchema 
+      // will always update the `maxOrderValue` so it remains correct 
+      // not just for Create operations, but for updates and deletes 
+      updateFirestoreDoc(`users/${$user.uid}`, {
+        maxOrderValue: increment(3)
+      })
 
-    // this below operation is redundant because checkTaskObjSchema 
-    // will always update the `maxOrderValue` so it remains correct 
-    // not just for Create operations, but for updates and deletes 
-    updateFirestoreDoc(`users/${$user.uid}`, {
-      maxOrderValue: increment(3)
-    })
+      // TO-DO: figure out why `newTaskObj` will not be shown on the UI
+      // but `newTaskObjChecked`will be. What specifically about the schema
+      // fixes it
+      createOnLocalState({ createdNode: newTaskObjChecked })
+    } catch (error) {
+      console.log(error)
+      alert('Database update failed, please reload')
+    }
   }
 
-  function updateTaskNode ({ id, keyValueChanges }) {
-    updateFirestoreDoc(tasksPath + id, keyValueChanges)
-    // very useful for debugging
+  async function updateTaskNode ({ id, keyValueChanges }) {
+    try {
+      updateFirestoreDoc(tasksPath + id, keyValueChanges)
+      // we purposely don't await, so the UI experience is much better
+      // without an unsettling delay - if it's a divergence in state we'll just throw an error (0.01% chance)
+      updateLocalState({ id, keyValueChanges })
+    } catch (error) {
+      console.log(error)
+      alert('Database update failed, please reload')
+    }
   }
 
   // THIS IS STILL NOT WORKING: THE ADOPTION IS NOT WORKING, RIGHT NOW ALL THE 
@@ -523,6 +538,8 @@
 
     // now safely delete itself
     deleteFirestoreDoc(tasksPath + id)
+
+    deleteFromLocalState({ id })
   }
 
   function updateMusicAutoplay (e) {
@@ -635,10 +652,13 @@
   }
 
   async function changeTaskStartTime ({ id, timeOfDay, dateScheduled }) {
+    // get an ISO YYYY-MM-DD format
+    const yyyy = '2024' // TO-DO: change this by 2025
+    const [mm, dd] = dateScheduled.split('/')
+
     updateTaskNode({ id, keyValueChanges: {
       startTime: timeOfDay,
-      startDate: dateScheduled, 
-      startYYYY: new Date().getFullYear().toString()
+      startDateISO: yyyy + '-' + mm + '-' + dd
     }})
   }
 

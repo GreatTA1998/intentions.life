@@ -27,14 +27,14 @@
     reconstructTreeInMemory,
     computeDateToTasksDict,
   } from "../helpers/dataStructures";
+  import { size, cushion } from '/src/helpers/constants.js'
   import { getRandomID } from "../helpers.js";
   import BackgroundRainScene from "./BackgroundRainScene.svelte";
   import BasicWhiteboard from "./BasicWhiteboard.svelte";
+  import { calendarMemoryTree } from "/src/store.js"
+  import { calendarTasks } from '/src/store.js'
 
   export let calStartDateClassObj;
-
-  const size = 4
-  const cushion = 1 // tested with cushion = 2
 
   let doodleIcons = null;
   // NOTE: timesOfDay should start from 00:00, so dateClassObjects also need to start from 00:00 military time
@@ -70,8 +70,6 @@
   onMount(() => {
     const today = DateTime.now()
     const temp = buildDates(
-      // today.minus({ days: -180 }),
-      // 365
       today.minus({ days: size + cushion }), 
       2 * (size + cushion) + 1 // +1 means because today's date column counts as the midpoint and is an additional column
     )
@@ -92,10 +90,20 @@
     }
   }
 
-  function incorporateNewWeekIntoCalendarTree(newWeekTasksArray) {
-    const newWeekMemoryTree = reconstructTreeInMemory(newWeekTasksArray);
-    const newSection = computeDateToTasksDict(newWeekMemoryTree);
-    tasksScheduledOn.set({ ...$tasksScheduledOn, ...newSection });
+  function incorporateNewWeekIntoCalendarTree (newWeekTasksArray) {
+    calendarTasks.set([...$calendarTasks, ...newWeekTasksArray])    
+    buildCalendarDataStructures()
+
+    // const newWeekMemoryTree = reconstructTreeInMemory(newWeekTasksArray)
+    // calendarMemoryTree.set([...$calendarMemoryTree, ...newWeekMemoryTree])
+    // const newDateToTasks = computeDateToTasksDict($calendarMemoryTree)
+    // tasksScheduledOn.set(newDateToTasks)
+  }
+
+  function buildCalendarDataStructures () {
+    calendarMemoryTree.set(reconstructTreeInMemory($calendarTasks))
+    const dateToTasks = computeDateToTasksDict($calendarMemoryTree)
+    tasksScheduledOn.set(dateToTasks)
   }
 
   async function fetchPastTasks(ISODate) {

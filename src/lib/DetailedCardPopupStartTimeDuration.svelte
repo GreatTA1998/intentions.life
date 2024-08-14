@@ -73,8 +73,9 @@
   $: isEditingTaskStart = taskObject.startTime !== newStartHHMM
   $: isEditingStartDate = taskObject.startDate !== newStartMMDD
 
-  let newStartMMDD = taskObject.startDate || ''
-  let newStartYYYY = taskObject.startYYYY || ''
+  taskObject.startDateISO.split('')
+  let newStartMMDD = getMMDD(taskObject.startDateISO) || ''
+  let newStartYYYY = getYYYY(taskObject)
 
   let newStartHHMM = taskObject.startTime || ''
 
@@ -82,6 +83,18 @@
   let newDuration 
 
   const dispatch = createEventDispatcher()
+  
+  function getYYYY (taskObject ) {
+    if (!taskObject.startDateISO) return ''
+    else {
+      taskObject.startDateISO.split('-')[0]
+    }
+  }
+
+  function getMMDD (startDateISO) {
+    const [yyyy, mm, dd] = startDateISO.split('-')
+    return `${mm}/${dd}`
+  }
 
   function saveStartTime (hhmm) {
     dispatch('task-update', { id: taskObject.id, keyValueChanges: {

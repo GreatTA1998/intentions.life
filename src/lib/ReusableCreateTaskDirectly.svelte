@@ -41,6 +41,7 @@
   import { getRandomID, getDateInMMDD, getHHMM } from '/src/helpers.js'
   import { user } from '/src/store.js'
   import { onMount, createEventDispatcher } from 'svelte'
+  import { DateTime } from 'luxon'
 
   export let resultantDateClassObject
   export let newTaskStartTime = '' // hh:mm format
@@ -98,10 +99,8 @@
       const newTaskObj = {
         id: getRandomID(),
         name: newTaskName,
-        startDate: getDateInMMDD(resultantDateClassObject),
-        // deadlineDate: getDateInDDMMYYYY(resultantDateClassObject),
-        startTime: newTaskStartTime,
-        startYYYY: resultantDateClassObject.getFullYear()
+        startDateISO: DateTime.fromJSDate(resultantDateClassObject).toFormat('yyyy-MM-dd'),
+        startTime: newTaskStartTime
       }
       dispatch('new-root-task', newTaskObj)
     }

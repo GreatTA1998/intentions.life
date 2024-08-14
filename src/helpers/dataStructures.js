@@ -11,7 +11,7 @@ import {
 
 
 // recursively mutate this monolith data structure until its correct
-export function reconstructTreeInMemory(firestoreTaskDocs) {
+export function reconstructTreeInMemory (firestoreTaskDocs) {
   const output = [];
 
   // first, do an O(n) operation, so we don't perform a O(n^2) operation constantly traversing trees
@@ -25,7 +25,8 @@ export function reconstructTreeInMemory(firestoreTaskDocs) {
   }
 
   // now construct the recursive tree
-  const rootTasks = memo[""];
+  let rootTasks = memo[""];
+  rootTasks = sortByOrderValue(rootTasks)
   for (const rootTask of rootTasks) {
     recursivelyHydrateChildren({
       node: rootTask,
