@@ -241,7 +241,8 @@
     longHorizonTasks,
     tasksScheduledOn,
     inclusiveWeekTodo,
-    hasInitialScrolled
+    hasInitialScrolled,
+    calendarMemoryTree
   } from '/src/store.js'
   import JournalPopup from '$lib/JournalPopup.svelte'
   import FinancePopup from '$lib/FinancePopup.svelte'
@@ -303,10 +304,9 @@
     )
 
     // build the tree from these 
-    const calendarMemoryTree = reconstructTreeInMemory(scheduledCalendarTasks)
-
-    // compute the state that calendar uses
-    tasksScheduledOn.set(computeDateToTasksDict(calendarMemoryTree))
+    calendarMemoryTree.set(reconstructTreeInMemory(scheduledCalendarTasks))
+    const dateToTasks = computeDateToTasksDict($calendarMemoryTree)
+    tasksScheduledOn.set(dateToTasks)
 
     ////  SEPARATE BUT SIMILAR PROCESS FOR THE TODO-LIST
     const unscheduledTodoTasks = await Tasks.getUnscheduled($user.uid)
@@ -325,16 +325,23 @@
     // return
   })
 
-  // $: if (allTasks) {
-  //   computeDataStructuresFromAllTasks(allTasks)
-  // }
-
   // FOR HANDLING A SINGLE NODE
-  function handleUpdatedNode () {
+  function updateLocalState ({ id, keyValueChanges }) {
     // search through the todo list memory tree
+
     // search through the calendar memory tree
+    const updatedNode = search({ memoryTree: $calendarMemoryTree, id })
+    
+    // must do pointers rather than reassign it to a new object, mutation
+    // draw a pointer diagram to understand
+    for (const key of Object.keys(keyValueChanges)) {
+      updatedNode[key] = keyValueChanges[key]
+    }
+
     // update it
     // manually trigger reativity via reassignment
+    const dateToTasks = computeDateToTasksDict($calendarMemoryTree)
+    tasksScheduledOn.set(dateToTasks)
   }
 
   function handleCreatedNode () {
@@ -343,8 +350,33 @@
   }
 
   function handleDeletedNode () {
-    // find the node, and delete it
+    // search through the todo list memory tree
+
+    // search through the calendar memory tree
     // manually trigger reactivity
+  }
+
+  function search ({ memoryTree, id }) {
+    // memory tree is an array of tree nodes
+    for (const rootNode of memoryTree) {
+      if (rootNode.id === id) return rootNode 
+      else {
+        for (const child of rootNode.children) {
+          const out = helper({ node: child, id })
+          if (out) return out
+        }
+      }
+    }
+  }
+
+  function helper ({ node, id }) {
+    if (node.id === id) return node 
+    else {
+      for (const child of node.children) {
+        const out = helper({ node: child, id })
+        if (out) return out
+      }
+    }
   }
 
   // FOR HANDLING A WEEK WORTH OF NEW TASKS
@@ -471,8 +503,17 @@
     })
   }
 
-  function updateTaskNode ({ id, keyValueChanges }) {
-    updateFirestoreDoc(tasksPath + id, keyValueChanges)
+  async function updateTaskNode ({ id, keyValueChanges }) {
+    try {
+      updateFirestoreDoc(tasksPath + id, keyValueChanges)
+      // we purposely don't await, so the UI experience is much better
+      // without an unsettling delay.
+      // if it's a divergence in state we'll just throw an error (1% of the time)
+      updateLocalState({ id, keyValueChanges })
+    } catch (error) {
+      alert('Database update failed, please reload')
+    }
+    // update our state
     // very useful for debugging
   }
 
@@ -621,10 +662,13 @@
   }
 
   async function changeTaskStartTime ({ id, timeOfDay, dateScheduled }) {
+    // get an ISO YYYY-MM-DD format
+    const yyyy = '2024' // TO-DO: change this by 2025
+    const [mm, dd] = dateScheduled.split('/')
+
     updateTaskNode({ id, keyValueChanges: {
       startTime: timeOfDay,
-      startDate: dateScheduled, 
-      startYYYY: new Date().getFullYear().toString()
+      startDateISO: yyyy + '-' + mm + '-' + dd
     }})
   }
 
