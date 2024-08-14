@@ -32,6 +32,7 @@
   import BackgroundRainScene from "./BackgroundRainScene.svelte";
   import BasicWhiteboard from "./BasicWhiteboard.svelte";
   import { calendarMemoryTree } from "/src/store.js"
+  import { calendarTasks } from '/src/store.js'
 
   export let calStartDateClassObj;
 
@@ -92,10 +93,19 @@
   }
 
   function incorporateNewWeekIntoCalendarTree (newWeekTasksArray) {
-    const newWeekMemoryTree = reconstructTreeInMemory(newWeekTasksArray)
-    calendarMemoryTree.set([...$calendarMemoryTree, ...newWeekMemoryTree])
-    const newDateToTasks = computeDateToTasksDict($calendarMemoryTree)
-    tasksScheduledOn.set(newDateToTasks)
+    calendarTasks.set([...$calendarTasks, ...newWeekTasksArray])    
+    buildCalendarDataStructures()
+
+    // const newWeekMemoryTree = reconstructTreeInMemory(newWeekTasksArray)
+    // calendarMemoryTree.set([...$calendarMemoryTree, ...newWeekMemoryTree])
+    // const newDateToTasks = computeDateToTasksDict($calendarMemoryTree)
+    // tasksScheduledOn.set(newDateToTasks)
+  }
+
+  function buildCalendarDataStructures () {
+    calendarMemoryTree.set(reconstructTreeInMemory($calendarTasks))
+    const dateToTasks = computeDateToTasksDict($calendarMemoryTree)
+    tasksScheduledOn.set(dateToTasks)
   }
 
   async function fetchPastTasks(ISODate) {

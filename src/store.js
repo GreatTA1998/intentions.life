@@ -41,3 +41,6 @@ export const rightMostDateForNewFetch = writable('')
 export const isInitialRender = writable(false)
 
 export const calendarMemoryTree = writable(null)
+
+export const todoTasks = writable(null)
+export const calendarTasks = writable(null)

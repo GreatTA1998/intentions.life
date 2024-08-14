@@ -242,7 +242,9 @@
     tasksScheduledOn,
     inclusiveWeekTodo,
     hasInitialScrolled,
-    calendarMemoryTree
+    calendarMemoryTree,
+    todoTasks,
+    calendarTasks
   } from '/src/store.js'
   import JournalPopup from '$lib/JournalPopup.svelte'
   import FinancePopup from '$lib/FinancePopup.svelte'
@@ -297,23 +299,20 @@
     const left = today.minus({ days: size + cushion })
     const right = today.plus({ days: size + cushion })
 
-    const scheduledCalendarTasks = await Tasks.getByDateRange(
+    const scheduledTasks = await Tasks.getByDateRange(
       $user.uid, 
       left.toFormat('yyyy-MM-dd'), 
       right.toFormat('yyyy-MM-dd')
     )
-
-    // build the tree from these 
-    calendarMemoryTree.set(reconstructTreeInMemory(scheduledCalendarTasks))
-    const dateToTasks = computeDateToTasksDict($calendarMemoryTree)
-    tasksScheduledOn.set(dateToTasks)
+    calendarTasks.set(scheduledTasks)
+    buildCalendarDataStructures()
 
     ////  SEPARATE BUT SIMILAR PROCESS FOR THE TODO-LIST
-    const unscheduledTodoTasks = await Tasks.getUnscheduled($user.uid)
-    const todoMemoryTree = reconstructTreeInMemory(unscheduledTodoTasks)
-    inclusiveWeekTodo.set(todoMemoryTree)
+    const unscheduledTasks = await Tasks.getUnscheduled($user.uid)
+    todoTasks.set(unscheduledTasks)
+    buildTodoDataStructures()
  
-    //   // RE-WRITE / INTEGRATE THIS WHEN READY
+    //   TO-DO: fix repeating tasks not getting pre-generated on time
     //   if (isInitialFetch) {
     //     isInitialFetch = false
     //     maintainPreviewWindowForPeriodicTasks()
@@ -324,6 +323,19 @@
     // garbageCollectInvalidTasks($user)
     // return
   })
+
+  function buildCalendarDataStructures () {
+    console.log("buildCalendarDataStructures()")
+    calendarMemoryTree.set(reconstructTreeInMemory($calendarTasks))
+    const dateToTasks = computeDateToTasksDict($calendarMemoryTree)
+    tasksScheduledOn.set(dateToTasks)
+  }
+
+  function buildTodoDataStructures () {
+    console.log("buildTodoDataStructures()")
+    const todoMemoryTree = reconstructTreeInMemory($todoTasks)
+    inclusiveWeekTodo.set(todoMemoryTree)
+  }
 
   // FOR HANDLING A SINGLE NODE
   function updateLocalState ({ id, keyValueChanges }) {
@@ -344,16 +356,88 @@
     tasksScheduledOn.set(dateToTasks)
   }
 
-  function handleCreatedNode () {
-    // find the right subtree, then insert it in the right location based on `orderValue`
-    // manually trigger reactivity
+  function newUpdateLocalState ({ id, keyValueChanges }) {
+    // find the task
+    let updatedTask = null
+    for (const task of $todoTasks) {
+      if (task.id === id) {
+        updatedTask = task 
+        continue
+      }
+    }
+    for (const task of $calendarTasks) {
+      if (task.id === id) {
+        updatedTask = task
+        continue
+      }
+    }
+
+    // compute what it'll be updated to
+    const newCopy = {...updatedTask}
+    for (const k in Object.keys(keyValueChanges)) {
+      newCopy[k] = keyValueChanges[k]
+    }
+
+    // for simplicity, delete it
+    if (updatedTask.startTimeISO) {
+      // delete it from `$calendarTasks`
+      for (let i = 0; i < $calendarTasks.length; i++) {
+        if ($calendarTasks[i].id === id) {
+          calendarTasks.set($calendarTasks.splice(i, 1))
+          console.log("deleted node =", $calendarTasks.splice(i, 1))
+        }
+      }
+    } else {
+      // delete it from `$todoTasks`
+      for (let i = 0; i < $todoTasks.length; i++) {
+        if ($todoTasks[i].id === id) {
+          todoTasks.set($todoTasks.splice(i, 1))
+          console.log("delete node =", $todoTasks.splice(i, 1))
+        }
+      }
+    }
+
+    // then add it (order doesn't matter, the later algorithms will rearrange it)
+    if (newCopy.startTimeISO) {
+      calendarTasks.set([...$calendarTasks, newCopy])
+      buildCalendarDataStructures()
+    } else {
+      todoTasks.set([...$todoTasks, newCopy])
+      buildTodoDataStructures()
+    } 
   }
 
-  function handleDeletedNode () {
-    // search through the todo list memory tree
+  function addToLocalState ({ createdNode }) {
+    if (createdNode.startTimeISO) {
+      calendarTasks.set([...$calendarTasks, createdNode])
+      buildCalendarDataStructures()
+    } else {
+      todoTasks.set([...$todoTasks, createdNode])
+      buildTodoDataStructures()
+    }
+  }
 
-    // search through the calendar memory tree
-    // manually trigger reactivity
+  function deleteFromLocalState ({ id }) {
+    if (createdNode.startTimeISO) {
+      // delete from calendarTasks
+      for (let i = 0; i < $todoTasks.length; i++) {
+        if ($calendarTasks[i].id === id) {
+          todoTasks.set($calendarTasks.splice(i, 1))
+          console.log("delete node =", $calendarTasks.splice(i, 1))
+        }
+      }
+
+      buildCalendarDataStructures()
+    } else {
+      // delete from todoTasks
+      for (let i = 0; i < $todoTasks.length; i++) {
+        if ($todoTasks[i].id === id) {
+          todoTasks.set($todoTasks.splice(i, 1))
+          console.log("delete node =", $todoTasks.splice(i, 1))
+        }
+      }
+      buildTodoDataStructures()
+    }
   }
 
   function search ({ memoryTree, id }) {
@@ -501,6 +585,8 @@
     updateFirestoreDoc(`users/${$user.uid}`, {
       maxOrderValue: increment(3)
     })
+
+    addToLocalState({ createdNode: newTaskObj })
   }
 
   async function updateTaskNode ({ id, keyValueChanges }) {
@@ -509,7 +595,7 @@
       // we purposely don't await, so the UI experience is much better
       // without an unsettling delay.
       // if it's a divergence in state we'll just throw an error (1% of the time)
-      updateLocalState({ id, keyValueChanges })
+      newUpdateLocalState({ id, keyValueChanges })
     } catch (error) {
       alert('Database update failed, please reload')
     }
@@ -550,6 +636,8 @@
 
     // now safely delete itself
     deleteFirestoreDoc(tasksPath + id)
+
+    deleteFromLocalState({ id })
   }
 
   function updateMusicAutoplay (e) {

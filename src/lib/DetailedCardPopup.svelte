@@ -13,6 +13,7 @@
 
     <div style="padding: 24px;">
       <div style="display: flex; align-items: center;">
+        {taskObject.id}
         <ReusableCheckbox
           value={taskObject.isDone}
           on:change={(e) => handleCheckboxChange(e)}
