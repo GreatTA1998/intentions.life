@@ -53,20 +53,18 @@
   let taskTemplateSearchResults = [];
 
   let pixelsPerMinute = pixelsPerHour / 60;
-  // $: resultantDateClassObject = getResultantDateClassObject(yPosition);
+  $: resultantDateClassObject = getResultantDateClassObject(yPosition);
 
 
   // Put tasks in ascending order of `startTime`, so newer tasks are above older tasks
   // this is important because when a big task swallows a small task,
   // you need to be able to drag the small task out easily (and the small task is BELOW the big task by definition)
-
-  let sortedScheduledTasks = scheduledTasks
-  // $: sortedScheduledTasks = scheduledTasks.sort((task1, task2) => {
-  //   return (
-  //     pureNumericalHourForm(task1.startTime) -
-  //     pureNumericalHourForm(task2.startTime)
-  //   );
-  // });
+  $: sortedScheduledTasks = scheduledTasks.sort((task1, task2) => {
+    return (
+      pureNumericalHourForm(task1.startTime) -
+      pureNumericalHourForm(task2.startTime)
+    );
+  });
 
   onMount(async () => {
     // scrolling
@@ -117,14 +115,11 @@
 
   // computes the physical offset, within origin based on d1
   function computeOffsetGeneral({ d1, d2, pixelsPerMinute }) {
-    console.log("d1 =", d1)
-    console.log("d2 =", d2)
     const millisecsDifference = computeMillisecsDifference(d1, d2);
 
     // translate time difference to a physical distance
     const minutesDifference = millisecsDifference / (1000 * 60);
     const offset = minutesDifference * pixelsPerMinute;
-    console.log("offset =", offset)
     return offset;
   }
 
@@ -203,10 +198,7 @@
 
   function getJSDateFromTask (task) {
     const dateTimeString = task.startDateISO + 'T' + task.startTime
-    console.log('dateTimeSTring =', dateTimeString)
-    const result = new Date(dateTimeString)
-    console.log("result =", result)
-    return result 
+    return new Date(dateTimeString)
   }
 </script>
 
