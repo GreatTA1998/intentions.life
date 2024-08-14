@@ -482,6 +482,10 @@
       updateFirestoreDoc(`users/${$user.uid}`, {
         maxOrderValue: increment(3)
       })
+
+      // TO-DO: figure out why `newTaskObj` will not be shown on the UI
+      // but `newTaskObjChecked`will be. What specifically about the schema
+      // fixes it
       createOnLocalState({ createdNode: newTaskObjChecked })
     } catch (error) {
       console.log(error)
