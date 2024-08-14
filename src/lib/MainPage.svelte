@@ -56,9 +56,9 @@
   <div slot="navbar" class="top-navbar" class:transparent-glow-navbar={currentMode === 'Day'}>
     <GrandTreeTodoPopupButton let:setIsPopupOpen={setIsPopupOpen}
       on:new-root-task={(e) => createNewRootTask(e.detail)}
+      on:subtask-create={(e) => createSubtask(e.detail)}
       on:task-unscheduled={(e) => unscheduleTask(e)}
       on:task-click={(e) => openDetailedCard(e.detail)}
-      on:subtask-create={(e) => createSubtask(e.detail)}
       on:task-dragged={(e) => changeTaskDeadline(e.detail)}
       on:task-checkbox-change={(e) => updateTaskNode({ id: e.detail.id, keyValueChanges: { isDone: e.detail.isDone }})}
     > 
@@ -182,7 +182,6 @@
           on:task-unscheduled={(e) => putTaskToThisWeekTodo(e)}
           on:task-click={(e) => openDetailedCard(e.detail)}
           on:subtask-create={(e) => createSubtask(e.detail)}
-          on:task-dragged={(e) => changeTaskDeadline(e.detail)}
           on:task-checkbox-change={(e) => updateTaskNode({ id: e.detail.id, keyValueChanges: { isDone: e.detail.isDone }})}
         />
       </div>
@@ -268,13 +267,24 @@
   import { getAuth, signOut } from 'firebase/auth'
   import db from '/src/db.js'
   import { doc, collection, getFirestore, updateDoc, arrayUnion, onSnapshot, arrayRemove, increment } from 'firebase/firestore'
-  import { setFirestoreDoc, updateFirestoreDoc, deleteFirestoreDoc, getFirestoreCollection } from '/src/crud.js'
+  import { 
+    setFirestoreDoc, 
+    updateFirestoreDoc, 
+    deleteFirestoreDoc, 
+    getFirestoreCollection,
+  } from '/src/crud.js'
   import NewThisWeekTodo from '$lib/NewThisWeekTodo.svelte'
   import { garbageCollectInvalidTasks, findActiveUsers } from '/src/scripts.js'
   import { deleteObject, getStorage, ref } from 'firebase/storage'
   import Tasks from '../back-end/Tasks'
   import { size, cushion } from '/src/helpers/constants.js'
   import { DateTime } from 'luxon'
+  import { 
+    newUpdateLocalState,
+    deleteFromLocalState,
+    buildCalendarDataStructures,
+    buildTodoDataStructures
+  } from '/src/helpers/maintainInvariant.js'
 
   let currentMode = 'Week' // weekMode hourMode monthMode
   const userDocPath = `users/${$user.uid}`
@@ -324,118 +334,12 @@
     // return
   })
 
-  function buildCalendarDataStructures () {
-    console.log("buildCalendarDataStructures()")
-    calendarMemoryTree.set(reconstructTreeInMemory($calendarTasks))
-    const dateToTasks = computeDateToTasksDict($calendarMemoryTree)
-    tasksScheduledOn.set(dateToTasks)
-  }
-
-  function buildTodoDataStructures () {
-    console.log("buildTodoDataStructures()")
-    const todoMemoryTree = reconstructTreeInMemory($todoTasks)
-    inclusiveWeekTodo.set(todoMemoryTree)
-  }
-
-  // FOR HANDLING A SINGLE NODE
-  function updateLocalState ({ id, keyValueChanges }) {
-    // search through the todo list memory tree
-
-    // search through the calendar memory tree
-    const updatedNode = search({ memoryTree: $calendarMemoryTree, id })
-    
-    // must do pointers rather than reassign it to a new object, mutation
-    // draw a pointer diagram to understand
-    for (const key of Object.keys(keyValueChanges)) {
-      updatedNode[key] = keyValueChanges[key]
-    }
-
-    // update it
-    // manually trigger reativity via reassignment
-    const dateToTasks = computeDateToTasksDict($calendarMemoryTree)
-    tasksScheduledOn.set(dateToTasks)
-  }
-
-  function newUpdateLocalState ({ id, keyValueChanges }) {
-    // find the task
-    let updatedTask = null
-    for (const task of $todoTasks) {
-      if (task.id === id) {
-        updatedTask = task 
-        continue
-      }
-    }
-    for (const task of $calendarTasks) {
-      if (task.id === id) {
-        updatedTask = task
-        continue
-      }
-    }
-
-    // compute what it'll be updated to
-    const newCopy = {...updatedTask}
-    for (const k in Object.keys(keyValueChanges)) {
-      newCopy[k] = keyValueChanges[k]
-    }
-
-    // for simplicity, delete it
-    if (updatedTask.startTimeISO) {
-      // delete it from `$calendarTasks`
-      for (let i = 0; i < $calendarTasks.length; i++) {
-        if ($calendarTasks[i].id === id) {
-          calendarTasks.set($calendarTasks.splice(i, 1))
-          console.log("deleted node =", $calendarTasks.splice(i, 1))
-        }
-      }
-    } else {
-      // delete it from `$todoTasks`
-      for (let i = 0; i < $todoTasks.length; i++) {
-        if ($todoTasks[i].id === id) {
-          todoTasks.set($todoTasks.splice(i, 1))
-          console.log("delete node =", $todoTasks.splice(i, 1))
-        }
-      }
-    }
-
-    // then add it (order doesn't matter, the later algorithms will rearrange it)
-    if (newCopy.startTimeISO) {
-      calendarTasks.set([...$calendarTasks, newCopy])
-      buildCalendarDataStructures()
-    } else {
-      todoTasks.set([...$todoTasks, newCopy])
-      buildTodoDataStructures()
-    } 
-  }
-
   function addToLocalState ({ createdNode }) {
     if (createdNode.startTimeISO) {
       calendarTasks.set([...$calendarTasks, createdNode])
       buildCalendarDataStructures()
     } else {
       todoTasks.set([...$todoTasks, createdNode])
-      buildTodoDataStructures()
-    }
-  }
-
-  function deleteFromLocalState ({ id }) {
-    if (createdNode.startTimeISO) {
-      // delete from calendarTasks
-      for (let i = 0; i < $todoTasks.length; i++) {
-        if ($calendarTasks[i].id === id) {
-          todoTasks.set($calendarTasks.splice(i, 1))
-          console.log("delete node =", $calendarTasks.splice(i, 1))
-        }
-      }
-
-      buildCalendarDataStructures()
-    } else {
-      // delete from todoTasks
-      for (let i = 0; i < $todoTasks.length; i++) {
-        if ($todoTasks[i].id === id) {
-          todoTasks.set($todoTasks.splice(i, 1))
-          console.log("delete node =", $todoTasks.splice(i, 1))
-        }
-      }
       buildTodoDataStructures()
     }
   }
@@ -593,14 +497,12 @@
     try {
       updateFirestoreDoc(tasksPath + id, keyValueChanges)
       // we purposely don't await, so the UI experience is much better
-      // without an unsettling delay.
-      // if it's a divergence in state we'll just throw an error (1% of the time)
+      // without an unsettling delay - if it's a divergence in state we'll just throw an error (0.01% chance)
       newUpdateLocalState({ id, keyValueChanges })
     } catch (error) {
+      console.log(error)
       alert('Database update failed, please reload')
     }
-    // update our state
-    // very useful for debugging
   }
 
   // THIS IS STILL NOT WORKING: THE ADOPTION IS NOT WORKING, RIGHT NOW ALL THE 
