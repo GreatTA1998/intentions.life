@@ -6,15 +6,12 @@ import {
   getDocs,
   collection,
   query,
-  where,
-  limit,
-  Timestamp,
 } from "firebase/firestore/lite";
+import { getStorage, ref, getDownloadURL } from "firebase/storage";
 
 const nesseryProperties = [
   "startTime",
   "notes",
-  "iconDataURL",
   "reusableTemplateID",
   "lastRanRepeatISO",
   "parentID",
@@ -26,32 +23,33 @@ const nesseryProperties = [
   "imageFullPath",
 ];
 
-const migrateUserDataToNewFormat = async (userID) => {
+// migrateUserDataToNewFormat("yGVJSutBrnS1156uopQQOBuwpMl2"); //Elton
+
+// migrateUserDataToNewFormat("6uIcMMsBEkQ85OINCDADtrygzZx1"); //Marius
+
+async function migrateUserDataToNewFormat(userID) {
   try {
     const q = query(collection(db, "users", userID, "tasks"));
     const querySnapshot = await getDocs(q);
     const tasksArray = querySnapshot.docs.map((doc) => doc.data());
     const IdArray = querySnapshot.docs.map((doc) => doc.id);
-    console.log("we got: ", tasksArray.length, IdArray.length);
-    const convertedArray = convert(tasksArray);
+    const convertedArray = await convert(tasksArray);
     return await updateDB(userID, convertedArray, IdArray);
   } catch (err) {
     console.error(err);
   }
-};
+}
 
-migrateUserDataToNewFormat("yGVJSutBrnS1156uopQQOBuwpMl2");
-
-// migrateUserDataToNewFormat("6uIcMMsBEkQ85OINCDADtrygzZx1")
-
-function convert(dataArray) {
+async function convert(dataArray) {
+  const iconMap = await buildIconUrlMap();
   const convertedArray = dataArray.map((task) => {
-    const newStartDate = {
+    const newStartDateAndIcon = {
       startDateISO: task.startDate
         ? `${task.startYYYY}-${task.startDate.split("/")[0]}-${
             task.startDate.split("/")[1]
           }`
         : "",
+      iconURL: iconMap[task.iconDataURL] ? iconMap[task.iconDataURL] : "",
     };
 
     const convertedTask = {
@@ -62,7 +60,7 @@ function convert(dataArray) {
         }),
         {}
       ),
-      ...newStartDate,
+      ...newStartDateAndIcon,
     };
     return convertedTask;
   });
@@ -73,7 +71,6 @@ const updateDB = async (userId, dataArray, idArray) => {
   try {
     const batch = writeBatch(db);
     idArray.map((id, i) => {
-      if (dataArray[i].iconDataURL) return;
       const docRef = doc(db, "users", userId, "tasks", id);
       batch.set(docRef, dataArray[i]);
     });
@@ -83,24 +80,20 @@ const updateDB = async (userId, dataArray, idArray) => {
   }
 };
 
-async function seedTasks() {
-  try {
-    console.time("seed");
-    const batch = writeBatch(db);
-    for (let i = 0; i < 3600; i++) {
-      const collectionRef = doc(
-        db,
-        "users",
-        "6uIcMMsBEkQ85OINCDADtrygzZx1",
-        "tasks",
-        ""
-      );
-      batch.update(collectionRef, buildRamdomTask());
-    }
-    await batch.commit();
-    console.timeEnd("seed");
-    return "";
-  } catch (e) {
-    console.log("erorr in seedTasks", e);
-  }
+async function buildIconUrlMap() {
+  const storage = getStorage();
+  const q = query(collection(db, "/doodleIcons"));
+  const querySnapshot = await getDocs(q);
+  const urlArray = await Promise.all(
+    querySnapshot.docs.map((doc) =>
+      getDownloadURL(
+        ref(storage, `gs://project-y-2a061.appspot.com/icons/${doc.id}.png`)
+      )
+    )
+  );
+  const iconMap = {};
+  querySnapshot.docs.map((doc, i) => {
+    iconMap[doc.data().dataURL] = urlArray[i];
+  });
+  return iconMap;
 }

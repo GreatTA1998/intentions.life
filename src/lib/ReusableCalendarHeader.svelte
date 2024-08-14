@@ -107,7 +107,7 @@
       {#key intForTriggeringRerender}
         {#if doodleIcons}
           <div style="display: flex; flex-wrap: wrap;">
-            {#each getScheduledTasks(ISODate).filter((task) => !task.startTime && task.iconDataURL) as iconTask}
+            {#each getScheduledTasks(ISODate).filter((task) => !task.startTime && task.iconURL) as iconTask}
               <FunctionalDoodleIcon
                 {iconTask}
                 on:task-click
@@ -117,7 +117,7 @@
           </div>
         {/if}
 
-        {#each getScheduledTasks(ISODate).filter((task) => !task.startTime && !task.iconDataURL) as flexibleDayTask}
+        {#each getScheduledTasks(ISODate).filter((task) => !task.startTime && !task.iconURL) as flexibleDayTask}
           <div
             on:click={() => dispatch("task-click", { task: flexibleDayTask })}
             style="width: var(--calendar-day-section-width); font-size: 12px; display: flex; gap: 4px; margin-top: 8px; margin-left: 4px; margin-right: 4px;"
