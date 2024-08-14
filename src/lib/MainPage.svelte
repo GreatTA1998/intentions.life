@@ -482,7 +482,7 @@
       updateFirestoreDoc(`users/${$user.uid}`, {
         maxOrderValue: increment(3)
       })
-      createOnLocalState({ createdNode: newTaskObj })
+      createOnLocalState({ createdNode: newTaskObjChecked })
     } catch (error) {
       console.log(error)
       alert('Database update failed, please reload')
