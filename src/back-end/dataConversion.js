@@ -22,6 +22,8 @@ const nesseryProperties = [
   "orderValue",
   "duration",
   "isDone",
+  "imageDownloadURL",
+  "imageFullPath",
 ];
 
 const migrateUserDataToNewFormat = async (userID) => {
@@ -38,9 +40,9 @@ const migrateUserDataToNewFormat = async (userID) => {
   }
 };
 
-migrateUserDataToNewFormat("yGVJSutBrnS1156uopQQOBuwpMl2").then(() =>
-  migrateUserDataToNewFormat("6uIcMMsBEkQ85OINCDADtrygzZx1")
-);
+migrateUserDataToNewFormat("yGVJSutBrnS1156uopQQOBuwpMl2");
+
+// migrateUserDataToNewFormat("6uIcMMsBEkQ85OINCDADtrygzZx1")
 
 function convert(dataArray) {
   const convertedArray = dataArray.map((task) => {
@@ -71,6 +73,7 @@ const updateDB = async (userId, dataArray, idArray) => {
   try {
     const batch = writeBatch(db);
     idArray.map((id, i) => {
+      if (dataArray[i].iconDataURL) return;
       const docRef = doc(db, "users", userId, "tasks", id);
       batch.set(docRef, dataArray[i]);
     });
