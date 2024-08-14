@@ -75,7 +75,7 @@
 
   taskObject.startDateISO.split('')
   let newStartMMDD = getMMDD(taskObject.startDateISO) || ''
-  let newStartYYYY = taskObject.startDateISO.split('-')[0] || ''
+  let newStartYYYY = getYYYY(taskObject)
 
   let newStartHHMM = taskObject.startTime || ''
 
@@ -83,6 +83,13 @@
   let newDuration 
 
   const dispatch = createEventDispatcher()
+  
+  function getYYYY (taskObject ) {
+    if (!taskObject.startDateISO) return ''
+    else {
+      taskObject.startDateISO.split('-')[0]
+    }
+  }
 
   function getMMDD (startDateISO) {
     const [yyyy, mm, dd] = startDateISO.split('-')

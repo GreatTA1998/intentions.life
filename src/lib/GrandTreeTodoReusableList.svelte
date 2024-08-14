@@ -169,6 +169,7 @@
     const d = new Date()
     d.setDate(d.getDate() + dueInHowManyDays - 1)
     const newRootTaskObj = {
+      startDateISO: '',
       deadlineDate: getDateInDDMMYYYY(d),
       deadlineTime: '23:59',
       id: getRandomID(),

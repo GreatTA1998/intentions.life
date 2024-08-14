@@ -70,8 +70,6 @@
   onMount(() => {
     const today = DateTime.now()
     const temp = buildDates(
-      // today.minus({ days: -180 }),
-      // 365
       today.minus({ days: size + cushion }), 
       2 * (size + cushion) + 1 // +1 means because today's date column counts as the midpoint and is an additional column
     )

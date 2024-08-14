@@ -15,7 +15,7 @@
 </div>
 
 <script>
-  import { newUpdateLocalState} from '/src/helpers/maintainInvariant.js'
+  import { updateLocalState } from '/src/helpers/maintainInvariant.js'
   import {
     breakParentRelationIfNecessary,
     maintainValidSubtreeDeadlines,
@@ -184,7 +184,7 @@
 
     batch.update(ref, betaUpdateObj) // updateObj
     await batch.commit()
-    newUpdateLocalState({ 
+    updateLocalState({ 
       id, 
       keyValueChanges: betaUpdateObj
     })

@@ -11,21 +11,21 @@ import {
   computeDateToTasksDict
 } from '/src/helpers/dataStructures.js'
 
-export function newUpdateLocalState ({ id, keyValueChanges }) {
+export function createOnLocalState ({ createdNode }) {
+  if (createdNode.startDateISO) {
+    calendarTasks.set([...get(calendarTasks), createdNode])
+    buildCalendarDataStructures()
+  } else {
+    todoTasks.set([...get(todoTasks), createdNode])
+    buildTodoDataStructures()
+  }
+}
+
+export function updateLocalState ({ id, keyValueChanges }) {
   // find the task
-  let updatedTask = null
-  for (const task of get(todoTasks)) {
-    if (task.id === id) {
-      updatedTask = task 
-      continue
-    }
-  }
-  for (const task of get(calendarTasks)) {
-    if (task.id === id) {
-      updatedTask = task
-      continue
-    }
-  }
+  const a1 = get(todoTasks).filter(task => task.id === id)
+  const a2 = get(calendarTasks).filter(task => task.id === id)
+  const updatedTask = a1.length === 1 ? a1[0] : a2[0]
 
   // compute what it'll be updated to
   const copy = {...updatedTask}
@@ -67,7 +67,9 @@ export function deleteFromLocalState ({ id }) {
 }
 
 export function buildCalendarDataStructures () {
-  calendarMemoryTree.set(reconstructTreeInMemory(get(calendarTasks)))
+  calendarMemoryTree.set(
+    reconstructTreeInMemory(get(calendarTasks))
+  )
   const dateToTasks = computeDateToTasksDict(get(calendarMemoryTree))
   tasksScheduledOn.set(dateToTasks)
 }

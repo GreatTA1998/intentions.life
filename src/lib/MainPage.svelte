@@ -280,7 +280,8 @@
   import { size, cushion } from '/src/helpers/constants.js'
   import { DateTime } from 'luxon'
   import { 
-    newUpdateLocalState,
+    createOnLocalState,
+    updateLocalState,
     deleteFromLocalState,
     buildCalendarDataStructures,
     buildTodoDataStructures
@@ -333,16 +334,6 @@
     // garbageCollectInvalidTasks($user)
     // return
   })
-
-  function addToLocalState ({ createdNode }) {
-    if (createdNode.startTimeISO) {
-      calendarTasks.set([...$calendarTasks, createdNode])
-      buildCalendarDataStructures()
-    } else {
-      todoTasks.set([...$todoTasks, createdNode])
-      buildTodoDataStructures()
-    }
-  }
 
   function search ({ memoryTree, id }) {
     // memory tree is an array of tree nodes
@@ -481,16 +472,21 @@
 
   async function createTaskNode ({ id, newTaskObj }) {
     const newTaskObjChecked = checkTaskObjSchema(newTaskObj, $user)
-    setFirestoreDoc(tasksPath + id, newTaskObjChecked)
-
-    // this below operation is redundant because checkTaskObjSchema 
-    // will always update the `maxOrderValue` so it remains correct 
-    // not just for Create operations, but for updates and deletes 
-    updateFirestoreDoc(`users/${$user.uid}`, {
-      maxOrderValue: increment(3)
-    })
-
-    addToLocalState({ createdNode: newTaskObj })
+    
+    try {
+      setFirestoreDoc(tasksPath + id, newTaskObjChecked)
+      
+      // this below operation is redundant because checkTaskObjSchema 
+      // will always update the `maxOrderValue` so it remains correct 
+      // not just for Create operations, but for updates and deletes 
+      updateFirestoreDoc(`users/${$user.uid}`, {
+        maxOrderValue: increment(3)
+      })
+      createOnLocalState({ createdNode: newTaskObj })
+    } catch (error) {
+      console.log(error)
+      alert('Database update failed, please reload')
+    }
   }
 
   async function updateTaskNode ({ id, keyValueChanges }) {
@@ -498,7 +494,7 @@
       updateFirestoreDoc(tasksPath + id, keyValueChanges)
       // we purposely don't await, so the UI experience is much better
       // without an unsettling delay - if it's a divergence in state we'll just throw an error (0.01% chance)
-      newUpdateLocalState({ id, keyValueChanges })
+      updateLocalState({ id, keyValueChanges })
     } catch (error) {
       console.log(error)
       alert('Database update failed, please reload')
