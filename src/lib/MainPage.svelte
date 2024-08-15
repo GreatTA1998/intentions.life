@@ -188,18 +188,16 @@
       
       <!-- 2nd flex child -->
       <div id="the-only-scrollable-container" class="calendar-section-flex-child"> 
-        {#if $tasksScheduledOn}   
-          <CalendarThisWeek
-            {calStartDateClassObj}
-            on:calendar-shifted={(e) => incrementDateClassObj({ days: e.detail.days})}
-            on:new-root-task={(e) => createNewRootTask(e.detail)}
-            on:task-click={(e) => openDetailedCard(e.detail)}
-            on:task-update={(e) => updateTaskNode({ id: e.detail.id, keyValueChanges: e.detail.keyValueChanges })}
-            on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
-            on:task-dragged={(e) => changeTaskDeadline(e.detail)}
-            on:task-checkbox-change={(e) => updateTaskNode({ id: e.detail.id, keyValueChanges: { isDone: e.detail.isDone }})} 
-          /> 
-        {/if}
+        <CalendarThisWeek
+          {calStartDateClassObj}
+          on:calendar-shifted={(e) => incrementDateClassObj({ days: e.detail.days})}
+          on:new-root-task={(e) => createNewRootTask(e.detail)}
+          on:task-click={(e) => openDetailedCard(e.detail)}
+          on:task-update={(e) => updateTaskNode({ id: e.detail.id, keyValueChanges: e.detail.keyValueChanges })}
+          on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
+          on:task-dragged={(e) => changeTaskDeadline(e.detail)}
+          on:task-checkbox-change={(e) => updateTaskNode({ id: e.detail.id, keyValueChanges: { isDone: e.detail.isDone }})} 
+        /> 
       </div>
     <!-- END OF WEEK MODE SECTION -->
     
@@ -241,10 +239,8 @@
     tasksScheduledOn,
     inclusiveWeekTodo,
     hasInitialScrolled,
-    calendarMemoryTree,
     todoTasks,
-    calendarTasks,
-    daysToRender
+    calendarTasks
   } from '/src/store.js'
   import JournalPopup from '$lib/JournalPopup.svelte'
   import FinancePopup from '$lib/FinancePopup.svelte'
@@ -297,13 +293,10 @@
 
   let calStartDateClassObj = new Date()
   let currentJournalEntryMMDD = getDateOfToday()
-  let dateOfToday = getDateOfToday()
-
   let allTasks = null
   let futureScheduledTasks = [] // AF([])
 
   let clickedTask = {}
-  let isInitialFetch = true
   let unsub
 
   onMount(async () => {
@@ -365,13 +358,6 @@
       signOutOnFirebase();
       goto('/');
     }
-
-    // if (!$user.email && !$user.phoneNumber) {
-    //   signOutOnFirebase();
-    //   goto('/');
-    // } else {
-    //   setIsPopupOpen({ newVal: true })
-    // }
   }
 
   function signOutOnFirebase () {
@@ -772,6 +758,7 @@
   }
 
   .calendar-section-flex-child {
+    /* this is funnily enough to fix a patch of white between the header and the calendar column */
     background-color: var(--calendar-bg-color);
   }
 
@@ -784,7 +771,6 @@
     margin: auto;
   }
 
-  
   .ux-tab-item {
     box-sizing: border-box;
     height: 60px;

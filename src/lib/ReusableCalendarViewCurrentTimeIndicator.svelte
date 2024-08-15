@@ -31,7 +31,7 @@
           CurrentTimeIndicator.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' })
           hasInitialScrolled.set(true)
         }
-      }, 0) 
+      }, 1000) 
     }
 
     updateTimeIndicator() 
