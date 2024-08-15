@@ -1,7 +1,7 @@
 <div class="sign-in-button"
   on:click={signInWithGoogle}
 >
-  Create your calendar
+  Sign in
   <span class="material-symbols-outlined" style="font-size: 24px; margin-left: 4px;">
     arrow_right_alt
   </span>

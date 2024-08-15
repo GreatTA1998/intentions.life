@@ -27,11 +27,15 @@ export function updateLocalState ({ id, keyValueChanges }) {
   const a2 = get(calendarTasks).filter(task => task.id === id)
   const updatedTask = a1.length === 1 ? a1[0] : a2[0]
 
+  // console.log("old =", updatedTask)
+
   // compute what it'll be updated to
   const copy = {...updatedTask}
   for (const [key, value] of Object.entries(keyValueChanges)) {
     copy[key] = value
   }
+
+  // console.log("new =", copy)
 
   // for simpler logic (even if inefficient) always delete the node
   if (updatedTask.startDateISO) {

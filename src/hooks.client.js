@@ -15,7 +15,7 @@ setTimeout(() => Sentry.init({
   
   // If you don't want to use Session Replay, just remove the line below:
   integrations: [replayIntegration()],
-}), 500)
+}), 0)
 
 // If you have a custom error handler, pass it to `handleErrorWithSentry`
 export const handleError = handleErrorWithSentry();

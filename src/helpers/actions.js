@@ -22,7 +22,7 @@ export function lazyCallable(node, callback) {
   );
 
   setTimeout(() => {
-    // console.log("mounting observer in the past");
     observer.observe(node);
   }, 1000);
+  // this 1 second delay means we don't trigger `fetchPastTasks()` if we scroll past it fast enough
 }

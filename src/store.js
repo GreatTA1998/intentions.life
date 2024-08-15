@@ -31,16 +31,13 @@ export const inclusiveWeekTodo = writable([])
 
 export const longHorizonTasks = writable([])
 
-export const tasksScheduledOn = writable({})
+export const tasksScheduledOn = writable(null)
 
 export const yPosWithinBlock = writable(0)
-
-export const leftMostDateForNewFetch = writable('')
-export const rightMostDateForNewFetch = writable('')
-
-export const isInitialRender = writable(false)
 
 export const calendarMemoryTree = writable(null)
 
 export const todoTasks = writable(null)
 export const calendarTasks = writable(null)
+
+export const daysToRender = writable([])

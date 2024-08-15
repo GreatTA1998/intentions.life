@@ -1,8 +1,87 @@
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<div
+  class="day-header sticky-day-of-week-abbreviation"
+  on:click|self={() => (isDirectlyCreatingTask = true)}
+  on:dragover={(e) => dragover_handler(e)}
+  on:drop={(e) => drop_handler(e, ISODate)}
+>
+  <div class="unselectable">
+    <div
+      class="center-flex day-name-label"
+      class:active-day-name={ISODate <= DateTime.now().toFormat('yyyy-MM-dd')}
+    >
+      {DateTime.fromISO(ISODate).toFormat("ccc")}
+    </div>
+
+    <div class="center-flex" style="font-size: 16px; font-weight: 300">
+      <div
+        class="center-flex"
+        style="padding: 8px; width: 48px; height: 36px;"
+        class:active-date-number={ISODate <= DateTime.now().toFormat('yyyy-MM-dd')}
+        class:highlighted-circle={false}
+      >
+        {DateTime.fromISO(ISODate).toFormat("dd")}
+      </div>
+    </div>
+  </div>
+
+  {#if isShowingDockingArea}
+    <div style="overflow: hidden; margin-top: 4px;">
+      {#if $tasksScheduledOn && doodleIcons}
+        {#if $tasksScheduledOn[ISODate]}
+          <div style="display: flex; flex-wrap: wrap;">
+            {#each $tasksScheduledOn[ISODate].noStartTime.hasIcon as iconTask}
+              <FunctionalDoodleIcon
+                {iconTask}
+                on:task-click
+                on:task-checkbox-change
+              />
+            {/each}
+          </div>
+        
+          {#each $tasksScheduledOn[ISODate].noStartTime.noIcon as flexibleDayTask}
+            <div
+              on:click={() => dispatch("task-click", { task: flexibleDayTask })}
+              style="width: var(--calendar-day-section-width); font-size: 12px; display: flex; gap: 4px; margin-top: 8px; margin-left: 4px; margin-right: 4px;"
+            >
+              <ReusableFlexibleDayTask
+                task={flexibleDayTask}
+                on:task-click
+                on:task-update
+                on:task-checkbox-change
+              />
+            </div>
+          {/each}
+        {/if}
+      {/if}
+    </div>
+  {/if}
+  <!-- END OF DOCKING AREA -->
+
+  {#if isDirectlyCreatingTask}
+    <div
+      id="calendar-direct-task-div"
+      style="
+        width: 90%; 
+        padding-left: 0px; 
+        padding-right: 0px;
+      "
+    >
+      <ReusableCreateTaskDirectly
+        newTaskStartTime={""}
+        resultantDateClassObject={DateTime.fromISO(ISODate).toJSDate()}
+        on:new-root-task
+        on:reset={() => (isDirectlyCreatingTask = false)}
+      />
+    </div>
+  {/if}
+</div>
+
 <script>
   import ReusableCreateTaskDirectly from "$lib/ReusableCreateTaskDirectly.svelte";
   import ReusableFlexibleDayTask from "$lib/ReusableFlexibleDayTask.svelte";
   import FunctionalDoodleIcon from "$lib/FunctionalDoodleIcon.svelte";
-  import { onMount, createEventDispatcher } from "svelte";
+  import { onMount, createEventDispatcher, afterUpdate } from "svelte";
   import { trace } from "../helpers/utils";
   import {
     tasksScheduledOn,
@@ -10,15 +89,10 @@
     whatIsBeingDragged,
     whatIsBeingDraggedID,
   } from "/src/store.js";
-  import {
-    computeDayDifference,
-    getDateInDDMMYYYY,
-    getDateInMMDD,
-  } from "/src/helpers.js";
   import { getFirestoreCollection } from "/src/crud.js";
   import { DateTime } from "luxon";
-  export let ISODate;
-  export let intForTriggeringRerender;
+
+  export let ISODate
   export let isShowingDockingArea;
 
   let doodleIcons = null;
@@ -54,105 +128,7 @@
     whatIsBeingDraggedID.set("");
     whatIsBeingDragged.set("");
   }
-
-  function getScheduledTasks(ISODate) {
-    return $tasksScheduledOn[ISODate] || []; // `tasksScheduledOn` will only use
-  }
-
-  // dd-mm-yyyy format
-  function getSimpleISOFromDateClassObj(d) {
-    let dd = d.getDate();
-    let mm = d.getMonth() + 1;
-    let yyyy = d.getFullYear();
-
-    if (dd < 10) dd = "0" + dd;
-    if (mm < 10) mm = "0" + mm;
-    return dd + "-" + mm + "-" + yyyy;
-  }
-
-  function isFuture(dateClassObj) {
-    return 0 < computeDayDifference(new Date(), dateClassObj); // dayDiff := d2 - d1
-  }
 </script>
-
-<!-- svelte-ignore a11y-click-events-have-key-events -->
-<div
-  class="day-header sticky-day-of-week-abbreviation"
-  on:click|self={() => (isDirectlyCreatingTask = true)}
-  on:dragover={(e) => dragover_handler(e)}
-  on:drop={(e) => drop_handler(e, ISODate)}
->
-  <div class="unselectable">
-    <div
-      class="center-flex day-name-label"
-      class:active-day-name={ISODate <= DateTime.now().toFormat('yyyy-MM-dd')}
-    >
-      {DateTime.fromISO(ISODate).toFormat("ccc")}
-    </div>
-
-    <div class="center-flex" style="font-size: 16px; font-weight: 300">
-      <div
-        class="center-flex"
-        style="padding: 8px; width: 48px; height: 36px;"
-        class:active-date-number={ISODate <= DateTime.now().toFormat('yyyy-MM-dd')}
-        class:highlighted-circle={false}
-      >
-        {DateTime.fromISO(ISODate).toFormat("dd")}
-      </div>
-    </div>
-  </div>
-
-  {#if isShowingDockingArea}
-    <div style="overflow: hidden; margin-top: 4px;">
-      {#key intForTriggeringRerender}
-        {#if doodleIcons}
-          <div style="display: flex; flex-wrap: wrap;">
-            {#each getScheduledTasks(ISODate).filter((task) => !task.startTime && task.iconURL) as iconTask}
-              <FunctionalDoodleIcon
-                {iconTask}
-                on:task-click
-                on:task-checkbox-change
-              />
-            {/each}
-          </div>
-        {/if}
-
-        {#each getScheduledTasks(ISODate).filter((task) => !task.startTime && !task.iconURL) as flexibleDayTask}
-          <div
-            on:click={() => dispatch("task-click", { task: flexibleDayTask })}
-            style="width: var(--calendar-day-section-width); font-size: 12px; display: flex; gap: 4px; margin-top: 8px; margin-left: 4px; margin-right: 4px;"
-          >
-            <ReusableFlexibleDayTask
-              task={flexibleDayTask}
-              on:task-click
-              on:task-update
-              on:task-checkbox-change
-            />
-          </div>
-        {/each}
-      {/key}
-    </div>
-  {/if}
-  <!-- END OF DOCKING AREA -->
-
-  {#if isDirectlyCreatingTask}
-    <div
-      id="calendar-direct-task-div"
-      style="
-        width: 90%; 
-        padding-left: 0px; 
-        padding-right: 0px;
-      "
-    >
-      <ReusableCreateTaskDirectly
-        newTaskStartTime={""}
-        resultantDateClassObject={dateClassObj}
-        on:new-root-task
-        on:reset={() => (isDirectlyCreatingTask = false)}
-      />
-    </div>
-  {/if}
-</div>
 
 <style>
   .day-header {

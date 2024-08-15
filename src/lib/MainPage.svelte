@@ -243,7 +243,8 @@
     hasInitialScrolled,
     calendarMemoryTree,
     todoTasks,
-    calendarTasks
+    calendarTasks,
+    daysToRender
   } from '/src/store.js'
   import JournalPopup from '$lib/JournalPopup.svelte'
   import FinancePopup from '$lib/FinancePopup.svelte'
@@ -358,14 +359,6 @@
     }
   }
 
-  // FOR HANDLING A WEEK WORTH OF NEW TASKS
-  // NOTE: by definition of these tasks being located on a different week, this will not 
-  // affect the existing dates and their task trees
-  function incorporateNewWeekIntoCalendarTree (newWeekTasksArray) {
-    const newWeekMemoryTree = reconstructTreeInMemory(newWeekTasksArray) 
-    const newSection = computeDateToTasksDict(newWeekMemoryTree)
-    tasksScheduledOn.set({ ...$tasksScheduledOn, ...newSection })
-  }
 
   function handleLogoClick (setIsPopupOpen) {
     if (confirm('Log out and return to home page tutorials?')) {
