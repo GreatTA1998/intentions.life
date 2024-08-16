@@ -40,7 +40,7 @@
       />
     </div>
 
-   <div class="task-name truncate-to-one-line" style="font-size: 12px;">
+   <div class="task-name truncate-to-one-line" style="font-size: 12px; margin-left: 4px;">
      {task.name}
    </div>
  </div>
