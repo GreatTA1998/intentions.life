@@ -25,14 +25,6 @@
   />
 {/if}
 
-{#if isFinancePopupOpen}
-  <FinancePopup
-    isOpen={isFinancePopupOpen}
-    on:card-close={() => isFinancePopupOpen = false}
-  />
-{/if}
-
-
 <!-- UNDO COMPLETED SNACKBAR -->
 {#if $mostRecentlyCompletedTaskID}
   <TheSnackbar on:undo-task-completion={() => {
@@ -236,14 +228,10 @@
     allTasksDueThisYear,
     allTasksDueThisLife,
     longHorizonTasks,
-    tasksScheduledOn,
     inclusiveWeekTodo,
-    hasInitialScrolled,
-    todoTasks,
-    calendarTasks
+    hasInitialScrolled
   } from '/src/store.js'
   import JournalPopup from '$lib/JournalPopup.svelte'
-  import FinancePopup from '$lib/FinancePopup.svelte'
   import BedtimePopupMaplestoryMusic from '$lib/BedtimePopupMaplestoryMusic.svelte'
   import TheSnackbar from '$lib/TheSnackbar.svelte'
   import CalendarThisWeek from '$lib/CalendarThisWeek.svelte'
@@ -252,7 +240,6 @@
   import PopupCustomerSupport from '$lib/PopupCustomerSupport.svelte'
   import NavbarAndContentWrapper from '$lib/NavbarAndContentWrapper.svelte'
   import DetailedCardPopup from '$lib/DetailedCardPopup.svelte'
-  import YearView from '$lib/YearView.svelte'
   import ZenJournal from '$lib/ZenJournal.svelte'
   import ZenJournalLeftNavigation from '$lib/ZenJournaLeftNavigation.svelte'
   import ManageReusableTasks from '$lib/ManageReusableTasks.svelte'
@@ -287,7 +274,6 @@
   let currentMode = 'Week' // weekMode hourMode monthMode
   const userDocPath = `users/${$user.uid}`
 
-  let isFinancePopupOpen = false
   let isDetailedCardOpen = false
   let isJournalPopupOpen = false
 
