@@ -4,7 +4,7 @@ import {
   createFirestoreQuery, 
   getFirestoreQuery, 
   updateFirestoreDoc 
-} from '/src/helpers/crud.js'
+} from '/src/crud.js'
 import { 
   getRandomID, 
   checkTaskObjSchema,  
@@ -13,7 +13,7 @@ import {
   mod,
   twoDigits,
   getDateInMMDD,
-} from '/src/helpers/everythingElse.js'
+} from '/src/helpers.js'
 
 // repeatOnDaysOfMonth: [0, 0, 0, 1, ... 0, 1]
 export function createNewInstancesOfWeeklyRepeatingTasks ({ weeklyTemplate, userDoc }) {

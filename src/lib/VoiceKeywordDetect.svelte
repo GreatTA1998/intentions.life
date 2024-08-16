@@ -9,7 +9,7 @@
 
 <script>
   import { onMount, createEventDispatcher } from 'svelte'
-  import { twoDigits } from '/src/helpers/everythingElse.js'
+  import { twoDigits } from '/src/helpers.js'
 
   let outputDiv
   const dispatch = createEventDispatcher()

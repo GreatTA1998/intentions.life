@@ -87,7 +87,7 @@ import RecursiveBulletPoint from '$lib/RecursiveBulletPoint.svelte'
 import { 
   convertDDMMYYYYToDateClassObject,
   clickOutside, 
-} from '/src/helpers/everythingElse.js'
+} from '/src/helpers.js'
 import UXFormTextArea from '$lib/UXFormTextArea.svelte'
 import ReusableRoundButton from '$lib/ReusableRoundButton.svelte'
 import ReusableCheckbox from '$lib/ReusableCheckbox.svelte'

@@ -1,4 +1,4 @@
-import { setFirestoreDoc, updateFirestoreDoc } from '/src/helpers/crud.js'
+import { setFirestoreDoc, updateFirestoreDoc } from '/src/crud.js'
 
 export function checkTaskObjSchema (task, userDoc) {
   const output = {...task}

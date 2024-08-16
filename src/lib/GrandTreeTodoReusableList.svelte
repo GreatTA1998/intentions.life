@@ -99,7 +99,7 @@
     getRandomID,
     sortByUnscheduledThenByOrderValue,
     convertDDMMYYYYToDateClassObject
-  } from '/src/helpers/everythingElse.js'
+  } from '/src/helpers.js'
   import UXFormField from '$lib/UXFormField.svelte'
   import ReusableHelperDropzone from '$lib/ReusableHelperDropzone.svelte'
   import RecursiveTaskElement from '$lib/RecursiveTaskElement.svelte'
@@ -169,7 +169,6 @@
     const d = new Date()
     d.setDate(d.getDate() + dueInHowManyDays - 1)
     const newRootTaskObj = {
-      startDateISO: '',
       deadlineDate: getDateInDDMMYYYY(d),
       deadlineTime: '23:59',
       id: getRandomID(),

@@ -49,7 +49,7 @@
 
 <script>
   import ReusableRoundButton from '$lib/ReusableRoundButton.svelte'
-  import { updateFirestoreDoc, getFirestoreCollection } from '/src/helpers/crud.js';
+  import { updateFirestoreDoc, getFirestoreCollection } from '/src/crud.js';
   import { user } from '/src/store.js'
   import { onMount } from 'svelte'
 

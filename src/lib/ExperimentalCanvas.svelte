@@ -8,9 +8,9 @@
 
 <script>
   import { onMount } from 'svelte'
-  import ExperimentalCanvasWhiteboard from '$lib/ExperimentalCanvasWhiteboard.svelte'
-  import { setFirestoreDoc } from '/src/helpers/crud.js'
-  import { getRandomID } from '/src/helpers/everythingElse.js'
+  import BasicWhiteboard from '$lib/BasicWhiteboard.svelte'
+  import { setFirestoreDoc } from '/src/crud.js'
+  import { getRandomID } from '/src/helpers.js'
   import { user } from '/src/store.js'
 
   function saveDoodleIconToDatabase (dataURL) {  

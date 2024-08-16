@@ -28,10 +28,10 @@
 <script>
   import { 
     getRandomID, 
-  } from '/src/helpers/everythingElse.js'
+  } from '/src/helpers.js'
   import { 
     setFirestoreDoc, 
-  } from '/src/helpers/crud.js'
+  } from '/src/crud.js'
   import { user } from '/src/store.js'
   import ReusableRoundButton from '$lib/ReusableRoundButton.svelte'
   import _ from 'lodash'

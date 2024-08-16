@@ -29,7 +29,7 @@
         </span>
       </div>
 
-      <ManageReusableTasksDurationStartTime
+      <ManageReusableTasksWeeklyPopupDurationStartTime
         {weeklyTemplate}
         on:weekly-template-update={(e) => updateWeeklyTemplate(e.detail)}
       />
@@ -82,7 +82,7 @@
   import { createNewInstancesOfWeeklyRepeatingTasks } from '/src/helpers/periodicRepeat.js'
   import PremiumPopup from '$lib/PremiumPopup.svelte'
   import PeriodicWeeklyModule from '$lib/PeriodicWeeklyModule.svelte'
-  import ManageReusableTasksDurationStartTime from '$lib/ManageReusableTasksDurationStartTime.svelte'
+  import ManageReusableTasksWeeklyPopupDurationStartTime from '$lib/ManageReusableTasksWeeklyPopupDurationStartTime.svelte'
   import { 
     getRandomID, 
     checkTaskObjSchema,  
@@ -90,14 +90,14 @@
     computeDayDifference, 
     mod,
     twoDigits
-  } from '/src/helpers/everythingElse.js'
+  } from '/src/helpers.js'
   import { 
     setFirestoreDoc, 
     deleteFirestoreDoc, 
     createFirestoreQuery, 
     getFirestoreQuery, 
     updateFirestoreDoc 
-  } from '/src/helpers/crud.js'
+  } from '/src/crud.js'
   import { user } from '/src/store.js'
   import { onMount, onDestroy } from 'svelte'
   import ExperimentalCanvas from '$lib/ExperimentalCanvas.svelte'

@@ -94,7 +94,7 @@
     setFirestoreDoc, 
     updateFirestoreDoc,
     deleteFirestoreDoc
-  } from "/src/helpers/crud.js"
+  } from "/src/crud.js"
   import { user } from '/src/store.js'
   import { onMount, onDestroy } from 'svelte'
   import { 
@@ -104,7 +104,7 @@
     arrayUnion,
     arrayRemove 
   } from 'firebase/firestore'
-  import { checkTaskObjSchema, getRandomID } from '/src/helpers/everythingElse.js'
+  import { checkTaskObjSchema, getRandomID } from '/src/helpers.js'
   import { reconstructTreeInMemory } from "/src/helpers/dataStructures.js"
   import RecursiveTaskElement from '$lib/RecursiveTaskElement.svelte'
   import ReusableHelperDropzone from '$lib/ReusableHelperDropzone.svelte'
