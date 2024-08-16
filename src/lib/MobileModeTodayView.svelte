@@ -75,7 +75,7 @@
   import { getTimeInHHMM, pureNumericalHourForm } from '/src/helpers/everythingElse.js'
   import { createEventDispatcher, onMount } from 'svelte'
   import { tasksScheduledOn } from '/src/store.js'
-  import { getFirestoreCollection } from '/src/crud.js'
+  import { getFirestoreCollection } from '/src/helpers/crud.js'
   import ReusableFlexibleDayTask from '$lib/ReusableFlexibleDayTask.svelte'
   import FunctionalDoodleIcon from '$lib/FunctionalDoodleIcon.svelte'
 

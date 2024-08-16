@@ -1,6 +1,6 @@
 <script>
   import { DateTime, Interval } from "luxon";
-  import { getFirestoreCollection } from "/src/crud.js";
+  import { getFirestoreCollection } from "/src/helpers/crud.js";
   import {
     computeMillisecsDifference,
     ensureTwoDigits,

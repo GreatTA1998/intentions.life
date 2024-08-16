@@ -4,7 +4,7 @@ import {
   createFirestoreQuery, 
   getFirestoreQuery, 
   updateFirestoreDoc 
-} from '/src/crud.js'
+} from '/src/helpers/crud.js'
 import { 
   getRandomID, 
   checkTaskObjSchema,  

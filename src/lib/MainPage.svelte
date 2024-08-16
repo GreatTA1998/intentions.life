@@ -221,7 +221,7 @@
     updateFirestoreDoc, 
     deleteFirestoreDoc, 
     getFirestoreCollection,
-  } from '/src/crud.js'
+  } from '/src/helpers/crud.js'
   import NewThisWeekTodo from '$lib/NewThisWeekTodo.svelte'
   import { garbageCollectInvalidTasks, findActiveUsers } from '/src/helpers/scripts.js'
   import { deleteObject, getStorage, ref } from 'firebase/storage'

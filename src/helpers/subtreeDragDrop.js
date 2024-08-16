@@ -1,4 +1,4 @@
-import { updateFirestoreDoc } from '/src/crud.js'
+import { updateFirestoreDoc } from '/src/helpers/crud.js'
 import { getFirestore, increment, writeBatch, doc } from 'firebase/firestore'
 import { 
   convertDDMMYYYYToDateClassObject, 

@@ -108,7 +108,7 @@
 <script>
   import { getFirestore, onSnapshot, collection, arrayUnion, arrayRemove } from 'firebase/firestore'
   import { getStorage, ref, deleteObject, uploadBytes, getDownloadURL } from "firebase/storage"
-  import { setFirestoreDoc, updateFirestoreDoc, deleteFirestoreDoc } from '/src/crud.js'
+  import { setFirestoreDoc, updateFirestoreDoc, deleteFirestoreDoc } from '/src/helpers/crud.js'
   import { 
     convertToISO8061,
     getRandomID, 

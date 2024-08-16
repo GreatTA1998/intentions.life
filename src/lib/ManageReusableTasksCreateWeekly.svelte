@@ -31,7 +31,7 @@
   } from '/src/helpers/everythingElse.js'
   import { 
     setFirestoreDoc, 
-  } from '/src/crud.js'
+  } from '/src/helpers/crud.js'
   import { user } from '/src/store.js'
   import ReusableRoundButton from '$lib/ReusableRoundButton.svelte'
   import _ from 'lodash'

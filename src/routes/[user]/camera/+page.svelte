@@ -47,7 +47,7 @@
 
 <script>
   import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage"
-  import { setFirestoreDoc } from '/src/crud.js'
+  import { setFirestoreDoc } from '/src/helpers/crud.js'
   import { getRandomID, checkTaskObjSchema, getDateInMMDD, getTimeInHHMM } from '/src/helpers/everythingElse.js'
   import { user } from '/src/store.js'
   import { goto } from '$app/navigation'

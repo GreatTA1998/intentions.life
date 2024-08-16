@@ -96,7 +96,7 @@
   import { MIKA_PIXELS_PER_HOUR } from "/src/helpers/everythingElse.js";
   import { onMount, afterUpdate } from "svelte";
   import { user, tasksScheduledOn, hasInitialScrolled } from "/src/store.js";
-  import { getFirestoreCollection } from "/src/crud.js";
+  import { getFirestoreCollection } from "/src/helpers/crud.js";
   import { lazyCallable } from "/src/helpers/actions.js";
   import Tasks from "../back-end/Tasks";
   import { DateTime } from "luxon";
