@@ -14,8 +14,8 @@
 
 <script>
   import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage"
-  import { updateFirestoreDoc } from '/src/crud.js'
-  import { getRandomID, checkTaskObjSchema, getDateInMMDD, getTimeInHHMM } from '/src/helpers.js'
+  import { updateFirestoreDoc } from '/src/helpers/crud.js'
+  import { getRandomID, checkTaskObjSchema, getDateInMMDD, getTimeInHHMM } from '/src/helpers/everythingElse.js'
   import { DateTime } from 'luxon'
   import { user } from '/src/store.js'
   import { updateLocalState } from '/src/helpers/maintainState.js'

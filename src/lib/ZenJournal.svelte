@@ -47,7 +47,7 @@
 />
 
 <script>
-  import { convertMMDDToReadableMonthDayForm, getDateInMMDD } from '/src/helpers.js'
+  import { convertMMDDToReadableMonthDayForm, getDateInMMDD } from '/src/helpers/everythingElse.js'
   import _ from 'lodash'
   import { onMount } from 'svelte'
   import { createEventDispatcher, afterUpdate } from 'svelte'

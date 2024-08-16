@@ -1,11 +1,11 @@
 <script>
   import { DateTime, Interval } from "luxon";
-  import { getFirestoreCollection } from "/src/crud.js";
+  import { getFirestoreCollection } from "/src/helpers/crud.js";
   import {
     computeMillisecsDifference,
     ensureTwoDigits,
     getHHMM,
-  } from "/src/helpers.js";
+  } from "/src/helpers/everythingElse.js";
   import ReusableTaskElement from "$lib/ReusableTaskElement.svelte";
   import ReusablePhotoTaskElement from "$lib/ReusablePhotoTaskElement.svelte";
   import ReusableIconTaskElement from "$lib/ReusableIconTaskElement.svelte";

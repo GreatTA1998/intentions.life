@@ -1,5 +1,5 @@
 import db from "./connection.js";
-import { getRandomID } from '/src/helpers.js'
+import { getRandomID } from '/src/helpers/everythingElse.js'
 import {
   doc,
   getDocs,

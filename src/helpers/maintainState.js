@@ -89,3 +89,27 @@ export function buildTodoDataStructures ({ flatArray }) {
     get(todoMemoryTree)
   )
 }
+
+// TREE TRAVERSAL: IN CASE YOU NEED IT FOR THE FUTURE
+function search ({ memoryTree, id }) {
+  // memory tree is an array of tree nodes
+  for (const rootNode of memoryTree) {
+    if (rootNode.id === id) return rootNode 
+    else {
+      for (const child of rootNode.children) {
+        const out = helper({ node: child, id })
+        if (out) return out
+      }
+    }
+  }
+}
+
+function helper ({ node, id }) {
+  if (node.id === id) return node 
+  else {
+    for (const child of node.children) {
+      const out = helper({ node: child, id })
+      if (out) return out
+    }
+  }
+}

@@ -24,7 +24,7 @@
     getRandomID,
     getDateInDDMMYYYY,
     getTimeInHHMM
-  } from '/src/helpers.js'
+  } from '/src/helpers/everythingElse.js'
   import { createEventDispatcher } from 'svelte'
 
   export let parentID

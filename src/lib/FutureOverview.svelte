@@ -59,7 +59,7 @@
 export let futureScheduledTasks 
 
 import { createEventDispatcher } from 'svelte'
-import { getDayOfWeek, convertMMDDToReadableMonthDayForm, pureNumericalHourForm } from '/src/helpers.js'
+import { getDayOfWeek, convertMMDDToReadableMonthDayForm, pureNumericalHourForm } from '/src/helpers/everythingElse.js'
 import ReusableFlexibleDayTask from '$lib/ReusableFlexibleDayTask.svelte'
 import FunctionalDoodleIcon from '$lib/FunctionalDoodleIcon.svelte'
 import { DateTime } from 'luxon'

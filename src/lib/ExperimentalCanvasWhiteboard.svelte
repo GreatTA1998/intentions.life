@@ -29,7 +29,7 @@
 
 <script>
   import { onMount, createEventDispatcher } from 'svelte'
-  import { getRandomColor } from '/src/helpers.js'
+  import { getRandomColor } from '/src/helpers/everythingElse.js'
 
   let colors = ['black', 'orange', 'red', 'lightblue', 'blue', 'green']
 
