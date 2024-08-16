@@ -35,19 +35,10 @@
 
 <NavbarAndContentWrapper>
   <div slot="navbar" class="top-navbar" class:transparent-glow-navbar={currentMode === 'Day'}>
-    <GrandTreeTodoPopupButton let:setIsPopupOpen={setIsPopupOpen}
-      on:new-root-task={(e) => createNewRootTask(e.detail)}
-      on:subtask-create={(e) => createSubtask(e.detail)}
-      on:task-unscheduled={(e) => unscheduleTask(e)}
-      on:task-click={(e) => openDetailedCard(e.detail)}
-      on:task-dragged={(e) => changeTaskDeadline(e.detail)}
-      on:task-checkbox-change={(e) => updateTaskNode({ id: e.detail.id, keyValueChanges: { isDone: e.detail.isDone }})}
-    > 
-      <img slot="button-slot" on:click={() => handleLogoClick()}
-        src="/trueoutput-square-nobg.png" 
-        style="width: 38px; height: 38px; margin-right: 6px; margin-left: -4px; cursor: pointer;"
-      >
-    </GrandTreeTodoPopupButton>
+    <img on:click={() => handleLogoClick()}
+      src="/trueoutput-square-nobg.png" 
+      style="width: 38px; height: 38px; margin-right: 6px; margin-left: -4px; cursor: pointer;"
+    >
 
     <div class="day-week-toggle-segment">
       <!-- quickfix so pressing home ALWAYS recalibrates you to today's region -->
@@ -202,29 +193,15 @@
     convertToISO8061
   } from '/src/helpers/everythingElse.js'
   import { 
-    computeYearViewTimelines, 
-    reconstructTreeInMemory,
-    computeDateToTasksDict,
-    computeTodoMemoryTrees
-  } from '/src/helpers/dataStructures.js'
-  import { 
     mostRecentlyCompletedTaskID, 
     user, 
     showSnackbar, 
-    allTasksDueToday,
-    allTasksDueThisWeek,
-    allTasksDueThisMonth,
-    allTasksDueThisYear,
-    allTasksDueThisLife,
-    longHorizonTasks,
-    inclusiveWeekTodo,
     hasInitialScrolled
   } from '/src/store.js'
   import BedtimePopupMaplestoryMusic from '$lib/BedtimePopupMaplestoryMusic.svelte'
   import TheSnackbar from '$lib/TheSnackbar.svelte'
   import CalendarThisWeek from '$lib/CalendarThisWeek.svelte'
   import BackgroundRainScene from '$lib/BackgroundRainScene.svelte'
-  import GrandTreeTodoPopupButton from '$lib/GrandTreeTodoPopupButton.svelte'
   import PopupCustomerSupport from '$lib/PopupCustomerSupport.svelte'
   import NavbarAndContentWrapper from '$lib/NavbarAndContentWrapper.svelte'
   import DetailedCardPopup from '$lib/DetailedCardPopup.svelte'
@@ -295,30 +272,6 @@
     // return
   })
 
-  function search ({ memoryTree, id }) {
-    // memory tree is an array of tree nodes
-    for (const rootNode of memoryTree) {
-      if (rootNode.id === id) return rootNode 
-      else {
-        for (const child of rootNode.children) {
-          const out = helper({ node: child, id })
-          if (out) return out
-        }
-      }
-    }
-  }
-
-  function helper ({ node, id }) {
-    if (node.id === id) return node 
-    else {
-      for (const child of node.children) {
-        const out = helper({ node: child, id })
-        if (out) return out
-      }
-    }
-  }
-
-
   function handleLogoClick (setIsPopupOpen) {
     if (confirm('Log out and return to home page tutorials?')) {
       signOutOnFirebase();
@@ -339,25 +292,6 @@
     // the parent needs to update its pointers
     updateTaskNode({ id: parentID, keyValueChanges: { children: arrayUnion(id)}})
     createTaskNode({ id, newTaskObj })
-  }
-
-  function computeDataStructuresFromAllTasks (allTasks) {
-    // future overview
-    collectFutureScheduledTasksToArray()
-
-    // grand tree todo
-    const todoMemoryTrees = computeTodoMemoryTrees(allTasks)
-    allTasksDueToday.set(todoMemoryTrees[0])
-    allTasksDueThisWeek.set(todoMemoryTrees[1])
-    allTasksDueThisMonth.set(todoMemoryTrees[2])
-    allTasksDueThisYear.set(todoMemoryTrees[3])
-    allTasksDueThisLife.set(todoMemoryTrees[4])
-
-    // simple week todo
-    inclusiveWeekTodo.set(computeInclusiveWeekTodo(allTasks))
-
-    // year timeline view
-    longHorizonTasks.set(computeYearViewTimelines(allTasks))
   }
 
   onDestroy(() => {
@@ -492,9 +426,6 @@
     updateDoc(doc(db, userDocPath), {
       willMusicAutoplay: newVal
     }) 
-    // quickfix
-    // userDoc.willMusicAutoplay = newVal
-    // userDoc = userDoc
   }
 
   function updateJournalEntryTitle ({ entryMMDD, newTitle }) {
@@ -512,13 +443,6 @@
     const offset = days * (24*60*60*1000)
     d.setTime(d.getTime() + offset)
     calStartDateClassObj = d // to manually trigger reactivity
-  }
-
-  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getDay
-  function getDayOfWeek (dateClassObj) {
-    // const today = new Date()
-    const options = { weekday: 'long' } // can be short for Mon. instead of Monday
-    return new Intl.DateTimeFormat('en-US', options).format(dateClassObj)
   }
 
   function changeJournal({ newJournal }) {
@@ -642,44 +566,6 @@
       startDate: '',
       deadlineDate: getDateInDDMMYYYY(d),
       deadlineTime: '07:00'
-    }})
-  }
-
-  // TO-DO: also refactor this
-  // unscheduling back to grand to-do
-  function transformToLifeTask (e) {
-    e.preventDefault()
-    // for backwards compatibility
-    let id
-    if (e.detail.id) {
-      id = e.detail.id
-    } else {
-      id = e.dataTransfer.getData('text/plain')
-    }
-    updateTaskNode({ id, keyValueChanges: {
-      startTime: '',
-      startDate: '',
-      deadlineDate: '',
-      deadlineTime: '',
-      parentID: '', // this is a quickfix, in the future handle data in This Life Todo properly
-      isDone: false
-    }})
-  }
-
-  // for tasks dragged into a todo-list
-  function unscheduleTask (e) {
-    e.preventDefault()
-    // for backwards compatibility
-    let id
-    if (e.detail.id) {
-      id = e.detail.id
-    } else {
-      id = e.dataTransfer.getData('text/plain')
-    }
-    updateTaskNode({ id, keyValueChanges: {
-      startTime: '',
-      startDate: '',
-      isDone: false
     }})
   }
 </script>
