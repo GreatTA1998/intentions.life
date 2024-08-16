@@ -95,7 +95,7 @@
   import ReusableCalendarColumn from "$lib/ReusableCalendarColumn.svelte";
   import { MIKA_PIXELS_PER_HOUR } from "/src/helpers.js";
   import { onMount, afterUpdate } from "svelte";
-  import { user, tasksScheduledOn } from "/src/store.js";
+  import { user, tasksScheduledOn, hasInitialScrolled } from "/src/store.js";
   import { getFirestoreCollection } from "/src/crud.js";
   import { lazyCallable } from "/src/helpers/actions.js";
   import Tasks from "../back-end/Tasks";
@@ -141,8 +141,16 @@
   })
 
   function handleIntersect (ISODate) {
-    fetchPastTasks(ISODate)
-    return true
+    // the initial intersection doesn't count
+    // the real intersection is when the app loads and autoscrolls to today's position
+    // then the user scrolls backwards to the past
+    if ($hasInitialScrolled) {
+      fetchPastTasks(ISODate)
+      return true // this boolean causes the observer to destroy itself after the callback
+    } 
+    else {
+      return false // this won't destroy the observer
+    }
   }
 
   function saveScrollPosition () {
