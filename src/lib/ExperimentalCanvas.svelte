@@ -8,7 +8,7 @@
 
 <script>
   import { onMount } from 'svelte'
-  import BasicWhiteboard from '$lib/BasicWhiteboard.svelte'
+  import ExperimentalCanvasWhiteboard from '$lib/ExperimentalCanvasWhiteboard.svelte'
   import { setFirestoreDoc } from '/src/crud.js'
   import { getRandomID } from '/src/helpers/everythingElse.js'
   import { user } from '/src/store.js'
