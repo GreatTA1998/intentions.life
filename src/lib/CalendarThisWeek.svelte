@@ -1,5 +1,5 @@
 <!-- This component was first planned on Svelte REPL: https://svelte.dev/repl/d42716f1cc2746ce949de01f0117419e?version=4.2.15 -->
-<div class="top-flexbox" style="border-bottom: 1px solid lightgrey;">
+<div class="top-flexbox" class:bottom-border={$tasksScheduledOn}>
   <div class="pinned-div">
     <div style="font-size: 16px; margin-top: var(--main-content-top-margin);">
       <div style="color: rgb(0, 0, 0); font-weight: 400;">
@@ -10,12 +10,14 @@
       </div>
     </div>
 
-    <span
-      on:click={toggleDockingArea}
-      class="collapse-arrow material-symbols-outlined"
-    >
-      {isShowingDockingArea ? "expand_less" : "expand_more"}
-    </span>
+    {#if $tasksScheduledOn}
+      <span
+        on:click={toggleDockingArea}
+        class="collapse-arrow material-symbols-outlined"
+      >
+        {isShowingDockingArea ? "expand_less" : "expand_more"}
+      </span>
+    {/if}
   </div>
 
   <div class="sticky-y-div flexbox">
@@ -292,5 +294,9 @@
     top: 0;
     z-index: 2;
     width: fit-content;
+  }
+
+  .bottom-border {
+    border-bottom: 1px solid lightgrey;
   }
 </style>
