@@ -14,25 +14,6 @@
   {/if}
 {/key}
 
-{#if isJournalPopupOpen}
-  <JournalPopup
-    goalsAndPosters={$user.goalsAndPosters}
-    isOpen={isJournalPopupOpen}
-    journal={$user.journal}
-    {userID}
-    on:card-close={() => isJournalPopupOpen = false}
-    on:journal-update={(e) => changeJournal(e.detail)}
-  />
-{/if}
-
-{#if isFinancePopupOpen}
-  <FinancePopup
-    isOpen={isFinancePopupOpen}
-    on:card-close={() => isFinancePopupOpen = false}
-  />
-{/if}
-
-
 <!-- UNDO COMPLETED SNACKBAR -->
 {#if $mostRecentlyCompletedTaskID}
   <TheSnackbar on:undo-task-completion={() => {
@@ -54,19 +35,10 @@
 
 <NavbarAndContentWrapper>
   <div slot="navbar" class="top-navbar" class:transparent-glow-navbar={currentMode === 'Day'}>
-    <GrandTreeTodoPopupButton let:setIsPopupOpen={setIsPopupOpen}
-      on:new-root-task={(e) => createNewRootTask(e.detail)}
-      on:task-unscheduled={(e) => unscheduleTask(e)}
-      on:task-click={(e) => openDetailedCard(e.detail)}
-      on:subtask-create={(e) => createSubtask(e.detail)}
-      on:task-dragged={(e) => changeTaskDeadline(e.detail)}
-      on:task-checkbox-change={(e) => updateTaskNode({ id: e.detail.id, keyValueChanges: { isDone: e.detail.isDone }})}
-    > 
-      <img slot="button-slot" on:click={() => handleLogoClick()}
-        src="/trueoutput-square-nobg.png" 
-        style="width: 38px; height: 38px; margin-right: 6px; margin-left: -4px; cursor: pointer;"
-      >
-    </GrandTreeTodoPopupButton>
+    <img on:click={() => handleLogoClick()}
+      src="/trueoutput-square-nobg.png" 
+      style="width: 38px; height: 38px; margin-right: 6px; margin-left: -4px; cursor: pointer;"
+    >
 
     <div class="day-week-toggle-segment">
       <!-- quickfix so pressing home ALWAYS recalibrates you to today's region -->
@@ -182,25 +154,22 @@
           on:task-unscheduled={(e) => putTaskToThisWeekTodo(e)}
           on:task-click={(e) => openDetailedCard(e.detail)}
           on:subtask-create={(e) => createSubtask(e.detail)}
-          on:task-dragged={(e) => changeTaskDeadline(e.detail)}
           on:task-checkbox-change={(e) => updateTaskNode({ id: e.detail.id, keyValueChanges: { isDone: e.detail.isDone }})}
         />
       </div>
       
       <!-- 2nd flex child -->
-      <div class="the-only-scrollable-container calendar-section-flex-child"> 
-        {#if allTasks}    
-          <CalendarThisWeek
-            {calStartDateClassObj}
-            on:calendar-shifted={(e) => incrementDateClassObj({ days: e.detail.days})}
-            on:new-root-task={(e) => createNewRootTask(e.detail)}
-            on:task-click={(e) => openDetailedCard(e.detail)}
-            on:task-update={(e) => updateTaskNode({ id: e.detail.id, keyValueChanges: e.detail.keyValueChanges })}
-            on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
-            on:task-dragged={(e) => changeTaskDeadline(e.detail)}
-            on:task-checkbox-change={(e) => updateTaskNode({ id: e.detail.id, keyValueChanges: { isDone: e.detail.isDone }})} 
-          /> 
-        {/if}
+      <div id="the-only-scrollable-container" class="calendar-section-flex-child"> 
+        <CalendarThisWeek
+          {calStartDateClassObj}
+          on:calendar-shifted={(e) => incrementDateClassObj({ days: e.detail.days})}
+          on:new-root-task={(e) => createNewRootTask(e.detail)}
+          on:task-click={(e) => openDetailedCard(e.detail)}
+          on:task-update={(e) => updateTaskNode({ id: e.detail.id, keyValueChanges: e.detail.keyValueChanges })}
+          on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
+          on:task-dragged={(e) => changeTaskDeadline(e.detail)}
+          on:task-checkbox-change={(e) => updateTaskNode({ id: e.detail.id, keyValueChanges: { isDone: e.detail.isDone }})} 
+        /> 
       </div>
     <!-- END OF WEEK MODE SECTION -->
     
@@ -222,39 +191,20 @@
     generateRepeatedTasks, 
     checkTaskObjSchema,
     convertToISO8061
-  } from '/src/helpers.js'
-  import { 
-    computeYearViewTimelines, 
-    reconstructTreeInMemory,
-    computeDateToTasksDict,
-    computeTodoMemoryTrees,
-    computeInclusiveWeekTodo
-  } from '/src/helpers/dataStructures.js'
+  } from '/src/helpers/everythingElse.js'
   import { 
     mostRecentlyCompletedTaskID, 
     user, 
     showSnackbar, 
-    allTasksDueToday,
-    allTasksDueThisWeek,
-    allTasksDueThisMonth,
-    allTasksDueThisYear,
-    allTasksDueThisLife,
-    longHorizonTasks,
-    tasksScheduledOn,
-    inclusiveWeekTodo,
     hasInitialScrolled
   } from '/src/store.js'
-  import JournalPopup from '$lib/JournalPopup.svelte'
-  import FinancePopup from '$lib/FinancePopup.svelte'
   import BedtimePopupMaplestoryMusic from '$lib/BedtimePopupMaplestoryMusic.svelte'
   import TheSnackbar from '$lib/TheSnackbar.svelte'
   import CalendarThisWeek from '$lib/CalendarThisWeek.svelte'
   import BackgroundRainScene from '$lib/BackgroundRainScene.svelte'
-  import GrandTreeTodoPopupButton from '$lib/GrandTreeTodoPopupButton.svelte'
   import PopupCustomerSupport from '$lib/PopupCustomerSupport.svelte'
   import NavbarAndContentWrapper from '$lib/NavbarAndContentWrapper.svelte'
   import DetailedCardPopup from '$lib/DetailedCardPopup.svelte'
-  import YearView from '$lib/YearView.svelte'
   import ZenJournal from '$lib/ZenJournal.svelte'
   import ZenJournalLeftNavigation from '$lib/ZenJournaLeftNavigation.svelte'
   import ManageReusableTasks from '$lib/ManageReusableTasks.svelte'
@@ -266,45 +216,67 @@
   import { getAuth, signOut } from 'firebase/auth'
   import db from '/src/db.js'
   import { doc, collection, getFirestore, updateDoc, arrayUnion, onSnapshot, arrayRemove, increment } from 'firebase/firestore'
-  import { setFirestoreDoc, updateFirestoreDoc, deleteFirestoreDoc, getFirestoreCollection } from '/src/crud.js'
+  import { 
+    setFirestoreDoc, 
+    updateFirestoreDoc, 
+    deleteFirestoreDoc, 
+    getFirestoreCollection,
+  } from '/src/helpers/crud.js'
   import NewThisWeekTodo from '$lib/NewThisWeekTodo.svelte'
-  import { garbageCollectInvalidTasks, findActiveUsers } from '/src/scripts.js'
+  import { garbageCollectInvalidTasks, findActiveUsers } from '/src/helpers/scripts.js'
   import { deleteObject, getStorage, ref } from 'firebase/storage'
-  
+  import Tasks from '../back-end/Tasks'
+  import { size, cushion } from '/src/helpers/constants.js'
+  import { DateTime } from 'luxon'
+  import { 
+    createOnLocalState,
+    updateLocalState,
+    deleteFromLocalState,
+    buildCalendarDataStructures,
+    buildTodoDataStructures
+  } from '/src/helpers/maintainState.js'
+
   let currentMode = 'Week' // weekMode hourMode monthMode
   const userDocPath = `users/${$user.uid}`
 
-  let isFinancePopupOpen = false
   let isDetailedCardOpen = false
-  let isJournalPopupOpen = false
 
   let calStartDateClassObj = new Date()
   let currentJournalEntryMMDD = getDateOfToday()
-  let dateOfToday = getDateOfToday()
-
   let allTasks = null
   let futureScheduledTasks = [] // AF([])
 
   let clickedTask = {}
-  let isInitialFetch = true
   let unsub
 
-  $: if (allTasks) {
-    computeDataStructuresFromAllTasks(allTasks)
-  }
+  onMount(async () => {
+    const today = DateTime.now()
+    const left = today.minus({ days: size + cushion })
+    const right = today.plus({ days: size + cushion })
+
+    Tasks.getByDateRange($user.uid, left.toFormat('yyyy-MM-dd'), right.toFormat('yyyy-MM-dd'))
+      .then(scheduledTasks => buildCalendarDataStructures({ flatArray: scheduledTasks }))
+
+    Tasks.getUnscheduled($user.uid)
+      .then(unscheduledTasks => buildTodoDataStructures({  flatArray: unscheduledTasks }))
+ 
+    //   TO-DO: fix repeating tasks not getting pre-generated on time
+    //   if (isInitialFetch) {
+    //     isInitialFetch = false
+    //     maintainPreviewWindowForPeriodicTasks()
+    //   }
+
+    // SCRIPTS
+    // findActiveUsers()
+    // garbageCollectInvalidTasks($user)
+    // return
+  })
 
   function handleLogoClick (setIsPopupOpen) {
     if (confirm('Log out and return to home page tutorials?')) {
       signOutOnFirebase();
       goto('/');
     }
-
-    // if (!$user.email && !$user.phoneNumber) {
-    //   signOutOnFirebase();
-    //   goto('/');
-    // } else {
-    //   setIsPopupOpen({ newVal: true })
-    // }
   }
 
   function signOutOnFirebase () {
@@ -321,50 +293,6 @@
     updateTaskNode({ id: parentID, keyValueChanges: { children: arrayUnion(id)}})
     createTaskNode({ id, newTaskObj })
   }
-
-  function computeDataStructuresFromAllTasks (allTasks) {
-    // future overview
-    collectFutureScheduledTasksToArray()
-
-    // grand tree todo
-    const todoMemoryTrees = computeTodoMemoryTrees(allTasks)
-    allTasksDueToday.set(todoMemoryTrees[0])
-    allTasksDueThisWeek.set(todoMemoryTrees[1])
-    allTasksDueThisMonth.set(todoMemoryTrees[2])
-    allTasksDueThisYear.set(todoMemoryTrees[3])
-    allTasksDueThisLife.set(todoMemoryTrees[4])
-
-    // simple week todo
-    inclusiveWeekTodo.set(computeInclusiveWeekTodo(allTasks))
-
-    // year timeline view
-    longHorizonTasks.set(computeYearViewTimelines(allTasks))
-  }
-
-  onMount(async () => {
-    // SCRIPTS
-    // findActiveUsers()
-    // garbageCollectInvalidTasks($user)
-    // return
-    const ref = collection(db, `/users/${$user.uid}/tasks`)
-    unsub = onSnapshot(ref, (querySnapshot) => {
-      const result = [] 
-      querySnapshot.forEach((doc) => {
-        result.push({ id: doc.id, ...doc.data()})
-      })
-
-      allTasks = reconstructTreeInMemory(result)
-
-      tasksScheduledOn.set(computeDateToTasksDict(allTasks))
-
-      // RE-WRITE / INTEGRATE THIS WHEN READY
-      if (isInitialFetch) {
-        isInitialFetch = false
-        maintainPreviewWindowForPeriodicTasks()
-      }
-    })
-    // can't use `return` in reactive expression https://github.com/sveltejs/svelte/issues/2828  
-  })
 
   onDestroy(() => {
     if (unsub) unsub()
@@ -423,19 +351,37 @@
 
   async function createTaskNode ({ id, newTaskObj }) {
     const newTaskObjChecked = checkTaskObjSchema(newTaskObj, $user)
-    setFirestoreDoc(tasksPath + id, newTaskObjChecked)
+    
+    try {
+      setFirestoreDoc(tasksPath + id, newTaskObjChecked)
+      
+      // this below operation is redundant because checkTaskObjSchema 
+      // will always update the `maxOrderValue` so it remains correct 
+      // not just for Create operations, but for updates and deletes 
+      updateFirestoreDoc(`users/${$user.uid}`, {
+        maxOrderValue: increment(3)
+      })
 
-    // this below operation is redundant because checkTaskObjSchema 
-    // will always update the `maxOrderValue` so it remains correct 
-    // not just for Create operations, but for updates and deletes 
-    updateFirestoreDoc(`users/${$user.uid}`, {
-      maxOrderValue: increment(3)
-    })
+      // TO-DO: figure out why `newTaskObj` will not be shown on the UI
+      // but `newTaskObjChecked`will be. What specifically about the schema
+      // fixes it
+      createOnLocalState({ createdNode: newTaskObjChecked })
+    } catch (error) {
+      console.log(error)
+      alert('Database update failed, please reload')
+    }
   }
 
-  function updateTaskNode ({ id, keyValueChanges }) {
-    updateFirestoreDoc(tasksPath + id, keyValueChanges)
-    // very useful for debugging
+  async function updateTaskNode ({ id, keyValueChanges }) {
+    try {
+      updateFirestoreDoc(tasksPath + id, keyValueChanges)
+      // we purposely don't await, so the UI experience is much better
+      // without an unsettling delay - if it's a divergence in state we'll just throw an error (0.01% chance)
+      updateLocalState({ id, keyValueChanges })
+    } catch (error) {
+      console.log(error)
+      alert('Database update failed, please reload')
+    }
   }
 
   // THIS IS STILL NOT WORKING: THE ADOPTION IS NOT WORKING, RIGHT NOW ALL THE 
@@ -471,6 +417,8 @@
 
     // now safely delete itself
     deleteFirestoreDoc(tasksPath + id)
+
+    deleteFromLocalState({ id })
   }
 
   function updateMusicAutoplay (e) {
@@ -478,9 +426,6 @@
     updateDoc(doc(db, userDocPath), {
       willMusicAutoplay: newVal
     }) 
-    // quickfix
-    // userDoc.willMusicAutoplay = newVal
-    // userDoc = userDoc
   }
 
   function updateJournalEntryTitle ({ entryMMDD, newTitle }) {
@@ -498,13 +443,6 @@
     const offset = days * (24*60*60*1000)
     d.setTime(d.getTime() + offset)
     calStartDateClassObj = d // to manually trigger reactivity
-  }
-
-  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getDay
-  function getDayOfWeek (dateClassObj) {
-    // const today = new Date()
-    const options = { weekday: 'long' } // can be short for Mon. instead of Monday
-    return new Intl.DateTimeFormat('en-US', options).format(dateClassObj)
   }
 
   function changeJournal({ newJournal }) {
@@ -583,10 +521,13 @@
   }
 
   async function changeTaskStartTime ({ id, timeOfDay, dateScheduled }) {
+    // get an ISO YYYY-MM-DD format
+    const yyyy = '2024' // TO-DO: change this by 2025
+    const [mm, dd] = dateScheduled.split('/')
+
     updateTaskNode({ id, keyValueChanges: {
       startTime: timeOfDay,
-      startDate: dateScheduled, 
-      startYYYY: new Date().getFullYear().toString()
+      startDateISO: yyyy + '-' + mm + '-' + dd
     }})
   }
 
@@ -627,44 +568,6 @@
       deadlineTime: '07:00'
     }})
   }
-
-  // TO-DO: also refactor this
-  // unscheduling back to grand to-do
-  function transformToLifeTask (e) {
-    e.preventDefault()
-    // for backwards compatibility
-    let id
-    if (e.detail.id) {
-      id = e.detail.id
-    } else {
-      id = e.dataTransfer.getData('text/plain')
-    }
-    updateTaskNode({ id, keyValueChanges: {
-      startTime: '',
-      startDate: '',
-      deadlineDate: '',
-      deadlineTime: '',
-      parentID: '', // this is a quickfix, in the future handle data in This Life Todo properly
-      isDone: false
-    }})
-  }
-
-  // for tasks dragged into a todo-list
-  function unscheduleTask (e) {
-    e.preventDefault()
-    // for backwards compatibility
-    let id
-    if (e.detail.id) {
-      id = e.detail.id
-    } else {
-      id = e.dataTransfer.getData('text/plain')
-    }
-    updateTaskNode({ id, keyValueChanges: {
-      startTime: '',
-      startDate: '',
-      isDone: false
-    }})
-  }
 </script>
 
 <style>  
@@ -701,12 +604,13 @@
     display: flex;
   }
 
-  .the-only-scrollable-container {
+  #the-only-scrollable-container {
     position: relative;
     overflow: auto; 
   }
 
   .calendar-section-flex-child {
+    /* this is funnily enough to fix a patch of white between the header and the calendar column */
     background-color: var(--calendar-bg-color);
   }
 
@@ -719,7 +623,6 @@
     margin: auto;
   }
 
-  
   .ux-tab-item {
     box-sizing: border-box;
     height: 60px;
@@ -797,7 +700,7 @@
   /* anything below this minimum tablet width is considered a phone */
   @media (max-width: 767.99px) {
     /* i.e. flatten all the scrolling onto one massive plane, instead of lots of separate scrolling contexts */
-    .the-only-scrollable-container {
+    #the-only-scrollable-container {
       overflow: visible;
     }
 

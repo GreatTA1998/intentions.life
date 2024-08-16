@@ -1,38 +1,68 @@
 <!-- This component was first planned on Svelte REPL: https://svelte.dev/repl/d42716f1cc2746ce949de01f0117419e?version=4.2.15 -->
-<div class="top-flexbox" style="border-bottom: 1px solid lightgrey;">
+<div class="top-flexbox" class:bottom-border={$tasksScheduledOn}>
   <div class="pinned-div">
     <div style="font-size: 16px; margin-top: var(--main-content-top-margin);">
       <div style="color: rgb(0, 0, 0); font-weight: 400;">
-        {calStartDateClassObj.toLocaleString('en-US', { month: 'short'})}
+        {calStartDateClassObj.toLocaleString("en-US", { month: "short" })}
       </div>
       <div style="font-weight: 200; margin-top: 2px;">
-        {calStartDateClassObj.toLocaleString('en-US', { year: 'numeric'})}
+        {calStartDateClassObj.toLocaleString("en-US", { year: "numeric" })}
       </div>
     </div>
-    <span on:click={toggleDockingArea} class="collapse-arrow material-symbols-outlined">
-      {isShowingDockingArea ? 'expand_less' : 'expand_more' }
-    </span>
+
+    {#if $tasksScheduledOn}
+      <span
+        on:click={toggleDockingArea}
+        class="collapse-arrow material-symbols-outlined"
+      >
+        {isShowingDockingArea ? "expand_less" : "expand_more"}
+      </span>
+    {/if}
   </div>
 
   <div class="sticky-y-div flexbox">
-    {#each dateClassObjects as dateClassObj}
-      <ReusableCalendarHeader
-        {dateClassObj}
-        {intForTriggeringRerender}
-        {isShowingDockingArea}
-        on:task-checkbox-change
-        on:task-scheduled  
-        on:new-root-task
-        on:task-click
-      />
+    {#each $daysToRender as ISODate, i (ISODate)}
+      {#if i === cushion}
+        <div use:lazyCallable={() => handleIntersect(ISODate)}>
+          <ReusableCalendarHeader
+            {ISODate}
+            {isShowingDockingArea}
+            on:task-checkbox-change
+            on:task-scheduled
+            on:new-root-task
+            on:task-click
+          />
+        </div>
+      {:else if i === $daysToRender.length - 1 - cushion}
+        <div use:lazyCallable={() => fetchNewWeekOfFutureTasks(ISODate)}>
+          <ReusableCalendarHeader
+            {ISODate}
+            {isShowingDockingArea}
+            on:task-checkbox-change
+            on:task-scheduled
+            on:new-root-task
+            on:task-click
+          />
+        </div>
+      {:else}
+        <ReusableCalendarHeader
+          {ISODate}
+          {isShowingDockingArea}
+          on:task-checkbox-change
+          on:task-scheduled
+          on:new-root-task
+          on:task-click
+        />
+      {/if}
     {/each}
   </div>
 </div>
 
 <div style="display: flex; width: fit-content;">
   <div class="x-sticky" style="margin-top: {timestampDivTopMargin}px;">
-    {#each timesOfDay as timestamp, i}
-      <div class="x-sticky timestamp-number" 
+    {#each timesOfDay as timestamp, i (i)}
+      <div
+        class="x-sticky timestamp-number"
         style="height: {MIKA_PIXELS_PER_HOUR}px; width: var(--timestamps-column-width);"
       >
         {timestamp.substring(0, 5)}
@@ -40,121 +70,171 @@
     {/each}
   </div>
 
-  {#each dateClassObjects as dateClassObj, i (dateClassObj.getTime())}
-   <!-- margin-left: 0.5vw;  -->
-   <div style="margin-top: {topMarginEqualizer}px;" class="unselectable">
-      <RenderlessMaryusState {dateClassObj} let:ourReactiveState={ourReactiveState}>
-        {#if timesOfDay.length !== 0}
-          <ReusableCalendarView
-            calendarBeginningDateClassObject={dateClassObj}
-            scheduledTasks={ourReactiveState}
-            timestamps={timesOfDay}
-            pixelsPerHour={MIKA_PIXELS_PER_HOUR}
-            timeBlockDurationInMinutes={60}
-            on:new-root-task
-            on:task-update
-            on:task-click
-            on:task-scheduled
-            on:task-checkbox-change
-          />
-        {/if}
-      </RenderlessMaryusState>
+  {#each $daysToRender as ISODate (ISODate)}
+    <div style="margin-top: {topMarginEqualizer}px;" class="unselectable">
+      {#if $tasksScheduledOn && timesOfDay.length !== 0}
+        <ReusableCalendarColumn
+          calendarBeginningDateClassObject={DateTime.fromISO(ISODate).toJSDate()}
+          scheduledTasks={$tasksScheduledOn[ISODate] ? $tasksScheduledOn[ISODate].hasStartTime : []}
+          timestamps={timesOfDay}
+          pixelsPerHour={MIKA_PIXELS_PER_HOUR}
+          timeBlockDurationInMinutes={60}
+          on:new-root-task
+          on:task-update
+          on:task-click
+          on:task-scheduled
+          on:task-checkbox-change
+        />
+      {/if}
     </div>
   {/each}
 </div>
 
 <script>
-  import ReusableCalendarHeader from '$lib/ReusableCalendarHeader.svelte'
-  import ReusableCalendarView from '$lib/ReusableCalendarView.svelte'
-  import { MIKA_PIXELS_PER_HOUR, getDateInMMDD, getDateInDDMMYYYY, computeDayDifference } from '/src/helpers.js'
-  import { onMount, createEventDispatcher } from 'svelte'
-  import { tasksScheduledOn } from '/src/store.js'
-  import { getFirestoreCollection } from '/src/crud.js'
-  import RenderlessMaryusState from '$lib/RenderlessMaryusState.svelte'
+  import ReusableCalendarHeader from "$lib/ReusableCalendarHeader.svelte";
+  import ReusableCalendarColumn from "$lib/ReusableCalendarColumn.svelte";
+  import { MIKA_PIXELS_PER_HOUR } from "/src/helpers/everythingElse.js";
+  import { onMount, afterUpdate } from "svelte";
+  import { user, tasksScheduledOn, hasInitialScrolled } from "/src/store.js";
+  import { getFirestoreCollection } from "/src/helpers/crud.js";
+  import { lazyCallable } from "/src/helpers/actions.js";
+  import Tasks from "../back-end/Tasks";
+  import { DateTime } from "luxon";
+  import { buildDates } from "../helpers/dataStructures";
+  import { size, cushion } from '/src/helpers/constants.js'
+  import BackgroundRainScene from "./BackgroundRainScene.svelte";
+  import { calendarTasks, daysToRender } from '/src/store.js'
+  import { buildCalendarDataStructures } from '/src/helpers/maintainState.js'
 
-  export let calStartDateClassObj
+  export let calStartDateClassObj;
 
-  let doodleIcons = null
+  let doodleIcons = null;
   // NOTE: timesOfDay should start from 00:00, so dateClassObjects also need to start from 00:00 military time
-  let timesOfDay = [] 
-  let numOfHourBlocksDisplayed = 24
-  let dateClassObjects = []
-  let intForTriggeringRerender = 0
+  let timesOfDay = [];
+  let numOfHourBlocksDisplayed = 24;
+  const topMarginEqualizer = 8 + timestampDivTopMargin; // to align with the timestamps that can't be displayed at negative margins
+  const timestampDivTopMargin = 24;
+  let isShowingDockingArea = true;
+  
+  let newScrollLeft = 0
+  let ScrollingParent
+  let hasFetchedNewPastTasks = false
 
-  const topMarginEqualizer = 8 + timestampDivTopMargin // to align with the timestamps that can't be displayed at negative margins
-  const timestampDivTopMargin = 24
-  let isShowingDockingArea = true
+  afterUpdate(() => {
+    if (ScrollingParent && hasFetchedNewPastTasks) {
+      ScrollingParent.scrollLeft = newScrollLeft
+      hasFetchedNewPastTasks = false
+    }
+  })
 
-  $: {
-    getDateClassObjects(calStartDateClassObj)
-  }
+  onMount(async () => {
+    const today = DateTime.now()
+    daysToRender.set(
+      buildDates(
+        today.minus({ days: size + cushion }), 
+        2 * (size + cushion) + 1 // +1 means because today's date column counts as the midpoint and is an additional column
+      )
+    )
 
-  $: if ($tasksScheduledOn) {
-    intForTriggeringRerender += 1
-  }
-
-  onMount(() => {
-    // Default start date is today, if left, you shift calStartDateClassObj
     getTimesOfDay()
-
     fetchDoodleIcons()
   })
 
-  function getScheduledTasks (dateClassObj) {
-    const simpleISO = getSimpleISOFromDateClassObj(dateClassObj)
-    return $tasksScheduledOn[simpleISO] || [] // `tasksScheduledOn` will only use
-  }
-
-  // dd-mm-yyyy format
-  function getSimpleISOFromDateClassObj (d) {
-    let dd = d.getDate()
-    let mm = d.getMonth() + 1
-    let yyyy = d.getFullYear()
-
-    if (dd < 10) dd = '0' + dd
-    if (mm < 10) mm = '0' + mm
-    return dd + '-' + mm + '-' + yyyy;
-  }
-
-  async function fetchDoodleIcons () {
-    const temp = await getFirestoreCollection('/doodleIcons')
-    doodleIcons = temp
-  }
-
-  function toggleDockingArea () {
-    isShowingDockingArea = !isShowingDockingArea
-  }
-
-  function getDateClassObjects (dateClassObj) {
-    const temp = []
-    let d = dateClassObj
-    for (let i = -7; i < 7; i++) {
-      const offset = i * (24*60*60*1000)
-      const copy = new Date()
-      copy.setTime(d.getTime() + offset)
-      // no longer start from 7 am, or else there will be missing hours
-      copy.setHours(0, 0, 0) // hours, minutes, seconds, note it's ZERO-indexed, 0-23, 0-59
-      temp.push(copy)
+  function handleIntersect (ISODate) {
+    // the initial intersection doesn't count
+    // the real intersection is when the app loads and autoscrolls to today's position
+    // then the user scrolls backwards to the past
+    if ($hasInitialScrolled) {
+      fetchPastTasks(ISODate)
+      return true // this boolean causes the observer to destroy itself after the callback
+    } 
+    else {
+      return false // this won't destroy the observer
     }
-    dateClassObjects = [...temp] // manually trigger reactivity)
   }
 
-  function getTimesOfDay () {
-    let currentHour = 0 // today.getHours() // get the integer i.e. 0 to 23
+  function saveScrollPosition () {
+    ScrollingParent = document.getElementById('the-only-scrollable-container')
+    if (ScrollingParent) {
+      const dayColumnWidth = 200
+      const correctionAmount = dayColumnWidth * (size + cushion)  
+ 
+      const oldScrollLeft = ScrollingParent.scrollLeft
+      newScrollLeft = correctionAmount + oldScrollLeft
+      hasFetchedNewPastTasks = true
+    }
+  }
+
+  async function fetchPastTasks(ISODate) {
+    const dt = DateTime.fromISO(ISODate)
+  
+    const right = dt.minus({ days: cushion + 1 })
+    const left = dt.minus({ days: cushion + size + cushion })
+
+    const newWeekTasksArray = await Tasks.getByDateRange(
+      $user.uid,
+      left.toISODate(), // '2024-07-31',
+      right.toISODate()
+    )
+
+    hasFetchedNewPastTasks = true
+
+    saveScrollPosition()
+
+    daysToRender.set(
+      [...buildDates(left, size + cushion), ...$daysToRender]
+    )
+
+    buildCalendarDataStructures({
+      flatArray: [...newWeekTasksArray, ...$calendarTasks]
+    })
+  }
+
+  async function fetchNewWeekOfFutureTasks(intersectedDate) {
+    const dt = DateTime.fromISO(intersectedDate);
+    const left = dt.plus({ days: cushion + 1 });
+    const right = left.plus({ days: size + cushion });
+    daysToRender.set(
+      [...$daysToRender, ...buildDates(left, size + cushion)]
+    )
+
+    // note each new loaded intervals should not be overlapping
+    const newWeekTasksArray = await Tasks.getByDateRange(
+      $user.uid,
+      left.toISODate(), 
+      right.toISODate() 
+    )
+
+    buildCalendarDataStructures({
+      flatArray: [...$calendarTasks, ...newWeekTasksArray]
+    })
+  }
+
+  async function fetchDoodleIcons() {
+    const temp = await getFirestoreCollection("/doodleIcons");
+    doodleIcons = temp;
+  }
+
+  function toggleDockingArea() {
+    isShowingDockingArea = !isShowingDockingArea;
+  }
+
+  function getTimesOfDay() {
+    let currentHour = 0; // today.getHours() // get the integer i.e. 0 to 23
     // now generate 16 hours of time (so it covers, for example, 8 am - midnight)
     for (let i = 0; i < numOfHourBlocksDisplayed; i++) {
       if (currentHour === 24) {
-        currentHour = 0
+        currentHour = 0;
       }
       if (currentHour < 10) {
-        timesOfDay.push('0' + currentHour + ':00')
+        timesOfDay.push("0" + currentHour + ":00");
       } else {
-        timesOfDay.push(currentHour + ':00')
+        timesOfDay.push(currentHour + ":00");
       }
 
-      currentHour += 1
+      currentHour += 1;
     }
-    timesOfDay = timesOfDay
+    timesOfDay = timesOfDay;
   }
 </script>
 
@@ -174,7 +254,7 @@
 
   .timestamp-number {
     padding-left: var(--calendar-left-padding);
-    color: #6D6D6D;
+    color: #6d6d6d;
 
     /* opaque, so that shifted calendar content will go "underneath" the timestamps */
     background-color: var(--calendar-bg-color);
@@ -199,7 +279,7 @@
     background-color: var(--calendar-bg-color);
     width: fit-content;
   }
-	
+
   .flexbox {
     display: flex;
   }
@@ -221,5 +301,9 @@
     top: 0;
     z-index: 2;
     width: fit-content;
+  }
+
+  .bottom-border {
+    border-bottom: 1px solid lightgrey;
   }
 </style>

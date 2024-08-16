@@ -1,7 +1,7 @@
 <div style="position: relative;">
   <img 
     on:click|stopPropagation={handleSingleOrDoubleClick}
-    src={iconTask.iconDataURL} 
+    src={iconTask.iconURL} 
     class:clearly-visible={iconTask.isDone}
     class:task-not-done={!iconTask.isDone}
     style="width: 32px; height: 32px; border: 0px solid blue; cursor: pointer;"

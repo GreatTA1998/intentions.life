@@ -1,4 +1,4 @@
-import { getFirestoreCollection, setFirestoreDoc, updateFirestoreDoc } from '/src/crud.js'
+import { getFirestoreCollection, setFirestoreDoc, updateFirestoreDoc } from '/src/helpers/crud.js'
 import { 
   createIndividualFirestoreDocForEachTaskInAllTasks, 
   applyFuncToEveryTreeNode, 
@@ -6,7 +6,7 @@ import {
   getDateInDDMMYYYY,
   getTimeInHHMM,
   helperFunction
-} from '/src/helpers.js'
+} from '/src/helpers/everythingElse.js'
 import { reconstructTreeInMemory} from '/src/helpers/dataStructures.js'
 
 

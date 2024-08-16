@@ -1,11 +1,11 @@
-import { updateFirestoreDoc } from '/src/crud.js'
+import { updateFirestoreDoc } from '/src/helpers/crud.js'
 import { getFirestore, increment, writeBatch, doc } from 'firebase/firestore'
 import { 
   convertDDMMYYYYToDateClassObject, 
   getDateInDDMMYYYY, 
   getTimeInHHMM,
   computeDayDifference
-} from '/src/helpers.js'
+} from '/src/helpers/everythingElse.js'
 import db from '/src/db.js'
 
 // break the parent relation only if necessary, so that the task can validly belong in the new todo list

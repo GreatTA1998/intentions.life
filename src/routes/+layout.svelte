@@ -28,7 +28,7 @@
   import { getAuth, onAuthStateChanged } from 'firebase/auth'
   import { getFirestore, doc, deleteDoc, getDoc, setDoc, updateDoc, increment, snapshotEqual, onSnapshot } from 'firebase/firestore'
   import { onDestroy, onMount } from 'svelte'
-  import { updateFirestoreDoc } from "/src/crud.js"
+  import { updateFirestoreDoc } from "/src/helpers/crud.js"
   import posthog from 'posthog-js'
 
   let unsubUserSnapListener = null

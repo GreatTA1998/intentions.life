@@ -168,7 +168,7 @@
     getRandomID, 
     getRandomColor,
     getTimeInHHMM,
-  } from '/src/helpers'
+  } from '/src/helpers/everythingElse.js'
   import { updateSubtreeDeadlineInMsElapsed } from '/src/helpers/dataStructures.js'
   import { createEventDispatcher, tick } from 'svelte'
   import { 

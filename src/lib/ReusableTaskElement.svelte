@@ -61,8 +61,8 @@
       </div>
     {/if}
 
-    {#if task.iconDataURL}
-      <img src={task.iconDataURL} style="pointer-events: none; width: 32px; height: 32px;">
+    {#if task.iconURL}
+      <img src={task.iconURL} style="pointer-events: none; width: 32px; height: 32px;">
     {:else}
       <div class="task-name truncate-to-one-line" style="color: {isBulletPoint ? '' : 'white'}">
         {task.name}
@@ -102,7 +102,7 @@
 <script>
   // Assumes `task` is hydrated
   import { createEventDispatcher } from 'svelte'
-  import { getTrueY } from '/src/helpers.js'
+  import { getTrueY } from '/src/helpers/everythingElse.js'
   import { yPosWithinBlock, whatIsBeingDragged, whatIsBeingDraggedID, whatIsBeingDraggedFullObj } from '/src/store.js'
   import ReusableCheckbox from '$lib/ReusableCheckbox.svelte'
 
