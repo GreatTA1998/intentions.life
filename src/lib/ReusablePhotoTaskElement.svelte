@@ -18,8 +18,7 @@
     opacity: {task.isDone ? '0.9' : '0.7'};
     background-color: {isBulletPoint ? '' : 'var(--experimental-black)'};
     background-image: url({hasIntersected ? task.imageDownloadURL : ''});
-    background-size: cover;
-    background-position: center;
+    background-size: contain;
     background-repeat: no-repeat;
     display: flex; flex-direction: column;
   " 
@@ -43,8 +42,8 @@
      </span>
    {/if}
 
-   {#if task.iconURL}
-     <img src={task.iconURL} style="pointer-events: none; width: 32px; height: 32px;">
+   {#if task.iconDataURL}
+     <img src={task.iconDataURL} style="pointer-events: none; width: 32px; height: 32px;">
    {:else}
       <div style="position: relative; width: 100%; padding-left: 6px; padding-top: 4px;">
         <div 
@@ -97,7 +96,7 @@
 <script>
  // Assumes `task` is hydrated
  import { createEventDispatcher } from 'svelte'
- import { getTrueY } from '/src/helpers/everythingElse.js'
+ import { getTrueY } from '/src/helpers.js'
  import { yPosWithinBlock, whatIsBeingDragged, whatIsBeingDraggedID, whatIsBeingDraggedFullObj } from '/src/store.js'
  import ReusableCheckbox from '$lib/ReusableCheckbox.svelte'
  import { lazyCallable } from '/src/helpers/actions.js'

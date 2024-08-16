@@ -47,7 +47,7 @@
 
 <script>
   import { showSnackbar } from '/src/store.js'
-  import { clickOutside } from '/src/helpers/everythingElse.js'
+  import { clickOutside } from '/src/helpers.js'
 
 
   let isPopupOpen = false

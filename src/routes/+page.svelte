@@ -130,6 +130,7 @@
   import { hasFetchedUser } from '/src/store.js'
   import { onMount } from 'svelte'
   import NavbarAndContentWrapper from '$lib/NavbarAndContentWrapper.svelte'
+  import PopupLogin from '$lib/PopupLogin.svelte'
   import { getAuth, signInAnonymously } from "firebase/auth"
   import { goto } from '$app/navigation'
 

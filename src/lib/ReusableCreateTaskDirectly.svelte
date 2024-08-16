@@ -37,11 +37,10 @@
 
 <script>
   import UXFormField from '$lib/UXFormField.svelte'
-  import { getFirestoreCollection } from '/src/helpers/crud.js'
-  import { getRandomID, getDateInMMDD, getHHMM } from '/src/helpers/everythingElse.js'
+  import { getFirestoreCollection } from '/src/crud.js'
+  import { getRandomID, getDateInMMDD, getHHMM } from '/src/helpers.js'
   import { user } from '/src/store.js'
   import { onMount, createEventDispatcher } from 'svelte'
-  import { DateTime } from 'luxon'
 
   export let resultantDateClassObject
   export let newTaskStartTime = '' // hh:mm format
@@ -86,8 +85,9 @@
     copy.id = getRandomID()
     copy.reusableTemplateID = taskObj.id
     copy.isDone = false
-    copy.startDateISO = DateTime.fromJSDate(resultantDateClassObject).toFormat('yyyy-MM-dd')
+    copy.startDate = getDateInMMDD(resultantDateClassObject)
     copy.startTime = newTaskStartTime
+    copy.startYYYY = resultantDateClassObject.getFullYear()
     dispatch('new-root-task', copy)
     dispatch('reset')
   }
@@ -98,8 +98,10 @@
       const newTaskObj = {
         id: getRandomID(),
         name: newTaskName,
-        startDateISO: DateTime.fromJSDate(resultantDateClassObject).toFormat('yyyy-MM-dd'),
-        startTime: newTaskStartTime
+        startDate: getDateInMMDD(resultantDateClassObject),
+        // deadlineDate: getDateInDDMMYYYY(resultantDateClassObject),
+        startTime: newTaskStartTime,
+        startYYYY: resultantDateClassObject.getFullYear()
       }
       dispatch('new-root-task', newTaskObj)
     }

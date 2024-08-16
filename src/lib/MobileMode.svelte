@@ -108,7 +108,7 @@
 <script>
   import { getFirestore, onSnapshot, collection, arrayUnion, arrayRemove } from 'firebase/firestore'
   import { getStorage, ref, deleteObject, uploadBytes, getDownloadURL } from "firebase/storage"
-  import { setFirestoreDoc, updateFirestoreDoc, deleteFirestoreDoc } from '/src/helpers/crud.js'
+  import { setFirestoreDoc, updateFirestoreDoc, deleteFirestoreDoc } from '/src/crud.js'
   import { 
     convertToISO8061,
     getRandomID, 
@@ -116,13 +116,14 @@
     getDateInDDMMYYYY,
     checkTaskObjSchema,
     sortByUnscheduledThenByOrderValue
-  } from '/src/helpers/everythingElse.js'
+  } from '/src/helpers.js'
   import { 
     user, 
     tasksScheduledOn,
     inclusiveWeekTodo
   } from '/src/store.js'
   import { 
+    computeInclusiveWeekTodo,
     reconstructTreeInMemory,
     computeDateToTasksDict
   } from '/src/helpers/dataStructures.js'
@@ -293,7 +294,7 @@
     collectFutureScheduledTasksToArray()
 
     // simple week todo
-    // inclusiveWeekTodo.set(computeInclusiveWeekTodo(allTasks))
+    inclusiveWeekTodo.set(computeInclusiveWeekTodo(allTasks))
   }
 
   // quick-fix for NaN/NaN bug

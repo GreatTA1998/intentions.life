@@ -15,13 +15,11 @@
 
 <script>
   import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage"
-  import { setFirestoreDoc } from '/src/helpers/crud.js'
-  import { getRandomID, checkTaskObjSchema, getDateInMMDD, getTimeInHHMM } from '/src/helpers/everythingElse.js'
+  import { setFirestoreDoc } from '/src/crud.js'
+  import { getRandomID, checkTaskObjSchema, getDateInMMDD, getTimeInHHMM } from '/src/helpers.js'
   import { user } from '/src/store.js'
   import { goto } from '$app/navigation'
   import { onMount } from 'svelte'
-  import { DateTime } from 'luxon'
-  import { createOnLocalState } from "/src/helpers/maintainState.js"
 
   const storage = getStorage()
 
@@ -92,17 +90,17 @@
       imageDownloadURL,
       imageFullPath: fullPath, // for easy garbage collection
       startTime: getTimeInHHMM({ dateClassObj }),
-      startDateISO: DateTime.fromJSDate(dateClassObj).toFormat('yyyy-MM-dd'),
+      startDate: getDateInMMDD(dateClassObj), // MMDD is a legacy function so doesn't use destructuring
+      startYYYY: `${dateClassObj.getFullYear()}`, // year needs to be a string for some reason
       duration: durationForFullDisplay,
       isDone: true // so the image isn't blurred
     }
     newTaskObj = checkTaskObjSchema(newTaskObj, $user)
 
-    setFirestoreDoc(
+    await setFirestoreDoc(
       `users/${$user.uid}/tasks/${id}`, 
       newTaskObj
     )  
-    createOnLocalState({ createdNode: newTaskObj })
   }
 </script>
 
