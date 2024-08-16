@@ -50,6 +50,45 @@ export function reconstructTreeInMemory (firestoreTaskDocs) {
   return output;
 }
 
+
+export function constructCalendarTrees (firestoreTaskDocs) {
+  const output = [];
+  const uniqueTaskIDs = new Set()
+
+  // first, do an O(n) operation, so we don't perform a O(n^2) operation constantly traversing trees
+  // build a dictionary that maps a task to its children ([] if no children)
+  const memo = { "": [] };
+  for (const taskDoc of firestoreTaskDocs) {
+    uniqueTaskIDs.add(taskDoc)
+
+    if (!memo[taskDoc.parentID]) memo[taskDoc.parentID] = [];
+    memo[taskDoc.parentID].push(taskDoc);
+
+    if (!memo[taskDoc.id]) memo[taskDoc.id] = [];
+  }
+
+  // now construct the recursive tree
+  for (const task of firestoreTaskDocs) {
+    const isRoot = memo[""].includes(task)
+
+    // sometimes the calendar belongs to a todo-parent, but the parent is
+    // not to be found within this calendar tree,
+    // so it's a detached subtree that will act as a root tree
+    const isAbandonedChild = task.parentID && !uniqueTaskIDs.has(task.parentID)
+    
+    if (isRoot || isAbandonedChild) {
+      recursivelyHydrateChildren({
+        node: task,
+        firestoreTaskDocs,
+        memo,
+        subtreeDeadlineInMsElapsed: Infinity,
+      });
+      output.push(task)
+    }
+  }
+  return output;
+}
+
 // rename to `maxDeadlineLimitInMs`: limits how far this node's deadline can be set
 function recursivelyHydrateChildren({
   node,

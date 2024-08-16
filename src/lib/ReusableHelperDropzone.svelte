@@ -183,14 +183,19 @@
     }
 
     batch.update(ref, betaUpdateObj) // updateObj
-    await batch.commit()
-    updateLocalState({ 
-      id, 
-      keyValueChanges: betaUpdateObj
-    })
 
-    whatIsBeingDraggedFullObj.set(null)
-    whatIsBeingDraggedID.set('')
-    whatIsBeingDragged.set('')
+
+    try {
+      batch.commit()
+      updateLocalState({ 
+        id, 
+        keyValueChanges: betaUpdateObj
+      })
+      whatIsBeingDraggedFullObj.set(null)
+      whatIsBeingDraggedID.set('')
+      whatIsBeingDragged.set('')
+    } catch (error) {
+      alert('Error updating, please reload the page')
+    }
   }
 </script>
