@@ -71,7 +71,7 @@
   {#each $daysToRender as ISODate (ISODate)}
     <div style="margin-top: {topMarginEqualizer}px;" class="unselectable">
       {#if $tasksScheduledOn && timesOfDay.length !== 0}
-        <ReusableCalendarView
+        <ReusableCalendarColumn
           calendarBeginningDateClassObject={DateTime.fromISO(ISODate).toJSDate()}
           scheduledTasks={$tasksScheduledOn[ISODate] ? $tasksScheduledOn[ISODate].hasStartTime : []}
           timestamps={timesOfDay}
@@ -90,7 +90,7 @@
 
 <script>
   import ReusableCalendarHeader from "$lib/ReusableCalendarHeader.svelte";
-  import ReusableCalendarView from "$lib/ReusableCalendarView.svelte";
+  import ReusableCalendarColumn from "$lib/ReusableCalendarColumn.svelte";
   import { MIKA_PIXELS_PER_HOUR } from "/src/helpers.js";
   import { onMount, afterUpdate } from "svelte";
   import { user, tasksScheduledOn } from "/src/store.js";

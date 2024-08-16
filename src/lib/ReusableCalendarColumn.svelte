@@ -19,7 +19,7 @@
     whatIsBeingDragged,
   } from "/src/store.js";
   import ReusableCreateTaskDirectly from "$lib/ReusableCreateTaskDirectly.svelte";
-  import ReusableCalendarViewCurrentTimeIndicator from "$lib/ReusableCalendarViewCurrentTimeIndicator.svelte"
+  import ReusableCalendarColumnTimeIndicator from "$lib/ReusableCalendarColumnTimeIndicator.svelte"
 
   export let scheduledTasks = [];
   export let timestamps = [];
@@ -263,7 +263,7 @@
       DateTime.fromJSDate(calendarBeginningDateClassObject).toFormat('yyyy-MM-dd')
       === DateTime.now().toFormat('yyyy-MM-dd')
     }
-      <ReusableCalendarViewCurrentTimeIndicator
+      <ReusableCalendarColumnTimeIndicator
         {pixelsPerMinute}
       />
     {/if}
