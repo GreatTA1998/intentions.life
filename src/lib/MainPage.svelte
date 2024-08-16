@@ -304,18 +304,11 @@
     const left = today.minus({ days: size + cushion })
     const right = today.plus({ days: size + cushion })
 
-    const scheduledTasks = await Tasks.getByDateRange(
-      $user.uid, 
-      left.toFormat('yyyy-MM-dd'), 
-      right.toFormat('yyyy-MM-dd')
-    )
-    calendarTasks.set(scheduledTasks)
-    buildCalendarDataStructures()
+    Tasks.getByDateRange($user.uid, left.toFormat('yyyy-MM-dd'), right.toFormat('yyyy-MM-dd'))
+      .then(scheduledTasks => buildCalendarDataStructures({ flatArray: scheduledTasks }))
 
-    ////  SEPARATE BUT SIMILAR PROCESS FOR THE TODO-LIST
-    const unscheduledTasks = await Tasks.getUnscheduled($user.uid)
-    todoTasks.set(unscheduledTasks)
-    buildTodoDataStructures()
+    Tasks.getUnscheduled($user.uid)
+      .then(unscheduledTasks => buildTodoDataStructures({  flatArray: unscheduledTasks }))
  
     //   TO-DO: fix repeating tasks not getting pre-generated on time
     //   if (isInitialFetch) {

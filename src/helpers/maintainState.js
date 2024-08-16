@@ -1,6 +1,6 @@
-// TO-DO: rename to "maintainState"
 import { 
   todoTasks, 
+  todoMemoryTree,
   calendarTasks,
   calendarMemoryTree,
   tasksScheduledOn,
@@ -15,69 +15,77 @@ import {
 
 export function createOnLocalState ({ createdNode }) {
   if (createdNode.startDateISO) {
-    calendarTasks.set([...get(calendarTasks), createdNode])
-    buildCalendarDataStructures()
+    buildCalendarDataStructures({
+      flatArray: [...get(calendarTasks), createdNode]
+    })
   } else {
-    todoTasks.set([...get(todoTasks), createdNode])
-    buildTodoDataStructures()
+    buildTodoDataStructures({
+      flatArray: [...get(todoTasks), createdNode]
+    })
   }
 }
 
 export function updateLocalState ({ id, keyValueChanges }) {
-  // find the task
+  // find the particular task
   const a1 = get(todoTasks).filter(task => task.id === id)
   const a2 = get(calendarTasks).filter(task => task.id === id)
-  const updatedTask = a1.length === 1 ? a1[0] : a2[0]
-
+  const oldNode = a1.length === 1 ? a1[0] : a2[0]
 
   // compute what it'll be updated to
-  const copy = {...updatedTask}
+  const newNode = {...oldNode}
   for (const [key, value] of Object.entries(keyValueChanges)) {
-    copy[key] = value
+    newNode[key] = value
   }
 
-  // for simpler logic (even if inefficient) always delete the node
-  if (updatedTask.startDateISO) {
-    calendarTasks.set(
-      get(calendarTasks).filter(task => task.id !== id)
-    )
-  } else {
-    todoTasks.set(
-      get(todoTasks).filter(task => task.id !== id)
-    )
-  }
+  // work with JS variables instead of Svelte stores
+  let calArr = get(calendarTasks)
+  let todoArr = get(todoTasks)
 
-  // then add it (order doesn't matter, the later algorithms will rearrange it)
-  if (copy.startDateISO) {
-    calendarTasks.set([...get(calendarTasks), copy])
-  } else {
-    todoTasks.set([...get(todoTasks), copy])
-  } 
+  // delete it from previous place
+  if (oldNode.startDateISO) calArr = calArr.filter(task => task.id !== id)
+  else todoArr = todoArr.filter(task => task.id !== id)
 
-  buildCalendarDataStructures()
-  buildTodoDataStructures()
+  // re-create it in new place (order doesn't matter, the tree algorithms will correct it)
+  if (newNode.startDateISO) calArr = [...calArr, newNode]
+  else todoArr = [...todoArr, newNode]
+
+  // rebuild both structures, so it's correct no matter which arrays changed/didn't change
+  buildCalendarDataStructures({
+    flatArray: calArr 
+  })
+  buildTodoDataStructures({ 
+    flatArray: todoArr 
+  })
 }
 
 export function deleteFromLocalState ({ id }) {
-  calendarTasks.set(
-    get(calendarTasks).filter(task => task.id !== id)
-  )
-  todoTasks.set(
-    get(todoTasks).filter(task => task.id !== id)
-  )
-  buildCalendarDataStructures()
-  buildTodoDataStructures()
+  buildCalendarDataStructures({
+    flatArray: get(calendarTasks).filter(task => task.id !== id)
+  })
+  buildTodoDataStructures({
+    flatArray: get(todoTasks).filter(task => task.id !== id)
+  })
 }
 
-export function buildCalendarDataStructures () {
+export function buildCalendarDataStructures ({ flatArray }) {
+  calendarTasks.set(flatArray)
   calendarMemoryTree.set(
     constructCalendarTrees(get(calendarTasks))
   )
-  const dateToTasks = computeDateToTasksDict(get(calendarMemoryTree))
+  const dateToTasks = computeDateToTasksDict(
+    get(calendarMemoryTree)
+  )
   tasksScheduledOn.set(dateToTasks)
 }
 
-export function buildTodoDataStructures () {
-  const todoMemoryTree = reconstructTreeInMemory(get(todoTasks))
-  inclusiveWeekTodo.set(todoMemoryTree)
+export function buildTodoDataStructures ({ flatArray }) {
+  todoTasks.set(flatArray)
+  todoMemoryTree.set(
+    reconstructTreeInMemory(
+      get(todoTasks)
+    )
+  )
+  inclusiveWeekTodo.set(
+    get(todoMemoryTree)
+  )
 }

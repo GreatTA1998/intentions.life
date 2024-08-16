@@ -165,11 +165,6 @@
     }
   }
 
-  function incorporateNewWeekIntoCalendarTree (newWeekTasksArray) {
-    calendarTasks.set([...$calendarTasks, ...newWeekTasksArray])    
-    buildCalendarDataStructures()
-  }
-
   async function fetchPastTasks(ISODate) {
     const dt = DateTime.fromISO(ISODate)
   
@@ -185,13 +180,14 @@
     hasFetchedNewPastTasks = true
 
     saveScrollPosition()
-    // from left
+
     daysToRender.set(
       [...buildDates(left, size + cushion), ...$daysToRender]
     )
 
-    // now update state
-    incorporateNewWeekIntoCalendarTree(newWeekTasksArray)
+    buildCalendarDataStructures({
+      flatArray: [...newWeekTasksArray, ...$calendarTasks]
+    })
   }
 
   async function fetchNewWeekOfFutureTasks(intersectedDate) {
@@ -208,7 +204,10 @@
       left.toISODate(), 
       right.toISODate() 
     )
-    incorporateNewWeekIntoCalendarTree(newWeekTasksArray);
+
+    buildCalendarDataStructures({
+      flatArray: [...$calendarTasks, ...newWeekTasksArray]
+    })
   }
 
   async function fetchDoodleIcons() {
