@@ -26,7 +26,7 @@
 import { createEventDispatcher, onMount, onDestroy, tick } from 'svelte'
 import _ from 'lodash'
 import RecursiveBulletPoint from './RecursiveBulletPoint.svelte';
-import { getDateOfToday, getRandomID, clickOutside } from '../helpers';
+import { getDateOfToday, getRandomID, clickOutside } from '../helpers/everythingElse';
 
 export let goalsAndPosters
 export let isOpen = false

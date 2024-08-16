@@ -44,7 +44,7 @@
 
 <script>
   import { createEventDispatcher } from 'svelte'
-  import { getTrueY, computeOffset } from '/src/helpers.js'
+  import { getTrueY, computeOffset } from '/src/helpers/everythingElse.js'
 
   export let pixelsPerHour
   export let task = null

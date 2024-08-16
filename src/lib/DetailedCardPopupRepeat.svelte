@@ -41,7 +41,7 @@
 </div>
 
 <script>
-  import { twoDigits, getRandomID, mod } from '/src/helpers.js'
+  import { twoDigits, getRandomID, mod } from '/src/helpers/everythingElse.js'
   import { createEventDispatcher } from 'svelte'
 
   export let taskObject

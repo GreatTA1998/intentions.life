@@ -26,7 +26,7 @@
   export let journalTitleFromMMDD 
   export let currentJournalEntryMMDD
 
-  import { getDateOfToday, getRandomID, clickOutside, convertMMDDToReadableMonthDayForm } from '/src/helpers.js'
+  import { getDateOfToday, getRandomID, clickOutside, convertMMDDToReadableMonthDayForm } from '/src/helpers/everythingElse.js'
   import { createEventDispatcher } from 'svelte'
 
   $: sortedJournalDates = [...Object.keys(journal)].sort()

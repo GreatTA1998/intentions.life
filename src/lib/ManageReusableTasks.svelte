@@ -175,7 +175,7 @@
   import { user } from '/src/store.js'
   import { collection, onSnapshot } from 'firebase/firestore'
   import db from '/src/db.js'
-  import { applyFuncToEveryTreeNode, round } from '/src/helpers.js'
+  import { applyFuncToEveryTreeNode, round } from '/src/helpers/everythingElse.js'
 
   export let allTasks // needed for TimeSpent dashboard
 

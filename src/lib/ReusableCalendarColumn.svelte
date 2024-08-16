@@ -5,7 +5,7 @@
     computeMillisecsDifference,
     ensureTwoDigits,
     getHHMM,
-  } from "/src/helpers.js";
+  } from "/src/helpers/everythingElse.js";
   import ReusableTaskElement from "$lib/ReusableTaskElement.svelte";
   import ReusablePhotoTaskElement from "$lib/ReusablePhotoTaskElement.svelte";
   import ReusableIconTaskElement from "$lib/ReusableIconTaskElement.svelte";

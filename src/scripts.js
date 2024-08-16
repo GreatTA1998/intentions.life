@@ -6,7 +6,7 @@ import {
   getDateInDDMMYYYY,
   getTimeInHHMM,
   helperFunction
-} from '/src/helpers.js'
+} from '/src/helpers/everythingElse.js'
 import { reconstructTreeInMemory} from '/src/helpers/dataStructures.js'
 
 

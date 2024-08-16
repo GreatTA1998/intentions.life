@@ -12,7 +12,7 @@
 
 <script>
   import { showSnackbar } from '/src/store.js'
-  import { clickOutside } from '/src/helpers.js'
+  import { clickOutside } from '/src/helpers/everythingElse.js'
   import PhoneLogin from '$lib/PhoneLogin.svelte'
 
 

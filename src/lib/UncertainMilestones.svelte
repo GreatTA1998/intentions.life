@@ -104,7 +104,7 @@
     arrayUnion,
     arrayRemove 
   } from 'firebase/firestore'
-  import { checkTaskObjSchema, getRandomID } from '/src/helpers.js'
+  import { checkTaskObjSchema, getRandomID } from '/src/helpers/everythingElse.js'
   import { reconstructTreeInMemory } from "/src/helpers/dataStructures.js"
   import RecursiveTaskElement from '$lib/RecursiveTaskElement.svelte'
   import ReusableHelperDropzone from '$lib/ReusableHelperDropzone.svelte'

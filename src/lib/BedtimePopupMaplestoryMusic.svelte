@@ -13,7 +13,7 @@
 <script>
   export let willMusicAutoplay
 
-  import { getRandomInt } from '/src/helpers.js'
+  import { getRandomInt } from '/src/helpers/everythingElse.js'
   import { onMount } from 'svelte'
 
   $: if (AudioElem) {

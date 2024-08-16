@@ -99,7 +99,7 @@
     getRandomID,
     sortByUnscheduledThenByOrderValue,
     convertDDMMYYYYToDateClassObject
-  } from '/src/helpers.js'
+  } from '/src/helpers/everythingElse.js'
   import UXFormField from '$lib/UXFormField.svelte'
   import ReusableHelperDropzone from '$lib/ReusableHelperDropzone.svelte'
   import RecursiveTaskElement from '$lib/RecursiveTaskElement.svelte'

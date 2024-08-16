@@ -72,7 +72,7 @@
 
 
 <script>
-  import { getTimeInHHMM, pureNumericalHourForm } from '/src/helpers.js'
+  import { getTimeInHHMM, pureNumericalHourForm } from '/src/helpers/everythingElse.js'
   import { createEventDispatcher, onMount } from 'svelte'
   import { tasksScheduledOn } from '/src/store.js'
   import { getFirestoreCollection } from '/src/crud.js'

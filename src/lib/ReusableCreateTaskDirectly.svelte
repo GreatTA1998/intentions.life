@@ -38,7 +38,7 @@
 <script>
   import UXFormField from '$lib/UXFormField.svelte'
   import { getFirestoreCollection } from '/src/crud.js'
-  import { getRandomID, getDateInMMDD, getHHMM } from '/src/helpers.js'
+  import { getRandomID, getDateInMMDD, getHHMM } from '/src/helpers/everythingElse.js'
   import { user } from '/src/store.js'
   import { onMount, createEventDispatcher } from 'svelte'
   import { DateTime } from 'luxon'

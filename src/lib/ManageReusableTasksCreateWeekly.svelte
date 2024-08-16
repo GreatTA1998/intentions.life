@@ -28,7 +28,7 @@
 <script>
   import { 
     getRandomID, 
-  } from '/src/helpers.js'
+  } from '/src/helpers/everythingElse.js'
   import { 
     setFirestoreDoc, 
   } from '/src/crud.js'

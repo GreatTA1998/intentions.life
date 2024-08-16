@@ -11,7 +11,7 @@
 </div>
 
 <script>
-  // import { computeOffset } from '/src/helpers.js'
+  // import { computeOffset } from '/src/helpers/everythingElse.js'
 
   // export let task
   // export let pixelsPerHour

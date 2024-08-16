@@ -53,7 +53,7 @@
 <script>
 import { createEventDispatcher, onMount, onDestroy, tick } from 'svelte'
 import _ from 'lodash'
-import { getDateOfToday, getRandomID, clickOutside, convertMMDDToReadableMonthDayForm } from '/src/helpers.js'
+import { getDateOfToday, getRandomID, clickOutside, convertMMDDToReadableMonthDayForm } from '/src/helpers/everythingElse.js'
 import JournalPopupGoalsAndPosters from './JournalPopupGoalsAndPosters.svelte';
 import db from '/src/db.js'
 import { doc, updateDoc } from 'firebase/firestore'

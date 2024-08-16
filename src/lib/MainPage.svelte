@@ -219,7 +219,7 @@
     generateRepeatedTasks, 
     checkTaskObjSchema,
     convertToISO8061
-  } from '/src/helpers.js'
+  } from '/src/helpers/everythingElse.js'
   import { 
     computeYearViewTimelines, 
     reconstructTreeInMemory,

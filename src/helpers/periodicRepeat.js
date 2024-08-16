@@ -13,7 +13,7 @@ import {
   mod,
   twoDigits,
   getDateInMMDD,
-} from '/src/helpers.js'
+} from '/src/helpers/everythingElse.js'
 
 // repeatOnDaysOfMonth: [0, 0, 0, 1, ... 0, 1]
 export function createNewInstancesOfWeeklyRepeatingTasks ({ weeklyTemplate, userDoc }) {

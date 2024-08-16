@@ -92,7 +92,7 @@
 //    2. 
 import { createEventDispatcher, onMount, onDestroy, tick } from 'svelte'
 import _ from 'lodash'
-import { getDateOfToday, getRandomID, clickOutside } from '/src/helpers.js'
+import { getDateOfToday, getRandomID, clickOutside } from '/src/helpers/everythingElse.js'
 import { getFunctions, httpsCallable } from "firebase/functions"
 import { updateDoc, doc, getFirestore, arrayUnion } from 'firebase/firestore'
 import { user } from '/src/store.js'

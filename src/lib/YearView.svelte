@@ -84,13 +84,13 @@
     convertMMDDToReadableMonthDayForm,
     convertDDMMYYYYToDateClassObject,
     computeDayDifference
-  } from '/src/helpers.js'
+  } from '/src/helpers/everythingElse.js'
   import { createEventDispatcher } from 'svelte'
   import { 
     getRandomID,
     getDateInDDMMYYYY, 
     getTimeInHHMM
-  } from '/src/helpers.js'
+  } from '/src/helpers/everythingElse.js'
   import UXFormField from '$lib/UXFormField.svelte'
   import ReusableNewSubtaskComponent from '$lib/ReusableNewSubtaskComponent.svelte'
   import FutureOverview from '$lib/FutureOverview.svelte'

@@ -93,7 +93,7 @@
 <script>
   import ReusableCalendarHeader from "$lib/ReusableCalendarHeader.svelte";
   import ReusableCalendarColumn from "$lib/ReusableCalendarColumn.svelte";
-  import { MIKA_PIXELS_PER_HOUR } from "/src/helpers.js";
+  import { MIKA_PIXELS_PER_HOUR } from "/src/helpers/everythingElse.js";
   import { onMount, afterUpdate } from "svelte";
   import { user, tasksScheduledOn, hasInitialScrolled } from "/src/store.js";
   import { getFirestoreCollection } from "/src/crud.js";

@@ -90,7 +90,7 @@
     computeDayDifference, 
     mod,
     twoDigits
-  } from '/src/helpers.js'
+  } from '/src/helpers/everythingElse.js'
   import { 
     setFirestoreDoc, 
     deleteFirestoreDoc, 
