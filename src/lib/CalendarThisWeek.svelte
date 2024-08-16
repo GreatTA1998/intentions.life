@@ -104,7 +104,7 @@
   import { size, cushion } from '/src/helpers/constants.js'
   import BackgroundRainScene from "./BackgroundRainScene.svelte";
   import { calendarTasks, daysToRender } from '/src/store.js'
-  import { buildCalendarDataStructures } from '/src/helpers/maintainInvariant.js'
+  import { buildCalendarDataStructures } from '/src/helpers/maintainState.js'
 
   export let calStartDateClassObj;
 

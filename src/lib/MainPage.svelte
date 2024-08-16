@@ -282,7 +282,7 @@
     deleteFromLocalState,
     buildCalendarDataStructures,
     buildTodoDataStructures
-  } from '/src/helpers/maintainInvariant.js'
+  } from '/src/helpers/maintainState.js'
 
   let currentMode = 'Week' // weekMode hourMode monthMode
   const userDocPath = `users/${$user.uid}`

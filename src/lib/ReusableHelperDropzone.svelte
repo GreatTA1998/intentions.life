@@ -15,7 +15,7 @@
 </div>
 
 <script>
-  import { updateLocalState } from '/src/helpers/maintainInvariant.js'
+  import { updateLocalState } from '/src/helpers/maintainState.js'
   import {
     breakParentRelationIfNecessary,
     maintainValidSubtreeDeadlines,
