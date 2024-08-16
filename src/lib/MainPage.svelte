@@ -223,7 +223,7 @@
     getFirestoreCollection,
   } from '/src/crud.js'
   import NewThisWeekTodo from '$lib/NewThisWeekTodo.svelte'
-  import { garbageCollectInvalidTasks, findActiveUsers } from '/src/scripts.js'
+  import { garbageCollectInvalidTasks, findActiveUsers } from '/src/helpers/scripts.js'
   import { deleteObject, getStorage, ref } from 'firebase/storage'
   import Tasks from '../back-end/Tasks'
   import { size, cushion } from '/src/helpers/constants.js'

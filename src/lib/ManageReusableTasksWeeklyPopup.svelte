@@ -29,7 +29,7 @@
         </span>
       </div>
 
-      <ManageReusableTasksWeeklyPopupDurationStartTime
+      <ManageReusableTasksDurationStartTime
         {weeklyTemplate}
         on:weekly-template-update={(e) => updateWeeklyTemplate(e.detail)}
       />
@@ -82,7 +82,7 @@
   import { createNewInstancesOfWeeklyRepeatingTasks } from '/src/helpers/periodicRepeat.js'
   import PremiumPopup from '$lib/PremiumPopup.svelte'
   import PeriodicWeeklyModule from '$lib/PeriodicWeeklyModule.svelte'
-  import ManageReusableTasksWeeklyPopupDurationStartTime from '$lib/ManageReusableTasksWeeklyPopupDurationStartTime.svelte'
+  import ManageReusableTasksDurationStartTime from '$lib/ManageReusableTasksDurationStartTime.svelte'
   import { 
     getRandomID, 
     checkTaskObjSchema,  

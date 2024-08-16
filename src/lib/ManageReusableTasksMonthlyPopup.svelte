@@ -21,7 +21,7 @@
         />
       {/key}
     
-      <ManageReusableTasksWeeklyPopupDurationStartTime
+      <ManageReusableTasksDurationStartTime
         weeklyTemplate={monthlyTemplate}
         on:weekly-template-update={(e) => updateMonthlyTemplate(e.detail)}
       />
@@ -39,7 +39,7 @@
 
 <script>
   import { createNewInstancesOfMonthlyRepeatingTasks } from '/src/helpers/periodicRepeat.js'
-  import ManageReusableTasksWeeklyPopupDurationStartTime from '$lib/ManageReusableTasksWeeklyPopupDurationStartTime.svelte'
+  import ManageReusableTasksDurationStartTime from '$lib/ManageReusableTasksDurationStartTime.svelte'
   import PeriodicMonthlyModule from '$lib/PeriodicMonthlyModule.svelte'
   import { getRandomID, checkTaskObjSchema, getDateInMMDD, convertMMDDToDateClassObject, computeDayDifference } from '/src/helpers/everythingElse.js'
   import { setFirestoreDoc, deleteFirestoreDoc, getFirestoreCollection, createFirestoreQuery, getFirestoreQuery, updateFirestoreDoc } from '/src/crud.js'
