@@ -188,18 +188,16 @@
       
       <!-- 2nd flex child -->
       <div id="the-only-scrollable-container" class="calendar-section-flex-child"> 
-        {#if $tasksScheduledOn}   
-          <CalendarThisWeek
-            {calStartDateClassObj}
-            on:calendar-shifted={(e) => incrementDateClassObj({ days: e.detail.days})}
-            on:new-root-task={(e) => createNewRootTask(e.detail)}
-            on:task-click={(e) => openDetailedCard(e.detail)}
-            on:task-update={(e) => updateTaskNode({ id: e.detail.id, keyValueChanges: e.detail.keyValueChanges })}
-            on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
-            on:task-dragged={(e) => changeTaskDeadline(e.detail)}
-            on:task-checkbox-change={(e) => updateTaskNode({ id: e.detail.id, keyValueChanges: { isDone: e.detail.isDone }})} 
-          /> 
-        {/if}
+        <CalendarThisWeek
+          {calStartDateClassObj}
+          on:calendar-shifted={(e) => incrementDateClassObj({ days: e.detail.days})}
+          on:new-root-task={(e) => createNewRootTask(e.detail)}
+          on:task-click={(e) => openDetailedCard(e.detail)}
+          on:task-update={(e) => updateTaskNode({ id: e.detail.id, keyValueChanges: e.detail.keyValueChanges })}
+          on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
+          on:task-dragged={(e) => changeTaskDeadline(e.detail)}
+          on:task-checkbox-change={(e) => updateTaskNode({ id: e.detail.id, keyValueChanges: { isDone: e.detail.isDone }})} 
+        /> 
       </div>
     <!-- END OF WEEK MODE SECTION -->
     
@@ -241,7 +239,6 @@
     tasksScheduledOn,
     inclusiveWeekTodo,
     hasInitialScrolled,
-    calendarMemoryTree,
     todoTasks,
     calendarTasks
   } from '/src/store.js'
@@ -285,7 +282,7 @@
     deleteFromLocalState,
     buildCalendarDataStructures,
     buildTodoDataStructures
-  } from '/src/helpers/maintainInvariant.js'
+  } from '/src/helpers/maintainState.js'
 
   let currentMode = 'Week' // weekMode hourMode monthMode
   const userDocPath = `users/${$user.uid}`
@@ -296,13 +293,10 @@
 
   let calStartDateClassObj = new Date()
   let currentJournalEntryMMDD = getDateOfToday()
-  let dateOfToday = getDateOfToday()
-
   let allTasks = null
   let futureScheduledTasks = [] // AF([])
 
   let clickedTask = {}
-  let isInitialFetch = true
   let unsub
 
   onMount(async () => {
@@ -310,18 +304,11 @@
     const left = today.minus({ days: size + cushion })
     const right = today.plus({ days: size + cushion })
 
-    const scheduledTasks = await Tasks.getByDateRange(
-      $user.uid, 
-      left.toFormat('yyyy-MM-dd'), 
-      right.toFormat('yyyy-MM-dd')
-    )
-    calendarTasks.set(scheduledTasks)
-    buildCalendarDataStructures()
+    Tasks.getByDateRange($user.uid, left.toFormat('yyyy-MM-dd'), right.toFormat('yyyy-MM-dd'))
+      .then(scheduledTasks => buildCalendarDataStructures({ flatArray: scheduledTasks }))
 
-    ////  SEPARATE BUT SIMILAR PROCESS FOR THE TODO-LIST
-    const unscheduledTasks = await Tasks.getUnscheduled($user.uid)
-    todoTasks.set(unscheduledTasks)
-    buildTodoDataStructures()
+    Tasks.getUnscheduled($user.uid)
+      .then(unscheduledTasks => buildTodoDataStructures({  flatArray: unscheduledTasks }))
  
     //   TO-DO: fix repeating tasks not getting pre-generated on time
     //   if (isInitialFetch) {
@@ -358,27 +345,12 @@
     }
   }
 
-  // FOR HANDLING A WEEK WORTH OF NEW TASKS
-  // NOTE: by definition of these tasks being located on a different week, this will not 
-  // affect the existing dates and their task trees
-  function incorporateNewWeekIntoCalendarTree (newWeekTasksArray) {
-    const newWeekMemoryTree = reconstructTreeInMemory(newWeekTasksArray) 
-    const newSection = computeDateToTasksDict(newWeekMemoryTree)
-    tasksScheduledOn.set({ ...$tasksScheduledOn, ...newSection })
-  }
 
   function handleLogoClick (setIsPopupOpen) {
     if (confirm('Log out and return to home page tutorials?')) {
       signOutOnFirebase();
       goto('/');
     }
-
-    // if (!$user.email && !$user.phoneNumber) {
-    //   signOutOnFirebase();
-    //   goto('/');
-    // } else {
-    //   setIsPopupOpen({ newVal: true })
-    // }
   }
 
   function signOutOnFirebase () {
@@ -779,6 +751,7 @@
   }
 
   .calendar-section-flex-child {
+    /* this is funnily enough to fix a patch of white between the header and the calendar column */
     background-color: var(--calendar-bg-color);
   }
 
@@ -791,7 +764,6 @@
     margin: auto;
   }
 
-  
   .ux-tab-item {
     box-sizing: border-box;
     height: 60px;

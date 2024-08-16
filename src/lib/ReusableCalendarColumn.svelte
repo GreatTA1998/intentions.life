@@ -3,23 +3,13 @@
   import { getFirestoreCollection } from "/src/crud.js";
   import {
     computeMillisecsDifference,
-    convertDDMMYYYYToDateClassObject,
     ensureTwoDigits,
-    getTimeInHHMM,
     getHHMM,
-    pureNumericalHourForm,
   } from "/src/helpers.js";
   import ReusableTaskElement from "$lib/ReusableTaskElement.svelte";
   import ReusablePhotoTaskElement from "$lib/ReusablePhotoTaskElement.svelte";
   import ReusableIconTaskElement from "$lib/ReusableIconTaskElement.svelte";
-  import {
-    onMount,
-    beforeUpdate,
-    afterUpdate,
-    tick,
-    createEventDispatcher,
-    onDestroy,
-  } from "svelte";
+  import { onMount, createEventDispatcher, onDestroy } from "svelte";
   import {
     user,
     hasInitialScrolled,
@@ -29,6 +19,7 @@
     whatIsBeingDragged,
   } from "/src/store.js";
   import ReusableCreateTaskDirectly from "$lib/ReusableCreateTaskDirectly.svelte";
+  import ReusableCalendarColumnTimeIndicator from "$lib/ReusableCalendarColumnTimeIndicator.svelte"
 
   export let scheduledTasks = [];
   export let timestamps = [];
@@ -38,51 +29,17 @@
   export let calendarBeginningDateClassObject;
 
   let overallContainerHeight;
-
   let OverallContainer;
-  let CurrentTimeIndicator;
-
   const dispatch = createEventDispatcher();
-
   let isDirectlyCreatingTask = false;
   let formFieldTopPadding = 40;
   let yPosition;
-  let newTaskName = "";
-
   let reusableTaskTemplates = null;
-  let taskTemplateSearchResults = [];
-
   let pixelsPerMinute = pixelsPerHour / 60;
+
   $: resultantDateClassObject = getResultantDateClassObject(yPosition);
 
-
-  // Put tasks in ascending order of `startTime`, so newer tasks are above older tasks
-  // this is important because when a big task swallows a small task,
-  // you need to be able to drag the small task out easily (and the small task is BELOW the big task by definition)
-  $: sortedScheduledTasks = scheduledTasks.sort((task1, task2) => {
-    return (
-      pureNumericalHourForm(task1.startTime) -
-      pureNumericalHourForm(task2.startTime)
-    );
-  });
-
   onMount(async () => {
-    // scrolling
-    
-    // if (CurrentTimeIndicator) {
-    //   setTimeout(() => {
-    //     // the calendar is re-rendered on every task drag-and-drop, so we don't want to reset scrolling each time
-    //     if (CurrentTimeIndicator && !$hasInitialScrolled) {
-    //       CurrentTimeIndicator.scrollIntoView({
-    //         behavior: "smooth",
-    //         block: "center",
-    //         inline: "center",
-    //       });
-    //       hasInitialScrolled.set(true);
-    //     }
-    //   }, 0);
-    // }
-
     // task template dropdown
     const temp = await getFirestoreCollection(
       `/users/${$user.uid}/periodicTasks`
@@ -91,18 +48,6 @@
   });
 
   onDestroy(() => {});
-
-  function computeTimeIndicatorOffset() {
-    const now = DateTime.now();
-    const startOfDay = now.startOf("day");
-    const i = Interval.fromDateTimes(startOfDay, now);
-    const minutesDifference = i.length() / (1000 * 60);
-    return minutesDifference * pixelsPerMinute;
-  }
-
-  function p(...args) {
-    console.log(...args);
-  }
 
   function copyGetTrueY(e) {
     return (
@@ -240,7 +185,7 @@
       {/each}
     {/if}
 
-    {#each sortedScheduledTasks as task, i}
+    {#each scheduledTasks as task, i}
       <div
         style="
           position: absolute; 
@@ -313,25 +258,14 @@
     <!-- https://svelte.dev/tutorial/update
       "Scrolling is hard to achieve with purely a state-driven way"
     -->
-
-    <!-- A red line that indicates the current time -->
-    {#if calendarBeginningDateClassObject.getDate() === new Date().getDate()}
-      <div
-        class="current-time-indicator-container"
-        style="
-          top: {computeTimeIndicatorOffset()}px;
-        "
-      >
-        <hr
-          style="border: 2px solid var(--location-indicator-color); border-radius: 5px; width: 100%; margin-top: 0px; margin-bottom: 0px;"
-          bind:this={CurrentTimeIndicator}
-        />
-        <div
-          style="font-size: 12px; color: var(--location-indicator-color); font-weight: 600;"
-        >
-          {DateTime.now().toLocaleString(DateTime.TIME_24_SIMPLE)}
-        </div>
-      </div>
+    <!-- A wood-colored line that indicates the current time -->
+    {#if 
+      DateTime.fromJSDate(calendarBeginningDateClassObject).toFormat('yyyy-MM-dd')
+      === DateTime.now().toFormat('yyyy-MM-dd')
+    }
+      <ReusableCalendarColumnTimeIndicator
+        {pixelsPerMinute}
+      />
     {/if}
   </div>
 </div>
