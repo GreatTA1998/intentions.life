@@ -16,7 +16,9 @@
   import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage"
   import { updateFirestoreDoc } from '/src/crud.js'
   import { getRandomID, checkTaskObjSchema, getDateInMMDD, getTimeInHHMM } from '/src/helpers.js'
+  import { DateTime } from 'luxon'
   import { user } from '/src/store.js'
+  import { updateLocalState } from '/src/helpers/maintainState.js'
   import { goto } from '$app/navigation'
   import { onMount } from 'svelte'
 
@@ -73,14 +75,18 @@
     }
 
     // only auto-hydrate the time if the task isn't already on the calendar
-    if (!taskObject.startDate) { 
+    if (!taskObject.startDateISO) { 
+      updateObj.startDateISO = DateTime.fromJSDate(dateClassObj).toFormat('yyyy-MM-dd')
       updateObj.startTime = getTimeInHHMM({ dateClassObj })
-      updateObj.startDate = getDateInMMDD(dateClassObj)
-      updateObj.startYYYY = `${dateClassObj.getFullYear()}`
       updateObj.duration = durationForFullDisplay
     }
-
-    updateFirestoreDoc(`/users/${$user.uid}/tasks/${taskObject.id}`, updateObj)
+    try {
+      updateFirestoreDoc(`/users/${$user.uid}/tasks/${taskObject.id}`, updateObj)
+      updateLocalState({ id: taskObject.id, keyValueChanges: updateObj })
+    } catch (error) {
+      console.log(error)
+      alert("Error uploading photo, please reload")
+    }
   }
 
   async function uploadImageBlobToFirebase (blobFile, id) {

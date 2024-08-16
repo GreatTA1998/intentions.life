@@ -86,9 +86,8 @@
     copy.id = getRandomID()
     copy.reusableTemplateID = taskObj.id
     copy.isDone = false
-    copy.startDate = getDateInMMDD(resultantDateClassObject)
+    copy.startDateISO = DateTime.fromJSDate(resultantDateClassObject).toFormat('yyyy-MM-dd')
     copy.startTime = newTaskStartTime
-    copy.startYYYY = resultantDateClassObject.getFullYear()
     dispatch('new-root-task', copy)
     dispatch('reset')
   }
