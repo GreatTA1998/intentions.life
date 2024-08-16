@@ -14,17 +14,6 @@
   {/if}
 {/key}
 
-{#if isJournalPopupOpen}
-  <JournalPopup
-    goalsAndPosters={$user.goalsAndPosters}
-    isOpen={isJournalPopupOpen}
-    journal={$user.journal}
-    {userID}
-    on:card-close={() => isJournalPopupOpen = false}
-    on:journal-update={(e) => changeJournal(e.detail)}
-  />
-{/if}
-
 <!-- UNDO COMPLETED SNACKBAR -->
 {#if $mostRecentlyCompletedTaskID}
   <TheSnackbar on:undo-task-completion={() => {
@@ -231,7 +220,6 @@
     inclusiveWeekTodo,
     hasInitialScrolled
   } from '/src/store.js'
-  import JournalPopup from '$lib/JournalPopup.svelte'
   import BedtimePopupMaplestoryMusic from '$lib/BedtimePopupMaplestoryMusic.svelte'
   import TheSnackbar from '$lib/TheSnackbar.svelte'
   import CalendarThisWeek from '$lib/CalendarThisWeek.svelte'
@@ -275,7 +263,6 @@
   const userDocPath = `users/${$user.uid}`
 
   let isDetailedCardOpen = false
-  let isJournalPopupOpen = false
 
   let calStartDateClassObj = new Date()
   let currentJournalEntryMMDD = getDateOfToday()
