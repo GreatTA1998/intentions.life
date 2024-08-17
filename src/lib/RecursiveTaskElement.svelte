@@ -29,6 +29,7 @@
     <slot name="dropzone-above-task-name">
 
     </slot>
+
     <div 
       draggable="true"
       on:dragstart|self={(e) => dragstart_handler(e, taskObj.id)}
@@ -78,7 +79,7 @@
     </div>
 
     <!-- the 6px compensates for the fact there is only 1 dropzone for the first child but 2 dropzones (reorder + sub-reorder) for the 2nd child onwards -->
-    <div style="margin-left: {indentationAmount}px; padding-top: 0px;">
+    <div style="margin-left: {indentationAmount}px;">
       {#each taskObj.children as subtaskObj, i (subtaskObj.id)}
         <RecursiveTaskElement 
           taskObj={subtaskObj}
@@ -97,18 +98,16 @@
           on:task-checkbox-change
         > 
           <div slot="dropzone-above-task-name"> 
-            {#if taskObj.children.length > 0}
-              <ReusableHelperDropzone
-                ancestorRoomIDs={[taskObj.id, ...ancestorRoomIDs]}
-                roomsInThisLevel={taskObj.children}
-                idxInThisLevel={i}
-                parentID={taskObj.id}
-                parentObj={taskObj}
-                {colorForDebugging}
-                {dueInHowManyDays}
-                {isMilestoneMode}
-              /> 
-            {/if}
+            <ReusableHelperDropzone
+              ancestorRoomIDs={[taskObj.id, ...ancestorRoomIDs]}
+              roomsInThisLevel={taskObj.children}
+              idxInThisLevel={i}
+              parentID={taskObj.id}
+              parentObj={taskObj}
+              {colorForDebugging}
+              {dueInHowManyDays}
+              {isMilestoneMode}
+            /> 
           </div>
         </RecursiveTaskElement>
       {/each}
@@ -134,13 +133,26 @@
 
     {#if isRecursive && taskObj.children.length === 0}
       <!-- 
-        This is the only way to create a sub-task, and it will be displayed
-        EVEN IF children.length === 0.
+        a task with no children is a special case,
+        we must display a way to create a subtask
         
-        `float: right` is the magic, that takes it out of the document so 
-        it collapses with the dropzone of the nearest ancestor below
+        `float: right` is the magic, that takes it out of the document flow 
+         so it collapses with the dropzone of the nearest ancestor below
       -->
       <div style="float: right; width: {200 - (indentationAmount * depth)}px; margin-left: auto; margin-right: 0;">
+        <ReusableHelperDropzone
+          ancestorRoomIDs={[taskObj.id, ...ancestorRoomIDs]}
+          roomsInThisLevel={taskObj.children}
+          idxInThisLevel={taskObj.children.length}
+          parentID={taskObj.id}
+          parentObj={taskObj}
+          {colorForDebugging}
+          {dueInHowManyDays}
+          {isMilestoneMode}
+        /> 
+      </div>
+    {:else if isRecursive && taskObj.children.length >= 2}
+      <div style="margin-left: {indentationAmount}px">
         <ReusableHelperDropzone
           ancestorRoomIDs={[taskObj.id, ...ancestorRoomIDs]}
           roomsInThisLevel={taskObj.children}
