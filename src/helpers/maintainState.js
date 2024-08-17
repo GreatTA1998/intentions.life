@@ -75,10 +75,6 @@ export function buildCalendarDataStructures({ flatArray }) {
 }
 
 export function buildTodoDataStructures({ flatArray }) {
-  console.log(
-    " in buildTodoDataStructures",
-    flatArray.filter((x) => x.name === "weekend")
-  );
   todoTasks.set(flatArray);
   todoMemoryTree.set(reconstructTreeInMemory(get(todoTasks)));
   inclusiveWeekTodo.set(get(todoMemoryTree));

@@ -190,7 +190,7 @@
     getDateInDDMMYYYY, 
     convertToISO8061
   } from '/src/helpers/everythingElse.js'
-  import applyTaskSchema from '../helpers/applyTaskSchema'
+  import applyTaskSchema from '../helpers/applyTaskSchema.js'
   import { 
     mostRecentlyCompletedTaskID, 
     user, 
@@ -351,19 +351,9 @@
     
     try {
       const newTaskObjChecked = await applyTaskSchema(newTaskObj, $user)
-      await setFirestoreDoc(tasksPath + id, newTaskObjChecked)
-      
-      // this below operation is redundant because applyTaskSchema 
-      // will always update the `maxOrderValue` so it remains correct 
-      // not just for Create operations, but for updates and deletes 
-      // updateFirestoreDoc(`users/${$user.uid}`, {
-      //   maxOrderValue: increment(3)
-      // })
 
-      // TO-DO: figure out why `newTaskObj` will not be shown on the UI
-      // but `newTaskObjChecked`will be. What specifically about the schema
-      // fixes it
-      createOnLocalState({ createdNode: newTaskObjChecked })
+      setFirestoreDoc(tasksPath + id, newTaskObjChecked) // hope mf doesn't notice :> 
+      createOnLocalState({ createdNode: { id, ...newTaskObjChecked }})
     } catch (error) {
       console.log(error)
       alert('Database update failed, please reload')
