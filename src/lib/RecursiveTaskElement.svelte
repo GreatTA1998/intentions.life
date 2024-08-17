@@ -1,58 +1,11 @@
-<!-- 
-  The goal is for this to be used on the calendar, todo-list...everywhere
-    1. It is hierarchical
-    2. It also has duration (NOTE: right now it doesn't)
-      (note, consider whether you want to display duration visualizations
-      for the future preview and the all-time todo list - it could be useful to turn off 
-      visualization as a prop)
-
-  Other notes: 
-    Previously, we deprecated the duration lines for the all-time todo tree, because it violates the principle of 
-    "do not distort or misrepresent data".
-
-    However, we will now keep duration visualization units consistent, pixelsPerHour will be the same for all elements on the screen. 
-    But the duration visualization is a big part, so I'm guessing, YES. Assume all clients who use <RecursiveTaskElement/> will have a scale.R
-
-    This task will include checkboxes 
-
-    Hierarchy based on tags, rather than a tree with high `h`
-
-    Directly add tasks to the calendar, the `allTasks` array should have length 1000 instead of 3 over the years.
--->
 {#if !(doNotShowScheduledTasks && taskObj.startDate) && !(doNotShowCompletedTasks && taskObj.isDone)}
-  <div 
-    style=" 
-      width: 100%;
-      font-weight: {depthAdjustedFontWeight};
-    "
-  >
-    <slot name="dropzone-above-task-name">
-
-    </slot>
+  <div style="position: relative; width: 100%; font-weight: {depthAdjustedFontWeight};">
     <div 
       draggable="true"
       on:dragstart|self={(e) => dragstart_handler(e, taskObj.id)}
-      style="
-      display: flex; 
-      align-items: center; 
-      opacity: {taskObj.isDone ? '0.6' : '1'};
-    ">
-      <!--  no more fixed width: width: calc(100% - 30px); 
-          min-width and height to make it easy to delete legacy tasks with no titles
-      -->
-      <div 
-        style="
-          min-width: 30px; 
-          max-width: 320px;
-          font-size: {depthAdjustedFontSize};
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          color: {taskObj.startDate && taskObj.startTime ? 'rgb(160, 160, 160)' : 'rgb(80, 80, 80)'};
-          display: flex;
-          align-items: center;
-        "
-      >   
+      style="display: flex; align-items: center; opacity: {taskObj.isDone ? '0.6' : '1'};"
+    >
+      <div class="task-row-container" style="font-size: {depthAdjustedFontSize};">   
         {#if willShowCheckbox}
           <div style="margin-left: 2px; margin-right: 4px;">
             <ReusableCheckbox 
@@ -77,8 +30,30 @@
       </div>
     </div>
 
-    <!-- the 6px compensates for the fact there is only 1 dropzone for the first child but 2 dropzones (reorder + sub-reorder) for the 2nd child onwards -->
-    <div style="margin-left: {indentationAmount}px; padding-top: 0px;">
+    <!-- we use `235px` instead of `100%` because absolute's 100% is different from
+      RecursiveTaskElement's 100% (which is constantly shrinking). A fixd value we subtract from 
+      gives us a consistent base
+    -->
+    <div style="margin-left: {indentationAmount}px;">
+      <div 
+        class:absolute-bottom={taskObj.children.length === 0} 
+        style="
+          width: calc(235px - {indentationAmount * (depth)}px);
+          z-index: {depth};
+        "
+      >
+        <ReusableHelperDropzone
+          ancestorRoomIDs={[taskObj.id, ...ancestorRoomIDs]}
+          roomsInThisLevel={taskObj.children}
+          idxInThisLevel={0}
+          parentID={taskObj.id}
+          parentObj={taskObj}
+          {colorForDebugging}
+          {dueInHowManyDays}
+          {isMilestoneMode}
+        /> 
+      </div>
+
       {#each taskObj.children as subtaskObj, i (subtaskObj.id)}
         <RecursiveTaskElement 
           taskObj={subtaskObj}
@@ -95,28 +70,36 @@
           on:task-click
           on:subtask-create
           on:task-checkbox-change
-        > 
-          <div slot="dropzone-above-task-name"> 
-            {#if taskObj.children.length > 0}
-              <ReusableHelperDropzone
-                ancestorRoomIDs={[taskObj.id, ...ancestorRoomIDs]}
-                roomsInThisLevel={taskObj.children}
-                idxInThisLevel={i}
-                parentID={taskObj.id}
-                parentObj={taskObj}
-                {colorForDebugging}
-                {dueInHowManyDays}
-                {isMilestoneMode}
-              /> 
-            {/if}
-          </div>
-        </RecursiveTaskElement>
+        /> 
+         <!-- 
+          Caveat with using calc(100%):
+          because absolute element's 100% ignores the margin = `indentationAmount` that
+          all has already scoped other normal divs, so we just add it back 
+
+          - {i === n - 1 ? indentationAmount : 0}px 
+        -->
+        <div class:absolute-bottom={i === n - 1} 
+          style="
+            width: calc(
+              235px 
+              - {indentationAmount * depth}px 
+            ); 
+            z-index: {depth};
+          "
+        >
+          <ReusableHelperDropzone
+            ancestorRoomIDs={[taskObj.id, ...ancestorRoomIDs]}
+            roomsInThisLevel={taskObj.children}
+            idxInThisLevel={i + 1}
+            parentID={taskObj.id}
+            parentObj={taskObj}
+            {colorForDebugging}
+            {dueInHowManyDays}
+            {isMilestoneMode}
+          /> 
+        </div>
       {/each}
       
-      <!-- 
-        If this task level has a deadline, new sub-tasks should also be 
-        initialized with the same deadline
-      -->
       {#if isTypingNewSubtask}
         <UXFormField
           fieldLabel="Task Name"
@@ -131,28 +114,6 @@
         />
       {/if}
     </div>
-
-    {#if isRecursive && taskObj.children.length === 0}
-      <!-- 
-        This is the only way to create a sub-task, and it will be displayed
-        EVEN IF children.length === 0.
-        
-        `float: right` is the magic, that takes it out of the document so 
-        it collapses with the dropzone of the nearest ancestor below
-      -->
-      <div style="float: right; width: {200 - (indentationAmount * depth)}px; margin-left: auto; margin-right: 0;">
-        <ReusableHelperDropzone
-          ancestorRoomIDs={[taskObj.id, ...ancestorRoomIDs]}
-          roomsInThisLevel={taskObj.children}
-          idxInThisLevel={taskObj.children.length}
-          parentID={taskObj.id}
-          parentObj={taskObj}
-          {colorForDebugging}
-          {dueInHowManyDays}
-          {isMilestoneMode}
-        /> 
-      </div>
-    {/if}
   </div>
 {/if}
 
@@ -213,6 +174,8 @@
         else depthAdjustedFontSize = '14px'
     }
   }
+
+  $: n = taskObj.children.length
   
   // depthAdjustedFontSize = 1 * (0.6 ** (depth)
   $: depthAdjustedFontWeight = 400 - (depth * 0) + (200 * Math.max(1 - depth, 0))
@@ -292,6 +255,23 @@
 </script>
 
 <style>
+  .absolute-bottom {
+    position: absolute; 
+    bottom: -18px;
+  }
+
+  /* min-width and height to make it easy to delete legacy tasks with no titles */
+  .task-row-container {
+    min-width: 30px; 
+    max-width: 320px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: rgb(80, 80, 80);
+    display: flex;
+    align-items: center;
+  }
+
   .cross-out-todo {
     text-decoration: line-through;
   }
