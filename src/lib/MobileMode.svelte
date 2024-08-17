@@ -114,7 +114,6 @@
     getRandomID, 
     getDateInMMDD, 
     getDateInDDMMYYYY,
-    checkTaskObjSchema,
     sortByUnscheduledThenByOrderValue
   } from '/src/helpers/everythingElse.js'
   import { 
@@ -282,12 +281,10 @@
   }
 
   async function createTaskNodeHelper ({ newTaskObj }) {
-  // this should be async, checkTaskObjSchema no longer exists! 
   // not rewriting because not sure it will be used in new mobile versionm
-
-    await setFirestoreDoc(
-      `/users/${$user.uid}/tasks/${newTaskObj.id}`,
-      checkTaskObjSchema(newTaskObj, $user)
+    const formatedTask = await applyTaskSchema(newTaskObj, $user);
+    return await setFirestoreDoc(
+      `/users/${$user.uid}/tasks/${newTaskObj.id}`, formatedTask,
     )
   }
 
