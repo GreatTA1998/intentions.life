@@ -16,12 +16,12 @@
 <script>
   import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage"
   import { setFirestoreDoc } from '/src/helpers/crud.js'
-  import { getRandomID, checkTaskObjSchema, getDateInMMDD, getTimeInHHMM } from '/src/helpers/everythingElse.js'
+  import { getRandomID, getTimeInHHMM } from '/src/helpers/everythingElse.js'
   import { user } from '/src/store.js'
-  import { goto } from '$app/navigation'
   import { onMount } from 'svelte'
   import { DateTime } from 'luxon'
   import { createOnLocalState } from "/src/helpers/maintainState.js"
+  import applyTaskSchema from '../helpers/applyTaskSchema'
 
   const storage = getStorage()
 
@@ -61,7 +61,6 @@
   }
 
   async function createNewScheduledTaskContainingImage (resultSnapshot, imageBlobFile, id) {
-    console.log('resultSnapshot =', resultSnapshot)
 
     const { metadata } = resultSnapshot 
     const { fullPath, timeCreated } = metadata
@@ -79,14 +78,14 @@
     let imageDownloadURL 
     const p2 = getDownloadURL(ref(storage, fullPath)).then(url => imageDownloadURL = url)
     
-    await Promise.all([p1, p2])
+    await Promise.all([p1, p2]).catch(err => console.error('error in creNewSchedueledTasksContainingImage PromiseAll', err));
 
     // STEP 2: create a task scheduled at the same time the photo is taken
     let dateClassObj 
     if (imageBlobFile.lastModified) dateClassObj = new Date(imageBlobFile.lastModified)
     else dateClassObj = new Date(timeCreated) // otherwise we set the time to right now.
 
-    let newTaskObj = {
+    const newTaskObj = {
       id, 
       name: `Photo ${getTimeInHHMM({ dateClassObj })}`,
       imageDownloadURL,
@@ -96,13 +95,14 @@
       duration: durationForFullDisplay,
       isDone: true // so the image isn't blurred
     }
-    newTaskObj = checkTaskObjSchema(newTaskObj, $user)
 
-    setFirestoreDoc(
+    const formatedTask = await applyTaskSchema(newTaskObj, $user);
+
+    await setFirestoreDoc(
       `users/${$user.uid}/tasks/${id}`, 
-      newTaskObj
-    )  
-    createOnLocalState({ createdNode: newTaskObj })
+      formatedTask
+    ).catch(err => 'error in setFirestore doc in Multi Photo uploader: ', err);
+    createOnLocalState({ createdNode: formatedTask })
   }
 </script>
 

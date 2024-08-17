@@ -41,8 +41,8 @@
   import { createNewInstancesOfMonthlyRepeatingTasks } from '/src/helpers/periodicRepeat.js'
   import ManageReusableTasksDurationStartTime from '$lib/ManageReusableTasksDurationStartTime.svelte'
   import PeriodicMonthlyModule from '$lib/PeriodicMonthlyModule.svelte'
-  import { getRandomID, checkTaskObjSchema, getDateInMMDD, convertMMDDToDateClassObject, computeDayDifference } from '/src/helpers/everythingElse.js'
-  import { setFirestoreDoc, deleteFirestoreDoc, getFirestoreCollection, createFirestoreQuery, getFirestoreQuery, updateFirestoreDoc } from '/src/helpers/crud.js'
+  import {  convertMMDDToDateClassObject, computeDayDifference } from '/src/helpers/everythingElse.js'
+  import {deleteFirestoreDoc, createFirestoreQuery, getFirestoreQuery, updateFirestoreDoc } from '/src/helpers/crud.js'
   import { user } from '/src/store.js'
   import { onMount } from 'svelte'
   import { createEventDispatcher } from 'svelte'
@@ -137,7 +137,7 @@
       name: monthlyTemplate.name,
       numOfMonthsInAdvance: 2
     }
-    createNewInstancesOfMonthlyRepeatingTasks({ 
+    await createNewInstancesOfMonthlyRepeatingTasks({ 
       monthlyTemplate: newMonthlyTemplate,
       userDoc: $user
     })

@@ -100,16 +100,16 @@
   import { 
     collection, 
     onSnapshot, 
-    getFirestore, 
     arrayUnion,
     arrayRemove 
   } from 'firebase/firestore'
-  import { checkTaskObjSchema, getRandomID } from '/src/helpers/everythingElse.js'
+  import { getRandomID } from '/src/helpers/everythingElse.js'
   import { reconstructTreeInMemory } from "/src/helpers/dataStructures.js"
   import RecursiveTaskElement from '$lib/RecursiveTaskElement.svelte'
   import ReusableHelperDropzone from '$lib/ReusableHelperDropzone.svelte'
   import DetailedCardPopup from '$lib/DetailedCardPopup.svelte'
   import db from '/src/db.js'
+  import applyTaskSchema from '../helpers/applyTaskSchema'
 
   let unsub = null 
   let allMilestones = [] // don't worry about AF
@@ -147,12 +147,12 @@
   //   - will need to generate the same tree to represent the hierarchical structure
 
   // same interface as hierarchical todo-lists, except the database collection is not "tasks" but `uncertainMilestones`
-  function createMilestoneNode ({ id, newMilestoneObj }) {
-    let newMilestoneObjChecked = checkTaskObjSchema(newMilestoneObj, $user)
-    setFirestoreDoc(
+  async function createMilestoneNode ({ id, newMilestoneObj }) {
+    const formatedMilestone = await applyTaskSchema(newMilestoneObj, $user)
+   return await setFirestoreDoc(
       `users/${$user.uid}/milestones/${id}`, 
       newMilestoneObjChecked
-    )
+    ).catch(err => console.error('error in creteMilesoneNode', err));
     // TO-DO: update a separate counter that keeps track of the `maxOrderValue` within milestones
   }
 

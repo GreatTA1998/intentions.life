@@ -166,12 +166,8 @@
 
   // INTERFACE DIFFERENCE #2
   function createRootTaskWithDeadline (taskName) {
-    const d = new Date()
-    d.setDate(d.getDate() + dueInHowManyDays - 1)
     const newRootTaskObj = {
       startDateISO: '',
-      deadlineDate: getDateInDDMMYYYY(d),
-      deadlineTime: '23:59',
       id: getRandomID(),
       name: taskName,
       parentID: ""
@@ -179,7 +175,7 @@
 
     if (tasksToDisplay.length > 0) {
       newRootTaskObj.orderValue = (0 + tasksToDisplay[0].orderValue) / 2 
-    } // otherwise the default `orderValue` will be `maxOrder`, handled by `checkTaskObjSchema`
+    } // otherwise the default `orderValue` will be `maxOrder`, handled by `applyTaskSchema`
 
     dispatch('new-root-task', newRootTaskObj)
     // use same API as legacy code

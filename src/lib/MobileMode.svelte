@@ -106,7 +106,7 @@
 </div>
 
 <script>
-  import { getFirestore, onSnapshot, collection, arrayUnion, arrayRemove } from 'firebase/firestore'
+  import { onSnapshot, collection, arrayUnion, arrayRemove } from 'firebase/firestore'
   import { getStorage, ref, deleteObject, uploadBytes, getDownloadURL } from "firebase/storage"
   import { setFirestoreDoc, updateFirestoreDoc, deleteFirestoreDoc } from '/src/helpers/crud.js'
   import { 
@@ -281,8 +281,11 @@
     createTaskNodeHelper({ newTaskObj })
   }
 
-  function createTaskNodeHelper ({ newTaskObj }) {
-    setFirestoreDoc(
+  async function createTaskNodeHelper ({ newTaskObj }) {
+  // this should be async, checkTaskObjSchema no longer exists! 
+  // not rewriting because not sure it will be used in new mobile versionm
+
+    await setFirestoreDoc(
       `/users/${$user.uid}/tasks/${newTaskObj.id}`,
       checkTaskObjSchema(newTaskObj, $user)
     )

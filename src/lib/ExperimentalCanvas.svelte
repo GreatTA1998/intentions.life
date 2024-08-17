@@ -8,18 +8,17 @@
 
 <script>
   import { onMount } from 'svelte'
-  import ExperimentalCanvasWhiteboard from '$lib/ExperimentalCanvasWhiteboard.svelte'
   import { setFirestoreDoc } from '/src/helpers/crud.js'
   import { getRandomID } from '/src/helpers/everythingElse.js'
   import { user } from '/src/store.js'
 
-  function saveDoodleIconToDatabase (dataURL) {  
+  async function saveDoodleIconToDatabase (dataURL) {  
     const id = getRandomID()
-    setFirestoreDoc(`/doodleIcons/${id}`, {
+    await setFirestoreDoc(`/doodleIcons/${id}`, {
       id,
       dataURL,
       creatorUID: $user.uid
-    })
+    }).catch(err => console.error('error in saveDoodleIconToDatabase,', err))
   }
 
   let finalDataURL = ''

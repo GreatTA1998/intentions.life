@@ -49,10 +49,10 @@
     isPopupOpen = newVal
   }
 
-  function createMonthlyTemplate () {
+  async function createMonthlyTemplate () {
     const id = getRandomID()
 
-    setFirestoreDoc(`/users/${$user.uid}/periodicTasks/${id}`, {
+   await setFirestoreDoc(`/users/${$user.uid}/periodicTasks/${id}`, {
       name: newTaskName,
       repeatOnDayOfMonth: Array(27).fill(0),
       willRepeatOnLastDay: false,

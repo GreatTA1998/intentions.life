@@ -84,15 +84,10 @@
   import PeriodicWeeklyModule from '$lib/PeriodicWeeklyModule.svelte'
   import ManageReusableTasksDurationStartTime from '$lib/ManageReusableTasksDurationStartTime.svelte'
   import { 
-    getRandomID, 
-    checkTaskObjSchema,  
     convertMMDDToDateClassObject, 
     computeDayDifference, 
-    mod,
-    twoDigits
   } from '/src/helpers/everythingElse.js'
   import { 
-    setFirestoreDoc, 
     deleteFirestoreDoc, 
     createFirestoreQuery, 
     getFirestoreQuery, 

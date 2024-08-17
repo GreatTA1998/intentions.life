@@ -49,10 +49,10 @@
     isPopupOpen = newVal
   }
 
-  function createWeeklyTemplate () {
+  async function createWeeklyTemplate () {
     const id = getRandomID()
 
-    setFirestoreDoc(`/users/${$user.uid}/periodicTasks/${id}`, {
+    await setFirestoreDoc(`/users/${$user.uid}/periodicTasks/${id}`, {
       name: newTaskName,
       repeatOnDayOfWeek: Array(7).fill(0),
       numOfWeeksInAdvance: 2,

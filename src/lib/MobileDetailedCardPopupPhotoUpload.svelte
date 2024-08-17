@@ -15,12 +15,10 @@
 <script>
   import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage"
   import { updateFirestoreDoc } from '/src/helpers/crud.js'
-  import { getRandomID, checkTaskObjSchema, getDateInMMDD, getTimeInHHMM } from '/src/helpers/everythingElse.js'
+  import { getRandomID, getTimeInHHMM } from '/src/helpers/everythingElse.js'
   import { DateTime } from 'luxon'
   import { user } from '/src/store.js'
   import { updateLocalState } from '/src/helpers/maintainState.js'
-  import { goto } from '$app/navigation'
-  import { onMount } from 'svelte'
 
   export let taskObject
 

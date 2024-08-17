@@ -40,7 +40,7 @@ export async function migrateUserDataToGoogleAccount (currentUID, googleUID) {
   // copy milestones
   const allMilestones = await getFirestoreCollection(`/users/${currentUID}/milestones`)
   for (const milestoneDoc of allMilestones) {
-    setFirestoreDoc(newAccountPath + `milestones/${milestoneDoc.id}`, milestoneDoc)
+    await setFirestoreDoc(newAccountPath + `milestones/${milestoneDoc.id}`, milestoneDoc)
     await delayTime(10)
     console.log('done milestone')
   }
@@ -48,7 +48,7 @@ export async function migrateUserDataToGoogleAccount (currentUID, googleUID) {
   // copy the periodic tasks (implement when needed)
   const allPeriodicTasks = await getFirestoreCollection(`/users/${currentUID}/periodicTasks`)
   for (const periodicTaskDoc of allPeriodicTasks) {
-    setFirestoreDoc(newAccountPath + `periodicTasks/${periodicTaskDoc.id}`, periodicTaskDoc)
+    await setFirestoreDoc(newAccountPath + `periodicTasks/${periodicTaskDoc.id}`, periodicTaskDoc)
     await delayTime(10)
     console.log('done periodic')
   }
@@ -171,7 +171,7 @@ export async function runScript () {
     if (emailsList.includes(userDoc.email) || (userDoc.phoneNumber && userDoc.phoneNumber === '+16473036039')) {
       console.log('migrating to new data format for userDoc =', userDoc)
       const copyOfData = [...userDoc.allTasks]
-      createIndividualFirestoreDocForEachTaskInAllTasks(copyOfData, userDoc)
+      await createIndividualFirestoreDocForEachTaskInAllTasks(copyOfData, userDoc)
       await delayTime(10000)
     }
     // THAT'S ONLY FOR ME AS I GENERATED TASK COLLECTIONS WITH NULL POINTERS, OTHER USERS DON'T HAVE THIS PROBLEM

@@ -1,22 +1,19 @@
 import { setFirestoreDoc, updateFirestoreDoc } from '/src/helpers/crud.js'
 
-export function checkTaskObjSchema (task, userDoc) {
-  const output = {...task}
-  if (!task.startYYYY) output.startYYYY = ''
-  if (!task.duration) output.duration = 30
-  if (!task.parentID) output.parentID = ""
-  if (!task.childrenIDs) output.childrenIDs = []
-  if (!task.startDate) output.startDate = '' // without it, `collectFutureScheduledTask` will run into a crashing error with `convertToISO`
-  if (!task.orderValue) { 
-    const newVal = (userDoc.maxOrderValue || 0) + 3
-    const epsilon = Math.random() * 0.5
-    output.orderValue = newVal + epsilon
-    updateFirestoreDoc(`/users/${userDoc.uid}`, {
-      maxOrderValue: newVal
-    })
-  }
-  return output
-}
+// export function checkTaskObjSchema (task, userDoc) {
+//   console.log('task is', task);
+//   const output = {...task}
+//   if (!task.duration) output.duration = 30
+//   if (!task.orderValue) { 
+//     const newVal = (userDoc.maxOrderValue || 0) + 3
+//     const epsilon = Math.random() * 0.5
+//     output.orderValue = newVal + epsilon
+//     updateFirestoreDoc(`/users/${userDoc.uid}`, {
+//       maxOrderValue: newVal
+//     })
+//   }
+//   return output
+// }
 
 // how far, INCLUDING SCROLL, the actual position on the calendar is
 // // containerDistanceFromTopOfPage should be fixed, and not be affected by scrolling
@@ -296,7 +293,7 @@ export function helperFunction ({ node, applyFunc }) {
   }
 }
 
-export function generateRepeatedTasks (taskObject) {
+export async function generateRepeatedTasks (taskObject) {
   const allGeneratedTasksToUpload = []
   const repeatGroupID = taskObject.id // the first instance of the repeated task will represent the repeatGroupID
   const d = new Date()
@@ -305,7 +302,7 @@ export function generateRepeatedTasks (taskObject) {
 
     const weekDayNumber = mod(d.getDay() - 1, 7) // for getDay(), Sunday = 0, Monday = 1
     if (taskObject.willRepeatOnWeekDayNumber[weekDayNumber]) {
-      const generatedTask = createRepeatedTask(
+      const generatedTask = await createRepeatedTask(
         { 
           repeatGroupID,
           dateClassObj: new Date(d.getTime()),
@@ -318,7 +315,7 @@ export function generateRepeatedTasks (taskObject) {
   return allGeneratedTasksToUpload
 }
 
-export function createRepeatedTask ({ dateClassObj, repeatGroupID }, taskObject) {
+export async function createRepeatedTask ({ dateClassObj, repeatGroupID }, taskObject) {
   const taskObjCopy = {...taskObject}
 
   taskObjCopy.id = getRandomID()
@@ -371,13 +368,13 @@ export function convertMMDDToReadableMonthDayForm (mmdd, yyyy = '2024') {
 // Here, you're converting the legacy `$user.allTasks` into a pointer-based data structure
 // So the data that you're starting with will have NO `parentID` nor `childrenIDs`
 // YOU DON'T EVEN NEED THE ARTIFICAL ROOT NODE, just run a for loop on `tree` directly
-export function createIndividualFirestoreDocForEachTaskInAllTasks (tree, userDoc) {
+export async function createIndividualFirestoreDocForEachTaskInAllTasks (tree, userDoc) {
   const artificialRootNode = {
     name: 'root',
     children: tree
   }
   for (const child of artificialRootNode.children) {
-    helperFunc({ 
+    await helperFunc({ 
       node: child, 
       parentID: "", 
       userDoc 
@@ -386,7 +383,7 @@ export function createIndividualFirestoreDocForEachTaskInAllTasks (tree, userDoc
 }
 
 // "root" shouldn't be included in this
-function helperFunc ({ node, parentID, userDoc }) {
+async function helperFunc ({ node, parentID, userDoc }) {
   if (!node.children) return
 
   node.children = node.children.filter(child => child.id)
@@ -399,7 +396,7 @@ function helperFunc ({ node, parentID, userDoc }) {
 
   if (!node.id) newDocObj.id = getRandomID()
   
-  setFirestoreDoc(`/users/${userDoc.uid}/tasks/${newDocObj.id}`, newDocObj)
+  await setFirestoreDoc(`/users/${userDoc.uid}/tasks/${newDocObj.id}`, newDocObj)
  
   for (const child of node.children) {
     helperFunc({ node: child, parentID: node.id, userDoc })

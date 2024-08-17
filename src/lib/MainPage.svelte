@@ -188,10 +188,9 @@
     computeDayDifference, 
     getDateOfToday, 
     getDateInDDMMYYYY, 
-    generateRepeatedTasks, 
-    checkTaskObjSchema,
     convertToISO8061
   } from '/src/helpers/everythingElse.js'
+  import applyTaskSchema from '../helpers/applyTaskSchema'
   import { 
     mostRecentlyCompletedTaskID, 
     user, 
@@ -215,7 +214,7 @@
   import { goto } from '$app/navigation';
   import { getAuth, signOut } from 'firebase/auth'
   import db from '/src/db.js'
-  import { doc, collection, getFirestore, updateDoc, arrayUnion, onSnapshot, arrayRemove, increment } from 'firebase/firestore'
+  import { doc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore'
   import { 
     setFirestoreDoc, 
     updateFirestoreDoc, 
@@ -223,7 +222,6 @@
     getFirestoreCollection,
   } from '/src/helpers/crud.js'
   import NewThisWeekTodo from '$lib/NewThisWeekTodo.svelte'
-  import { garbageCollectInvalidTasks, findActiveUsers } from '/src/helpers/scripts.js'
   import { deleteObject, getStorage, ref } from 'firebase/storage'
   import Tasks from '../back-end/Tasks'
   import { size, cushion } from '/src/helpers/constants.js'
@@ -309,25 +307,25 @@
 
     const periodicTasks = await getFirestoreCollection(`/users/${$user.uid}/periodicTasks`)
     handleWeekly(periodicTasks)
-    handleMonthly(periodicTasks)
+    await handleMonthly(periodicTasks)
 
     updateFirestoreDoc(`/users/${$user.uid}`, {
       lastRanRepeatISO: new Date().toISOString()
     })
   }
 
-  function handleMonthly (periodicTasks) {
+  async function handleMonthly (periodicTasks) {
     const monthlyTemplates = periodicTasks.filter(t => t.repeatOnDayOfMonth)
     for (const monthlyTemplate of monthlyTemplates) {
       const { lastRanRepeatISO } = monthlyTemplate
 
       // backwards compatibility
       if (!lastRanRepeatISO) {
-        createNewInstancesOfMonthlyRepeatingTasks({ monthlyTemplate, userDoc: $user })
+       await createNewInstancesOfMonthlyRepeatingTasks({ monthlyTemplate, userDoc: $user })
       }
 
       if (new Date(lastRanRepeatISO).getMonth() !== new Date().getMonth()) {
-        createNewInstancesOfMonthlyRepeatingTasks({ monthlyTemplate, userDoc: $user })
+        await createNewInstancesOfMonthlyRepeatingTasks({ monthlyTemplate, userDoc: $user })
       } 
     }
   }
@@ -350,17 +348,17 @@
   }
 
   async function createTaskNode ({ id, newTaskObj }) {
-    const newTaskObjChecked = checkTaskObjSchema(newTaskObj, $user)
     
     try {
-      setFirestoreDoc(tasksPath + id, newTaskObjChecked)
+      const newTaskObjChecked = await applyTaskSchema(newTaskObj, $user)
+      await setFirestoreDoc(tasksPath + id, newTaskObjChecked)
       
-      // this below operation is redundant because checkTaskObjSchema 
+      // this below operation is redundant because applyTaskSchema 
       // will always update the `maxOrderValue` so it remains correct 
       // not just for Create operations, but for updates and deletes 
-      updateFirestoreDoc(`users/${$user.uid}`, {
-        maxOrderValue: increment(3)
-      })
+      // updateFirestoreDoc(`users/${$user.uid}`, {
+      //   maxOrderValue: increment(3)
+      // })
 
       // TO-DO: figure out why `newTaskObj` will not be shown on the UI
       // but `newTaskObjChecked`will be. What specifically about the schema
