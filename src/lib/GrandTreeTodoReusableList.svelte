@@ -5,7 +5,7 @@
   on:dragover={(e) => dragover_handler(e)}
 > 
   <div class="first-column" style="height: 100%; display: flex; flex-direction: column;">
-    <div style="display: flex; align-items: center; margin-bottom: 12px;">
+    <div style="display: flex; align-items: center;">
       <div style="font-weight: 600; font-size: 18px; color: rgb(80, 80, 80)">
         {listTitle} 
       </div> 
@@ -38,6 +38,17 @@
         <div style="margin-bottom: 8px;"></div>
       {/if}
 
+      <ReusableHelperDropzone
+        ancestorRoomIDs={['']}
+        roomsInThisLevel={tasksToDisplay}
+        idxInThisLevel={0}
+        parentID={''}
+        parentObj={{ subtreeDeadlineInMsElapsed: convertDDMMYYYYToDateClassObject(defaultDeadline).getTime() }}
+        colorForDebugging="purple"
+        {dueInHowManyDays}
+        heightInPx={36}
+      />
+
       {#each tasksToDisplay as taskObj, i (taskObj.id)}
         <RecursiveTaskElement 
           {taskObj}
@@ -53,38 +64,24 @@
           on:task-checkbox-change
           on:task-node-update
           on:subtask-create
-        > 
-          <div slot="dropzone-above-task-name">
-            {#if tasksToDisplay.length > 2}
-              <ReusableHelperDropzone
-                ancestorRoomIDs={['']}
-                roomsInThisLevel={tasksToDisplay}
-                idxInThisLevel={i}
-                parentID={''}
-                parentObj={{ subtreeDeadlineInMsElapsed: convertDDMMYYYYToDateClassObject(defaultDeadline).getTime() }}
-                colorForDebugging="purple"
-                {dueInHowManyDays}
-              />
-            {/if}
-          </div>
-        </RecursiveTaskElement>
-      {/each}
+        />
 
-      {#if tasksToDisplay.length > 2}
-        <!-- NOTE: BECAUSE WE DON'T DISPLAY TASKS THAT ARE COMPLETED,
-          WE HAVE A DEVIATION BETWEEN STATE AND UI
-          IN THE FUTURE IF THERE ARE UNEXPECTED BUGS, THIS IS THE LIKELY CAUSE
-        -->
         <ReusableHelperDropzone
           ancestorRoomIDs={['']}
           roomsInThisLevel={tasksToDisplay}
-          idxInThisLevel={tasksToDisplay.length}
+          idxInThisLevel={i+1}
           parentID={''}
           parentObj={{ subtreeDeadlineInMsElapsed: convertDDMMYYYYToDateClassObject(defaultDeadline).getTime() }}
-          colorForDebugging="blue"
+          colorForDebugging="purple"
           {dueInHowManyDays}
+          heightInPx={36}
         />
-      {/if}
+      {/each}
+
+      <!-- NOTE: BECAUSE WE DON'T DISPLAY TASKS THAT ARE COMPLETED,
+        WE HAVE A DEVIATION BETWEEN STATE AND UI
+        IN THE FUTURE IF THERE ARE UNEXPECTED BUGS, THIS IS THE LIKELY CAUSE
+      -->
     </div>
   </div>
 

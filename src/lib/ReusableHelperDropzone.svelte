@@ -1,6 +1,6 @@
 <div
   bind:this={ReorderDropzone} 
-  style="height: 18px; border-radius: 9px; border: 0px solid {colorForDebugging};" 
+  style="height: {heightInPx}px; border-radius: {heightInPx / 2}px; border: 0px solid {colorForDebugging};" 
   on:dragenter={() => {
     // quickfix as even if it's an invalid operation it's unintuitive to not see the drag area highlight
     if (!isInvalidReorderDrop() || true) {
@@ -38,6 +38,7 @@
   export let colorForDebugging = "red"
   export let dueInHowManyDays // tells us which todo-list we're in
   export let isMilestoneMode = false
+  export let heightInPx = 18
 
   let ReorderDropzone
   let batch = writeBatch(db)
