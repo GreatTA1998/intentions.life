@@ -1,5 +1,5 @@
 <script>
-  import { DateTime, Interval } from "luxon";
+  import { DateTime } from "luxon";
   import { getFirestoreCollection } from "/src/helpers/crud.js";
   import {
     computeMillisecsDifference,
@@ -12,7 +12,6 @@
   import { onMount, createEventDispatcher, onDestroy } from "svelte";
   import {
     user,
-    hasInitialScrolled,
     yPosWithinBlock,
     whatIsBeingDraggedFullObj,
     whatIsBeingDraggedID,

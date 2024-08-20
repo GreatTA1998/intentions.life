@@ -1,6 +1,8 @@
+<!-- svelte-ignore a11y-click-events-have-key-events -->
 <div class="fullscreen-invisible-modular-popup-layer" on:click|self={handleClickOutside} style="z-index: 10;">
   <div class="detailed-card-popup" bind:this={PopupElem}>
     {#if taskObject.imageDownloadURL}
+      <!-- svelte-ignore a11y-missing-attribute -->
       <img 
         bind:this={TaskImageElem}
         on:click|self={() => isViewingPhoto ? isViewingPhoto = false : ''}
@@ -84,20 +86,12 @@ import { createEventDispatcher, onMount, onDestroy, tick } from 'svelte'
 import { mostRecentlyCompletedTaskID } from '/src/store.js'
 import _ from 'lodash'
 import RecursiveBulletPoint from '$lib/RecursiveBulletPoint.svelte'
-import { 
-  convertDDMMYYYYToDateClassObject,
-  clickOutside, 
-} from '/src/helpers/everythingElse.js'
 import UXFormTextArea from '$lib/UXFormTextArea.svelte'
-import ReusableRoundButton from '$lib/ReusableRoundButton.svelte'
 import ReusableCheckbox from '$lib/ReusableCheckbox.svelte'
 import DetailedCardPopupStartTimeDuration from '$lib/DetailedCardPopupStartTimeDuration.svelte'
 import MobileDetailedCardPopupPhotoUpload from '$lib/MobileDetailedCardPopupPhotoUpload.svelte'
 
 export let taskObject 
-
-let newDeadlineDate
-let newDeadlineTime
 
 let TaskImageElem
 let PopupElem
@@ -166,30 +160,6 @@ function handleCheckboxChange (e) {
 const debouncedSaveTitle = _.debounce(saveTitle, 800)
 const debouncedSaveNotes = _.debounce(saveNotes, 1500)
 
-function saveDeadline (DDMMYYYY, HHMM) {
-  const d1 = convertDDMMYYYYToDateClassObject(DDMMYYYY, HHMM)
-  if (d1.getTime() > taskObject.subtreeDeadlineInMsElapsed) {
-    alert(`Invalid deadline: a subtask's can't be due later than the overall task, which is due at ${new Date(taskObject.subtreeDeadlineInMsElapsed)}`)
-    return
-  }
-
-  dispatch('task-update', { 
-    id: taskObject.id, 
-    keyValueChanges: {
-      deadlineTime: HHMM, 
-      deadlineDate: DDMMYYYY
-    }
-  })
-  isEditingDeadline = false
-}
-
-function handleDeadlineInput (e) {
-  isEditingDeadline = true
-  const newVal = e.detail.value
-  newDeadlineDate = newVal.split(" ")[0]
-  newDeadlineTime = newVal.split(" ")[1]
-}
-
 function confirmDelete () {
   if (confirm('Are you sure you want to delete the task? This is irreversible.')) {
     dispatch('task-delete', {...taskObject})
@@ -199,10 +169,6 @@ function confirmDelete () {
 
 function handleClickOutside (e) {
   dispatch('card-close')
-}
-
-function handleInput (e) {
-  debouncedSaveNotes(e.target.value)
 }
 
 function saveNotes (newVal) {
