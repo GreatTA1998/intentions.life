@@ -1,5 +1,3 @@
-
-
 {#key clickedTask}
   {#if isDetailedCardOpen}
     <DetailedCardPopup 
@@ -35,13 +33,28 @@
 
 <NavbarAndContentWrapper>
   <div slot="navbar" class="top-navbar" class:transparent-glow-navbar={currentMode === 'Day'}>
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
     <img on:click={() => handleLogoClick()}
       src="/trueoutput-square-nobg.png" 
       style="width: 38px; height: 38px; margin-right: 6px; margin-left: -4px; cursor: pointer;"
+      alt=''
     >
 
     <div class="day-week-toggle-segment">
+
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
+      <div on:click={() => currentMode = 'AI'}
+      class="ux-tab-item" 
+      class:active-ux-tab={currentMode === 'AI'} 
+      class:transparent-inactive-tab={currentMode === 'Day'}
+    >
+     <span class="material-symbols-outlined" style="font-size: 32px;">
+      psychology
+      </span>
+    </div>
+
       <!-- quickfix so pressing home ALWAYS recalibrates you to today's region -->
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
       <div on:click={async () => { 
           currentMode = ''
           await tick()
@@ -57,6 +70,7 @@
         </span>
       </div>
 
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
       <div on:click={() => currentMode = 'ManageRepeats'}
         class="ux-tab-item" 
         class:active-ux-tab={currentMode === 'ManageRepeats'} 
@@ -68,6 +82,7 @@
       </div>
       
 
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
       <div on:click={() => currentMode = 'Year'}
         class="ux-tab-item" 
         class:active-ux-tab={currentMode === 'Year'} 
@@ -175,6 +190,8 @@
     
     {:else if currentMode === 'Year'}
       <UncertainMilestones/>
+    {:else if currentMode === 'AI'}
+      <AI/>
     {/if}
   </div>
 </NavbarAndContentWrapper>
@@ -197,6 +214,7 @@
     showSnackbar, 
     hasInitialScrolled
   } from '/src/store.js'
+  import AI from './AI/AI.svelte';
   import BedtimePopupMaplestoryMusic from '$lib/BedtimePopupMaplestoryMusic.svelte'
   import TheSnackbar from '$lib/TheSnackbar.svelte'
   import CalendarThisWeek from '$lib/CalendarThisWeek.svelte'
