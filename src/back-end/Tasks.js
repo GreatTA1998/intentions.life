@@ -11,8 +11,6 @@ import {
   updateDoc,
 } from "firebase/firestore";
 
-const mariusUserID = "6uIcMMsBEkQ85OINCDADtrygzZx1"; //TESTING
-
 const getByDateRange = (userUID, startDate, endDate) => {
   try {
     const q = query(

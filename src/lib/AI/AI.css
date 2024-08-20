@@ -1,13 +1,15 @@
   .container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
     width: 100%;
     background-color: var(--calendar-bg-color);
   }
 
   .column {
     width: 100vw;
+  }
+
+  .intro{
+    margin: 5% auto;
+    width: 80vw;
   }
 
   .json-box {
@@ -22,9 +24,13 @@
     white-space: pre-wrap;
     overflow-y: scroll;
   }
+  .buttons {
+    display: flex;
+    justify-content: center;
+  }
 
   .export-button, .copy-button{
-    margin: 10px auto;
+    margin: 10px;
     padding: 10px 20px;
     font-size: 16px;
     cursor: pointer;
