@@ -361,15 +361,13 @@
   }
 
   async function updateTaskNode ({ id, keyValueChanges }) {
-    try {
-      updateFirestoreDoc(tasksPath + id, keyValueChanges)
+       updateFirestoreDoc(tasksPath + id, keyValueChanges).catch(err => {
+        alert('there was an error in atempting to save changes to the db, please reload ')
+        console.error('error in updateTaskNode: ', err);
+       })
       // we purposely don't await, so the UI experience is much better
       // without an unsettling delay - if it's a divergence in state we'll just throw an error (0.01% chance)
       updateLocalState({ id, keyValueChanges })
-    } catch (error) {
-      console.log(error)
-      alert('Database update failed, please reload')
-    }
   }
 
   // THIS IS STILL NOT WORKING: THE ADOPTION IS NOT WORKING, RIGHT NOW ALL THE 

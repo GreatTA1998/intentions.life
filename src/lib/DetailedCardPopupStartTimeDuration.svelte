@@ -1,6 +1,9 @@
 <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; row-gap: 24px; margin-top: 24px; font-size: 1.2em;">
   <div style="display: flex; align-items: start; gap: 16px;" class:half-invisible={!isScheduled(taskObject)}>
-    <div>
+    
+    <!-- TODO: Deprecate or refactor Currently not working
+    Since drag and drop is working, maybe no need for manual entry? -->
+    <!-- <div>
       <MyJSDatePicker
         MMDD={newStartMMDD}
         YYYY={newStartYYYY}
@@ -9,9 +12,9 @@
           newStartYYYY = e.detail.selectedYear
         }}
       />
-
       <div style="margin-top: 4px;"></div>
-
+      TODO: Deprecate or refactor Currently not working
+      Since drag and drop is working, maybe no need for manual entry?
       {#if isEditingStartDate}
         <ReusableRoundButton 
           on:click={() => saveStartDateAndYear(newStartMMDD, newStartYYYY)}
@@ -20,7 +23,7 @@
           Save
         </ReusableRoundButton>
       {/if}
-    </div>
+    </div> -->
 
     <div>
       <MyTimePicker value={newStartHHMM} 
