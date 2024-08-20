@@ -11,8 +11,6 @@ import {
   updateDoc,
 } from "firebase/firestore";
 
-const mariusUserID = "6uIcMMsBEkQ85OINCDADtrygzZx1"; //TESTING
-
 const getByDateRange = (userUID, startDate, endDate) => {
   try {
     const q = query(
@@ -48,19 +46,31 @@ const update = (userUID, taskID, keyValueChanges) => {
   return updateDoc(doc(db, users, userUID, taskID), keyValueChanges);
 };
 
-// function getRandomID() {
-//   const chars =
-//     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-//   let autoId = "";
-//   for (let i = 0; i < 20; i++) {
-//     autoId += chars.charAt(Math.floor(Math.random() * chars.length));
-//   }
-//   return autoId;
-// }
+const getTasksJSON = async (uid) => {
+  const neededProperties = [
+    "duration",
+    "isDone",
+    "name",
+    "notes",
+    "startDateISO",
+    "startTime",
+  ];
+  const q = query(collection(db, "users", uid, "tasks"));
+  const getDataArray = (snapshot) => snapshot.docs.map((doc) => doc.data());
+  const taskArray = await getDocs(q).then(getDataArray).catch(console.error);
+
+  const reducetoNeeded = (task) =>
+    neededProperties.reduce(
+      (acc, prop) => ({ [prop]: task[prop] || "", ...acc }),
+      {}
+    );
+  return JSON.stringify(taskArray.map(reducetoNeeded));
+};
 
 export default {
   getByDateRange,
   getUnscheduled,
   post,
   update,
+  getTasksJSON,
 };
