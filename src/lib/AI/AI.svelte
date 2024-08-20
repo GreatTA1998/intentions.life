@@ -1,5 +1,4 @@
 <script>
-  import "./AI.css";
   import { user } from "../../store";
   import Tasks from "../../back-end/Tasks";
   import text from "./text";
@@ -40,3 +39,5 @@
     </div>
   </div>
 </div>
+
+<style src="./AI.css"></style>
