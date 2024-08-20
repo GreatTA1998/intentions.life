@@ -6,7 +6,7 @@
     background-color: var(--calendar-bg-color);
   }
 
-  .row {
+  .column {
     width: 100vw;
   }
 

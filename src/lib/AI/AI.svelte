@@ -1,26 +1,35 @@
 <script>
   import "./AI.css";
+  import { user } from "../../store";
+  import Tasks from "../../back-end/Tasks";
+
+  let state = {
+    userID: "",
+    tasksJSON:
+      "your Tasks will be generated here in JSON format, please copy and paste them into chatGPT followed by a question like: 'On average how much time do I spend on sports per week?' or 'Analyse what are the most common corollaries to the 'depressed' Event'",
+  };
+
+  const setState = (newState) => (state = newState);
+
   let tasks = [
     { id: 1, title: "Task 1", completed: false },
     { id: 2, title: "Task 2", completed: true },
     { id: 3, title: "Task 3", completed: false },
   ];
 
-  function exportTasks() {
-    const blob = new Blob([JSON.stringify(tasks, null, 2)], {
-      type: "application/json",
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "tasks.json";
-    a.click();
-    URL.revokeObjectURL(url);
+  $: user.subscribe((value) => {
+    state = { ...state, userID: value.uid };
+  });
+
+  async function exportTasks() {
+    const tasksJSON = await Tasks.getTasksJSON(state.userID);
+    setState({...state, tasksJSON});
+    console.log("our new state is", state);
   }
 
   async function copyCode() {
     try {
-      await navigator.clipboard.writeText(JSON.stringify(tasks, null, 2));
+      await navigator.clipboard.writeText(state.tasksJSON);
       alert("JSON copied to clipboard!");
     } catch (err) {
       alert("Failed to copy JSON to clipboard.");
@@ -29,13 +38,13 @@
 </script>
 
 <div class="container">
-  <div class="row">
+  <div class="column">
     <button class="copy-button" on:click={copyCode}> Copy Code </button>
     <div class="json-box">
-      {JSON.stringify(tasks, null, 2)}
+      {state.tasksJSON}
     </div>
     <button class="export-button" on:click={exportTasks}>
-      Export My Tasks
+     Export Tasks
     </button>
   </div>
 </div>
