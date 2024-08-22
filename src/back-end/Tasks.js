@@ -1,5 +1,6 @@
 // import db from "./connection.js";
 import db from "./db";
+import { DateTime } from "luxon";
 import { getRandomID } from "/src/helpers/everythingElse.js";
 import {
   doc,
@@ -46,7 +47,7 @@ const update = (userUID, taskID, keyValueChanges) => {
   return updateDoc(doc(db, users, userUID, taskID), keyValueChanges);
 };
 
-const getTasksJSON = async (uid) => {
+const getTasksJSONByRange = async (uid, startDate, endDate) => {
   const neededProperties = [
     "duration",
     "isDone",
@@ -55,7 +56,12 @@ const getTasksJSON = async (uid) => {
     "startDateISO",
     "startTime",
   ];
-  const q = query(collection(db, "users", uid, "tasks"));
+  const q = query(
+    collection(db, "users", uid, "tasks"),
+    where("startDateISO", "!=", ""),
+    where("startDateISO", ">=", startDate),
+    where("startDateISO", "<=", endDate)
+  );
   const getDataArray = (snapshot) => snapshot.docs.map((doc) => doc.data());
   const taskArray = await getDocs(q).then(getDataArray).catch(console.error);
 
@@ -72,5 +78,5 @@ export default {
   getUnscheduled,
   post,
   update,
-  getTasksJSON,
+  getTasksJSONByRange,
 };

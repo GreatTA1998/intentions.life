@@ -7,29 +7,60 @@
     width: 100vw;
   }
 
-  .intro{
+  .intro {
     margin: 5% auto;
     width: 80vw;
   }
 
-  .json-box {
+  .chat-box {
     width: 66%;
     margin: auto;
-    height: 50vh; /* A third of the viewport height */
-    font-family: monospace;
+    height: 50vh;
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
     background-color: #f9f9f9;
-    white-space: pre-wrap;
     overflow-y: scroll;
-  }
-  .buttons {
-    display: flex;
-    justify-content: center;
+    font-family: monospace;
+    white-space: pre-wrap;
   }
 
-  .export-button, .copy-button{
+  .message-class {
+    text-align: right;
+    color: #007bff;
+  }
+
+  .input-section {
+    display: flex;
+    justify-content: center;
+    padding: 10px;
+  }
+
+  .input-section input {
+    width: 60%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+  }
+
+  .submit-button {
+    margin-left: 10px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    border-radius: 4px;
+    background-color: #007bff;
+    color: white;
+  }
+
+  .submit-button:hover {
+    background-color: #0056b3;
+  }
+
+  .export-button,
+  .copy-button {
     margin: 10px;
     padding: 10px 20px;
     font-size: 16px;
@@ -41,6 +72,7 @@
     display: block;
   }
 
-  .export-button:hover, .copy-button:hover {
+  .export-button:hover,
+  .copy-button:hover {
     background-color: #0056b3;
   }

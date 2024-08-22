@@ -1,8 +1,5 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
-import { helloWorld } from './AI';
-
-helloWorld();
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_PUBLIC_FIREBASE_API,
