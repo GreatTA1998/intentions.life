@@ -174,7 +174,7 @@
   import { onMount, onDestroy } from 'svelte'
   import { user } from '/src/store.js'
   import { collection, onSnapshot } from 'firebase/firestore'
-  import db from '/src/db.js'
+  import db from '../back-end/db'
   import { applyFuncToEveryTreeNode, round } from '/src/helpers/everythingElse.js'
 
   export let allTasks // needed for TimeSpent dashboard

@@ -108,7 +108,7 @@
   import RecursiveTaskElement from '$lib/RecursiveTaskElement.svelte'
   import ReusableHelperDropzone from '$lib/ReusableHelperDropzone.svelte'
   import DetailedCardPopup from '$lib/DetailedCardPopup.svelte'
-  import db from '/src/db.js'
+  import db from '../back-end/db'
   import applyTaskSchema from '../helpers/applyTaskSchema'
 
   let unsub = null 

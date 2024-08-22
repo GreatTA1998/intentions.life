@@ -21,7 +21,7 @@
 
 <script>
   import "/src/app.css";
-  import db from '../db.js'
+  import db from '../back-end/db'
   import { page } from '$app/stores'
   import { hasFetchedUser, user, hasLogoExited } from '../store.js'
   import { goto } from '$app/navigation'

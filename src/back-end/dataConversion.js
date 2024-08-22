@@ -1,5 +1,5 @@
 const user = "6uIcMMsBEkQ85OINCDADtrygzZx1";
-import db from "./connection.js";
+import db from "./db.js";
 import {
   writeBatch,
   doc,

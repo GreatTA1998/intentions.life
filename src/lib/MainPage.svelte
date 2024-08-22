@@ -231,7 +231,7 @@
   import { onDestroy, onMount, tick } from 'svelte'
   import { goto } from '$app/navigation';
   import { getAuth, signOut } from 'firebase/auth'
-  import db from '/src/db.js'
+  import db from '../back-end/db.js'
   import { doc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore'
   import { 
     setFirestoreDoc, 

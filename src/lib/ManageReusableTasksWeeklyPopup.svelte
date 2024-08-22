@@ -97,7 +97,7 @@
   import { onMount, onDestroy } from 'svelte'
   import ExperimentalCanvas from '$lib/ExperimentalCanvas.svelte'
   import { onSnapshot, collection } from 'firebase/firestore'
-  import db from '/src/db.js'
+  import db from '../back-end/db'
   import _ from 'lodash'
 
   export let weeklyTemplate = {

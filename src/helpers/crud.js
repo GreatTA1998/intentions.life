@@ -1,29 +1,16 @@
-import { getRandomID } from "/src/helpers/everythingElse.js";
 import {
-  deleteField,
   collection,
   query,
-  orderBy,
-  limit,
   getDoc,
   getDocs,
   updateDoc,
   deleteDoc,
-  arrayUnion,
-  arrayRemove,
-  increment,
   doc,
   setDoc,
   where,
 } from "firebase/firestore";
-import db from "/src/db.js";
-import {
-  getStorage,
-  ref,
-  uploadBytes,
-  getDownloadURL,
-  deleteObject,
-} from "firebase/storage";
+import db from "../back-end/db";
+
 
 // I prefix all Firestore helper functions with `firestore` prefix
 // e.g. `firestoreRef` (written by me) vs `ref` (native to library)

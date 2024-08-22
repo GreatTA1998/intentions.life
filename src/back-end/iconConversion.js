@@ -1,4 +1,4 @@
-import db from "./connection.js";
+import db from "./db.js";
 import {
   writeBatch,
   doc,
