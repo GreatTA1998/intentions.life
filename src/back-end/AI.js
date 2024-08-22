@@ -1,5 +1,5 @@
 import OpenAI from "openai";
-
+console.log('new version, can you see this? also env: ', import.meta.env)
 const openai = new OpenAI({
   apiKey: import.meta.env.VITE_PUBLIC_BROWSER_NAME,
   dangerouslyAllowBrowser: true
