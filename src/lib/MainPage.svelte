@@ -109,6 +109,7 @@
     </div> -->
 
     <div style="display: flex; gap: 24px; align-items: center;">
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
       <span on:click={() => goto(`/${$user.uid}/mobile`)} class="material-symbols-outlined mika-hover responsive-icon-size">
         smartphone
       </span>
@@ -116,6 +117,7 @@
       <MultiPhotoUploader/>
   
       <PopupCustomerSupport let:setIsPopupOpen={setIsPopupOpen}>
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
         <span on:click={() => setIsPopupOpen({ newVal: true })}  class="material-symbols-outlined mika-hover responsive-icon-size">
           contact_support
         </span>

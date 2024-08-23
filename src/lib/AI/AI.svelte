@@ -10,6 +10,7 @@
     startDate: DateTime.now().minus({ month: 2 }).toISODate(),
     endDate: DateTime.now().plus({ month: 2 }).toISODate(),
   };
+  
   let state = {
     userID: "",
     chat: [],
@@ -86,5 +87,3 @@
 </div>
 
 <style src="./AI.css"></style>
-
-
