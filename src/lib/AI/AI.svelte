@@ -13,7 +13,7 @@
   
   let state = {
     userID: "",
-    chat: [],
+    chat: [{role: 'assistant', message: text.example}],
     currentInput: "",
     tasksJSON: "",
     DateRange: DefaultDateRange,

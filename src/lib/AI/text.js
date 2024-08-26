@@ -1,3 +1,6 @@
 export default {
-    intro: "This is your assistant that knows your scheduele. Use it to search for specific events in past or future, analyse and give suggestions for our scheduele, or just chat about the enternal sunshine of the spotless mind. If you add info like 'I couldnt sleep today' into your calendar, this assistant will evaluate likely causes by analysing frequent coralations to other nights where you couldn't sleep.",
-}
+  intro:
+    "This is your assistant that knows your scheduele. Use it to search for specific events, analyse and get suggestions for your scheduele, or just chat about the enternal sunshine of the spotless mind.",
+  example:
+    "I become exponentially more powerful with more data, If you track your mood in the calendar, I can analyse what makes you happy or depressed.",
+};
