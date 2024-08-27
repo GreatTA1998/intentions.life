@@ -5,7 +5,7 @@ import {
   Messaging,
 } from "firebase/messaging";
 import { app } from "../src/back-end/firestoreConnection";
-
+console.log('what the wholy fuck is going on')
 export const handleNotificationPermission = () => {
   console.log("Requesting permission...");
   Notification.requestPermission().then((permission) => {
