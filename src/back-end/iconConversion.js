@@ -1,4 +1,4 @@
-import db from "./db.js";
+import {db} from "./firestoreConnection.js/index.js";
 import {
   writeBatch,
   doc,

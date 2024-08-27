@@ -6,7 +6,7 @@ import {
   getTimeInHHMM,
   computeDayDifference
 } from '/src/helpers/everythingElse.js'
-import db from '../back-end/db'
+import {db} from '../back-end/firestoreConnection'
 
 // break the parent relation only if necessary, so that the task can validly belong in the new todo list
 // `updateObj` is what the dropped task is about to be updated to Firestore

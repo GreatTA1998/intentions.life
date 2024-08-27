@@ -12,5 +12,5 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-export default getFirestore(app, "tokyo-db"); 
-
+const db = getFirestore(app, "tokyo-db"); 
+export {app, db};

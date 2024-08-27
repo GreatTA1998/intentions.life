@@ -1,5 +1,5 @@
 const user = "6uIcMMsBEkQ85OINCDADtrygzZx1";
-import db from "./db.js";
+import{ db }from "./firestoreConnection.js/index.js";
 import {
   writeBatch,
   doc,

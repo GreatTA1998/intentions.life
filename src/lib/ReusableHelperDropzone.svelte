@@ -27,7 +27,7 @@
     user 
   } from '/src/store.js'
   import { increment, writeBatch, doc } from 'firebase/firestore'
-  import db from '../back-end/db'
+  import {db} from '../back-end/firestoreConnection'
 
   export let ancestorRoomIDs
   export let roomsInThisLevel

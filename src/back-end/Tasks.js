@@ -1,6 +1,5 @@
 // import db from "./connection.js";
-import db from "./db";
-import { DateTime } from "luxon";
+import {db} from "./firestoreConnection";
 import { getRandomID } from "/src/helpers/everythingElse.js";
 import {
   doc,

@@ -9,7 +9,7 @@ import {
   setDoc,
   where,
 } from "firebase/firestore";
-import db from "../back-end/db";
+import {db} from "../back-end/firestoreConnection";
 
 
 // I prefix all Firestore helper functions with `firestore` prefix

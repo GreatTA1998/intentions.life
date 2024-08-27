@@ -21,7 +21,7 @@
 
 <script>
   import "/src/app.css";
-  import db from '../back-end/db'
+  import {db} from '../back-end/firestoreConnection'
   import { page } from '$app/stores'
   import { hasFetchedUser, user, hasLogoExited } from '../store.js'
   import { goto } from '$app/navigation'

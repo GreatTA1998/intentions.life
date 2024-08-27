@@ -5,6 +5,6 @@
 
 
 <script>
-  import MainPage from '$lib/MainPage.svelte'
+  import MainPage from '$lib/MainPage/MainPage.svelte'
   import { user } from '/src/store.js'
 </script>

@@ -108,7 +108,7 @@
   import RecursiveTaskElement from '$lib/RecursiveTaskElement.svelte'
   import ReusableHelperDropzone from '$lib/ReusableHelperDropzone.svelte'
   import DetailedCardPopup from '$lib/DetailedCardPopup.svelte'
-  import db from '../back-end/db'
+  import {db} from '../back-end/firestoreConnection'
   import applyTaskSchema from '../helpers/applyTaskSchema'
 
   let unsub = null 
