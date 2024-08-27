@@ -14,7 +14,7 @@ export const handleNotificationPermission = () => {
     console.log('we are in handleSW');
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker
-        .register("/firebase-messaging-sw.js", { type: 'module' })
+        .register("%sveltekit.assets%/firebase-messaging-sw.js", { type: 'module' })
         .then((registration) => {
           console.log(
             "Service Worker registered with scope:",
