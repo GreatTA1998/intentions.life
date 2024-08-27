@@ -28,6 +28,5 @@ export const handleSW = () => {
     } else {
       console.error("Service Worker not supported in this browser.");
     }
-  }),
-    3000;
+  },3000)
 };
