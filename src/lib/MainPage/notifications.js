@@ -10,7 +10,7 @@ export const handleNotificationPermission = () => {
   console.log("Requesting permission...");
   Notification.requestPermission().then((permission) => {
     if (permission === "granted") {
-      console.log("Notification permission granted.");
+      console.log("Notification permission granted. 32!!!!!!!!!!!!!!!!");
       const messaging = getMessaging(app);
       getToken(messaging, {
         vapidKey: import.meta.env.VITE_PUBLIC_MESSAGING_VAPID_KEY,
