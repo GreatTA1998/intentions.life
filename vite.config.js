@@ -15,13 +15,6 @@ export default {
   }), // viteCommonjs(),
   
   sveltekit()],
-  build: {
-    rollupOptions: {
-      input: {
-        'firebase-messaging-sw': 'static/firebase-messaging-sw.js',
-      },
-    },
-  },
 
   // Fixes known issue with v9 Firebase and SvelteKit
   // https://kit.svelte.dev/faq

@@ -1,17 +1,5 @@
 {
   "github": {
     "silent": true
-  },
-  "routes": [
-    { "src": "/firebase-messaging-sw.js", "dest": "/firebase-messaging-sw.js" }
-  ],
-  "headers": [
-    {
-      "source": "/firebase-messaging-sw.js",
-      "headers": [
-        { "key": "Access-Control-Allow-Origin", "value": "*" },
-        { "key": "Content-Type", "value": "application/javascript" }
-      ]
-    }
-  ]
+  }
 }
