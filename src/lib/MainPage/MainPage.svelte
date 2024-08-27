@@ -530,7 +530,7 @@
         </div>
 
         <!-- svelte-ignore a11y-click-events-have-key-events -->
-        <div
+        <!-- <div
           on:click={() => (currentMode = "ManageRepeats")}
           class="ux-tab-item"
           class:active-ux-tab={currentMode === "ManageRepeats"}
@@ -543,10 +543,10 @@
           >
             restart_alt
           </span>
-        </div>
+        </div> -->
 
         <!-- svelte-ignore a11y-click-events-have-key-events -->
-        <div
+        <!-- <div
           on:click={() => (currentMode = "Year")}
           class="ux-tab-item"
           class:active-ux-tab={currentMode === "Year"}
@@ -556,7 +556,7 @@
             sports_score
           </span>
         </div>
-      </div>
+      </div> -->
 
       <!-- 
       KEEP THIS SO YOU CAN MIGRATE THIS TO YOUR JOURNAL APP
