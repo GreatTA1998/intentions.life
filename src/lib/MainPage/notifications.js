@@ -1,21 +1,21 @@
-
 export const handleNotificationPermission = () => {
-    console.log("Requesting permission...");
-    Notification.requestPermission().then((permission) => {
-      if (permission === "granted") {
-        console.log("Notification permission granted.");
-      } else {
-        console.error("permision rejected");
-      }
-    });
-  };
+  console.log("Requesting permission...");
+  Notification.requestPermission().then((permission) => {
+    if (permission === "granted") {
+      console.log("Notification permission granted.");
+    } else {
+      console.error("permision rejected");
+    }
+  });
+};
 
-  export const handleSW = () => {
-    console.log('we are in handleSW');
+export const handleSW = () => {
+  setTimeout(() => {
+    console.log("we are in handleSW");
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker
-        .register("/firebase-messaging-sw.js", { type: 'module', scope: '/'  })
-        
+        .register("/firebase-messaging-sw.js", { type: "module", scope: "/" })
+
         .then((registration) => {
           console.log(
             "Service Worker registered with scope:",
@@ -28,5 +28,6 @@ export const handleNotificationPermission = () => {
     } else {
       console.error("Service Worker not supported in this browser.");
     }
-  };
-  
+  }),
+    3000;
+};
