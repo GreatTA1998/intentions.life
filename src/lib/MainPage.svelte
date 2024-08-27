@@ -1,7 +1,8 @@
 
 
 {#if isMobile}
-<img class='mobile-mode-coming' src='https://firebasestorage.googleapis.com/v0/b/project-y-2a061.appspot.com/o/websiteImages%2F57668dc2-ef2b-4f71-a54d-dc2e1746b219.webp?alt=media&token=29b2fd82-7a11-494c-91fe-ebdfadc58873'/>
+<img class='mobile-mode-coming-image' src='https://firebasestorage.googleapis.com/v0/b/project-y-2a061.appspot.com/o/websiteImages%2F57668dc2-ef2b-4f71-a54d-dc2e1746b219.webp?alt=media&token=29b2fd82-7a11-494c-91fe-ebdfadc58873'/>
+<h1 class='mobile-mode-coming-text'> Mobile mode is coming </h1>
 {:else}
 {#key clickedTask}
   {#if isDetailedCardOpen}
@@ -733,7 +734,7 @@ const checkMobile = () => {
       overflow: visible;
     }
   }
-  .mobile-mode-coming{
+  .mobile-mode-coming-image{
     max-width: 100vw;
     object-fit: cover;
     object-position: center;
@@ -741,5 +742,9 @@ const checkMobile = () => {
     padding-left: 10px;
     padding-right: 10px;
     
+  }
+  .mobile-mode-coming-text{
+    text-align: center;
+    margin: 50px auto;
   }
 </style>
