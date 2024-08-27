@@ -1,3 +1,8 @@
+
+
+{#if isMobile}
+<img class='mobile-mode-coming' src='https://firebasestorage.googleapis.com/v0/b/project-y-2a061.appspot.com/o/websiteImages%2F57668dc2-ef2b-4f71-a54d-dc2e1746b219.webp?alt=media&token=29b2fd82-7a11-494c-91fe-ebdfadc58873'/>
+{:else}
 {#key clickedTask}
   {#if isDetailedCardOpen}
     <DetailedCardPopup 
@@ -110,9 +115,9 @@
 
     <div style="display: flex; gap: 24px; align-items: center;">
       <!-- svelte-ignore a11y-click-events-have-key-events -->
-      <span on:click={() => goto(`/${$user.uid}/mobile`)} class="material-symbols-outlined mika-hover responsive-icon-size">
+      <!-- <span on:click={() => goto(`/${$user.uid}/mobile`)} class="material-symbols-outlined mika-hover responsive-icon-size">
         smartphone
-      </span>
+      </span> -->
 
       <MultiPhotoUploader/>
   
@@ -198,6 +203,7 @@
   </div>
 </NavbarAndContentWrapper>
 
+{/if}
 <script>
   import { 
     createNewInstancesOfWeeklyRepeatingTasks,
@@ -266,8 +272,18 @@
 
   let clickedTask = {}
   let unsub
+  let isMobile = false;
+
+// Function to check if the user is on a mobile device
+const checkMobile = () => {
+  isMobile = window.innerWidth <= 768; // You can adjust the width threshold as needed
+};
 
   onMount(async () => {
+    checkMobile();
+    window.addEventListener('resize', checkMobile); // Update on resize
+
+    
     const today = DateTime.now()
     const left = today.minus({ days: size + cushion })
     const right = today.plus({ days: size + cushion })
@@ -288,6 +304,9 @@
     // findActiveUsers()
     // garbageCollectInvalidTasks($user)
     // return
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+    };
   })
 
   function handleLogoClick (setIsPopupOpen) {
@@ -713,5 +732,14 @@
     .todo-container {
       overflow: visible;
     }
+  }
+  .mobile-mode-coming{
+    max-width: 100vw;
+    object-fit: cover;
+    object-position: center;
+    margin-top: 20vh;
+    padding-left: 10px;
+    padding-right: 10px;
+    
   }
 </style>
