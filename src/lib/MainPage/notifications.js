@@ -1,8 +1,28 @@
+import {
+  getMessaging,
+  getToken,
+  onMessage,
+  Messaging,
+} from "firebase/messaging";
+import { app } from "../src/back-end/firestoreConnection";
+
 export const handleNotificationPermission = () => {
   console.log("Requesting permission...");
   Notification.requestPermission().then((permission) => {
     if (permission === "granted") {
       console.log("Notification permission granted.");
+      const messaging = getMessaging(app);
+      getToken(messaging, {
+        vapidKey: import.meta.env.VITE_PUBLIC_MESSAGING_VAPID_KEY,
+      })
+        .then((fetchedToken) => {
+          // Store the received token
+          console.log("out token is:", fetchedToken);
+        })
+        .catch((error) => {
+          // Handle any errors in fetching the token
+          console.error("Error fetching token:", error);
+        });
     } else {
       console.error("permision rejected");
     }
@@ -14,7 +34,7 @@ export const handleSW = () => {
     console.log("we are in handleSW");
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker
-        .register("/firebase-messaging-sw.js", { type: "module", scope: "/" })
+        .register("/firebase-messaging-sw.js")
 
         .then((registration) => {
           console.log(

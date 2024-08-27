@@ -1,5 +1,6 @@
+
+console.log('sw file')
 import { getMessaging, getToken } from "firebase/messaging";
-console.log("we attached messaging");
 import {app} from '../src/back-end/firestoreConnection'
 // Get registration token. Initially this makes a network call, once retrieved
 // subsequent calls to getToken will return from cache.
