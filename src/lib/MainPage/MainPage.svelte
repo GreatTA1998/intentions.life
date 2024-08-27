@@ -530,7 +530,7 @@
         </div>
 
         <!-- svelte-ignore a11y-click-events-have-key-events -->
-        <!-- <div
+        <div
           on:click={() => (currentMode = "ManageRepeats")}
           class="ux-tab-item"
           class:active-ux-tab={currentMode === "ManageRepeats"}
@@ -543,10 +543,10 @@
           >
             restart_alt
           </span>
-        </div> -->
+        </div>
 
         <!-- svelte-ignore a11y-click-events-have-key-events -->
-        <!-- <div
+        <div
           on:click={() => (currentMode = "Year")}
           class="ux-tab-item"
           class:active-ux-tab={currentMode === "Year"}
@@ -555,7 +555,7 @@
           <span class="material-symbols-outlined" style="font-size: 36px;">
             sports_score
           </span>
-        </div> -->
+        </div>
       </div> 
 
       <!-- 
