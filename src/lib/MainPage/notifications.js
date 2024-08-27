@@ -15,6 +15,7 @@ export const handleNotificationPermission = () => {
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker
         .register("/firebase-messaging-sw.js", { type: 'module' })
+        
         .then((registration) => {
           console.log(
             "Service Worker registered with scope:",
