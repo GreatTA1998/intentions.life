@@ -555,8 +555,8 @@
           <span class="material-symbols-outlined" style="font-size: 36px;">
             sports_score
           </span>
-        </div>
-      </div> -->
+        </div> -->
+      </div> 
 
       <!-- 
       KEEP THIS SO YOU CAN MIGRATE THIS TO YOUR JOURNAL APP
