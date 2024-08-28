@@ -29,11 +29,14 @@
   import ManageReusableTasks from "$lib/ManageReusableTasks.svelte";
   import UncertainMilestones from "$lib/UncertainMilestones.svelte";
   import MultiPhotoUploader from "$lib/MultiPhotoUploader.svelte";
-  import {handleSW, handleNotificationPermission} from './notifications.js'
+  import {
+    handleSW,
+    handleNotificationPermission,
+  } from "./handleNotifications.js";
   import { onDestroy, onMount, tick } from "svelte";
   import { goto } from "$app/navigation";
   import { getAuth, signOut } from "firebase/auth";
-  import {db} from "../../back-end/firestoreConnection.js";
+  import { db } from "../../back-end/firestoreConnection.js";
   import { doc, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore";
   import {
     setFirestoreDoc,
@@ -43,15 +46,11 @@
   } from "/src/helpers/crud.js";
   import NewThisWeekTodo from "$lib/NewThisWeekTodo.svelte";
   import { deleteObject, getStorage, ref } from "firebase/storage";
-  import Tasks from "../../back-end/Tasks.js";
-  import { size, cushion } from "/src/helpers/constants.js";
-  import { DateTime } from "luxon";
+  import { handleInitialTasks } from "./handleTasks.js";
   import {
     createOnLocalState,
     updateLocalState,
     deleteFromLocalState,
-    buildCalendarDataStructures,
-    buildTodoDataStructures,
   } from "/src/helpers/maintainState.js";
   import MobileView from "../MobileView/MobileView.svelte";
 
@@ -74,29 +73,14 @@
     isMobile = window.innerWidth <= 768; // You can adjust the width threshold as needed
   };
 
-
   onMount(async () => {
     checkMobile();
     window.addEventListener("resize", checkMobile); // Update on resize
 
-    handleSW()
-    handleNotificationPermission();
+    handleNotificationPermission($user);
+    handleSW();
 
-    const today = DateTime.now();
-    const left = today.minus({ days: size + cushion });
-    const right = today.plus({ days: size + cushion });
-
-    Tasks.getByDateRange(
-      $user.uid,
-      left.toFormat("yyyy-MM-dd"),
-      right.toFormat("yyyy-MM-dd")
-    ).then((scheduledTasks) =>
-      buildCalendarDataStructures({ flatArray: scheduledTasks })
-    );
-
-    Tasks.getUnscheduled($user.uid).then((unscheduledTasks) =>
-      buildTodoDataStructures({ flatArray: unscheduledTasks })
-    );
+    handleInitialTasks();
 
     //   TO-DO: fix repeating tasks not getting pre-generated on time
     //   if (isInitialFetch) {
@@ -104,10 +88,6 @@
     //     maintainPreviewWindowForPeriodicTasks()
     //   }
 
-    // SCRIPTS
-    // findActiveUsers()
-    // garbageCollectInvalidTasks($user)
-    // return
     return () => {
       window.removeEventListener("resize", checkMobile);
     };
@@ -115,20 +95,10 @@
 
   function handleLogoClick(setIsPopupOpen) {
     if (confirm("Log out and return to home page tutorials?")) {
-      signOutOnFirebase();
+      const auth = getAuth();
+      signOut(auth).catch(console.error);
       goto("/");
     }
-  }
-
-  function signOutOnFirebase() {
-    const auth = getAuth();
-    signOut(auth)
-      .then(() => {
-        // Sign-out successful.
-      })
-      .catch((error) => {
-        // An error happened.
-      });
   }
 
   function createSubtask({ id, parentID, newTaskObj }) {
@@ -146,24 +116,7 @@
 
   const tasksPath = `/users/${$user.uid}/tasks/`;
 
-  async function maintainPreviewWindowForPeriodicTasks() {
-    if (
-      $user.lastRanRepeatISO &&
-      1 > computeDayDifference(new Date($user.lastRanRepeatISO), new Date())
-    ) {
-      return; // already did daily check
-    }
 
-    const periodicTasks = await getFirestoreCollection(
-      `/users/${$user.uid}/periodicTasks`
-    );
-    handleWeekly(periodicTasks);
-    await handleMonthly(periodicTasks);
-
-    updateFirestoreDoc(`/users/${$user.uid}`, {
-      lastRanRepeatISO: new Date().toISOString(),
-    });
-  }
 
   async function handleMonthly(periodicTasks) {
     const monthlyTemplates = periodicTasks.filter((t) => t.repeatOnDayOfMonth);
@@ -187,31 +140,6 @@
     }
   }
 
-  function handleWeekly(periodicTasks) {
-    const weeklyTemplates = periodicTasks.filter((t) => t.repeatOnDayOfWeek);
-    for (const weeklyTemplate of weeklyTemplates) {
-      const { lastRanRepeatISO, numOfWeeksInAdvance } = weeklyTemplate;
-
-      // backwards compatibility
-      if (!lastRanRepeatISO) {
-        createNewInstancesOfWeeklyRepeatingTasks({
-          weeklyTemplate,
-          userDoc: $user,
-        });
-      }
-
-      const daysSinceLastRepeat = computeDayDifference(
-        new Date(lastRanRepeatISO),
-        new Date()
-      );
-      if (daysSinceLastRepeat > 7 * numOfWeeksInAdvance) {
-        createNewInstancesOfWeeklyRepeatingTasks({
-          weeklyTemplate,
-          userDoc: $user,
-        });
-      }
-    }
-  }
 
   async function createTaskNode({ id, newTaskObj }) {
     try {
@@ -232,8 +160,6 @@
       );
       console.error("error in updateTaskNode: ", err);
     });
-    // we purposely don't await, so the UI experience is much better
-    // without an unsettling delay - if it's a divergence in state we'll just throw an error (0.01% chance)
     updateLocalState({ id, keyValueChanges });
   }
 
@@ -243,7 +169,6 @@
     id,
     parentID,
     childrenIDs,
-    imageDownloadURL = "",
     imageFullPath = "",
   }) {
     if (parentID !== "") {
@@ -556,7 +481,7 @@
             sports_score
           </span>
         </div>
-      </div> 
+      </div>
 
       <!-- 
       KEEP THIS SO YOU CAN MIGRATE THIS TO YOUR JOURNAL APP
@@ -688,142 +613,4 @@
   </NavbarAndContentWrapper>
 {/if}
 
-<style>
-  .responsive-icon-size {
-    font-size: clamp(1rem, 4vw, 1.5rem); /* font-size: 24px;  */
-    cursor: pointer;
-    color: rgb(120, 120, 120);
-  }
-
-  .todo-container {
-    min-width: 360px;
-    background-color: var(--todo-list-bg-color);
-    font-size: 2em;
-    overflow-y: auto;
-  }
-
-  .rounded-card {
-    /* border-radius: 36px; */
-    padding: 24px;
-    border-radius: 6px;
-  }
-
-  .rounded-card::webkit-scrollbar {
-    width: 0px;
-  }
-
-  .container-for-float-cards {
-    margin: auto;
-    height: 70%;
-    min-width: 800px;
-    width: 70%;
-    max-width: 1200px;
-    z-index: 1;
-    display: flex;
-  }
-
-  #the-only-scrollable-container {
-    position: relative;
-    overflow: auto;
-  }
-
-  .calendar-section-flex-child {
-    /* this is funnily enough to fix a patch of white between the header and the calendar column */
-    background-color: var(--calendar-bg-color);
-  }
-
-  .day-week-toggle-segment {
-    display: flex;
-    margin-left: 64px;
-    width: fit-content;
-    justify-content: space-evenly;
-    border-bottom: 0px solid rgb(200, 200, 200);
-    margin: auto;
-  }
-
-  .ux-tab-item {
-    box-sizing: border-box;
-    height: 60px;
-    width: 72px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-bottom: 2px solid transparent;
-    transition: all 0.2s ease-in-out;
-    cursor: pointer;
-    color: rgb(120, 120, 120);
-    font-weight: 300;
-  }
-
-  .transparent-glow-tab {
-    color: white;
-    font-weight: 500;
-    border-bottom: 1px solid white;
-  }
-
-  .transparent-inactive-tab {
-    color: black;
-    font-weight: 400;
-  }
-
-  .active-ux-tab {
-    border-bottom: 1px solid var(--location-indicator-color);
-    color: var(--location-indicator-color);
-    font-weight: 500;
-  }
-
-  .transparent-glow-navbar {
-    background-color: rgba(150, 150, 150, 0.1);
-    border-bottom: none;
-  }
-
-  .glow-card-hover-effect {
-    /* BOX SHADOW */
-    /* #48abe0; was the original glow box shadow color */
-    /* box-shadow: 0 0 48px 15px #3b3b3b;   */
-    box-shadow: 0 0 48px 15px #ffffff3b;
-
-    /* Additional ways to blend the cards to the background suggested by Claude AI */
-    /* 90% opacity without affecting children */
-    background-color: rgba(40, 40, 40, 0.75);
-    color: white;
-  }
-
-  .mika-hover {
-    transition: all 0s ease-out;
-  }
-
-  .mika-hover:hover {
-    color: #0085ff;
-    /* background-color: #0085FF; */
-    /* border: 1px solid #0085FF; */
-    transition: all 0.2s ease-out;
-  }
-
-  .blue-icon {
-    color: #0085ff;
-  }
-
-  /* #radio-player-with-art {
-    background-image: url('../maplestory-watercolor.jpg')
-  } */
-
-  @media (max-width: 1279.99px) {
-    .todo-container {
-      /* reduce todo-list width by 60px for tablets */
-      min-width: 300px;
-    }
-  }
-
-  /* anything below this minimum tablet width is considered a phone */
-  @media (max-width: 767.99px) {
-    /* i.e. flatten all the scrolling onto one massive plane, instead of lots of separate scrolling contexts */
-    #the-only-scrollable-container {
-      overflow: visible;
-    }
-
-    .todo-container {
-      overflow: visible;
-    }
-  }
-</style>
+<style src="./MainPage.css"></style>
