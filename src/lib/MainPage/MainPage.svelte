@@ -1,13 +1,10 @@
 <script>
   import {
-    createNewInstancesOfWeeklyRepeatingTasks,
     createNewInstancesOfMonthlyRepeatingTasks,
   } from "/src/helpers/periodicRepeat.js";
   import {
-    computeDayDifference,
     getDateOfToday,
     getDateInDDMMYYYY,
-    convertToISO8061,
   } from "/src/helpers/everythingElse.js";
   import applyTaskSchema from "../../helpers/applyTaskSchema.js";
   import {
@@ -42,7 +39,6 @@
     setFirestoreDoc,
     updateFirestoreDoc,
     deleteFirestoreDoc,
-    getFirestoreCollection,
   } from "/src/helpers/crud.js";
   import NewThisWeekTodo from "$lib/NewThisWeekTodo.svelte";
   import { deleteObject, getStorage, ref } from "firebase/storage";
@@ -80,13 +76,7 @@
     handleNotificationPermission($user);
     handleSW();
 
-    handleInitialTasks();
-
-    //   TO-DO: fix repeating tasks not getting pre-generated on time
-    //   if (isInitialFetch) {
-    //     isInitialFetch = false
-    //     maintainPreviewWindowForPeriodicTasks()
-    //   }
+    handleInitialTasks($user.uid);
 
     return () => {
       window.removeEventListener("resize", checkMobile);
@@ -204,24 +194,6 @@
     deleteFromLocalState({ id });
   }
 
-  function updateMusicAutoplay(e) {
-    const { newVal } = e.detail;
-    updateDoc(doc(db, userDocPath), {
-      willMusicAutoplay: newVal,
-    });
-  }
-
-  function updateJournalEntryTitle({ entryMMDD, newTitle }) {
-    let updateObj = {};
-    if ($user.journalTitleFromMMDD)
-      updateObj = { ...$user.journalTitleFromMMDD };
-
-    updateObj[entryMMDD] = newTitle;
-    updateDoc(doc(db, userDocPath), {
-      journalTitleFromMMDD: updateObj,
-    });
-  }
-
   function incrementDateClassObj({ days }) {
     const d = calStartDateClassObj;
     const offset = days * (24 * 60 * 60 * 1000);
@@ -229,11 +201,6 @@
     calStartDateClassObj = d; // to manually trigger reactivity
   }
 
-  function changeJournal({ newJournal }) {
-    updateDoc(doc(db, userDocPath), {
-      journal: newJournal,
-    });
-  }
 
   // FOR DEBUGGING PURPOSES, TURN IT ON TO TRUE TO RUN SCRIPT ONCE
   let testRunOnce = false;
@@ -262,40 +229,7 @@
   }
 
   // quick-fix for NaN/NaN bug
-  function collectFutureScheduledTasksToArray() {
-    const yearNumber = new Date().getFullYear();
-    futureScheduledTasks = []; // reset
-    traverseAndUpdateTree({
-      fulfilsCriteria: (task) => {
-        if (!task.startTime || !task.startDate) return;
-        if (task.willRepeatOnWeekDayNumber) return;
-        const d1 = new Date(convertToISO8061({ mmdd: task.startDate }));
-
-        // setHours(hoursValue 0 - 23, minutesValue 0 - 59)
-        // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/setHours
-        const [hh, mm] = task.startTime.split(":");
-        d1.setHours(Number(hh), Number(mm));
-        return (
-          task.startDate &&
-          task.startDate !== "NaN/NaN" &&
-          !task.willRepeatOnWeekDayNumber &&
-          task.startTime &&
-          d1.getTime() >= new Date().getTime() &&
-          Number(task.startYYYY) === Number(yearNumber.toString())
-        ); // this line is a quickfix because we don't store YYYY values in legacy versions
-      }, // 'NaN' quick-fix bug
-      applyFunc: (task) =>
-        (futureScheduledTasks = [...futureScheduledTasks, task]),
-    });
-
-    // TO-DO: don't include all the tasks in the future, only if it is bounded by < 7 days for the week view, and < 30 days for the month view
-    futureScheduledTasks.sort((task1, task2) => {
-      const d1 = new Date(task1.startDate);
-      const d2 = new Date(task2.startDate);
-      return d1.getTime() - d2.getTime(); // most recent to the top??
-    });
-  }
-
+  
   async function createReusableTaskTemplate(id) {
     traverseAndUpdateTree({
       fulfilsCriteria: (task) => task.id === id,
