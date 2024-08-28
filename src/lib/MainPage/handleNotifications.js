@@ -13,7 +13,6 @@ export const handleNotificationPermission = (user) => {
       alert(
         "turn on notifications! (check chrome and Mac notification settings)"
       );
-      handleNotificationPermission(user);
     }
   });
 };

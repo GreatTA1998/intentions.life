@@ -1,9 +1,5 @@
 <script>
   import {
-    createNewInstancesOfMonthlyRepeatingTasks,
-  } from "/src/helpers/periodicRepeat.js";
-  import {
-    getDateOfToday,
     getDateInDDMMYYYY,
   } from "/src/helpers/everythingElse.js";
   import applyTaskSchema from "../../helpers/applyTaskSchema.js";
@@ -14,15 +10,11 @@
     hasInitialScrolled,
   } from "/src/store.js";
   import AI from "../AI/AI.svelte";
-  import BedtimePopupMaplestoryMusic from "$lib/BedtimePopupMaplestoryMusic.svelte";
   import TheSnackbar from "$lib/TheSnackbar.svelte";
   import CalendarThisWeek from "$lib/CalendarThisWeek.svelte";
-  import BackgroundRainScene from "$lib/BackgroundRainScene.svelte";
   import PopupCustomerSupport from "$lib/PopupCustomerSupport.svelte";
   import NavbarAndContentWrapper from "$lib/NavbarAndContentWrapper.svelte";
   import DetailedCardPopup from "$lib/DetailedCardPopup.svelte";
-  import ZenJournal from "$lib/ZenJournal.svelte";
-  import ZenJournalLeftNavigation from "$lib/ZenJournaLeftNavigation.svelte";
   import ManageReusableTasks from "$lib/ManageReusableTasks.svelte";
   import UncertainMilestones from "$lib/UncertainMilestones.svelte";
   import MultiPhotoUploader from "$lib/MultiPhotoUploader.svelte";
@@ -50,15 +42,13 @@
   } from "/src/helpers/maintainState.js";
   import MobileView from "../MobileView/MobileView.svelte";
 
-  let currentMode = "Week"; // weekMode hourMode monthMode
+  let currentMode = "Week"; 
   const userDocPath = `users/${$user.uid}`;
 
   let isDetailedCardOpen = false;
 
   let calStartDateClassObj = new Date();
-  let currentJournalEntryMMDD = getDateOfToday();
   let allTasks = null;
-  let futureScheduledTasks = []; // AF([])
 
   let clickedTask = {};
   let unsub;
@@ -83,7 +73,7 @@
     };
   });
 
-  function handleLogoClick(setIsPopupOpen) {
+  function handleLogoClick() {
     if (confirm("Log out and return to home page tutorials?")) {
       const auth = getAuth();
       signOut(auth).catch(console.error);
@@ -130,12 +120,7 @@
 
   // THIS IS STILL NOT WORKING: THE ADOPTION IS NOT WORKING, RIGHT NOW ALL THE
   // SUBTREE WILL BE GONE FOR SOME REASON
-  function deleteTaskNode({
-    id,
-    parentID,
-    childrenIDs,
-    imageFullPath = "",
-  }) {
+  function deleteTaskNode({ id, parentID, childrenIDs, imageFullPath = "" }) {
     if (parentID !== "") {
       updateFirestoreDoc(tasksPath + parentID, {
         childrenIDs: arrayRemove(id),
@@ -176,7 +161,6 @@
     calStartDateClassObj = d; // to manually trigger reactivity
   }
 
-
   // FOR DEBUGGING PURPOSES, TURN IT ON TO TRUE TO RUN SCRIPT ONCE
   let testRunOnce = false;
 
@@ -204,7 +188,7 @@
   }
 
   // quick-fix for NaN/NaN bug
-  
+
   async function createReusableTaskTemplate(id) {
     traverseAndUpdateTree({
       fulfilsCriteria: (task) => task.id === id,
@@ -391,10 +375,7 @@
         </div>
       </div>
 
-
       <div style="display: flex; gap: 24px; align-items: center;">
-      
-
         <MultiPhotoUploader />
 
         <PopupCustomerSupport let:setIsPopupOpen>
@@ -411,7 +392,7 @@
 
     <div slot="content" style="display: flex; flex-grow: 1; height: 100%;">
       {#if currentMode === "ManageRepeats"}
-        <ManageReusableTasks {allTasks} />     
+        <ManageReusableTasks {allTasks} />
         <!-- WEEK MODE -->
       {:else if currentMode === "Week"}
         <!-- 1st flex child -->
