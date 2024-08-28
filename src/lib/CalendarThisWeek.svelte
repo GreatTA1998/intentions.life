@@ -102,7 +102,6 @@
   import { DateTime } from "luxon";
   import { buildDates } from "../helpers/dataStructures";
   import { size, cushion } from '/src/helpers/constants.js'
-  import BackgroundRainScene from "./BackgroundRainScene.svelte";
   import { calendarTasks, daysToRender } from '/src/store.js'
   import { buildCalendarDataStructures } from '/src/helpers/maintainState.js'
 

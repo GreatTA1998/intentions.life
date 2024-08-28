@@ -106,31 +106,6 @@
 
   const tasksPath = `/users/${$user.uid}/tasks/`;
 
-
-
-  async function handleMonthly(periodicTasks) {
-    const monthlyTemplates = periodicTasks.filter((t) => t.repeatOnDayOfMonth);
-    for (const monthlyTemplate of monthlyTemplates) {
-      const { lastRanRepeatISO } = monthlyTemplate;
-
-      // backwards compatibility
-      if (!lastRanRepeatISO) {
-        await createNewInstancesOfMonthlyRepeatingTasks({
-          monthlyTemplate,
-          userDoc: $user,
-        });
-      }
-
-      if (new Date(lastRanRepeatISO).getMonth() !== new Date().getMonth()) {
-        await createNewInstancesOfMonthlyRepeatingTasks({
-          monthlyTemplate,
-          userDoc: $user,
-        });
-      }
-    }
-  }
-
-
   async function createTaskNode({ id, newTaskObj }) {
     try {
       const newTaskObjChecked = await applyTaskSchema(newTaskObj, $user);
@@ -416,25 +391,9 @@
         </div>
       </div>
 
-      <!-- 
-      KEEP THIS SO YOU CAN MIGRATE THIS TO YOUR JOURNAL APP
-    <div on:click={() => currentMode = 'Day'}
-      class="ux-tab-item hide-for-mobile" 
-      class:transparent-glow-tab={currentMode === 'Day'} 
-      style="margin-right: 8px;"
-    >
-      <span on:click={() => currentMode === 'Day' ? currentMode = 'Week' : currentMode = 'Day'} class="material-symbols-outlined"
-        style="font-size: 30px; margin-top: 4px; color: black;"  
-      >
-        menu_book
-      </span>
-    </div> -->
 
       <div style="display: flex; gap: 24px; align-items: center;">
-        <!-- svelte-ignore a11y-click-events-have-key-events -->
-        <!-- <span on:click={() => goto(`/${$user.uid}/mobile`)} class="material-symbols-outlined mika-hover responsive-icon-size">
-        smartphone
-      </span> -->
+      
 
         <MultiPhotoUploader />
 
@@ -452,48 +411,7 @@
 
     <div slot="content" style="display: flex; flex-grow: 1; height: 100%;">
       {#if currentMode === "ManageRepeats"}
-        <ManageReusableTasks {allTasks} />
-      {:else if currentMode === "Day"}
-        <!-- Show daytime art from 5 am - 7 pm, note `.getHours()` is 0-indexed from 0 to 23 -->
-        {#if new Date().getHours() > 5 && new Date().getHours() < 18}
-          <BedtimePopupMaplestoryMusic
-            willMusicAutoplay={$user.willMusicAutoplay}
-          />
-        {:else}
-          <BackgroundRainScene willMusicAutoplay={$user.willMusicAutoplay} />
-        {/if}
-
-        <div class="container-for-float-cards">
-          <div class="glow-card-hover-effect rounded-card" style="width: 36%;">
-            <ZenJournalLeftNavigation
-              journal={$user.journal}
-              journalTitleFromMMDD={$user.journalTitleFromMMDD}
-              {currentJournalEntryMMDD}
-              on:toggle-music-autoplay={(e) => updateMusicAutoplay(e)}
-              on:journal-entry-select={(e) =>
-                (currentJournalEntryMMDD = e.detail.newMMDD)}
-            />
-          </div>
-
-          <div
-            class="glow-card-hover-effect rounded-card"
-            style="margin-left: 4%; width: 60%;"
-          >
-            {#key currentJournalEntryMMDD}
-              <ZenJournal
-                journal={$user.journal}
-                journalTitleFromMMDD={$user.journalTitleFromMMDD}
-                {currentJournalEntryMMDD}
-                willMusicAutoplay={$user.willMusicAutoplay}
-                on:toggle-music-autoplay={(e) => updateMusicAutoplay(e)}
-                on:journal-update={(e) => changeJournal(e.detail)}
-                on:journal-entry-title-update={(e) =>
-                  updateJournalEntryTitle(e.detail)}
-              />
-            {/key}
-          </div>
-        </div>
-
+        <ManageReusableTasks {allTasks} />     
         <!-- WEEK MODE -->
       {:else if currentMode === "Week"}
         <!-- 1st flex child -->

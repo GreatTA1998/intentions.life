@@ -44,3 +44,5 @@ self.addEventListener('notificationclick', (event) => {
   // This call will focus on the tab or open a new one if the app isn't open
   event.waitUntil(clients.openWindow('https://intentions-life-git-live-testing-https-fuck-it-just-pay-money.vercel.app'));
 });
+
+
