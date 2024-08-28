@@ -193,7 +193,6 @@
       }
     }
 
-    // TO-DO: handle pointerless images
     if (imageFullPath) {
       const storage = getStorage();
       deleteObject(ref(storage, imageFullPath));
