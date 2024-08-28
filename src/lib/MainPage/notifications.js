@@ -1,4 +1,4 @@
-import { getMessaging, getToken } from "firebase/messaging";
+import { getMessaging, getToken, onMessage } from "firebase/messaging";
 import { app } from "../../back-end/firestoreConnection";
 export const handleNotificationPermission = () => {
   console.log("Requesting permission...");
