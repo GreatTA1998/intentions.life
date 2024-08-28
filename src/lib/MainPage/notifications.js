@@ -51,4 +51,17 @@ export const handleSW = () => {
   } else {
     console.error("Service Worker not supported in this browser.");
   }
+
+  onMessage(messaging, (payload) => {
+    console.log('Message received in foreground. ', payload);
+    
+    // Customize notification here
+    const notificationTitle = payload.notification.title || 'New Message';
+    const notificationOptions = {
+      body: payload.notification.body || 'You have a new message',
+      icon: '/path/to/your/icon.png',
+    };
+  
+    new Notification(notificationTitle, notificationOptions);
+  });
 };
