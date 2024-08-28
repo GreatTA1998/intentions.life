@@ -34,6 +34,7 @@ export const handleSW = () => {
     .catch((err) => {
       console.log("An error occurred while retrieving token. ", err);
     });
+    
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
       .register("/firebase-messaging-sw.js")

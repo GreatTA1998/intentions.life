@@ -1,3 +1,6 @@
+console.log('we are in sw');
+
+
 importScripts(
   "https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"
 );
