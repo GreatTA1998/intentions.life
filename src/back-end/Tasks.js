@@ -1,4 +1,4 @@
-import {db} from "./firestoreConnection";
+import { db } from "./firestoreConnection";
 import { getRandomID } from "/src/helpers/everythingElse.js";
 import {
   doc,
@@ -38,12 +38,15 @@ const getUnscheduled = (userUID) => {
 };
 
 const post = (userUID, task) => {
-  return setDoc(doc(db, 'users', userUID, getRandomID()), task);
+  return setDoc(doc(db, "users", userUID, getRandomID()), task);
 };
 
 const update = (userUID, taskID, keyValueChanges) => {
-  return updateDoc(doc(db, 'users', userUID, taskID), keyValueChanges);
+  return updateDoc(doc(db, "users", userUID, taskID), keyValueChanges);
 };
+
+const remove = (userUID, taskID) =>
+  deleteDoc(doc(db, "users", userUID, taskID));
 
 const getTasksJSONByRange = async (uid, startDate, endDate) => {
   const neededProperties = [
@@ -77,4 +80,5 @@ export default {
   post,
   update,
   getTasksJSONByRange,
+  remove,
 };

@@ -15,6 +15,7 @@ const Schema = {
   imageFullPath: "",
   startDateISO: "",
   iconURL: "",
+  notify: false,
 };
 
 export default async function applyTaskSchema(task, userDoc) {
