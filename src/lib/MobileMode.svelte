@@ -132,7 +132,7 @@
   import MobileModeTodayView from '$lib/MobileModeTodayView.svelte'
   import {db} from '../back-end/firestoreConnection'
   import VoiceKeywordDetect from '$lib/VoiceKeywordDetect.svelte'
-  import DetailedCardPopup from '$lib/DetailedCardPopup.svelte'
+  import DetailedCardPopup from '$lib/DetailedCardPopup/DetailedCardPopup.svelte'
 
   let allTasks = []
   let isTesting = false

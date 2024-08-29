@@ -30,7 +30,7 @@
         >
       </div>
 
-      <DetailedCardPopupStartTimeDuration
+      <StartTimeDurationNotify
         {taskObject}
         on:task-update
       />
@@ -46,7 +46,7 @@
       <div style="margin-top: 0px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
         <div style="display: flex; align-items: center; width: 100%;">
           {#if !taskObject.imageDownloadURL}
-            <MobileDetailedCardPopupPhotoUpload {taskObject}/>
+            <PhotoUpload {taskObject}/>
           {/if}
 
           <span class="material-symbols-outlined" on:click|stopPropagation={confirmDelete} 
@@ -85,11 +85,11 @@
 import { createEventDispatcher, onMount, onDestroy, tick } from 'svelte'
 import { mostRecentlyCompletedTaskID } from '/src/store.js'
 import _ from 'lodash'
-import RecursiveBulletPoint from '$lib/RecursiveBulletPoint.svelte'
-import UXFormTextArea from '$lib/UXFormTextArea.svelte'
+import RecursiveBulletPoint from '$lib/DetailedCardPopup/RecursiveBulletPoint.svelte'
+import UXFormTextArea from '$lib/DetailedCardPopup/UXFormTextArea.svelte'
 import ReusableCheckbox from '$lib/ReusableCheckbox.svelte'
-import DetailedCardPopupStartTimeDuration from '$lib/DetailedCardPopupStartTimeDuration.svelte'
-import MobileDetailedCardPopupPhotoUpload from '$lib/MobileDetailedCardPopupPhotoUpload.svelte'
+import StartTimeDurationNotify from '$lib/DetailedCardPopup/StartTimeDurationNotify.svelte'
+import PhotoUpload from './PhotoUpload.svelte';
 
 export let taskObject 
 
@@ -181,83 +181,4 @@ function saveTitle (newVal) {
 }
 </script>
 
-<style>
-  ::-webkit-scrollbar {
-    width: 0px;
-    height: 0px;
-    background: transparent;
-  }
-
-  .blurred-image {
-    filter: blur(6px) brightness(1.0) contrast(1.0) saturate(1.0);  z-index: -1;
-  }
-  .clear-image {
-    z-index: 1;
-  }
-
-  .detailed-card-popup {
-    /* 
-      Default sizing so mobile popup doesn't engulf the entire screen
-      but doesn't affect subsequent image aspect ratio computations
-        - height: fit-content; would exceed width of mobile screen 
-        - max-height: 80%; would affect subsequent image dimension changes 
-    */
-    /* min-width: 400px;
-       min-height: 400px; */
-    height: 50%;
-    width: 80%;
-    position: fixed;
-    font-size: 14px;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    overflow-y: auto;
-    z-index: 4;
-    
-
-    border-radius: 24px;
-    background-color: white;
- 
-    /* border: 1px solid #000; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);*/
-    box-shadow:  0px 0px 0px 9999px rgba(0, 0, 0, 0.5);
-  }
-
-  /* Refer to: https://stackoverflow.com/a/3131082/7812829 */
-  input[type=text] {
-    background: transparent;
-    border: none;
-    border-bottom: 1px solid #DBDBDD;
-    outline: none;
-    font-size: 23px;
-    font-weight: 700;
-    padding-left: 0px;
-    padding-bottom: 6px;
-  }
-
-
-.material-symbols-outlined {
-  font-variation-settings:
-  'FILL' 0,
-  'wght' 400,
-  'GRAD' 0,
-  'opsz' 48
-}
-
-a {
-  flex: 1;
-  background-color: #F4F4F4;
-  color: #4E4E4E;
-  padding-top: 8px; 
-  padding-bottom: 8px;
-  padding-left: 20px;
-  padding-right: 20px;
-  border-radius: 20px;
-  text-align: center;
-  text-decoration: none;
-  transition: all 0.2s ease-out;
-  border: 1px solid #F4F4F4;
-  font-family: sans-serif;
-  font-size: 1rem;
-  height: 5px;
-}
-</style>
+<style src='./DetailedCardPopup.css'></style>

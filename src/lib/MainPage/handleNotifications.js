@@ -5,9 +5,6 @@ import User from "../../back-end/User";
 export const handleNotificationPermission = (user) => {
   Notification.requestPermission().then((permission) => {
     if (permission === "granted") {
-      alert(
-        "If you dont recive a test notification, check out your system and browser settings to make sure notifications are turned on"
-      );
       handleFCMToken(user);
     } else {
       alert(

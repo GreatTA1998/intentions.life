@@ -14,7 +14,7 @@
   import CalendarThisWeek from "$lib/CalendarThisWeek.svelte";
   import PopupCustomerSupport from "$lib/PopupCustomerSupport.svelte";
   import NavbarAndContentWrapper from "$lib/NavbarAndContentWrapper.svelte";
-  import DetailedCardPopup from "$lib/DetailedCardPopup.svelte";
+  import DetailedCardPopup from "$lib/DetailedCardPopup/DetailedCardPopup.svelte";
   import ManageReusableTasks from "$lib/ManageReusableTasks.svelte";
   import UncertainMilestones from "$lib/UncertainMilestones.svelte";
   import MultiPhotoUploader from "$lib/MultiPhotoUploader.svelte";

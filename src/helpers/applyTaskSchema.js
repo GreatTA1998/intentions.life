@@ -15,7 +15,7 @@ const Schema = {
   imageFullPath: "",
   startDateISO: "",
   iconURL: "",
-  notify: false,
+  notify: "", //string so "0" means notification at 0 minutes instead of false
 };
 
 export default async function applyTaskSchema(task, userDoc) {
