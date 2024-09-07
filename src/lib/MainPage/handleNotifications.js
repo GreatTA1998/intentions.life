@@ -22,11 +22,14 @@ async function handleFCMToken({ uid, FCMTokens }) {
   }).catch((err) =>
     console.error("An error occurred while retrieving token. ", err)
   );
-  return !FCMTokens || !FCMTokens.includes(token)
-    ? User.addFCMToken(uid, token).catch((err) =>
-        console.error("error in addFCMToken, ", err)
-      )
-    : token;
+  if(!FCMTokens || !FCMTokens.includes(token)){
+    console.log('adding token =', token)
+    return User.addFCMToken(uid, token).catch((err) =>
+      console.error("error in addFCMToken, ", err)
+    )
+  } else{
+    return token;
+  } ;
 }
 
 export const handleSW = async () => {

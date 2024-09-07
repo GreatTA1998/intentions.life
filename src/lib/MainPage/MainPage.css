@@ -91,7 +91,6 @@
     /* #48abe0; was the original glow box shadow color */
     /* box-shadow: 0 0 48px 15px #3b3b3b;   */
     box-shadow: 0 0 48px 15px #ffffff3b;
-
     /* Additional ways to blend the cards to the background suggested by Claude AI */
     /* 90% opacity without affecting children */
     background-color: rgba(40, 40, 40, 0.75);

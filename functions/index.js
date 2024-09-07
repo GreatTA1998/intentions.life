@@ -1,6 +1,5 @@
 const { onSchedule } = require('firebase-functions/v2/scheduler');
 const { logger } = require('firebase-functions');
-const { db } = require('./firestoreConnection');
 const functions = require('firebase-functions');
 const { checkNotify } = require('./checkNotify');
 
@@ -13,6 +12,8 @@ const { checkNotify } = require('./checkNotify');
 //     await checkNotify();
 //   },
 // );
+
+// For Testing
 exports.scheduledFunction = functions.https.onRequest(async (req, res) => {
   await checkNotify();
   res.status(200).send('Function executed successfully');
