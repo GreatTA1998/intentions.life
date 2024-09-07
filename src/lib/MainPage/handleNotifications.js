@@ -15,15 +15,16 @@ export const handleNotificationPermission = (user) => {
 };
 
 async function handleFCMToken({ uid, FCMTokens }) {
+  console.log('FCMTokens =', FCMTokens)
   const messaging = getMessaging(app);
   const token = await getToken(messaging, {
     vapidKey: import.meta.env.VITE_PUBLIC_MESSAGING_VAPID_KEY,
   }).catch((err) =>
     console.error("An error occurred while retrieving token. ", err)
   );
-  return !FCMTokens.includes(token)
-    ? User.addFMCToken(uid, token).catch((err) =>
-        console.error("error in addFMCToken, ", err)
+  return !FCMTokens || !FCMTokens.includes(token)
+    ? User.addFCMToken(uid, token).catch((err) =>
+        console.error("error in addFCMToken, ", err)
       )
     : token;
 }

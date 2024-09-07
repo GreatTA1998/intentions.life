@@ -11,13 +11,13 @@ const update = (userUID, keyValueChanges) => {
   );
 };
 
-const addFMCToken = (userUID, FMCToken) => {
+const addFCMToken = (userUID, FCMToken) => {
     return updateDoc(doc(db, "users", userUID), {
-      FMCTokens: arrayUnion(FMCToken),
+      FCMTokens: arrayUnion(FCMToken),
     }).catch((err) => console.error("error in User.update", err));
   };
 
 export default {
   update,
-  addFMCToken
+  addFCMToken
 };
