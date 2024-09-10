@@ -1,5 +1,4 @@
 const { onSchedule } = require('firebase-functions/v2/scheduler');
-const { logger } = require('firebase-functions');
 const functions = require('firebase-functions');
 const { checkNotify } = require('./checkNotify');
 

@@ -12,27 +12,42 @@ async function checkNotify() {
   functions.logger.info('scheduledFunction');
   try {
     const db = getFirestore('tokyo-db');
-    const usersSnapshot = await db.collection('users').get();
+    const usersSnapshot = await db
+      .collection('users')
+      .where('FCMTokens', '!=', [])
+      .get();
     for (const userDoc of usersSnapshot.docs) {
-      const tasksSnapshot = await userDoc.ref.collection('tasks').get();
-      tasksSnapshot.docs.map(async (taskDoc) =>
-        await handleNotifications(taskDoc.data(), userDoc.data()),
+      const tasksSnapshot = getTodaysTasksSnapshot(userDoc);
+      tasksSnapshot.docs.map(
+        async (taskDoc) =>
+          await handleNotifications(taskDoc.data(), userDoc.data()),
       );
     }
-    functions.logger.info(
-      `Successfully sent notifications.`,
-    );
   } catch (error) {
     functions.logger.error('Error in sendTaskNotifications:', error);
   }
 }
 
+async function getTodaysTasksSnapshot(userDoc) {
+  const safeFirstDateISO = DateTime.now()
+    .minus({ days: 1 })
+    .toISO()
+    .slice(0, 10);
+  const safeLastDateISO = DateTime.now().plus({ days: 1 }).toISO().slice(0, 10);
+  const tasksSnapshot = await userDoc.ref
+    .collection('tasks')
+    .where('startDateISO', '>=', safeFirstDateISO)
+    .where('startDateISO', '<=', safeLastDateISO)
+    .get();
+  return tasksSnapshot;
+}
+
 function handleNotifications(taskData, userData) {
-  if (!taskData.notify || taskData.notify == '') return;
+  if (!shouldNotifyNow(taskData)) return;
   userData.FCMTokens.map(async (token) => {
     const message = {
       notification: {
-        title: 'Task Reminder',
+        title: taskData.name,
         body: `${taskData.name} is coming up in ${taskData.notify} minutes!`,
       },
       token: token,
@@ -51,5 +66,16 @@ function handleNotifications(taskData, userData) {
     }
   });
 }
+
+const shouldNotifyNow = (taskData) => {
+  const now = DateTime.now().setZone(taskData.timeZone);
+  const taskDateTime = DateTime.fromISO(
+    `${taskData.startDateISO}T${taskData.startTime}:00`,
+  );
+  return now.hasSame(
+    taskDateTime.minus({ minutes: taskData.notify }),
+    'minute',
+  );
+};
 
 exports.checkNotify = checkNotify;

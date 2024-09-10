@@ -1,5 +1,6 @@
 const admin = require('firebase-admin');
 const configJson = require('./adminConfig.json');
+
 const config = {
   credential: admin.credential.cert(configJson),
 };
