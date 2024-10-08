@@ -17,14 +17,12 @@ export const handleNotificationPermission = (user) => {
 async function handleFCMToken({ uid, FCMTokens }) {
   console.log('FCMTokens =', FCMTokens)
   const messaging = await getMessaging(app);
-  console.log('messaging =', messaging);
   const token = await getToken(messaging, {
     vapidKey: import.meta.env.VITE_PUBLIC_MESSAGING_VAPID_KEY,
   }).catch((err) =>
     console.error("An error occurred while retrieving token. ", err)
   );
   if(!FCMTokens || !FCMTokens.includes(token)){
-    console.log('adding token =', token)
     return User.addFCMToken(uid, token).catch((err) =>
       console.error("error in addFCMToken, ", err)
     )
@@ -34,6 +32,7 @@ async function handleFCMToken({ uid, FCMTokens }) {
 }
 
 export const handleSW = async () => {
+  const messaging = await getMessaging(app);
   navigator.serviceWorker
     .register("/firebase-messaging-sw.js")
     .then((registration) => {
