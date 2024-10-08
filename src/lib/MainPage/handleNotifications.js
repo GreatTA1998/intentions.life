@@ -16,7 +16,8 @@ export const handleNotificationPermission = (user) => {
 
 async function handleFCMToken({ uid, FCMTokens }) {
   console.log('FCMTokens =', FCMTokens)
-  const messaging = getMessaging(app);
+  const messaging = await getMessaging(app);
+  console.log('messaging =', messaging);
   const token = await getToken(messaging, {
     vapidKey: import.meta.env.VITE_PUBLIC_MESSAGING_VAPID_KEY,
   }).catch((err) =>
