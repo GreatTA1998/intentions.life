@@ -1,65 +1,66 @@
+<script>
+  import { onMount, createEventDispatcher } from "svelte";
+
+  export let fieldLabel = "Field Label";
+  export let value = "";
+  export let max = "";
+  export let pattern = "";
+  export let placeholder = "";
+  export let willAutofocus = true;
+
+  const dispatch = createEventDispatcher();
+
+  let InputElem;
+  let isFocused = false;
+
+  onMount(() => {
+    if (willAutofocus) {
+      InputElem.focus();
+    }
+  });
+</script>
+
 <!-- Based on UX newsletter, includes
   - Infield top-aligned form labels
 
   More info: https://uxmovement.substack.com/p/8-rules-for-switching-to-infield
 -->
 <!-- svelte-ignore a11y-click-events-have-key-events -->
-<div class="ux-form-field"
+<div
+  class="ux-form-field"
   on:click={() => InputElem.focus()}
   class:grey-border={!isFocused}
   class:blue-border={isFocused}
 >
   <div class="ux-field-label">
-    <slot name="icon"> </slot>
+    <slot name="icon"></slot>
     {fieldLabel}
   </div>
 
   <div style="display: flex; align-items: center;">
-    <input 
-      placeholder={placeholder}
-      pattern={pattern}
-      bind:this={InputElem} 
-      value={value}
-      max={max}
-      on:input={(e) => dispatch('input', { value: e.target.value })}
+    <input
+      {placeholder}
+      {pattern}
+      bind:this={InputElem}
+      {value}
+      {max}
+      on:input={(e) => dispatch("input", { value: e.target.value })}
       on:keyup={(e) => {
-        if (e.key === 'Enter') {
-          dispatch('task-entered', { taskName: value })
+        if (e.key === "Enter") {
+          dispatch("task-entered", { taskName: value });
         }
       }}
-      on:focusin={() => isFocused = true}
+      on:focusin={() => (isFocused = true)}
       on:focusout={() => {
         isFocused = false;
-        dispatch('focus-out')
+        dispatch("focus-out");
       }}
-      class="ux-input-text" 
-      placeholder={placeholder}
-    >
+      class="ux-input-text"
+    />
 
-    <slot name="append"> </slot>
+    <slot name="append"></slot>
   </div>
 </div>
-
-<script>
-  import { onMount, createEventDispatcher } from 'svelte'
-
-  export let fieldLabel = 'Field Label'
-  export let value = ''
-  export let placeholder = ''
-  export let willAutofocus = true
-
-  const dispatch = createEventDispatcher()
-
-  let InputElem
-  let isFocused = false
-
-  onMount(() => {
-    if (willAutofocus) {
-      InputElem.focus()
-    }
-  })
-</script>
-
 
 <style>
   .blue-border {
@@ -67,7 +68,7 @@
   }
 
   .grey-border {
-    border: 1px solid #DBDBDD;
+    border: 1px solid #dbdbdd;
   }
 
   .ux-form-field {
