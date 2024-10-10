@@ -37,14 +37,23 @@ firebase.messaging().onBackgroundMessage((payload) => {
     tag: 'notification-tag', 
     data: payload.data 
   };
-  
+
   lastNotificationTimestamp = currentTime;
   return self.registration.showNotification(notificationTitle, notificationOptions);
 });
 
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  event.waitUntil(clients.openWindow(payload.data.url));
+  const url = event.notification.data && event.notification.data.url;
+  if (url) {
+    event.waitUntil(
+      clients.openWindow(url)
+    );
+  } else {
+    event.waitUntil(
+      clients.openWindow('https://www.intentions.life')
+    );
+  }
 });
 
 

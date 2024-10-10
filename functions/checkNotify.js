@@ -45,7 +45,7 @@ function handleNotifications(taskData, userData) {
     const message = {
       notification: {
         title: `${taskData.name} in ${taskData.notify} minutes!`,
-        body: `${taskData.name} is coming up in ${taskData.notify} minutes!`,
+        body: taskData.notes,
       },
       token: token,
     };
@@ -69,8 +69,8 @@ const shouldNotifyNow = (taskData) => {
     `${taskData.startDateISO}T${taskData.startTime}:00`,
   );
   const notifyMinutes = parseInt(taskData.notify, 10);
-  if (isNaN(notifyMinutes) || typeof notifyMinutes !== 'string') {
-    functions.logger.error('Invalid notify value:', taskData.notify);
+  if (isNaN(notifyMinutes)) {
+    functions.logger.error('Invalid notify value:', taskData);
     return false;
   }
 
