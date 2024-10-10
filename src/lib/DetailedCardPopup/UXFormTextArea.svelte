@@ -1,3 +1,4 @@
+<!-- svelte-ignore a11y-click-events-have-key-events -->
 <div 
   on:click={() => willTriggerFocus = true}
   class="ux-form-field"
