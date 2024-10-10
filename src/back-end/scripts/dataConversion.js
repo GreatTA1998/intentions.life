@@ -41,7 +41,6 @@ async function runConversionForAllUsers() {
 }
 async function migrateUserDataToNewFormat(userID) {
   try {
-    console.log("workin on uid: ", userID);
     const q = query(collection(db, "users", userID, "tasks"));
     const querySnapshot = await getDocs(q);
     const tasksArray = querySnapshot.docs.map((doc) => doc.data());

@@ -18,7 +18,6 @@
   async function exportTasks() {
     const tasksJSON = await Tasks.getTasksJSON(state.userID);
     setState({ ...state, tasksJSON });
-    console.log("our new state is", state);
   }
 
   async function copyCode() {

@@ -13,7 +13,6 @@ import {
 const mariusUserID = "6uIcMMsBEkQ85OINCDADtrygzZx1"; //TESTING
 
 const getByDateRange = (userUID, startDate, endDate) => {
-  console.log('getByDateRange =', startDate, endDate)
   const q = query(
     collection(db, "users", userUID, "tasks"),
     where("startDateISO", ">=", startDate),

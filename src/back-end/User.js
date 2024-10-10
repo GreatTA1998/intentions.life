@@ -12,7 +12,6 @@ const update = (userUID, keyValueChanges) => {
 };
 
 const addFCMToken = (userUID, FCMToken) => {
-    console.log('adding FCMToken =', FCMToken)
     return updateDoc(doc(db, "users", userUID), {
       FCMTokens: arrayUnion(FCMToken),
     }).catch((err) => console.error("error in User.update", err));

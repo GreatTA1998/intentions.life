@@ -103,7 +103,7 @@
       setFirestoreDoc(tasksPath + id, newTaskObjChecked); // hope mf doesn't notice :>
       createOnLocalState({ createdNode: { id, ...newTaskObjChecked } });
     } catch (error) {
-      console.log(error);
+      console.error('error creating task node: ', error);
       alert("Database update failed, please reload");
     }
   }

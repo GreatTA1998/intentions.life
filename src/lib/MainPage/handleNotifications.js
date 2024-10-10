@@ -15,7 +15,6 @@ export const handleNotificationPermission = (user) => {
 };
 
 async function handleFCMToken({ uid, FCMTokens }) {
-  console.log('FCMTokens =', FCMTokens)
   const messaging = await getMessaging(app);
   const token = await getToken(messaging, {
     vapidKey: import.meta.env.VITE_PUBLIC_MESSAGING_VAPID_KEY,
@@ -42,7 +41,6 @@ export const handleSW = async () => {
       console.error("Service Worker registration failed:", error);
     });
   onMessage(messaging, (payload) => {
-    console.log("Message received in foreground. ", payload);
     const notificationTitle = payload.notification.title;
     const notificationOptions = {
       body: payload.notification.body,
@@ -50,11 +48,11 @@ export const handleSW = async () => {
       data: { url: payload.data?.click_action || '/'}
      };
     if (!("Notification" in window)) {
-      console.log("This browser does not support desktop notification");
+      console.error("This browser does not support desktop notification");
     } else if (Notification.permission === "granted") {
       const notification = new Notification(notificationTitle, notificationOptions);
       notification.onclick = function(event) {
-        event.preventDefault(); // Prevent the browser from focusing the Notification's tab
+        event.preventDefault();
         window.open(notification.data.url, '_blank');
         notification.close();
       };

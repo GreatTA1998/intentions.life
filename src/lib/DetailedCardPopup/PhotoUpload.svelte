@@ -82,7 +82,7 @@
       updateFirestoreDoc(`/users/${$user.uid}/tasks/${taskObject.id}`, updateObj)
       updateLocalState({ id: taskObject.id, keyValueChanges: updateObj })
     } catch (error) {
-      console.log(error)
+      console.error(error)
       alert("Error uploading photo, please reload")
     }
   }
@@ -91,7 +91,6 @@
     return new Promise(async (resolve) => {
       const storageRef = ref(storage, `images/${id}`)
       const snapshot = await uploadBytes(storageRef, blobFile)
-      console.log('Uploaded a blob or file! =', snapshot);
       resolve(snapshot)
     })
   }

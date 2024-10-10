@@ -8,7 +8,6 @@ exports.scheduledFunctionCrontab = onSchedule(
     region: 'asia-northeast1', // Tokyo region
   },
   async (event) => {
-    console.log('running check notiffy');
     await checkNotify();
   },
 );
