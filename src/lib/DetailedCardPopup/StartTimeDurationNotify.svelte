@@ -35,6 +35,8 @@
   >
     <div>
       <MyTimePicker
+        placeholder="HH:MM"
+        pattern="[0-9]{2}:[0-9]{2}"
         value={internalStartTime}
         on:input={(e) => handleChanges("startTime", e.detail.typedHHMM)}
         on:time-selected={(e) => {
@@ -46,6 +48,8 @@
 
     <div style="margin-left: 6px; margin-right: 6px; max-width: 80px;">
       <UXFormField
+        pattern="[0-9]*"
+        max="1000"
         fieldLabel="Duration"
         value={Math.round(taskObject.duration)}
         willAutofocus={false}
@@ -64,7 +68,10 @@
     <div style="margin-left: 6px; margin-right: 6px; max-width: 120px;">
       <UXFormField
         fieldLabel="Notification"
-        value={taskObject.notify || 'not set'}
+        value={taskObject.notify}
+        placeholder="not set"
+        pattern="[0-9]*"
+        max="1000"
         willAutofocus={false}
         on:input={(e) => handleChanges("notify", !isNaN(parseInt(e.detail.value)) ?e.detail.value : '', true)}
       >

@@ -3,6 +3,7 @@
 
   More info: https://uxmovement.substack.com/p/8-rules-for-switching-to-infield
 -->
+<!-- svelte-ignore a11y-click-events-have-key-events -->
 <div class="ux-form-field"
   on:click={() => InputElem.focus()}
   class:grey-border={!isFocused}
@@ -15,8 +16,11 @@
 
   <div style="display: flex; align-items: center;">
     <input 
+      placeholder={placeholder}
+      pattern={pattern}
       bind:this={InputElem} 
       value={value}
+      max={max}
       on:input={(e) => dispatch('input', { value: e.target.value })}
       on:keyup={(e) => {
         if (e.key === 'Enter') {
