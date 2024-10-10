@@ -15,12 +15,10 @@
     if (pattern) {
       const regex = new RegExp(`^${pattern}$`);
       if (!regex.test(newValue)) {
-        // If the new value doesn't match the pattern, revert to the last valid value
         event.target.value = value;
         return;
       }
     }
-
     value = newValue;
     dispatch('input', { value: newValue });
   }
