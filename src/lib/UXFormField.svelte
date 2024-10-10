@@ -10,6 +10,21 @@
 
   const dispatch = createEventDispatcher();
 
+  function handleInput(event) {
+    let newValue = event.target.value;
+    if (pattern) {
+      const regex = new RegExp(`^${pattern}$`);
+      if (!regex.test(newValue)) {
+        // If the new value doesn't match the pattern, revert to the last valid value
+        event.target.value = value;
+        return;
+      }
+    }
+
+    value = newValue;
+    dispatch('input', { value: newValue });
+  }
+
   let InputElem;
   let isFocused = false;
 
@@ -44,7 +59,7 @@
       bind:this={InputElem}
       {value}
       {max}
-      on:input={(e) => dispatch("input", { value: e.target.value })}
+      on:input={handleInput}
       on:keyup={(e) => {
         if (e.key === "Enter") {
           dispatch("task-entered", { taskName: value });
