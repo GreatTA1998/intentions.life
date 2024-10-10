@@ -59,7 +59,6 @@
   function copyEmailToClipboard () {
     navigator.clipboard.writeText("elton@explanations.app")
     showSnackbar.set(true)
-    console.log('$showSnackbar =', $showSnackbar)
     setTimeout(() => showSnackbar.set(false), 3000)
   }
 </script>

@@ -107,8 +107,8 @@
   import { reconstructTreeInMemory } from "/src/helpers/dataStructures.js"
   import RecursiveTaskElement from '$lib/RecursiveTaskElement.svelte'
   import ReusableHelperDropzone from '$lib/ReusableHelperDropzone.svelte'
-  import DetailedCardPopup from '$lib/DetailedCardPopup.svelte'
-  import db from '/src/db.js'
+  import DetailedCardPopup from '$lib/DetailedCardPopup/DetailedCardPopup.svelte'
+  import {db} from '../back-end/firestoreConnection'
   import applyTaskSchema from '../helpers/applyTaskSchema'
 
   let unsub = null 

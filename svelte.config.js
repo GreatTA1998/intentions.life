@@ -7,7 +7,7 @@ import preprocess from "svelte-preprocess";
 const config = {
 	preprocess: preprocess({ scss: true }),
 	kit: {
-		adapter: vercel()
+		adapter: vercel(),
 	}
 };
 

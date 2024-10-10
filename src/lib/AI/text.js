@@ -1,4 +1,6 @@
 export default {
-    intro: "Welcome to the experimental AI page, For now, this page generates a JSON of all your Events(Tasks) that you can copy over to ChatGPT to analyse the data for you. Add a question like 'What activities correlate with a good sleep'. ***This quary would only work if you have Events representing your sleep like 'Slept well' or 'Tired'",
-    default: "your Tasks will be generated here, please copy and paste them into chatGPT followed by a question like: 'On average how much time do I spend on sports per week?' or 'Analyse what are the most common corollaries to the 'depressed' Event'",
-}
+  intro:
+    "This is your assistant that knows your scheduele. Use it to search for specific events, analyse and get suggestions for your scheduele, or just chat about the enternal sunshine of the spotless mind.",
+  example:
+    "I become exponentially more powerful with more data, If you track your mood in the calendar, I can analyse what makes you happy or depressed.",
+};

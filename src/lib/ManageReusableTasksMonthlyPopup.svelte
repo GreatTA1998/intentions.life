@@ -80,7 +80,6 @@
   }
 
   async function updateMonthlyTemplate (keyValueChanges) {
-    console.log("keyValueChanges =", keyValueChanges)
     await updateFirestoreDoc(
       `/users/${$user.uid}/periodicTasks/${monthlyTemplate.id}`, 
       keyValueChanges

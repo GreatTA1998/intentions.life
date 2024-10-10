@@ -108,7 +108,7 @@
   } from '/src/helpers/subtreeDragDrop.js'
   import { user, whatIsBeingDraggedFullObj, whatIsBeingDragged, whatIsBeingDraggedID } from '/src/store.js'
   import { getFirestore, writeBatch, doc, increment } from 'firebase/firestore'
-  import db from '/src/db.js'
+  import {db} from '../back-end/firestoreConnection'
 
   export let dueInHowManyDays = null // AF(null) means it's a life todo, otherwise it should be a number
   export let allTasksDue = []

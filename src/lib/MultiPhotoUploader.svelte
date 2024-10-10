@@ -55,7 +55,6 @@
     return new Promise(async (resolve) => {
       const storageRef = ref(storage, `images/${id}`)
       const snapshot = await uploadBytes(storageRef, blobFile)
-      console.log('Uploaded a blob or file! =', snapshot);
       resolve(snapshot)
     })
   }

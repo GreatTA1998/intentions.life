@@ -21,12 +21,12 @@
 
 <script>
   import "/src/app.css";
-  import db from '../db.js'
+  import {db} from '../back-end/firestoreConnection'
   import { page } from '$app/stores'
   import { hasFetchedUser, user, hasLogoExited } from '../store.js'
   import { goto } from '$app/navigation'
   import { getAuth, onAuthStateChanged } from 'firebase/auth'
-  import { getFirestore, doc, deleteDoc, getDoc, setDoc, updateDoc, increment, snapshotEqual, onSnapshot } from 'firebase/firestore'
+  import { doc, setDoc, onSnapshot } from 'firebase/firestore'
   import { onDestroy, onMount } from 'svelte'
   import { updateFirestoreDoc } from "/src/helpers/crud.js"
   import posthog from 'posthog-js'
@@ -112,15 +112,12 @@
 
 
   async function initializeNewFirestoreUser (ref, resultUser) {
-    return new Promise(async (resolve) => {
-      await setDoc(ref, {
+      return await setDoc(ref, {
         uid: resultUser.uid,
         phoneNumber: resultUser.phoneNumber || '',
         email: resultUser.email || '',
         // allTasks: []
-      }, { merge: true })
-      resolve()
-    })
+      }, { merge: true }).catch(err => console.error('error in initializeNewFirestoreUser', err))
   }
 </script>
 

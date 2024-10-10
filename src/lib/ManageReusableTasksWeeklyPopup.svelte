@@ -97,7 +97,7 @@
   import { onMount, onDestroy } from 'svelte'
   import ExperimentalCanvas from '$lib/ExperimentalCanvas.svelte'
   import { onSnapshot, collection } from 'firebase/firestore'
-  import db from '/src/db.js'
+  import {db} from '../back-end/firestoreConnection'
   import _ from 'lodash'
 
   export let weeklyTemplate = {
@@ -144,7 +144,6 @@
   }) 
 
   async function updateWeeklyTemplate (keyValueChanges) {
-    console.log('keyValueChanges =', keyValueChanges)
     await updateFirestoreDoc(
       `/users/${$user.uid}/periodicTasks/${weeklyTemplate.id}`, 
       keyValueChanges

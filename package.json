@@ -21,9 +21,11 @@
   "dependencies": {
     "@sentry/sveltekit": "^8.19.0",
     "firebase": "^9.6.5",
+    "firebase-functions": "^6.0.1",
     "js-datepicker": "^5.18.2",
     "lodash": "^4.17.21",
     "luxon": "^3.4.4",
+    "openai": "^4.56.0",
     "posthog-js": "^1.136.5",
     "svelte-portal": "^2.2.0"
   }

@@ -13,6 +13,7 @@ export default {
       project: "javascript-sveltekit"
     }
   }), // viteCommonjs(),
+  
   sveltekit()],
 
   // Fixes known issue with v9 Firebase and SvelteKit

@@ -17,7 +17,6 @@
 <script>
   import { updateLocalState } from '/src/helpers/maintainState.js'
   import {
-    breakParentRelationIfNecessary,
     maintainValidSubtreeDeadlines,
     correctDeadlineIfNecessary
   } from '/src/helpers/subtreeDragDrop.js'
@@ -27,8 +26,8 @@
     whatIsBeingDraggedFullObj,
     user 
   } from '/src/store.js'
-  import { getFirestore, increment, writeBatch, doc } from 'firebase/firestore'
-  import db from '/src/db.js'
+  import { increment, writeBatch, doc } from 'firebase/firestore'
+  import {db} from '../back-end/firestoreConnection'
 
   export let ancestorRoomIDs
   export let roomsInThisLevel
