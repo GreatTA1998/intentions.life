@@ -32,16 +32,16 @@ async function handleFCMToken({ uid, FCMTokens }) {
 
 export const handleSW = async () => {
   const messaging = await getMessaging(app);
+  const existingRegistration = await navigator.serviceWorker.getRegistration("/firebase-messaging-sw.js");
 
+  if (existingRegistration) {
+    console.log("Existing Service Worker found. Updating...");
+    await existingRegistration.update().catch(err => console.error("Error updating Service Worker", err));
+  } else {
+    console.log("No existing Service Worker found. Registering new one...");
+    await navigator.serviceWorker.register("/firebase-messaging-sw.js").catch(err => console.error("Error registering Service Worker", err));
+  }
 
-  navigator.serviceWorker
-    .register("/firebase-messaging-sw.js")
-    .then((registration) => {
-      console.log("Service Worker registered with scope:", registration.scope);
-    })
-    .catch((error) => {
-      console.error("Service Worker registration failed:", error);
-    });
     
   let lastNotificationId = null;
 

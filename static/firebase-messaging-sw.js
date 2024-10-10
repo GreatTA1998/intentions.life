@@ -18,10 +18,18 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 
 const messaging = firebase.messaging();
+let lastNotificationTimestamp = 0;
 
 
 firebase.messaging().onBackgroundMessage((payload) => {
   console.log('onBackgroundMessage', payload);
+
+  const currentTime = Date.now();
+  if (currentTime - lastNotificationTimestamp < 5000) {
+    console.log('Duplicate notification prevented');
+    return;
+  }
+
   const notificationTitle = payload.notification.title || 'New Message';
   const notificationOptions = {
     body: payload.notification.body || 'You have a new message',
@@ -29,7 +37,8 @@ firebase.messaging().onBackgroundMessage((payload) => {
     tag: 'notification-tag', 
     data: payload.data 
   };
-
+  
+  lastNotificationTimestamp = currentTime;
   return self.registration.showNotification(notificationTitle, notificationOptions);
 });
 
