@@ -17,7 +17,7 @@ async function checkNotify() {
       .where('FCMTokens', '!=', [])
       .get();
     for (const userDoc of usersSnapshot.docs) {
-      const tasksSnapshot = getTodaysTasksSnapshot(userDoc);
+      const tasksSnapshot = await getTodaysTasksSnapshot(userDoc);
       tasksSnapshot.docs.map(
         async (taskDoc) =>
           await handleNotifications(taskDoc.data(), userDoc.data()),
@@ -47,7 +47,7 @@ function handleNotifications(taskData, userData) {
   userData.FCMTokens.map(async (token) => {
     const message = {
       notification: {
-        title: taskData.name,
+        title: `${taskData.name} in ${taskData.notify} minutes!`,
         body: `${taskData.name} is coming up in ${taskData.notify} minutes!`,
       },
       token: token,

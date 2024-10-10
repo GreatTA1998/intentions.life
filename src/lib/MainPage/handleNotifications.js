@@ -43,5 +43,22 @@ export const handleSW = async () => {
     });
   onMessage(messaging, (payload) => {
     console.log("Message received in foreground. ", payload);
+    const notificationTitle = payload.notification.title;
+    const notificationOptions = {
+      body: payload.notification.body,
+      icon: payload.notification.icon || '%sveltekit.assets%/trueoutput-square.png',
+      data: { url: payload.data?.click_action || '/'}
+     };
+    if (!("Notification" in window)) {
+      console.log("This browser does not support desktop notification");
+    } else if (Notification.permission === "granted") {
+      const notification = new Notification(notificationTitle, notificationOptions);
+      notification.onclick = function(event) {
+        event.preventDefault(); // Prevent the browser from focusing the Notification's tab
+        window.open(notification.data.url, '_blank');
+        notification.close();
+      };
+    }
+
   });
 };
