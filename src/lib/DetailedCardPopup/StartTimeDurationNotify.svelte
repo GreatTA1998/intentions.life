@@ -13,6 +13,7 @@
   }
 
   function handleChanges(key, value, timeZone) {
+    console.log('handleChanges', key, value, timeZone);
     if (typeof Number(value) !== "number") return;
     const taskUpdates = {
       [key]: value,
@@ -63,7 +64,7 @@
     <div style="margin-left: 6px; margin-right: 6px; max-width: 120px;">
       <UXFormField
         fieldLabel="Notification"
-        value={Math.round(taskObject.notify)}
+        value={taskObject.notify || 'not set'}
         willAutofocus={false}
         on:input={(e) => handleChanges("notify", e.detail.value, true)}
       >

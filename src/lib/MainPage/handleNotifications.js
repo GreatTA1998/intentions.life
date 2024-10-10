@@ -32,6 +32,8 @@ async function handleFCMToken({ uid, FCMTokens }) {
 
 export const handleSW = async () => {
   const messaging = await getMessaging(app);
+
+
   navigator.serviceWorker
     .register("/firebase-messaging-sw.js")
     .then((registration) => {
@@ -40,7 +42,16 @@ export const handleSW = async () => {
     .catch((error) => {
       console.error("Service Worker registration failed:", error);
     });
+    
+  let lastNotificationId = null;
+
   onMessage(messaging, (payload) => {
+    const notificationId = payload.data?.notificationId || Date.now().toString();
+    if (notificationId === lastNotificationId) {
+      console.error('Duplicate notification received, ignoring.');
+      return;
+    }
+    lastNotificationId = notificationId;
     const notificationTitle = payload.notification.title;
     const notificationOptions = {
       body: payload.notification.body,

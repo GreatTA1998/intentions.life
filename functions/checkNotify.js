@@ -38,6 +38,8 @@ async function getTodaysTasksSnapshot(userDoc) {
     .collection('tasks')
     .where('startDateISO', '>=', safeFirstDateISO)
     .where('startDateISO', '<=', safeLastDateISO)
+    .where('notify', '!=', '')
+    .where('timeZone', '!=', '')
     .get();
   return tasksSnapshot;
 }
@@ -68,14 +70,21 @@ function handleNotifications(taskData, userData) {
 }
 
 const shouldNotifyNow = (taskData) => {
-  const now = DateTime.now().setZone(taskData.timeZone);
-  const taskDateTime = DateTime.fromISO(
-    `${taskData.startDateISO}T${taskData.startTime}:00`,
-  );
-  return now.hasSame(
-    taskDateTime.minus({ minutes: taskData.notify }),
-    'minute',
-  );
+  try{
+    const now = DateTime.now().setZone(taskData.timeZone);
+    const taskDateTime = DateTime.fromISO(
+      `${taskData.startDateISO}T${taskData.startTime}:00`,
+    );
+    const notifyMinutes = parseInt(taskData.notify, 10);
+    return now.hasSame(
+      taskDateTime.minus({ minutes: notifyMinutes }),
+      'minute',
+    );
+  } catch (error) {
+    functions.logger.error('Error in shouldNotifyNow:', error);
+    functions.logger.error('Error in shouldNotifyNow with taskData:', taskData);
+    return false;
+  }
 };
 
 exports.checkNotify = checkNotify;

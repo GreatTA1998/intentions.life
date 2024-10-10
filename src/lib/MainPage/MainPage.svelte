@@ -187,8 +187,6 @@
     }
   }
 
-  // quick-fix for NaN/NaN bug
-
   async function createReusableTaskTemplate(id) {
     traverseAndUpdateTree({
       fulfilsCriteria: (task) => task.id === id,
@@ -202,7 +200,6 @@
   }
 
   async function changeTaskStartTime({ id, timeOfDay, dateScheduled }) {
-    // get an ISO YYYY-MM-DD format
     const yyyy = "2024"; // TO-DO: change this by 2025
     const [mm, dd] = dateScheduled.split("/");
 
