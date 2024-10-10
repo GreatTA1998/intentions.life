@@ -66,7 +66,7 @@
         fieldLabel="Notification"
         value={taskObject.notify || 'not set'}
         willAutofocus={false}
-        on:input={(e) => handleChanges("notify", e.detail.value, true)}
+        on:input={(e) => handleChanges("notify", !isNaN(parseInt(e.detail.value)) ?e.detail.value : '', true)}
       >
         <div
           slot="append"
