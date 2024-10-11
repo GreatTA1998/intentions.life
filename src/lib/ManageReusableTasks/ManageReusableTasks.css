@@ -1,0 +1,44 @@
+.monthly-periodic-task {
+    margin-top: 12px;
+    cursor: pointer;
+  }
+
+  .add-reusable-task-button {
+    font-size: 26px;
+    margin-left: 8px;
+    cursor: pointer;
+  }
+
+  .day-of-week-circle {
+    border-radius: 2px;
+    background-color: rgb(223, 223, 223);
+    width: 4px;
+    height: 4px;
+    margin: 4px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: 1px solid rgb(111, 111, 111);
+  }
+
+  .highlighted {
+    background-color: orange;
+    border: none;
+  }
+
+  .tick {
+    position: absolute;
+    width: 2px; /* 1px looks nicer, but is inconsistently rendered by the browser */
+    height: 10px; /* Adjust the tick height */
+    background-color: #c6c6c6; /* Set the tick color */
+    margin-bottom: -12pxpx;
+  }
+
+  .start {
+    left: 0; /* Position the start tick at the beginning */
+  }
+
+  .end {
+    right: 0; /* Position the end tick at the end */
+  }

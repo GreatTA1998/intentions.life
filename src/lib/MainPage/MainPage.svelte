@@ -15,7 +15,7 @@
   import PopupCustomerSupport from "$lib/PopupCustomerSupport.svelte";
   import NavbarAndContentWrapper from "$lib/NavbarAndContentWrapper.svelte";
   import DetailedCardPopup from "$lib/DetailedCardPopup/DetailedCardPopup.svelte";
-  import ManageReusableTasks from "$lib/ManageReusableTasks.svelte";
+  import ManageReusableTasks from "$lib/ManageReusableTasks/ManageReusableTasks.svelte";
   import UncertainMilestones from "$lib/UncertainMilestones.svelte";
   import MultiPhotoUploader from "$lib/MultiPhotoUploader.svelte";
   import {
@@ -48,7 +48,6 @@
   let isDetailedCardOpen = false;
 
   let calStartDateClassObj = new Date();
-  let allTasks = null;
 
   let clickedTask = {};
   let unsub;
@@ -168,25 +167,7 @@
     clickedTask = task;
     isDetailedCardOpen = true;
   }
-
-  function traverseAndUpdateTree({ fulfilsCriteria, applyFunc }) {
-    const artificialRootNode = {
-      name: "root",
-      children: allTasks,
-    };
-    helperFunction({ node: artificialRootNode, fulfilsCriteria, applyFunc });
-  }
-
-  // useful helper function for task update operations
-  function helperFunction({ node, fulfilsCriteria, applyFunc }) {
-    if (fulfilsCriteria(node)) {
-      applyFunc(node);
-    }
-    for (const child of node.children) {
-      helperFunction({ node: child, fulfilsCriteria, applyFunc });
-    }
-  }
-
+  
   async function createReusableTaskTemplate(id) {
     traverseAndUpdateTree({
       fulfilsCriteria: (task) => task.id === id,
@@ -389,7 +370,7 @@
 
     <div slot="content" style="display: flex; flex-grow: 1; height: 100%;">
       {#if currentMode === "ManageRepeats"}
-        <ManageReusableTasks {allTasks} />
+        <ManageReusableTasks />
         <!-- WEEK MODE -->
       {:else if currentMode === "Week"}
         <!-- 1st flex child -->
