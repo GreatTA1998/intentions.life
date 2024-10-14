@@ -1,6 +1,6 @@
 {#key intForTriggeringRerender}
   <div style="padding: 0px;">
-    <h1 bind:this={DayHeader} style="padding: 8px; margin: 0px; margin-bottom: 16px">
+    <h1 bind:this={DayHeader} style="font-size: 2.4rem; text-transform: uppercase; color: black; padding: 8px; margin: 0px; margin-bottom: 0px">
       {DateTime.fromISO(dateToRender).toFormat('cccc (LLL dd)')}
     </h1>
 
@@ -15,18 +15,20 @@
         {/each}
       </div>
     {/if}
-
-    {#each tasksThisDay.noStartTime.noIcon as flexibleDayTask}
-      <div on:click={() => dispatch('task-click', { task: flexibleDayTask })} 
-        style="width: var(--calendar-day-section-width); font-size: 12px; display: flex; gap: 4px; margin-bottom: 4px; margin-left: 4px; margin-right: 4px;"
-      >
-        <ReusableFlexibleDayTask task={flexibleDayTask}
-          on:task-click
-          on:task-update
-          on:task-checkbox-change
-        />
-      </div>
-    {/each}
+    
+    <div style="display: flex; flex-direction: column; gap: 4px; padding-left: 8px; margin-bottom: 8px;">
+      {#each tasksThisDay.noStartTime.noIcon as flexibleDayTask}
+        <div on:click={() => dispatch('task-click', { task: flexibleDayTask })} 
+          style="width: var(--calendar-day-section-width); font-size: 12px; display: flex; gap: 4px; margin-bottom: 4px; margin-left: 4px; margin-right: 4px;"
+        >
+          <ReusableFlexibleDayTask task={flexibleDayTask}
+            on:task-click
+            on:task-update
+            on:task-checkbox-change
+          />
+        </div>
+      {/each}
+    </div>
 
     {#each tasksThisDay.hasStartTime as eventToday, i}
       {#if dateToRender === DateTime.now().toFormat('yyyy-MM-dd') && i === idxOfTimeIndicator}

@@ -79,7 +79,7 @@
           sunny
         </span>
         <div class="nav-tab-desc">
-          Schedule
+          Calendar View
         </div>
       </div>
     </div>
@@ -90,7 +90,7 @@
           upcoming
         </span>
         <div class="nav-tab-desc">
-          Condensed Schedule
+          Future Overview
         </div>
       </div>
     </div>

@@ -4,7 +4,7 @@
       on:task-click  
     />
 
-    <div style="margin-bottom: 80px;"></div>
+    <div style="margin-bottom: 60px;"></div>
   {/if}
 {/each}
 
