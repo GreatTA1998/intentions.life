@@ -21,27 +21,23 @@
     }
   }
 
-  function isScheduled(taskObj) {
+  function isScheduled (taskObj) {
     return taskObj.startDate && taskObj.startTime && taskObj.startYYYY;
   }
 
-  function handleChanges(key, value, timeZone) {
-    console.log('handleChanges', key, value, timeZone);
-    if (typeof Number(value) !== "number") return;
-    const taskUpdates = {
-      [key]: value,
-    };
-    if(timeZone) taskUpdates.timeZone = DateTime.local().zoneName
+  function handleChanges (key, value, timeZone) {
+    if (typeof Number(value) !== "number") return
+
+    if (timeZone) taskUpdates.timeZone = DateTime.local().zoneName
+
     dispatch("task-update", {
       id: taskObject.id,
-      keyValueChanges: taskUpdates,
-    });
+      keyValueChanges: { [key]: value }
+    })
   }
 </script>
 
-<div
-  style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; row-gap: 24px; margin-top: 24px; font-size: 1.2em;"
->
+<div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; row-gap: 24px; margin-top: 24px; font-size: 1.2em;">
   <div
     style="display: flex; align-items: start; gap: 16px;"
     class:half-invisible={!isScheduled(taskObject)}
