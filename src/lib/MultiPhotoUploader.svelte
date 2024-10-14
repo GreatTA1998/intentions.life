@@ -10,6 +10,7 @@
     multiple
     type="file" 
     accept="image/*" 
+    capture=""
   >
 </div>
 

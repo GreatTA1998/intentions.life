@@ -3,6 +3,8 @@
     <CalendarViewDay {dateToRender} {doodleIcons}
       on:task-click  
     />
+
+    <div style="margin-bottom: 80px;"></div>
   {/if}
 {/each}
 

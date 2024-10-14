@@ -1,5 +1,9 @@
 {#key intForTriggeringRerender}
   <div style="padding: 0px;">
+    <h1 bind:this={DayHeader} style="padding: 8px; margin: 0px; margin-bottom: 16px">
+      {DateTime.fromISO(dateToRender).toFormat('cccc (LLL dd)')}
+    </h1>
+
     {#if doodleIcons}
       <div style="display: flex; flex-wrap: wrap;">
         {#each tasksThisDay.noStartTime.hasIcon as iconTask}
@@ -26,7 +30,7 @@
 
     {#each tasksThisDay.hasStartTime as eventToday, i}
       {#if dateToRender === DateTime.now().toFormat('yyyy-MM-dd') && i === idxOfTimeIndicator}
-        <div class="current-time-indicator"></div>
+        <div bind:this={CurrentTimeIndicator} class="current-time-indicator"></div>
       {/if}
 
       {#if eventToday.iconDataURL}
@@ -81,6 +85,8 @@
   export let dateToRender
   export let doodleIcons
 
+  let DayHeader
+  let CurrentTimeIndicator
   let intForTriggeringRerender = 0
   let tasksThisDay = $tasksScheduledOn[dateToRender]
 
@@ -93,14 +99,21 @@
     computeIndicatorPosition()
   }
 
+  $: if (CurrentTimeIndicator) {
+    if (DayHeader) {
+      DayHeader.scrollIntoView({ behavior: 'instant', block: 'start' })
+    }
+  }
+
   onMount(() => {
     tasksThisDay = $tasksScheduledOn[dateToRender]
   })
 
   function computeIndicatorPosition () {
+    const { hasStartTime } = tasksThisDay
     // bonus: display current time (brown line)
-    for (let i = 0; i < scheduledEvents.length; i++) {
-      if (!hasTimeAlreadyPassed(scheduledEvents[i])) {
+    for (let i = 0; i < hasStartTime.length; i++) {
+      if (!hasTimeAlreadyPassed(hasStartTime[i])) {
         idxOfTimeIndicator = i
         return
       }

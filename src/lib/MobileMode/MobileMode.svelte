@@ -32,21 +32,7 @@
         on:subtask-create={(e) => createSubtask(e.detail)}
       />
     </div>
-  {:else if activeTabName === 'TODAY_VIEW'}
-    <CalendarView
-      on:task-click={(e) => openDetailedCard(e.detail)}
-    />
-  {:else if activeTabName === 'FUTURE_VIEW'}
-    <div style="overflow-y: auto;">
-      <ScheduleView
-        {futureScheduledTasks}
-        on:task-duration-adjusted
-        on:task-click={(e) => openDetailedCard(e.detail)}
-      />
-    </div>
-  {/if}
-  
-  {#if activeTabName === 'TODO_VIEW'}
+
     <VoiceKeywordDetect
       on:voice-start={() => isUsingVoice = true}
       on:voice-end={() => isUsingVoice = false}
@@ -55,6 +41,24 @@
       on:new-event-today={(e) => createNewEvent(e.detail)}
       on:new-todo={(e) => createNewTodo(e.detail)}
     />
+  {:else if activeTabName === 'TODAY_VIEW'}
+    <div style="overflow-y: auto;">
+      <CalendarView
+        on:task-click={(e) => openDetailedCard(e.detail)}
+      />  
+    </div>
+
+    <FloatingButtonWrapper>
+      <MultiPhotoUploader/>
+    </FloatingButtonWrapper>
+  {:else if activeTabName === 'FUTURE_VIEW'}
+    <div style="overflow-y: auto;">
+      <ScheduleView
+        {futureScheduledTasks}
+        on:task-duration-adjusted
+        on:task-click={(e) => openDetailedCard(e.detail)}
+      />
+    </div>
   {/if}
 
   <div class="bottom-navbar">
@@ -113,6 +117,8 @@
   import CalendarView from '$lib/MobileMode/CalendarView.svelte'
   import VoiceKeywordDetect from '$lib/VoiceKeywordDetect.svelte'
   import DetailedCardPopup from '$lib/DetailedCardPopup/DetailedCardPopup.svelte'
+  import MultiPhotoUploader from '$lib/MultiPhotoUploader.svelte'
+  import FloatingButtonWrapper from './FloatingButtonWrapper.svelte'
 
   let isTesting = false
   let futureScheduledTasks = null
