@@ -13,15 +13,17 @@ import {
   computeDateToTasksDict,
 } from "/src/helpers/dataStructures.js";
 
-export function createOnLocalState({ createdNode }) {
+export function createOnLocalState({ id, createdNode }) {
+  const newLocalNode = { id, ...createdNode }
+
   if (createdNode.startDateISO) {
     buildCalendarDataStructures({
-      flatArray: [...get(calendarTasks), createdNode],
-    });
+      flatArray: [...get(calendarTasks), newLocalNode]
+    })
   } else {
     buildTodoDataStructures({
-      flatArray: [...get(todoTasks), createdNode],
-    });
+      flatArray: [...get(todoTasks), newLocalNode]
+    })
   }
 }
 

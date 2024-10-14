@@ -41,6 +41,7 @@
     deleteFromLocalState,
   } from "/src/helpers/maintainState.js";
   import MobileMode from "$lib/MobileMode/MobileMode.svelte"
+  import { DateTime } from 'luxon'
 
   let currentMode = "Week"; 
   const userDocPath = `users/${$user.uid}`;
@@ -101,7 +102,7 @@
       const newTaskObjChecked = await applyTaskSchema(newTaskObj, $user);
 
       setFirestoreDoc(tasksPath + id, newTaskObjChecked); // hope mf doesn't notice :>
-      createOnLocalState({ createdNode: { id, ...newTaskObjChecked } });
+      createOnLocalState({ id, createdNode: newTaskObjChecked })
     } catch (error) {
       console.error('error creating task node: ', error);
       alert("Database update failed, please reload");
@@ -199,8 +200,9 @@
     });
   }
 
-  async function changeTaskStartTime({ id, timeOfDay, dateScheduled }) {
-    const yyyy = "2024"; // TO-DO: change this by 2025
+  async function changeTaskStartTime({ id, timeOfDay, dateScheduled, newYYYY = DateTime.now().toFormat('yyyy') }) {
+    // TO-DO: fix the rest of the app to explicitly set the correct year, especially before 2025
+    const yyyy = newYYYY
     const [mm, dd] = dateScheduled.split("/");
 
     updateTaskNode({
