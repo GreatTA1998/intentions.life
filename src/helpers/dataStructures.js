@@ -11,9 +11,9 @@ import {
 // affect the existing dates and their task trees
 
 // totalNumber
-export function buildDates(start, totalNumber) {
+export function buildDates({ start, totalDays }) {
   const dates = [];
-  for (let i = 0; i < totalNumber; i++) {
+  for (let i = 0; i < totalDays; i++) {
     dates.push(
       start.plus({ days: i }).toFormat('yyyy-MM-dd')
     )

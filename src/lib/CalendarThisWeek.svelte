@@ -129,10 +129,10 @@
   onMount(async () => {
     const today = DateTime.now()
     daysToRender.set(
-      buildDates(
-        today.minus({ days: size + cushion }), 
-        2 * (size + cushion) + 1 // +1 means because today's date column counts as the midpoint and is an additional column
-      )
+      buildDates({
+        start: today.minus({ days: size + cushion }), 
+        totalDays: 2 * (size + cushion) + 1 // +1 means because today's date column counts as the midpoint and is an additional column
+      })
     )
 
     getTimesOfDay()
@@ -181,7 +181,7 @@
     saveScrollPosition()
 
     daysToRender.set(
-      [...buildDates(left, size + cushion), ...$daysToRender]
+      [...buildDates({ start: left, totalDays: size + cushion }), ...$daysToRender]
     )
 
     buildCalendarDataStructures({
@@ -194,7 +194,7 @@
     const left = dt.plus({ days: cushion + 1 });
     const right = left.plus({ days: size + cushion });
     daysToRender.set(
-      [...$daysToRender, ...buildDates(left, size + cushion)]
+      [...$daysToRender, ...buildDates({ start: left, totalDays: size + cushion })]
     )
 
     // note each new loaded intervals should not be overlapping

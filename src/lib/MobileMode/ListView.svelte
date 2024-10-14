@@ -1,6 +1,5 @@
-<!-- background-color: var(--todo-list-bg-color);  -->
 <GrandTreeTodoReusableList
-  listTitle="TO-DO"
+  listTitle=""
   allTasksDue={$inclusiveWeekTodo}
   dueInHowManyDays={7}
   style="
@@ -27,11 +26,15 @@
   </div>
 </GrandTreeTodoReusableList>
 
-<!-- TO-DO: display completed tasks here -->
-
 <script>
   import GrandTreeTodoReusableList from '$lib/GrandTreeTodoReusableList.svelte'
-  import { inclusiveWeekTodo } from '/src/store.js'
+  import { inclusiveWeekTodo, user } from '/src/store.js'
+  import Tasks from '/src/back-end/Tasks.js'
+  import { buildTodoDataStructures } from '/src/helpers/maintainState.js'
+
+  Tasks.getUnscheduled($user.uid).then(unscheduledTasks => {
+    buildTodoDataStructures({ flatArray: unscheduledTasks })
+  })
 </script>
 
 <style>

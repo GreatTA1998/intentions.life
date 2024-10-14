@@ -24,7 +24,7 @@
     </div>
 
     <div style="overflow-y: auto;">
-      <MobileModeTodoList
+      <ListView
         on:task-click={(e) => openDetailedCard(e.detail)}
         on:task-checkbox-change={(e) => updateTaskNode({ id: e.detail.id, keyValueChanges: { isDone: e.detail.isDone }})}
 
@@ -33,12 +33,12 @@
       />
     </div>
   {:else if activeTabName === 'TODAY_VIEW'}
-    <MobileModeTodayView
+    <CalendarView
       on:task-click={(e) => openDetailedCard(e.detail)}
     />
   {:else if activeTabName === 'FUTURE_VIEW'}
     <div style="overflow-y: auto;">
-      <FutureOverview
+      <ScheduleView
         {futureScheduledTasks}
         on:task-duration-adjusted
         on:task-click={(e) => openDetailedCard(e.detail)}
@@ -64,7 +64,7 @@
           summarize
         </span>
         <div class="nav-tab-desc">
-          To-do
+          List
         </div>
       </div>
     </div>
@@ -75,30 +75,18 @@
           sunny
         </span>
         <div class="nav-tab-desc">
-          Today
+          Calendar
         </div>
       </div>
     </div>
 
-    <!-- on:click={() => activeTabName = 'FUTURE_OVERVIEW'}  -->
     <div class="bottom-nav-tab" on:click={() => activeTabName = 'FUTURE_VIEW'} class:active-nav-tab={activeTabName === 'FUTURE_VIEW'}>
       <div style="text-align: center;">
         <span class=" material-icons nav-tab-icon">
           upcoming
         </span>
         <div class="nav-tab-desc">
-          Future
-        </div>
-      </div>
-    </div>
-
-    <div on:click={() => goto(`/${$user.uid}`)} class="bottom-nav-tab">
-      <div style="text-align: center;">
-        <span class="material-symbols-outlined nav-tab-icon">
-          house
-        </span>
-        <div class="nav-tab-desc">
-          Calendar
+          Schedule
         </div>
       </div>
     </div>
@@ -110,7 +98,6 @@
   import { getStorage, ref, deleteObject, uploadBytes, getDownloadURL } from "firebase/storage"
   import { setFirestoreDoc, updateFirestoreDoc, deleteFirestoreDoc } from '/src/helpers/crud.js'
   import { 
-    convertToISO8061,
     getRandomID, 
     getDateInMMDD, 
     getDateInDDMMYYYY,
@@ -118,23 +105,15 @@
   } from '/src/helpers/everythingElse.js'
   import { 
     user, 
-    tasksScheduledOn,
     inclusiveWeekTodo
   } from '/src/store.js'
-  import { 
-    reconstructTreeInMemory,
-    computeDateToTasksDict
-  } from '/src/helpers/dataStructures.js'
-  import { goto } from '$app/navigation'
   import { onDestroy, onMount } from 'svelte'
-  import FutureOverview from '$lib/FutureOverview.svelte'
-  import MobileModeTodoList from '$lib/MobileModeTodoList.svelte'
-  import MobileModeTodayView from '$lib/MobileModeTodayView.svelte'
-  import {db} from '../back-end/firestoreConnection'
+  import ScheduleView from '$lib/MobileMode/ScheduleView.svelte'
+  import ListView from '$lib/MobileMode/ListView.svelte'
+  import CalendarView from '$lib/MobileMode/CalendarView.svelte'
   import VoiceKeywordDetect from '$lib/VoiceKeywordDetect.svelte'
   import DetailedCardPopup from '$lib/DetailedCardPopup/DetailedCardPopup.svelte'
 
-  let allTasks = []
   let isTesting = false
   let futureScheduledTasks = null
   let activeTabName = 'TODO_VIEW'
@@ -150,42 +129,11 @@
 
   let tasksToDisplay = []
 
-  $: if (allTasks.length > 0) {
-    computeDataStructuresFromAllTasks(allTasks)
-  }
-
-  onMount(() => {
-    // fetch `allTasks`
-    const ref = collection(db, `/users/${$user.uid}/tasks`)
-    unsub = onSnapshot(ref, (querySnapshot) => {
-      const result = [] 
-      querySnapshot.forEach((doc) => {
-        result.push({ id: doc.id, ...doc.data()})
-      })
-      allTasks = reconstructTreeInMemory(result)
-      tasksScheduledOn.set(computeDateToTasksDict(allTasks))
-    })
-  })
+  onMount(() => {})
 
   onDestroy(() => {
     if (unsub) unsub()
   })
-
-  ////// copied from <ReusableList/>, refactor in future
-  // svelte reactive statements are order sensitive
-  
-  $: if ($inclusiveWeekTodo.length > 0) {
-    computeTasksToDisplay()
-  }
-
-  function computeTasksToDisplay () {
-    const temp = sortByUnscheduledThenByOrderValue($inclusiveWeekTodo)
-    tasksToDisplay = temp.filter(task => !task.isDone)
-  }
-
-  ////// 
-
-
 
   function createNewRootTask (newTaskObj) {
     createTaskNodeHelper({ newTaskObj })
@@ -286,46 +234,6 @@
     return await setFirestoreDoc(
       `/users/${$user.uid}/tasks/${newTaskObj.id}`, formatedTask,
     )
-  }
-
-  function computeDataStructuresFromAllTasks (allTasks) {
-    // future overview
-    collectFutureScheduledTasksToArray()
-
-    // simple week todo
-    // inclusiveWeekTodo.set(computeInclusiveWeekTodo(allTasks))
-  }
-
-  // quick-fix for NaN/NaN bug
-  function collectFutureScheduledTasksToArray () {
-    const yearNumber = new Date().getFullYear()
-    futureScheduledTasks = [] // reset 
-    traverseAndUpdateTree({
-      fulfilsCriteria: (task) => { 
-        if (!task.startDate) return 
-        if (task.willRepeatOnWeekDayNumber) return
-        const d1 = new Date(convertToISO8061({ mmdd: task.startDate }))
-        
-        // setHours(hoursValue 0 - 23, minutesValue 0 - 59)
-        // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/setHours
-        if (task.startTime) {
-          const [hh, mm] = task.startTime.split(":")
-          d1.setHours(Number(hh), Number(mm))
-        }
-        return (task.startDate && task.startDate !== 'NaN/NaN') && 
-                (!task.willRepeatOnWeekDayNumber) &&
-                    (d1.getTime() >= new Date().getTime()) && 
-                      (Number(task.startYYYY) === Number(yearNumber.toString())) // this line is a quickfix because we don't store YYYY values in legacy versions
-      }, // 'NaN' quick-fix bug
-      applyFunc: (task) => futureScheduledTasks = [...futureScheduledTasks, task]
-    })
-
-    // TO-DO: don't include all the tasks in the future, only if it is bounded by < 7 days for the week view, and < 30 days for the month view
-    futureScheduledTasks.sort((task1, task2) => {
-      const d1 = new Date(task1.startDate)
-      const d2 = new Date(task2.startDate)
-      return d1.getTime() - d2.getTime() // most recent to the top??
-    })
   }
 
   function traverseAndUpdateTree ({ fulfilsCriteria, applyFunc }) {

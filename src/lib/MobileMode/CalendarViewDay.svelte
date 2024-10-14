@@ -1,8 +1,8 @@
 {#key intForTriggeringRerender}
-  <div style="padding: 0px; overflow-y: auto;">
+  <div style="padding: 0px;">
     {#if doodleIcons}
       <div style="display: flex; flex-wrap: wrap;">
-        {#each flexibleIconTasks as iconTask}
+        {#each tasksThisDay.noStartTime.hasIcon as iconTask}
           <FunctionalDoodleIcon
             {iconTask}
             on:task-click
@@ -12,7 +12,7 @@
       </div>
     {/if}
 
-    {#each flexibleNormalTasks as flexibleDayTask}
+    {#each tasksThisDay.noStartTime.noIcon as flexibleDayTask}
       <div on:click={() => dispatch('task-click', { task: flexibleDayTask })} 
         style="width: var(--calendar-day-section-width); font-size: 12px; display: flex; gap: 4px; margin-bottom: 4px; margin-left: 4px; margin-right: 4px;"
       >
@@ -24,8 +24,8 @@
       </div>
     {/each}
 
-    {#each scheduledEvents as eventToday, i}
-      {#if i === idxOfTimeIndicator}
+    {#each tasksThisDay.hasStartTime as eventToday, i}
+      {#if dateToRender === DateTime.now().toFormat('yyyy-MM-dd') && i === idxOfTimeIndicator}
         <div class="current-time-indicator"></div>
       {/if}
 
@@ -70,48 +70,32 @@
   </div>
 {/key}
 
-
 <script>
-  import { getTimeInHHMM, pureNumericalHourForm } from '/src/helpers/everythingElse.js'
-  import { createEventDispatcher, onMount } from 'svelte'
-  import { tasksScheduledOn } from '/src/store.js'
-  import { getFirestoreCollection } from '/src/helpers/crud.js'
   import ReusableFlexibleDayTask from '$lib/ReusableFlexibleDayTask.svelte'
   import FunctionalDoodleIcon from '$lib/FunctionalDoodleIcon.svelte'
+  import { tasksScheduledOn, user } from '/src/store.js'
+  import { createEventDispatcher, onMount } from 'svelte'
+  import { getTimeInHHMM, pureNumericalHourForm } from '/src/helpers/everythingElse.js'
+  import { DateTime } from 'luxon'
+
+  export let dateToRender
+  export let doodleIcons
+
+  let intForTriggeringRerender = 0
+  let tasksThisDay = $tasksScheduledOn[dateToRender]
 
   let idxOfTimeIndicator = 0
-  let todayTasks = []
-  let flexibleIconTasks = []
-  let flexibleNormalTasks = []
   let scheduledEvents = []
-  let doodleIcons
-  let intForTriggeringRerender = 0
   const dispatch = createEventDispatcher()
-
-  onMount(async () => {
-    const temp = await getFirestoreCollection('/doodleIcons')
-    doodleIcons = temp
-  })
 
   $: if ($tasksScheduledOn) {
     intForTriggeringRerender += 1
-    computeDataStructures()
     computeIndicatorPosition()
   }
 
-  function computeDataStructures () {
-    todayTasks = getScheduledTasks()
-    flexibleIconTasks = todayTasks.filter(task => !task.startTime && task.iconDataURL)
-    flexibleNormalTasks = todayTasks.filter(task => !task.startTime && !task.iconDataURL)
-    scheduledEvents = todayTasks.filter(t => t.startTime).sort((task1, task2) => {
-      return pureNumericalHourForm(task1.startTime) - pureNumericalHourForm(task2.startTime)
-    })
-  }
-
-  function getScheduledTasks () {
-    const simpleISO = getSimpleISOFromDateClassObj(new Date())
-    return $tasksScheduledOn[simpleISO] || [] // `tasksScheduledOn` will only use
-  }
+  onMount(() => {
+    tasksThisDay = $tasksScheduledOn[dateToRender]
+  })
 
   function computeIndicatorPosition () {
     // bonus: display current time (brown line)
@@ -121,17 +105,6 @@
         return
       }
     }
-  }
-
-  // dd-mm-yyyy format
-  function getSimpleISOFromDateClassObj (d) {
-    let dd = d.getDate()
-    let mm = d.getMonth() + 1
-    let yyyy = d.getFullYear()
-
-    if (dd < 10) dd = '0' + dd
-    if (mm < 10) mm = '0' + mm
-    return dd + '-' + mm + '-' + yyyy;
   }
 
   function hasTimeAlreadyPassed (eventTask) {

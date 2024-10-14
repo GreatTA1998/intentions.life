@@ -9,7 +9,7 @@
     showSnackbar,
     hasInitialScrolled,
   } from "/src/store.js";
-  import AI from "../AI/AI.svelte";
+  // import AI from "../AI/AI.svelte";
   import TheSnackbar from "$lib/TheSnackbar.svelte";
   import CalendarThisWeek from "$lib/CalendarThisWeek.svelte";
   import PopupCustomerSupport from "$lib/PopupCustomerSupport.svelte";
@@ -18,10 +18,10 @@
   import ManageReusableTasks from "$lib/ManageReusableTasks.svelte";
   import UncertainMilestones from "$lib/UncertainMilestones.svelte";
   import MultiPhotoUploader from "$lib/MultiPhotoUploader.svelte";
-  import {
-    handleSW,
-    handleNotificationPermission,
-  } from "./handleNotifications.js";
+  // import {
+  //   handleSW,
+  //   handleNotificationPermission,
+  // } from "./handleNotifications.js";
   import { onDestroy, onMount, tick } from "svelte";
   import { goto } from "$app/navigation";
   import { getAuth, signOut } from "firebase/auth";
@@ -40,7 +40,7 @@
     updateLocalState,
     deleteFromLocalState,
   } from "/src/helpers/maintainState.js";
-  import MobileView from "../MobileView/MobileView.svelte";
+  import MobileMode from "$lib/MobileMode/MobileMode.svelte"
 
   let currentMode = "Week"; 
   const userDocPath = `users/${$user.uid}`;
@@ -63,8 +63,8 @@
     checkMobile();
     window.addEventListener("resize", checkMobile); // Update on resize
 
-    handleNotificationPermission($user);
-    handleSW();
+    // handleNotificationPermission($user);
+    // handleSW();
 
     handleInitialTasks($user.uid);
 
@@ -258,7 +258,7 @@
 </script>
 
 {#if isMobile}
-  <MobileView />
+  <MobileMode/>
 {:else}
   {#key clickedTask}
     {#if isDetailedCardOpen}
@@ -436,7 +436,7 @@
       {:else if currentMode === "Year"}
         <UncertainMilestones />
       {:else if currentMode === "AI"}
-        <AI />
+        <!-- <AI /> -->
       {/if}
     </div>
   </NavbarAndContentWrapper>
