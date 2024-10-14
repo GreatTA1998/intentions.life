@@ -1,80 +1,78 @@
-{#key intForTriggeringRerender}
-  <div style="padding: 0px;">
-    <h1 bind:this={DayHeader} style="font-size: 2.4rem; text-transform: uppercase; color: black; padding: 8px; margin: 0px; margin-bottom: 0px">
-      {DateTime.fromISO(dateToRender).toFormat('cccc (LLL dd)')}
-    </h1>
+<div style="padding: 0px;">
+  <h1 bind:this={DayHeader} style="font-size: 2.4rem; text-transform: uppercase; color: black; padding: 8px; margin: 0px; margin-bottom: 0px">
+    {DateTime.fromISO(dateToRender).toFormat('cccc (LLL dd)')}
+  </h1>
 
-    {#if doodleIcons}
-      <div style="display: flex; flex-wrap: wrap;">
-        {#each tasksThisDay.noStartTime.hasIcon as iconTask}
-          <FunctionalDoodleIcon
-            {iconTask}
-            on:task-click
-            on:task-checkbox-change
-          />
-        {/each}
-      </div>
-    {/if}
-    
-    <div style="display: flex; flex-direction: column; gap: 4px; padding-left: 8px; margin-bottom: 8px;">
-      {#each tasksThisDay.noStartTime.noIcon as flexibleDayTask}
-        <div on:click={() => dispatch('task-click', { task: flexibleDayTask })} 
-          style="width: var(--calendar-day-section-width); font-size: 12px; display: flex; gap: 4px; margin-bottom: 4px; margin-left: 4px; margin-right: 4px;"
-        >
-          <ReusableFlexibleDayTask task={flexibleDayTask}
-            on:task-click
-            on:task-update
-            on:task-checkbox-change
-          />
-        </div>
+  {#if doodleIcons}
+    <div style="display: flex; flex-wrap: wrap;">
+      {#each tasksThisDay.noStartTime.hasIcon as iconTask}
+        <FunctionalDoodleIcon
+          {iconTask}
+          on:task-click
+          on:task-checkbox-change
+        />
       {/each}
     </div>
+  {/if}
+  
+  <div style="display: flex; flex-direction: column; gap: 4px; padding-left: 8px; margin-bottom: 8px;">
+    {#each tasksThisDay.noStartTime.noIcon as flexibleDayTask}
+      <div on:click={() => dispatch('task-click', { task: flexibleDayTask })} 
+        style="width: var(--calendar-day-section-width); font-size: 12px; display: flex; gap: 4px; margin-bottom: 4px; margin-left: 4px; margin-right: 4px;"
+      >
+        <ReusableFlexibleDayTask task={flexibleDayTask}
+          on:task-click
+          on:task-update
+          on:task-checkbox-change
+        />
+      </div>
+    {/each}
+  </div>
 
-    {#each tasksThisDay.hasStartTime as eventToday, i}
-      {#if dateToRender === DateTime.now().toFormat('yyyy-MM-dd') && i === idxOfTimeIndicator}
-        <div bind:this={CurrentTimeIndicator} class="current-time-indicator"></div>
-      {/if}
+  {#each tasksThisDay.hasStartTime as eventToday, i}
+    {#if dateToRender === DateTime.now().toFormat('yyyy-MM-dd') && i === idxOfTimeIndicator}
+      <div bind:this={CurrentTimeIndicator} class="current-time-indicator"></div>
+    {/if}
 
-      {#if eventToday.iconDataURL}
-        <div on:click={() => dispatch('task-click', { task: eventToday })}
-          class="today-event"
-          class:half-visible={!hasAlreadyHappened(eventToday)} 
-          class:night-time={isNightTime(eventToday)}
-          style="display: flex; align-items: center; margin-bottom: 0px;"
-        >
+    {#if eventToday.iconDataURL}
+      <div on:click={() => dispatch('task-click', { task: eventToday })}
+        class="today-event"
+        class:half-visible={!hasAlreadyHappened(eventToday)} 
+        class:night-time={isNightTime(eventToday)}
+        style="display: flex; align-items: center; margin-bottom: 0px;"
+      >
+        <div class="event-scheduled-time">
+          {eventToday.startTime} 
+        </div>
+
+        <img src={eventToday.iconDataURL} style="width: 48px; height: 48px;">
+      </div>
+    {:else}
+      <div on:click={() => dispatch('task-click', { task: eventToday })}
+        class="today-event"
+        class:half-visible={!hasAlreadyHappened(eventToday)} 
+        class:night-time={isNightTime(eventToday)}
+        style="
+          margin-bottom: 0px;
+          background-image: {eventToday.imageDownloadURL ? `url(${eventToday.imageDownloadURL})` : ''};
+          background-size: contain;
+          background-repeat: no-repeat;
+        "
+      >
+        {#if !eventToday.imageDownloadURL}
           <div class="event-scheduled-time">
             {eventToday.startTime} 
           </div>
-
-          <img src={eventToday.iconDataURL} style="width: 48px; height: 48px;">
-        </div>
-      {:else}
-        <div on:click={() => dispatch('task-click', { task: eventToday })}
-          class="today-event"
-          class:half-visible={!hasAlreadyHappened(eventToday)} 
-          class:night-time={isNightTime(eventToday)}
-          style="
-            margin-bottom: 0px;
-            background-image: {eventToday.imageDownloadURL ? `url(${eventToday.imageDownloadURL})` : ''};
-            background-size: contain;
-            background-repeat: no-repeat;
-          "
-        >
-          {#if !eventToday.imageDownloadURL}
-            <div class="event-scheduled-time">
-              {eventToday.startTime} 
-            </div>
-            <div style="font-size: 32px; display: flex; align-items: center; flex-wrap: no-wrap;">
-              {eventToday.name}
-            </div>
-          {:else}
-            <div style="width: 100%; height: 240px;"></div>
-          {/if}
-        </div>
-      {/if}
-    {/each}      
-  </div>
-{/key}
+          <div style="font-size: 32px; display: flex; align-items: center; flex-wrap: no-wrap;">
+            {eventToday.name}
+          </div>
+        {:else}
+          <div style="width: 100%; height: 240px;"></div>
+        {/if}
+      </div>
+    {/if}
+  {/each}      
+</div>
 
 <script>
   import ReusableFlexibleDayTask from '$lib/ReusableFlexibleDayTask.svelte'
@@ -89,15 +87,12 @@
 
   let DayHeader
   let CurrentTimeIndicator
-  let intForTriggeringRerender = 0
-  let tasksThisDay = $tasksScheduledOn[dateToRender]
+  $: tasksThisDay = $tasksScheduledOn[dateToRender]
 
   let idxOfTimeIndicator = 0
-  let scheduledEvents = []
   const dispatch = createEventDispatcher()
 
   $: if ($tasksScheduledOn) {
-    intForTriggeringRerender += 1
     computeIndicatorPosition()
   }
 
@@ -108,7 +103,7 @@
   }
 
   onMount(() => {
-    tasksThisDay = $tasksScheduledOn[dateToRender]
+    
   })
 
   function computeIndicatorPosition () {

@@ -60,13 +60,19 @@ export function updateLocalState({ id, keyValueChanges }) {
   });
 }
 
+// we check for existence because mobile mode doesn't necessarily fetch the calendar tasks
+// in the future we can be more precise with deletions and trim the logic
 export function deleteFromLocalState({ id }) {
-  buildCalendarDataStructures({
-    flatArray: get(calendarTasks).filter((task) => task.id !== id),
-  });
-  buildTodoDataStructures({
-    flatArray: get(todoTasks).filter((task) => task.id !== id),
-  });
+  if (get(calendarTasks)) {
+    buildCalendarDataStructures({
+      flatArray: get(calendarTasks).filter((task) => task.id !== id),
+    })
+  }
+  if (get(todoTasks)) {
+    buildTodoDataStructures({
+      flatArray: get(todoTasks).filter((task) => task.id !== id),
+    })
+  }
 }
 
 export function buildCalendarDataStructures({ flatArray }) {

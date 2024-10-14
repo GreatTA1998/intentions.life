@@ -2,7 +2,6 @@
   import {
     getDateInDDMMYYYY,
   } from "/src/helpers/everythingElse.js";
-  import applyTaskSchema from "../../helpers/applyTaskSchema.js";
   import {
     mostRecentlyCompletedTaskID,
     user,
@@ -27,21 +26,11 @@
   import { getAuth, signOut } from "firebase/auth";
   import { db } from "../../back-end/firestoreConnection.js";
   import { doc, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore";
-  import {
-    setFirestoreDoc,
-    updateFirestoreDoc,
-    deleteFirestoreDoc,
-  } from "/src/helpers/firestoreHelpers.js";
   import NewThisWeekTodo from "$lib/NewThisWeekTodo.svelte";
-  import { deleteImage } from '/src/helpers/storage.js'
   import { handleInitialTasks } from "./handleTasks.js";
-  import {
-    createOnLocalState,
-    updateLocalState,
-    deleteFromLocalState,
-  } from "/src/helpers/maintainState.js";
   import MobileMode from "$lib/MobileMode/MobileMode.svelte"
   import { DateTime } from 'luxon'
+  import { createTaskNode, updateTaskNode, deleteTaskNode } from '/src/helpers/crud.js'
 
   let currentMode = "Week"; 
   const userDocPath = `users/${$user.uid}`;
@@ -94,65 +83,6 @@
   onDestroy(() => {
     if (unsub) unsub();
   });
-
-  const tasksPath = `/users/${$user.uid}/tasks/`;
-
-  async function createTaskNode({ id, newTaskObj }) {
-    try {
-      const newTaskObjChecked = await applyTaskSchema(newTaskObj, $user);
-
-      setFirestoreDoc(tasksPath + id, newTaskObjChecked); // hope mf doesn't notice :>
-      createOnLocalState({ id, createdNode: newTaskObjChecked })
-    } catch (error) {
-      console.error('error creating task node: ', error);
-      alert("Database update failed, please reload");
-    }
-  }
-
-  async function updateTaskNode({ id, keyValueChanges }) {
-    updateFirestoreDoc(tasksPath + id, keyValueChanges).catch((err) => {
-      alert(
-        "there was an error in atempting to save changes to the db, please reload "
-      );
-      console.error("error in updateTaskNode: ", err);
-    });
-    updateLocalState({ id, keyValueChanges });
-  }
-
-  // THIS IS STILL NOT WORKING: THE ADOPTION IS NOT WORKING, RIGHT NOW ALL THE
-  // SUBTREE WILL BE GONE FOR SOME REASON
-  function deleteTaskNode({ id, parentID, childrenIDs, imageFullPath = "" }) {
-    if (parentID !== "") {
-      updateFirestoreDoc(tasksPath + parentID, {
-        childrenIDs: arrayRemove(id),
-      });
-      // parent will be deleted, so the grandparent will take care of the children
-      if (childrenIDs) {
-        updateFirestoreDoc(tasksPath + parentID, {
-          childrenIDs: arrayUnion(...childrenIDs),
-        });
-      }
-    }
-
-    // temporary to clean up tasks that were created that didn't conform to the schema
-    // surprisngly many, keep it in to save time
-    if (childrenIDs) {
-      for (const childID of childrenIDs) {
-        updateFirestoreDoc(tasksPath + childID, {
-          parentID: parentID,
-        });
-      }
-    }
-
-    if (imageFullPath) {
-      deleteImage({ imageFullPath })
-    }
-
-    // now safely delete itself
-    deleteFirestoreDoc(tasksPath + id);
-
-    deleteFromLocalState({ id });
-  }
 
   function incrementDateClassObj({ days }) {
     const d = calStartDateClassObj;

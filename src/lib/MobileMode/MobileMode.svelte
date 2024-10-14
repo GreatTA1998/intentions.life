@@ -119,6 +119,7 @@
   import DetailedCardPopup from '$lib/DetailedCardPopup/DetailedCardPopup.svelte'
   import MultiPhotoUploader from '$lib/MultiPhotoUploader.svelte'
   import FloatingButtonWrapper from './FloatingButtonWrapper.svelte'
+  import { createTaskNode, updateTaskNode, deleteTaskNode } from '/src/helpers/crud.js'
 
   let isTesting = false
   let futureScheduledTasks = null
@@ -142,71 +143,22 @@
   })
 
   function createNewRootTask (newTaskObj) {
-    createTaskNodeHelper({ newTaskObj })
+    // note: `newTaskObj` should NOT have an `id` (violates the schema), so this is a quickfix
+    createTaskNode({ id: newTaskObj.id, newTaskObj })
   }
 
-  function createSubtask ({ id, parentID, newTaskObj }) {
-    // the parent needs to update its pointers
-    updateTaskNode({ id: parentID, keyValueChanges: { children: arrayUnion(id)}})
-    createTaskNodeHelper({ newTaskObj })
-  }
-
-  function openDetailedCard ({ task }) {
-    clickedTask = task 
-    isDetailedCardOpen = true
-  }
-
-  // THIS IS STILL NOT WORKING: THE ADOPTION IS NOT WORKING, RIGHT NOW ALL THE 
-  // SUBTREE WILL BE GONE FOR SOME REASON
-  function deleteTaskNode ({ id, parentID, childrenIDs, imageDownloadURL = '', imageFullPath = ''}) {
-    if (parentID !== "") {
-      updateFirestoreDoc(tasksPath + parentID, {
-        childrenIDs: arrayRemove(id)
-      })
-      // parent will be deleted, so the grandparent will take care of the children
-      if (childrenIDs) {
-        updateFirestoreDoc(tasksPath + parentID, {
-          childrenIDs: arrayUnion(...childrenIDs)
-        })
-      }
-    }
-
-    // temporary to clean up tasks that were created that didn't conform to the schema
-    // surprisngly many, keep it in to save time
-    if (childrenIDs) {
-      for (const childID of childrenIDs) {
-        updateFirestoreDoc(tasksPath + childID, {
-          "parentID": parentID
-        })
-      }
-    }
-
-    // TO-DO: handle pointerless images
-    if (imageFullPath) {
-      const storage = getStorage()
-      deleteObject(ref(storage, imageFullPath))
-    }
-
-    // now safely delete itself
-    deleteFirestoreDoc(tasksPath + id)
-  }
-
-  function updateTaskNode ({ id, keyValueChanges }) {
-    updateFirestoreDoc(tasksPath + id, keyValueChanges)
-    // very useful for debugging
-    // console.log("updateTaskNode(), keyValueChanges =", keyValueChanges)
+  function createSubtask ({ id, newTaskObj }) {
+    createTaskNode({ id, newTaskObj })
   }
 
   function createNewEvent ({ name, startTime }) {
-    // createTaskNodeHelper()
     const newTaskObj = {
       name,
       parentID: "",
       startTime,
-      startDate: getDateInMMDD(new Date()),
-      id: getRandomID()
+      startDate: getDateInMMDD(new Date())
     }
-    createTaskNodeHelper({ newTaskObj })
+    createTaskNode({ id: getRandomID(), newTaskObj })
   }
 
   function createNewTodo ({ name }) {
@@ -218,8 +170,7 @@
       name,
       parentID: "",
       deadlineDate: getDateInDDMMYYYY(d),
-      deadlineTime: '23:59',
-      id: getRandomID(),
+      deadlineTime: '23:59'
     }
 
     if (tasksToDisplay.length > 0) {
@@ -230,36 +181,13 @@
       newTaskObj.orderValue += epsilon
     } // otherwise the default `orderValue` will be `maxOrder`, handled by `checkTaskObjSchema`
 
-
-    createTaskNodeHelper({ newTaskObj })
+    createTaskNode({ id: getRandomID(), newTaskObj })
   }
 
-  async function createTaskNodeHelper ({ newTaskObj }) {
-  // not rewriting because not sure it will be used in new mobile versionm
-    const formatedTask = await applyTaskSchema(newTaskObj, $user);
-    return await setFirestoreDoc(
-      `/users/${$user.uid}/tasks/${newTaskObj.id}`, formatedTask,
-    )
+  function openDetailedCard ({ task }) {
+    clickedTask = task 
+    isDetailedCardOpen = true
   }
-
-  function traverseAndUpdateTree ({ fulfilsCriteria, applyFunc }) {
-    const artificialRootNode = {
-      name: 'root',
-      children: allTasks
-    }
-    helperFunction({ node: artificialRootNode, fulfilsCriteria, applyFunc })
-  }
-
-  // useful helper function for task update operations
-  function helperFunction ({ node, fulfilsCriteria, applyFunc }) {
-    if (fulfilsCriteria(node)) {
-      applyFunc(node)
-    } 
-    for (const child of node.children) {
-      helperFunction({ node: child, fulfilsCriteria, applyFunc })
-    }
-  }
-
 </script>
 
 <style>
