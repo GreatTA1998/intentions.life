@@ -8,7 +8,7 @@
 
 <script>
   import { onMount } from 'svelte'
-  import { setFirestoreDoc } from '/src/helpers/crud.js'
+  import { setFirestoreDoc } from '/src/helpers/firestoreHelpers.js'
   import { getRandomID } from '/src/helpers/everythingElse.js'
   import { user } from '/src/store.js'
 

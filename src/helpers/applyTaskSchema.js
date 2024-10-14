@@ -1,4 +1,4 @@
-import {updateFirestoreDoc } from '/src/helpers/crud.js'
+import { updateFirestoreDoc } from '/src/helpers/firestoreHelpers.js'
 
 
 const Schema = {

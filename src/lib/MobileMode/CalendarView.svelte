@@ -12,7 +12,7 @@
 <script>
   import { createEventDispatcher, onMount } from 'svelte'
   import { tasksScheduledOn, user } from '/src/store.js'
-  import { getFirestoreCollection } from '/src/helpers/crud.js'
+  import { getFirestoreCollection } from '/src/helpers/firestoreHelpers.js'
   import Tasks from '/src/back-end/Tasks.js'
   import { DateTime } from 'luxon'
   import { buildCalendarDataStructures } from '/src/helpers/maintainState.js'

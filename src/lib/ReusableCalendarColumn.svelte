@@ -1,6 +1,6 @@
 <script>
   import { DateTime } from "luxon";
-  import { getFirestoreCollection } from "/src/helpers/crud.js";
+  import { getFirestoreCollection } from "/src/helpers/firestoreHelpers.js";
   import {
     computeMillisecsDifference,
     ensureTwoDigits,

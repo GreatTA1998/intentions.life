@@ -20,7 +20,7 @@
 
 <script>
   import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage"
-  import { updateFirestoreDoc } from '/src/helpers/crud.js'
+  import { updateFirestoreDoc } from '/src/helpers/firestoreHelpers.js'
   import { getRandomID, getTimeInHHMM } from '/src/helpers/everythingElse.js'
   import { DateTime } from 'luxon'
   import { user } from '/src/store.js'

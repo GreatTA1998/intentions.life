@@ -100,7 +100,7 @@
 <script>
   import { onSnapshot, collection, arrayUnion, arrayRemove } from 'firebase/firestore'
   import { getStorage, ref, deleteObject, uploadBytes, getDownloadURL } from "firebase/storage"
-  import { setFirestoreDoc, updateFirestoreDoc, deleteFirestoreDoc } from '/src/helpers/crud.js'
+  import { setFirestoreDoc, updateFirestoreDoc, deleteFirestoreDoc } from '/src/helpers/firestoreHelpers.js'
   import { 
     getRandomID, 
     getDateInMMDD, 

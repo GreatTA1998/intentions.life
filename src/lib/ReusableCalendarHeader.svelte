@@ -89,7 +89,7 @@
     whatIsBeingDragged,
     whatIsBeingDraggedID,
   } from "/src/store.js";
-  import { getFirestoreCollection } from "/src/helpers/crud.js";
+  import { getFirestoreCollection } from "/src/helpers/firestoreHelpers.js";
   import { DateTime } from "luxon";
 
   export let ISODate

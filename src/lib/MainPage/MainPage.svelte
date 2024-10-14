@@ -31,7 +31,7 @@
     setFirestoreDoc,
     updateFirestoreDoc,
     deleteFirestoreDoc,
-  } from "/src/helpers/crud.js";
+  } from "/src/helpers/firestoreHelpers.js";
   import NewThisWeekTodo from "$lib/NewThisWeekTodo.svelte";
   import { deleteImage } from '/src/helpers/storage.js'
   import { handleInitialTasks } from "./handleTasks.js";

@@ -94,7 +94,7 @@
     setFirestoreDoc, 
     updateFirestoreDoc,
     deleteFirestoreDoc
-  } from "/src/helpers/crud.js"
+  } from "/src/helpers/firestoreHelpers.js"
   import { user } from '/src/store.js'
   import { onMount, onDestroy } from 'svelte'
   import { 
