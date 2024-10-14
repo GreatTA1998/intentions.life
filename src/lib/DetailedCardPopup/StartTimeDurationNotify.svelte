@@ -4,9 +4,22 @@
   import MyJSDatePicker from "$lib/MyJSDatePicker.svelte";
   import MyTimePicker from "$lib/DetailedCardPopup/MyTimePicker.svelte";
   import { DateTime } from "luxon";
+
   export let taskObject;
+
+  let newStartMMDD = getLegacyMMDD(taskObject.startDateISO) 
+  let newStartYYYY = taskObject.startDateISO ? taskObject.startDateISO.split('-')[0] : ''
+
   let internalStartTime = taskObject.startTime;
   const dispatch = createEventDispatcher();
+
+  function getLegacyMMDD (simpleISO) {
+    if (!simpleISO) return 
+    else {
+      const [MM, DD] = simpleISO.split('-')
+      return MM + '/' + DD
+    }
+  }
 
   function isScheduled(taskObj) {
     return taskObj.startDate && taskObj.startTime && taskObj.startYYYY;
@@ -34,6 +47,20 @@
     class:half-invisible={!isScheduled(taskObject)}
   >
     <div>
+      <MyJSDatePicker
+        MMDD={newStartMMDD}
+        YYYY={newStartYYYY}
+        on:date-selected={(e) => { 
+          newStartMMDD = e.detail.selectedDate
+          newStartYYYY = e.detail.selectedYear
+          
+          const isoMMDD = newStartMMDD.replace('/', '-')
+          const YYYYMMDD = `${newStartYYYY}-${isoMMDD}`
+
+          handleChanges('startDate', YYYYMMDD)
+        }}
+      />
+
       <MyTimePicker
         placeholder="HH:MM"
         pattern="[0-9]{2}:[0-9]{2}"

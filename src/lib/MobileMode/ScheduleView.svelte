@@ -1,68 +1,29 @@
-<div style="padding: 24px;">
-  {#each Object.keys(datesToTasks) as date}
-    <div style="margin-bottom: 20px;">
-      <div>
-        <div style="font-size: 14px; margin-bottom: 2px; color: rgb(10, 10, 10); font-weight: 600;">  
-          {displayNicely(date)}  
-        </div>
-      </div>
-
-      <div style="display: flex; flex-wrap: wrap;">
-        {#each datesToTasks[date].filter(task => !task.startTime && task.iconDataURL) as iconTask}
-          <FunctionalDoodleIcon
-            {iconTask}
-            on:task-click
-            on:task-checkbox-change
-          />
-        {/each}
-      </div>
-
-      {#each datesToTasks[date].filter(task => !task.startTime && !task.iconDataURL) as flexibleDayTask}
-        <div on:click={() => dispatch('task-click', { task: flexibleDayTask })} 
-          style="
-            width: var(--calendar-day-section-width); 
-            font-size: 12px; 
-            display: flex; 
-            flex-direction: column;
-            gap: 4px; margin-left: 4px; margin-right: 4px; margin-bottom: 4px;
-          "
-        >
-          <ReusableFlexibleDayTask task={flexibleDayTask}
-            on:task-click
-            on:task-update
-            on:task-checkbox-change
-          />
-        </div>
-      {/each}
-
-      {#each filterAndSort(datesToTasks[date]) as task}
-        <div
-          on:click={() => dispatch('task-click', { task })} 
-          style="display: flex; align-items: center; flex-wrap: nowrap; padding: 2px;"
-        >
-          <div 
-            style="font-size: 16px; white-space: nowrap; text-overflow: ellipsis;"
-            class:grey-text={task.daysBeforeRepeating}
-            class:purple-text={!task.daysBeforeRepeating}
-          > 
-            <span style="white-space: nowrap; text-overflow: ellipsis; color: rgb(40, 40, 40); font-weight: 400; display: flex;">
-              - <div style="color: rgb(90, 90, 90); font-weight: 300; margin-right: 4px;">{task.startTime}</div> {' ' + task.name + ' '}
-            </span>
-          </div>
-        </div>
-      {/each}
-    </div>
-  {/each}
-</div>
+{#if $tasksScheduledOn}
+  <div style="padding: 24px;">
+    {#each Object.keys($tasksScheduledOn) as simpleDateISO}
+      {#if $tasksScheduledOn[simpleDateISO]}
+        <ScheduleViewDay 
+          tasksThisDay={$tasksScheduledOn[simpleDateISO]} 
+          {simpleDateISO}
+          on:task-click
+          on:task-checkbox-change
+        />
+      {/if}
+    {/each}
+  </div>
+{/if}
 
 <script>
   export let futureScheduledTasks 
 
   import { createEventDispatcher } from 'svelte'
   import { getDayOfWeek, convertMMDDToReadableMonthDayForm, pureNumericalHourForm } from '/src/helpers/everythingElse.js'
-  import ReusableFlexibleDayTask from '$lib/ReusableFlexibleDayTask.svelte'
-  import FunctionalDoodleIcon from '$lib/FunctionalDoodleIcon.svelte'
   import { DateTime } from 'luxon'
+  import { onMount } from 'svelte'
+  import Tasks from '/src/back-end/Tasks';
+  import { user, tasksScheduledOn } from '/src/store.js'
+  import { buildCalendarDataStructures } from '/src/helpers/maintainState.js'
+  import ScheduleViewDay from './ScheduleViewDay.svelte'
 
   // NOTE: should this be redundant or complementary to the calendar view?
   // The advantage of the schedule view is that it's more space efficient, 
@@ -74,6 +35,17 @@
   let datesToTasks = {} 
 
   const dispatch = createEventDispatcher()
+
+  onMount(() => {
+    const today = DateTime.now()
+    Tasks.getByDateRange(
+      $user.uid, 
+      today.toFormat('yyyy-MM-dd'),
+      today.plus({ years: 2 }).toFormat('yyyy-MM-dd')
+    )
+      .then(scheduledTasks => buildCalendarDataStructures({ flatArray: scheduledTasks }))
+  })
+
 
     // NOTE: keep for quick reference
   // quick-fix for NaN/NaN bug
@@ -160,9 +132,3 @@
   //   - Special deadline: Non-repeated task with deadline
   //   - Special event: Non-repeated scheduled at a particular time
 </script>
-
-<style>
-  .purple-text {
-    color: #6D6D6D;
-  }
-</style>
