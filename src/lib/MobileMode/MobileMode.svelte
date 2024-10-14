@@ -68,7 +68,7 @@
           summarize
         </span>
         <div class="nav-tab-desc">
-          List
+          To-do List
         </div>
       </div>
     </div>
@@ -79,7 +79,7 @@
           sunny
         </span>
         <div class="nav-tab-desc">
-          Calendar
+          Calendar Schedule
         </div>
       </div>
     </div>
@@ -90,7 +90,7 @@
           upcoming
         </span>
         <div class="nav-tab-desc">
-          Schedule
+          Compact Schedule
         </div>
       </div>
     </div>
