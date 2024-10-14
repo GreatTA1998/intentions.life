@@ -1,16 +1,22 @@
-<span class="material-symbols-outlined"  
-  on:click={() => FolderInput.click()} 
-  style="cursor: pointer; margin-left: 6px; border: 1px solid grey; border-radius: 24px; padding: 4px;"
->
-  add_photo_alternate
-</span>
+{#if !taskObject.imageDownloadURL}
+  <span class="material-symbols-outlined"  
+    on:click={() => FolderInput.click()} 
+    style="cursor: pointer; margin-left: 6px; border: 1px solid grey; border-radius: 24px; padding: 4px;"
+  >
+    add_photo_alternate
+  </span>
 
-<input style="display: none;" 
-  bind:this={FolderInput}
-  on:change={(e) =>  handleFileChange(e)} 
-  type="file" 
-  accept="image/*" 
->
+  <input style="display: none;" 
+    bind:this={FolderInput}
+    on:change={(e) =>  handleFileChange(e)} 
+    type="file" 
+    accept="image/*" 
+  >
+{:else}
+  <span on:click={() => deleteImage({ imageFullPath: taskObject.imageFullPath })}>
+    Delete photo
+  </span>
+{/if}
 
 <script>
   import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage"
@@ -19,6 +25,7 @@
   import { DateTime } from 'luxon'
   import { user } from '/src/store.js'
   import { updateLocalState } from '/src/helpers/maintainState.js'
+  import { deleteImage } from '/src/helpers/storage.js'
 
   export let taskObject
 

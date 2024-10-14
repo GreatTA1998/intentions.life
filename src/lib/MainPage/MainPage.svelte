@@ -33,7 +33,7 @@
     deleteFirestoreDoc,
   } from "/src/helpers/crud.js";
   import NewThisWeekTodo from "$lib/NewThisWeekTodo.svelte";
-  import { deleteObject, getStorage, ref } from "firebase/storage";
+  import { deleteImage } from '/src/helpers/storage.js'
   import { handleInitialTasks } from "./handleTasks.js";
   import {
     createOnLocalState,
@@ -144,8 +144,7 @@
     }
 
     if (imageFullPath) {
-      const storage = getStorage();
-      deleteObject(ref(storage, imageFullPath));
+      deleteImage({ imageFullPath })
     }
 
     // now safely delete itself
