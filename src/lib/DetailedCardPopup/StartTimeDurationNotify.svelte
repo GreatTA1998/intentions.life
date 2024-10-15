@@ -16,7 +16,7 @@
   function getLegacyMMDD (simpleISO) {
     if (!simpleISO) return 
     else {
-      const [MM, DD] = simpleISO.split('-')
+      const [YYYY, MM, DD] = simpleISO.split('-')
       return MM + '/' + DD
     }
   }
@@ -57,7 +57,7 @@
           const isoMMDD = newStartMMDD.replace('/', '-')
           const YYYYMMDD = `${newStartYYYY}-${isoMMDD}`
 
-          handleChanges('startDate', YYYYMMDD)
+          handleChanges('startDateISO', YYYYMMDD)
         }}
       />
 

@@ -14,6 +14,8 @@
   import { onMount, createEventDispatcher } from 'svelte'
   import { getDateInMMDD, convertMMDDToDateClassObject } from '/src/helpers/everythingElse.js'
 
+  // THIS COMPONENT STILL USES THE LEGACY API where `startDate` is mm/dd and `startYYYY` is yyyy 
+
   export let MMDD 
   export let YYYY
 
@@ -26,13 +28,16 @@
 
     picker = datepicker.default(AttachTarget, {
       onSelect: (instance, date) => {
-        if (date) {// the 2nd click on the same date will cancel it
+        if (date) {
           const newMMDD = getDateInMMDD(date)
           dispatch('date-selected', {
             selectedDate: newMMDD,
-            selectedYear: date.getFullYear()
+            selectedYear: date.getFullYear() // notice this is a Number
           })
-        } else {
+        } 
+
+        // the 2nd click on the same date will cancel it
+        else {
           dispatch('date-selected', {
             selectedDate: '',
             selectedYear: ''
@@ -51,6 +56,8 @@
   
     // initialize the picker to today's date
     if (MMDD && YYYY) {
+      console.log('MMDD, YYYY =', MMDD, YYYY)
+
       picker.setDate(convertMMDDToDateClassObject(MMDD, YYYY), true)
     }
   })
@@ -58,6 +65,7 @@
 
 <style>
   .my-date-field {
+    padding-left: 6px;
     height: 30px;
     border-radius: 4px;
     border: 1px solid lightgrey;
