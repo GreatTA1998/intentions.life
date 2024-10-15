@@ -98,19 +98,12 @@
 </div>
 
 <script>
-  import { onSnapshot, collection, arrayUnion, arrayRemove } from 'firebase/firestore'
-  import { getStorage, ref, deleteObject, uploadBytes, getDownloadURL } from "firebase/storage"
-  import { setFirestoreDoc, updateFirestoreDoc, deleteFirestoreDoc } from '/src/helpers/firestoreHelpers.js'
   import { 
     getRandomID, 
     getDateInMMDD, 
     getDateInDDMMYYYY,
-    sortByUnscheduledThenByOrderValue
   } from '/src/helpers/everythingElse.js'
-  import { 
-    user, 
-    inclusiveWeekTodo
-  } from '/src/store.js'
+  import { user } from '/src/store.js'
   import { onDestroy, onMount } from 'svelte'
   import ScheduleView from '$lib/MobileMode/ScheduleView.svelte'
   import ListView from '$lib/MobileMode/ListView.svelte'
@@ -120,6 +113,7 @@
   import MultiPhotoUploader from '$lib/MultiPhotoUploader.svelte'
   import FloatingButtonWrapper from './FloatingButtonWrapper.svelte'
   import { createTaskNode, updateTaskNode, deleteTaskNode } from '/src/helpers/crud.js'
+  import { fetchMobileTodoTasks, fetchMobileCalTasks, fetchMobileFutureOverviewTasks } from '$lib/MainPage/handleTasks.js'
 
   let isTesting = false
   let futureScheduledTasks = null
@@ -134,17 +128,20 @@
 
   let tasksToDisplay = []
 
-  onMount(() => {})
+  onMount(() => {
+    fetchMobileTodoTasks($user.uid)
+    fetchMobileCalTasks($user.uid)
+    fetchMobileFutureOverviewTasks($user.uid)
+  })
 
   onDestroy(() => {
     if (unsub) unsub()
   })
 
-
   function createNewEvent ({ name, startTime }) {
     const newTaskObj = {
       name,
-      parentID: "",
+      parentID: '',
       startTime,
       startDate: getDateInMMDD(new Date())
     }

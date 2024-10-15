@@ -28,13 +28,7 @@
 
 <script>
   import GrandTreeTodoReusableList from '$lib/GrandTreeTodoReusableList.svelte'
-  import { inclusiveWeekTodo, user } from '/src/store.js'
-  import Tasks from '/src/back-end/Tasks.js'
-  import { buildTodoDataStructures } from '/src/helpers/maintainState.js'
-
-  Tasks.getUnscheduled($user.uid).then(unscheduledTasks => {
-    buildTodoDataStructures({ flatArray: unscheduledTasks })
-  })
+  import { inclusiveWeekTodo } from '/src/store.js'
 </script>
 
 <style>
