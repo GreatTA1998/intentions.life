@@ -56,8 +56,6 @@
   
     // initialize the picker to today's date
     if (MMDD && YYYY) {
-      console.log('MMDD, YYYY =', MMDD, YYYY)
-
       picker.setDate(convertMMDDToDateClassObject(MMDD, YYYY), true)
     }
   })

@@ -33,6 +33,8 @@
   import MobileMode from "$lib/MobileMode/MobileMode.svelte"
   import { DateTime } from 'luxon'
   import { createTaskNode, updateTaskNode, deleteTaskNode } from '/src/helpers/crud.js'
+  import { findTaskByID } from '/src/helpers/utils.js'
+
 
   let currentMode = "Week"; 
   const userDocPath = `users/${$user.uid}`;
@@ -47,16 +49,8 @@
   let isMobile = false;
 
   $: if (clickedTaskID) {
-    if (clickedTaskID) clickedTask = findTask(clickedTaskID)
+    if (clickedTaskID) clickedTask = findTaskByID(clickedTaskID)
     else clickedTask = {}
-  }
-
-  function findTask (id) {
-    for (const elem of [...$todoTasks, ...$calendarTasks]) {
-      if (elem.id === id) {
-        return elem
-      }
-    }
   }
 
   function openDetailedCard({ task }) {

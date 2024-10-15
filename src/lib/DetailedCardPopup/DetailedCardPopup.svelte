@@ -56,22 +56,19 @@
       </div>
 
         <div style="font-size: 1rem; margin-top: 16px; margin-bottom: 12px; font-weight: 400;">
-          Full ancestral tree
+          Subtree history
         </div>
 
-        {#if taskObject.rootAncestor}
-          <div style="max-height: 500px; overflow-y: auto;">
-            <RecursiveBulletPoint
-              taskObject={taskObject.rootAncestor}
-              originalPopupTask={taskObject}
-              rootAncestor={taskObject.rootAncestor}
-              on:task-click
-              on:task-checkbox-change
-            >
+        <div style="max-height: 500px; overflow-y: auto;">
+          <RecursiveBulletPoint
+            taskObject={taskObject.parentID ? findTaskByID(taskObject.parentID) : taskObject}
+            originalPopupTask={taskObject}
+            on:task-click
+            on:task-checkbox-change
+          >
 
-            </RecursiveBulletPoint>
-          </div>
-        {/if}
+          </RecursiveBulletPoint>
+        </div>
     </div>
     <!-- End of padding container -->
   </div>
@@ -87,7 +84,8 @@ import RecursiveBulletPoint from '$lib/DetailedCardPopup/RecursiveBulletPoint.sv
 import UXFormTextArea from '$lib/DetailedCardPopup/UXFormTextArea.svelte'
 import ReusableCheckbox from '$lib/ReusableCheckbox.svelte'
 import StartTimeDurationNotify from '$lib/DetailedCardPopup/StartTimeDurationNotify.svelte'
-import PhotoUpload from './PhotoUpload.svelte';
+import PhotoUpload from './PhotoUpload.svelte'
+import { findTaskByID } from '/src/helpers/utils.js'
 
 export let taskObject 
 
