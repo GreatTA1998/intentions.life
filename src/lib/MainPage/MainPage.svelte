@@ -168,12 +168,6 @@
     });
   }
 
-  function createNewRootTask(newTaskObj) {
-    createTaskNode({
-      id: newTaskObj.id,
-      newTaskObj: newTaskObj,
-    });
-  }
 
   // mvoe to this week's todo
   function putTaskToThisWeekTodo(e) {
@@ -339,7 +333,7 @@
         <!-- 1st flex child -->
         <div class="todo-container">
           <NewThisWeekTodo
-            on:new-root-task={(e) => createNewRootTask(e.detail)}
+            on:new-root-task={(e) => createTaskNode(e.detail)}
             on:task-unscheduled={(e) => putTaskToThisWeekTodo(e)}
             on:task-click={(e) => openDetailedCard(e.detail)}
             on:subtask-create={(e) => createSubtask(e.detail)}
@@ -360,7 +354,7 @@
             {calStartDateClassObj}
             on:calendar-shifted={(e) =>
               incrementDateClassObj({ days: e.detail.days })}
-            on:new-root-task={(e) => createNewRootTask(e.detail)}
+            on:new-root-task={(e) => createTaskNode(e.detail)}
             on:task-click={(e) => openDetailedCard(e.detail)}
             on:task-update={(e) =>
               updateTaskNode({

@@ -83,25 +83,28 @@
   
   async function createNewInstanceOfReusableTask (taskObj) {
     const copy = {...taskObj}
-    copy.id = getRandomID()
     copy.reusableTemplateID = taskObj.id
     copy.isDone = false
     copy.startDateISO = DateTime.fromJSDate(resultantDateClassObject).toFormat('yyyy-MM-dd')
     copy.startTime = newTaskStartTime
-    dispatch('new-root-task', copy)
+    dispatch('new-root-task', { 
+      id: getRandomID(), 
+      newTaskObj: copy 
+    })
     dispatch('reset')
   }
 
   async function createTaskDirectly (e) {
     const newTaskName = e.detail.taskName
     if (newTaskName !== '') {
-      const newTaskObj = {
+      dispatch('new-root-task', {
         id: getRandomID(),
-        name: newTaskName,
-        startDateISO: DateTime.fromJSDate(resultantDateClassObject).toFormat('yyyy-MM-dd'),
-        startTime: newTaskStartTime
-      }
-      dispatch('new-root-task', newTaskObj)
+        newTaskObj: {
+          name: newTaskName,
+          startDateISO: DateTime.fromJSDate(resultantDateClassObject).toFormat('yyyy-MM-dd'),
+          startTime: newTaskStartTime
+        }
+      })
     }
     dispatch('reset')
   }

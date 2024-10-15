@@ -28,8 +28,8 @@
         on:task-click={(e) => openDetailedCard(e.detail)}
         on:task-checkbox-change={(e) => updateTaskNode({ id: e.detail.id, keyValueChanges: { isDone: e.detail.isDone }})}
 
-        on:new-root-task={(e) => createNewRootTask(e.detail)}
-        on:subtask-create={(e) => createSubtask(e.detail)}
+        on:new-root-task={(e) => createTaskNode(e.detail)}
+        on:subtask-create={(e) => createTaskNode(e.detail)}
       />
     </div>
 
@@ -131,8 +131,6 @@
   
   let isDetailedCardOpen = false
   let clickedTask = {}
-  
-  const tasksPath = `/users/${$user.uid}/tasks/`
 
   let tasksToDisplay = []
 
@@ -142,14 +140,6 @@
     if (unsub) unsub()
   })
 
-  function createNewRootTask (newTaskObj) {
-    // note: `newTaskObj` should NOT have an `id` (violates the schema), so this is a quickfix
-    createTaskNode({ id: newTaskObj.id, newTaskObj })
-  }
-
-  function createSubtask ({ id, newTaskObj }) {
-    createTaskNode({ id, newTaskObj })
-  }
 
   function createNewEvent ({ name, startTime }) {
     const newTaskObj = {

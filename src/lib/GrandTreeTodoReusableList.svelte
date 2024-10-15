@@ -167,17 +167,18 @@
   function createRootTaskWithDeadline (taskName) {
     const newRootTaskObj = {
       startDateISO: '',
-      id: getRandomID(),
       name: taskName,
-      parentID: ""
+      parentID: ''
     }
 
     if (tasksToDisplay.length > 0) {
       newRootTaskObj.orderValue = (0 + tasksToDisplay[0].orderValue) / 2 
     } // otherwise the default `orderValue` will be `maxOrder`, handled by `applyTaskSchema`
 
-    dispatch('new-root-task', newRootTaskObj)
-    // use same API as legacy code
+    dispatch('new-root-task', { 
+      id: getRandomID(), 
+      newTaskObj: newRootTaskObj 
+    })
   }
 
   function handleDroppedTask (e) {
