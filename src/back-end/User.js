@@ -2,7 +2,8 @@ import { db } from "./firestoreConnection";
 import {
   doc,
   updateDoc,
-  arrayUnion
+  arrayUnion,
+  collection
 } from "firebase/firestore";
 
 const update = (userUID, keyValueChanges) => {
@@ -11,13 +12,22 @@ const update = (userUID, keyValueChanges) => {
   );
 };
 
+const addIconURL = (userUID, name, url, hidden) => {
+  return addDoc(collection(db, "users", userUID, "icons"), {
+    url,
+    name,
+    hidden,
+  }).then(() => url).catch((err) => console.error("error in User.addIcon", err));
+};
+
 const addFCMToken = (userUID, FCMToken) => {
-    return updateDoc(doc(db, "users", userUID), {
-      FCMTokens: arrayUnion(FCMToken),
-    }).catch((err) => console.error("error in User.update", err));
-  };
+  return updateDoc(doc(db, "users", userUID), {
+    FCMTokens: arrayUnion(FCMToken),
+  }).catch((err) => console.error("error in User.update", err));
+};
 
 export default {
   update,
-  addFCMToken
+  addFCMToken,
+  addIconURL,
 };
