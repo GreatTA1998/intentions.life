@@ -82,7 +82,6 @@
           on:new-root-task
           on:task-update
           on:task-click
-          on:task-scheduled
           on:task-checkbox-change
         />
       {/if}

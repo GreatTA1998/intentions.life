@@ -144,20 +144,6 @@
     });
   }
 
-  async function changeTaskStartTime({ id, timeOfDay, dateScheduled, newYYYY = DateTime.now().toFormat('yyyy') }) {
-    // TO-DO: fix the rest of the app to explicitly set the correct year, especially before 2025
-    const yyyy = newYYYY
-    const [mm, dd] = dateScheduled.split("/");
-
-    updateTaskNode({
-      id,
-      keyValueChanges: {
-        startTime: timeOfDay,
-        startDateISO: yyyy + "-" + mm + "-" + dd,
-      },
-    });
-  }
-
   async function changeTaskDeadline({ id, deadlineTime, deadlineDate }) {
     updateTaskNode({
       id,
@@ -168,8 +154,7 @@
     });
   }
 
-
-  // mvoe to this week's todo
+  // move to this week's todo
   function putTaskToThisWeekTodo(e) {
     e.preventDefault();
     // for backwards compatibility
@@ -361,7 +346,6 @@
                 id: e.detail.id,
                 keyValueChanges: e.detail.keyValueChanges,
               })}
-            on:task-scheduled={(e) => changeTaskStartTime(e.detail)}
             on:task-dragged={(e) => changeTaskDeadline(e.detail)}
             on:task-checkbox-change={(e) =>
               updateTaskNode({
