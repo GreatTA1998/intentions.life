@@ -1,8 +1,6 @@
 import {
-  convertDDMMYYYYToDateClassObject,
   sortByOrderValue,
   convertToISO8061,
-  computeDayDifference,
   pureNumericalHourForm
 } from "/src/helpers/everythingElse.js";
 
@@ -123,12 +121,6 @@ export function updateSubtreeDeadlineInMsElapsed(node, oldVal) {
     d.setHours(hh, mm);
 
     if (d.toString() === "Invalid Date") {
-      // useful test logs for detecting tasks to be garbage collected
-      // console.log('dd, MM, yyyy =', dd, MM, yyyy)
-      // console.log('hh, mm =', hh, mm)
-      // console.log('iso8061 =', iso8061)
-      // console.log('node has invalid deadline =', node)
-      // console.log('d =', d)
       return oldVal;
     }
 
@@ -137,52 +129,6 @@ export function updateSubtreeDeadlineInMsElapsed(node, oldVal) {
   }
 }
 
-//  using the memory tree, compute an array of tasks [], where each task in the array is:
-//           1. parentless root task
-//           2. has a deadline
-//           3. has children
-//
-//  and is sorted by the task with the longest time horizon
-//
-// Note, the root task itself will have a distinct UI that is clearly separate from the timeline view of its
-// children tasks. Nor will it have its deadline be explicitly displayed, as the length and deadline of its last
-// immediate child (and therefore the length of the timeline) already conveys the idea visually.
-// It also wouldn't make sense for the parent to participate in the geometry of the deadline, given that if it's displayed at the top it'd imply that it's due immediately.
-export function computeYearViewTimelines(allTasks) {
-  const output = [];
-  for (const taskTree of allTasks) {
-    if (!taskTree.deadlineDate) continue;
-    else if (taskTree.children.length === 0) continue;
-    else if (taskTree.isDone) continue;
-    else {
-      output.push(taskTree);
-    }
-  }
-
-  // then sort it, prioritizing tasks with the longest time horizon first
-  output.sort((task1, task2) => {
-    const d1 = convertDDMMYYYYToDateClassObject(
-      task1.deadlineDate,
-      task1.deadlineTime
-    );
-    const d2 = convertDDMMYYYYToDateClassObject(
-      task2.deadlineDate,
-      task2.deadlineTime
-    );
-
-    // milliseconds value since 1970
-    return d2.getTime() - d1.getTime();
-  });
-
-  return output;
-}
-
-// theoretically faster (by a factor 'k' where k is the # of days shown on calendar)
-// more importantly, it allows us to inject a reference to `rootAncestor`
-
-// encapsulating all the state computations within this function
-// rather than distribute it across components, because 
-// it's more efficient for this particular project nature
 export function computeDateToTasksDict (taskTrees) {
   const tasksScheduledOn = {}
   for (const root of taskTrees) {
@@ -200,7 +146,7 @@ export function computeDateToTasksDict (taskTrees) {
   return tasksScheduledOn
 }
 
-function myHelper({ node, rootAncestor, tasksScheduledOn }) {
+function myHelper ({ node, rootAncestor, tasksScheduledOn }) {
   const { startDateISO } = node
   if (startDateISO) {
     if (!tasksScheduledOn[startDateISO]) {
@@ -210,12 +156,10 @@ function myHelper({ node, rootAncestor, tasksScheduledOn }) {
       }
     }
     if (!node.startTime) {
-      if (node.iconURL) {
-        tasksScheduledOn[startDateISO].noStartTime.hasIcon.push(node)
-      } else {
-        tasksScheduledOn[startDateISO].noStartTime.noIcon.push(node)
-      }
-    } else {
+      if (node.iconURL) tasksScheduledOn[startDateISO].noStartTime.hasIcon.push(node)
+      else tasksScheduledOn[startDateISO].noStartTime.noIcon.push(node)
+    } 
+    else {
       tasksScheduledOn[startDateISO].hasStartTime.push({ rootAncestor, ...node })
     }
   }
@@ -223,119 +167,4 @@ function myHelper({ node, rootAncestor, tasksScheduledOn }) {
   for (const child of node.children) {
     myHelper({ node: child, rootAncestor, tasksScheduledOn });
   }
-}
-
-// TO-DO:
-//   - Introduce a "weekTodoDisjointTree" and "weekTodoInclusiveTree" for the separate todo lists
-export function computeTodoMemoryTrees(allTasks) {
-  const allTasksDueToday = [];
-  const allTasksDueThisWeek = []; // this is disjoint
-  const allTasksDueThisMonth = [];
-  const allTasksDueThisYear = []; // up to infinite deadline
-  const allTasksDueThisLife = []; // no deadline defined
-
-  for (const parentlessTask of allTasks) {
-    helper({ node: parentlessTask, rootAncestor: parentlessTask });
-  }
-
-  // use VS code's collpase feature
-  // this is so the function can access the arrays we define above
-  function helper({
-    node,
-    parentCategory = "",
-    parentObjReference = null,
-    rootAncestor,
-  }) {
-    const shallowCopy = { ...node };
-    shallowCopy.children = [];
-    shallowCopy.rootAncestor = rootAncestor;
-
-    if (!node.deadlineDate) {
-      if (parentCategory === "LIFE" && parentObjReference !== null) {
-        parentObjReference.children.push(shallowCopy);
-      } else allTasksDueThisLife.push(shallowCopy);
-
-      // continue scanning for a todo's top-level task
-      for (const child of node.children) {
-        helper({
-          node: child,
-          parentCategory: "LIFE",
-          parentObjReference: shallowCopy,
-          rootAncestor,
-        }); // NOTE: the `rootAncestor` is not based on deadlines
-      }
-    } else {
-      const d = new Date();
-      d.setHours(0, 0, 0);
-      const dueInHowManyDays = computeDayDifference(
-        d,
-        convertDDMMYYYYToDateClassObject(node.deadlineDate, node.deadlineTime)
-      );
-      if (dueInHowManyDays <= 1) {
-        // quickfix for now
-        if (parentCategory === "DAY" && parentObjReference !== null) {
-          parentObjReference.children.push(shallowCopy);
-        } else allTasksDueToday.push(shallowCopy); // any reason we use node here instead of `shallowCopy`?
-
-        for (const child of node.children) {
-          helper({
-            node: child,
-            parentCategory: "DAY",
-            parentObjReference: shallowCopy,
-            rootAncestor,
-          });
-        }
-      } else if (dueInHowManyDays <= 7) {
-        if (parentCategory === "WEEK" && parentObjReference !== null) {
-          parentObjReference.children.push(shallowCopy);
-        } else allTasksDueThisWeek.push(shallowCopy);
-
-        // notice we iterate on the original tree that still has a `.children` array preserved
-        for (const child of node.children) {
-          i += 1;
-          helper({
-            node: child,
-            parentCategory: "WEEK",
-            parentObjReference: shallowCopy,
-            rootAncestor,
-          });
-        }
-      } else if (dueInHowManyDays <= 31) {
-        if (parentCategory === "MONTH" && parentObjReference !== null) {
-          parentObjReference.children.push(shallowCopy);
-        } else allTasksDueThisMonth.push(shallowCopy);
-
-        for (const child of node.children) {
-          helper({
-            node: child,
-            parentCategory: "MONTH",
-            parentObjReference: shallowCopy,
-            rootAncestor,
-          });
-        }
-      } else {
-        if (parentCategory === "YEAR" && parentObjReference !== null) {
-          parentObjReference.children.push(shallowCopy);
-        } else allTasksDueThisYear.push(shallowCopy);
-
-        for (const child of node.children) {
-          helper({
-            node: child,
-            parentCategory: "YEAR",
-            parentObjReference: shallowCopy,
-            rootAncestor,
-          });
-        }
-      }
-    }
-  }
-
-  // console.log('# of recursion should be at most the total number of tasks', i)
-  return [
-    allTasksDueToday,
-    allTasksDueThisWeek,
-    allTasksDueThisMonth,
-    allTasksDueThisYear,
-    allTasksDueThisLife,
-  ];
 }
