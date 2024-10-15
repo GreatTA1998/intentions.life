@@ -14,9 +14,11 @@ import { arrayRemove, arrayUnion } from 'firebase/firestore'
 import { get } from 'svelte/store'
 import { user } from '/src/store.js'
 
-const tasksPath = `/users/${get(user).uid}/tasks/`
-
 export async function createTaskNode({ id, newTaskObj }) {
+  // cannot define `tasksPath` outside of the functions because
+  // get(user) is not defined when the app starts
+  const tasksPath = `/users/${get(user).uid}/tasks/`
+
   try {
     const newTaskObjChecked = await applyTaskSchema(newTaskObj, get(user))
 
@@ -30,6 +32,8 @@ export async function createTaskNode({ id, newTaskObj }) {
 }
 
 export async function updateTaskNode({ id, keyValueChanges }) {
+  const tasksPath = `/users/${get(user).uid}/tasks/`
+
   updateFirestoreDoc(tasksPath + id, keyValueChanges).catch((err) => {
     alert(
       "there was an error in atempting to save changes to the db, please reload "
@@ -42,6 +46,8 @@ export async function updateTaskNode({ id, keyValueChanges }) {
 // THIS IS STILL NOT WORKING: THE ADOPTION IS NOT WORKING, RIGHT NOW ALL THE
 // SUBTREE WILL BE GONE FOR SOME REASON
 export function deleteTaskNode({ id, parentID, childrenIDs, imageFullPath = "" }) {
+  const tasksPath = `/users/${get(user).uid}/tasks/`
+  
   if (parentID !== "") {
     updateFirestoreDoc(tasksPath + parentID, {
       childrenIDs: arrayRemove(id),

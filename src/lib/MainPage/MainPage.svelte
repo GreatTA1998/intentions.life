@@ -7,6 +7,8 @@
     user,
     showSnackbar,
     hasInitialScrolled,
+    todoTasks,
+    calendarTasks
   } from "/src/store.js";
   // import AI from "../AI/AI.svelte";
   import TheSnackbar from "$lib/TheSnackbar.svelte";
@@ -35,14 +37,31 @@
   let currentMode = "Week"; 
   const userDocPath = `users/${$user.uid}`;
 
-  let isDetailedCardOpen = false;
-
+  let clickedTaskID = ''
+  let clickedTask = {}
+  
   let calStartDateClassObj = new Date();
   let allTasks = null;
 
-  let clickedTask = {};
   let unsub;
   let isMobile = false;
+
+  $: if (clickedTaskID) {
+    if (clickedTaskID) clickedTask = findTask(clickedTaskID)
+    else clickedTask = {}
+  }
+
+  function findTask (id) {
+    for (const elem of [...$todoTasks, ...$calendarTasks]) {
+      if (elem.id === id) {
+        return elem
+      }
+    }
+  }
+
+  function openDetailedCard({ task }) {
+    clickedTaskID = task.id
+  }
 
   // Function to check if the user is on a mobile device
   const checkMobile = () => {
@@ -94,10 +113,6 @@
   // FOR DEBUGGING PURPOSES, TURN IT ON TO TRUE TO RUN SCRIPT ONCE
   let testRunOnce = false;
 
-  function openDetailedCard({ task }) {
-    clickedTask = task;
-    isDetailedCardOpen = true;
-  }
 
   function traverseAndUpdateTree({ fulfilsCriteria, applyFunc }) {
     const artificialRootNode = {
@@ -191,23 +206,21 @@
 {#if isMobile}
   <MobileMode/>
 {:else}
-  {#key clickedTask}
-    {#if isDetailedCardOpen}
-      <DetailedCardPopup
-        taskObject={clickedTask}
-        on:task-update={(e) => updateTaskNode(e.detail)}
-        on:task-reusable={() => createReusableTaskTemplate(clickedTask.id)}
-        on:task-click={(e) => openDetailedCard(e.detail)}
-        on:card-close={() => (isDetailedCardOpen = false)}
-        on:task-delete={(e) => deleteTaskNode(e.detail)}
-        on:task-checkbox-change={(e) =>
-          updateTaskNode({
-            id: e.detail.id,
-            keyValueChanges: { isDone: e.detail.isDone },
-          })}
-      />
-    {/if}
-  {/key}
+  {#if clickedTaskID}
+    <DetailedCardPopup
+      taskObject={clickedTask}
+      on:task-update={(e) => updateTaskNode(e.detail)}
+      on:task-reusable={() => createReusableTaskTemplate(clickedTask.id)}
+      on:task-click={(e) => openDetailedCard(e.detail)}
+      on:card-close={() => clickedTaskID = ''}
+      on:task-delete={(e) => deleteTaskNode(e.detail)}
+      on:task-checkbox-change={(e) =>
+        updateTaskNode({
+          id: e.detail.id,
+          keyValueChanges: { isDone: e.detail.isDone },
+        })}
+    />
+  {/if}
 
   <!-- UNDO COMPLETED SNACKBAR -->
   {#if $mostRecentlyCompletedTaskID}

@@ -28,11 +28,15 @@
   function handleChanges (key, value, timeZone) {
     if (typeof Number(value) !== "number") return
 
+    const taskUpdates = {
+      [key]: value
+    }
+
     if (timeZone) taskUpdates.timeZone = DateTime.local().zoneName
 
     dispatch("task-update", {
       id: taskObject.id,
-      keyValueChanges: { [key]: value }
+      keyValueChanges: taskUpdates
     })
   }
 </script>
