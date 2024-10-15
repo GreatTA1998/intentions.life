@@ -56,7 +56,7 @@
       </div>
 
         <div style="font-size: 1rem; margin-top: 16px; margin-bottom: 12px; font-weight: 400;">
-          Subtree history
+          Tree History
         </div>
 
         <div style="max-height: 500px; overflow-y: auto;">

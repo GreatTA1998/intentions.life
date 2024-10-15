@@ -35,7 +35,6 @@
   import { createTaskNode, updateTaskNode, deleteTaskNode } from '/src/helpers/crud.js'
   import { findTaskByID } from '/src/helpers/utils.js'
 
-
   let currentMode = "Week"; 
   const userDocPath = `users/${$user.uid}`;
 
