@@ -1,25 +1,9 @@
-import { setFirestoreDoc, updateFirestoreDoc } from '/src/helpers/crud.js'
-
-// export function checkTaskObjSchema (task, userDoc) {
-//   console.log('task is', task);
-//   const output = {...task}
-//   if (!task.duration) output.duration = 30
-//   if (!task.orderValue) { 
-//     const newVal = (userDoc.maxOrderValue || 0) + 3
-//     const epsilon = Math.random() * 0.5
-//     output.orderValue = newVal + epsilon
-//     updateFirestoreDoc(`/users/${userDoc.uid}`, {
-//       maxOrderValue: newVal
-//     })
-//   }
-//   return output
-// }
+import { setFirestoreDoc, updateFirestoreDoc } from '/src/helpers/firestoreHelpers.js'
 
 // how far, INCLUDING SCROLL, the actual position on the calendar is
 // // containerDistanceFromTopOfPage should be fixed, and not be affected by scrolling
 // so it's the e.clientY + initialOffset + scrollOffset 
 // e.clientY := coordinates relative to VIEWPORT, so doesn't matter if root page is scrolled
-
 
 export function pureNumericalHourForm (startTime) {
   const hh = startTime.slice(0, 2)

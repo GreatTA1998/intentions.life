@@ -1,6 +1,6 @@
 <script>
   import { DateTime } from "luxon";
-  import { getFirestoreCollection } from "/src/helpers/crud.js";
+  import { getFirestoreCollection } from "/src/helpers/firestoreHelpers.js";
   import {
     computeMillisecsDifference,
     ensureTwoDigits,
@@ -91,7 +91,7 @@
   // How it works:
   //   1. Do origin + new difference to get the date object
   //   2. use the new date object to generate `startTime` and `startDate`
-  function drop_handler(e) {
+  function drop_handler (e) {
     const id = e.dataTransfer.getData("text/plain");
     if (!id) return; // it means we're adjusting the duration but it triggers a drop event, and a dragend event must be followed by a drop event
 
@@ -116,16 +116,20 @@
       ensureTwoDigits(d.getHours()) + ":" + ensureTwoDigits(d.getMinutes());
     const mmdd =
       ensureTwoDigits(d.getMonth() + 1) + "/" + ensureTwoDigits(d.getDate());
+    
+    const [MM, DD] = mmdd.split('/')
 
-    dispatch("task-scheduled", {
+    dispatch('task-update', { 
       id,
-      timeOfDay: hhmm,
-      dateScheduled: mmdd,
-    });
+      keyValueChanges: {
+        startTime: hhmm,
+        startDateISO: `${d.getFullYear()}-${MM}-${DD}`
+      }
+    })
 
-    whatIsBeingDraggedFullObj.set(null);
-    whatIsBeingDraggedID.set("");
-    whatIsBeingDragged.set("");
+    whatIsBeingDraggedFullObj.set(null)
+    whatIsBeingDraggedID.set('')
+    whatIsBeingDragged.set('')
   }
 
   function getResultantDateClassObject(trueY) {

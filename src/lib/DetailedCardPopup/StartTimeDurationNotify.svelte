@@ -4,36 +4,63 @@
   import MyJSDatePicker from "$lib/MyJSDatePicker.svelte";
   import MyTimePicker from "$lib/DetailedCardPopup/MyTimePicker.svelte";
   import { DateTime } from "luxon";
+
   export let taskObject;
+
+  let newStartMMDD = getLegacyMMDD(taskObject.startDateISO) 
+  let newStartYYYY = taskObject.startDateISO ? taskObject.startDateISO.split('-')[0] : ''
+
   let internalStartTime = taskObject.startTime;
   const dispatch = createEventDispatcher();
 
-  function isScheduled(taskObj) {
+  function getLegacyMMDD (simpleISO) {
+    if (!simpleISO) return 
+    else {
+      const [YYYY, MM, DD] = simpleISO.split('-')
+      return MM + '/' + DD
+    }
+  }
+
+  function isScheduled (taskObj) {
     return taskObj.startDate && taskObj.startTime && taskObj.startYYYY;
   }
 
-  function handleChanges(key, value, timeZone) {
-    console.log('handleChanges', key, value, timeZone);
-    if (typeof Number(value) !== "number") return;
+  function handleChanges (key, value, timeZone) {
+    if (typeof Number(value) !== "number") return
+
     const taskUpdates = {
-      [key]: value,
-    };
-    if(timeZone) taskUpdates.timeZone = DateTime.local().zoneName
+      [key]: value
+    }
+
+    if (timeZone) taskUpdates.timeZone = DateTime.local().zoneName
+
     dispatch("task-update", {
       id: taskObject.id,
-      keyValueChanges: taskUpdates,
-    });
+      keyValueChanges: taskUpdates
+    })
   }
 </script>
 
-<div
-  style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; row-gap: 24px; margin-top: 24px; font-size: 1.2em;"
->
+<div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; row-gap: 24px; margin-top: 24px; font-size: 1.2em;">
   <div
     style="display: flex; align-items: start; gap: 16px;"
     class:half-invisible={!isScheduled(taskObject)}
   >
     <div>
+      <MyJSDatePicker
+        MMDD={newStartMMDD}
+        YYYY={newStartYYYY}
+        on:date-selected={(e) => { 
+          newStartMMDD = e.detail.selectedDate
+          newStartYYYY = e.detail.selectedYear
+          
+          const isoMMDD = newStartMMDD.replace('/', '-')
+          const YYYYMMDD = `${newStartYYYY}-${isoMMDD}`
+
+          handleChanges('startDateISO', YYYYMMDD)
+        }}
+      />
+
       <MyTimePicker
         placeholder="HH:MM"
         pattern="[0-9]{2}:[0-9]{2}"

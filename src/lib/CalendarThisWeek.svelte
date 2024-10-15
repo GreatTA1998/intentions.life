@@ -82,7 +82,6 @@
           on:new-root-task
           on:task-update
           on:task-click
-          on:task-scheduled
           on:task-checkbox-change
         />
       {/if}
@@ -96,7 +95,7 @@
   import { MIKA_PIXELS_PER_HOUR } from "/src/helpers/everythingElse.js";
   import { onMount, afterUpdate } from "svelte";
   import { user, tasksScheduledOn, hasInitialScrolled } from "/src/store.js";
-  import { getFirestoreCollection } from "/src/helpers/crud.js";
+  import { getFirestoreCollection } from "/src/helpers/firestoreHelpers.js";
   import { lazyCallable } from "/src/helpers/actions.js";
   import Tasks from "../back-end/Tasks";
   import { DateTime } from "luxon";
@@ -129,10 +128,10 @@
   onMount(async () => {
     const today = DateTime.now()
     daysToRender.set(
-      buildDates(
-        today.minus({ days: size + cushion }), 
-        2 * (size + cushion) + 1 // +1 means because today's date column counts as the midpoint and is an additional column
-      )
+      buildDates({
+        start: today.minus({ days: size + cushion }), 
+        totalDays: 2 * (size + cushion) + 1 // +1 means because today's date column counts as the midpoint and is an additional column
+      })
     )
 
     getTimesOfDay()
@@ -181,7 +180,7 @@
     saveScrollPosition()
 
     daysToRender.set(
-      [...buildDates(left, size + cushion), ...$daysToRender]
+      [...buildDates({ start: left, totalDays: size + cushion }), ...$daysToRender]
     )
 
     buildCalendarDataStructures({
@@ -194,7 +193,7 @@
     const left = dt.plus({ days: cushion + 1 });
     const right = left.plus({ days: size + cushion });
     daysToRender.set(
-      [...$daysToRender, ...buildDates(left, size + cushion)]
+      [...$daysToRender, ...buildDates({ start: left, totalDays: size + cushion })]
     )
 
     // note each new loaded intervals should not be overlapping

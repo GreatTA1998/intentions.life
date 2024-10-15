@@ -1,4 +1,4 @@
-import {updateFirestoreDoc } from '/src/helpers/crud.js'
+import { updateFirestoreDoc } from '/src/helpers/firestoreHelpers.js'
 
 
 const Schema = {
@@ -19,15 +19,16 @@ const Schema = {
   notify: "", //string so "0" means notification at 0 minutes instead of false
 };
 
-export default async function applyTaskSchema(task, userDoc) {
-  const formatedTask = {};
+// NOTE: `id` will be removed from this process, as it's not explicitly stated in the schema
+export default async function applyTaskSchema (task, userDoc) {
+  const formattedTask = {}
   for (const [key, value] of Object.entries(Schema)) {
-    formatedTask[key] = task[key] || value;
+    formattedTask[key] = task[key] || value
   }
-  if (!formatedTask.orderValue) {
-    formatedTask.orderValue = await handleOrderValue(userDoc);
+  if (!formattedTask.orderValue) {
+    formattedTask.orderValue = await handleOrderValue(userDoc)
   }
-  return formatedTask;
+  return formattedTask
 }
 
 async function handleOrderValue(userDoc) {

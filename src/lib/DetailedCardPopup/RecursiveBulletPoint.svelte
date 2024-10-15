@@ -17,7 +17,7 @@
     -->
     <div 
       on:click={() => {
-        dispatch('task-click', { task: { rootAncestor, ...taskObject }})
+        dispatch('task-click', { task: taskObject })
       }}
       class:completed-task={taskObject.isDone}
       style="cursor: pointer; margin-left: 4px; margin-right: 4px;" class="truncate-to-one-line"
@@ -42,7 +42,7 @@
       <RecursiveBulletPoint 
         on:task-click
         on:task-checkbox-change
-        taskObject={child} {originalPopupTask} {rootAncestor}
+        taskObject={child} {originalPopupTask}
       />
     </div>
   {/each}
@@ -56,7 +56,6 @@
 
   export let taskObject 
   export let originalPopupTask
-  export let rootAncestor
 
   const dispatch = createEventDispatcher()
 

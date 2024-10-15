@@ -170,7 +170,7 @@
   import ManageReusableTasksCreateWeekly from '$lib/ManageReusableTasksCreateWeekly.svelte'
   import ManageReusableTasksCreateMonthly from '$lib/ManageReusableTasksCreateMonthly.svelte'
   import ReusableSimpleDropzone from '$lib/ReusableSimpleDropzone.svelte'
-  import { updateFirestoreDoc, deleteFirestoreDoc } from '/src/helpers/crud.js'
+  import { updateFirestoreDoc, deleteFirestoreDoc } from '/src/helpers/firestoreHelpers.js'
   import { onMount, onDestroy } from 'svelte'
   import { user } from '/src/store.js'
   import { collection, onSnapshot } from 'firebase/firestore'

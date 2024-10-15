@@ -42,7 +42,7 @@
   import ManageReusableTasksDurationStartTime from '$lib/ManageReusableTasksDurationStartTime.svelte'
   import PeriodicMonthlyModule from '$lib/PeriodicMonthlyModule.svelte'
   import {  convertMMDDToDateClassObject, computeDayDifference } from '/src/helpers/everythingElse.js'
-  import {deleteFirestoreDoc, createFirestoreQuery, getFirestoreQuery, updateFirestoreDoc } from '/src/helpers/crud.js'
+  import {deleteFirestoreDoc, createFirestoreQuery, getFirestoreQuery, updateFirestoreDoc } from '/src/helpers/firestoreHelpers.js'
   import { user } from '/src/store.js'
   import { onMount } from 'svelte'
   import { createEventDispatcher } from 'svelte'
