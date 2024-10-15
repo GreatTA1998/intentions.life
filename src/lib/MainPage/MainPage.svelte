@@ -65,8 +65,8 @@
     checkMobile();
     window.addEventListener("resize", checkMobile); // Update on resize
 
-    // handleNotificationPermission($user);
-    // handleSW();
+    handleNotificationPermission($user);
+    handleSW();
 
     handleInitialTasks($user.uid);
 
