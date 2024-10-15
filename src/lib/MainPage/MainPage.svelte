@@ -10,7 +10,7 @@
     todoTasks,
     calendarTasks
   } from "/src/store.js";
-  // import AI from "../AI/AI.svelte";
+  import AI from "../AI/AI.svelte";
   import TheSnackbar from "$lib/TheSnackbar.svelte";
   import CalendarThisWeek from "$lib/CalendarThisWeek.svelte";
   import PopupCustomerSupport from "$lib/PopupCustomerSupport.svelte";
@@ -19,10 +19,10 @@
   import ManageReusableTasks from "$lib/ManageReusableTasks.svelte";
   import UncertainMilestones from "$lib/UncertainMilestones.svelte";
   import MultiPhotoUploader from "$lib/MultiPhotoUploader.svelte";
-  // import {
-  //   handleSW,
-  //   handleNotificationPermission,
-  // } from "./handleNotifications.js";
+  import {
+    handleSW,
+    handleNotificationPermission,
+  } from "./handleNotifications.js";
   import { onDestroy, onMount, tick } from "svelte";
   import { goto } from "$app/navigation";
   import { getAuth, signOut } from "firebase/auth";
@@ -351,7 +351,7 @@
       {:else if currentMode === "Year"}
         <UncertainMilestones />
       {:else if currentMode === "AI"}
-        <!-- <AI /> -->
+        <AI />
       {/if}
     </div>
   </NavbarAndContentWrapper>
