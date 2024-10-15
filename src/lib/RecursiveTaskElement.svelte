@@ -30,13 +30,16 @@
       </div>
     </div>
 
-    <!-- we use `235px` instead of `100%` because absolute's 100% is different from
+    <!-- 
+      DROPZONE BELOW THE TASK
+      
+      We use `235px` instead of `100%` because absolute's 100% is different from
       RecursiveTaskElement's 100% (which is constantly shrinking). A fixd value we subtract from 
       gives us a consistent base
     -->
     <div style="margin-left: {indentationAmount}px;">
       <div 
-        class:absolute-bottom={taskObj.children.length === 0} 
+        class:absolute-bottom={n === 0} 
         style="
           width: calc(235px - {indentationAmount * (depth)}px);
           z-index: {depth};
@@ -54,7 +57,8 @@
         /> 
       </div>
 
-      {#each taskObj.children as subtaskObj, i (subtaskObj.id)}
+      <!-- CHILDREN DROPZONES -->
+      {#each notDoneChildren as subtaskObj, i (subtaskObj.id)}
         <RecursiveTaskElement 
           taskObj={subtaskObj}
           depth={depth+1}
@@ -71,7 +75,7 @@
           on:subtask-create
           on:task-checkbox-change
         /> 
-         <!-- 
+        <!-- 
           Caveat with using calc(100%):
           because absolute element's 100% ignores the margin = `indentationAmount` that
           all has already scoped other normal divs, so we just add it back 
@@ -163,6 +167,10 @@
 
   const dispatch = createEventDispatcher()
 
+  $: notDoneChildren = taskObj.children.filter(child => !child.isDone)
+
+  $: n = notDoneChildren.length 
+
   $: if (depth >= 0) {
     switch (depth) {
       case 0:
@@ -174,8 +182,6 @@
         else depthAdjustedFontSize = '14px'
     }
   }
-
-  $: n = taskObj.children.length
   
   // depthAdjustedFontSize = 1 * (0.6 ** (depth)
   $: depthAdjustedFontWeight = 400 - (depth * 0) + (200 * Math.max(1 - depth, 0))
