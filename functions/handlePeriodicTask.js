@@ -6,24 +6,25 @@ const { parseExpression } = require('cron-parser');
 const db = getFirestore('tokyo-db');
 const { getRandomID } = require('./utils.js');
 
-const periodicTaskTest = {
-    name: "test",
-    lastGeneratedTask: "2024-10-15",
-    crontab: "0 0 15 10 *",  //yearly on october 15th, monday and wednesday: "0 0 * * 1,4",
-    iconUrl: "url",
-    tags: [],
-    id: "88888888",
-    timeZone: "Asia/Tokyo",
-    userID: "88888888",
-    notes: "",
-    notify: "",
-    duration: 30,
-    startTime: "12:00",
-    isYearly: true,
-};
+// const periodicTaskTest = {
+//     name: "test",
+//     lastGeneratedTask: "2024-10-15",
+//     crontab: "0 0 15 10 *",  //yearly on october 15th, monday and wednesday: "0 0 * * 1,4",
+//     iconUrl: "url",
+//     tags: [],
+//     id: "88888888",
+//     timeZone: "Asia/Tokyo",
+//     userID: "88888888",
+//     notes: "",
+//     notify: "",
+//     duration: 30,
+//     startTime: "12:00",
+//     isYearly: true,
+// };
 
 const handlePeriodicTask = async (periodicTask) => {
     try {
+        if(!periodicTask.crontab) return;
         const db = getFirestore('tokyo-db');
         const offset = periodicTask.isYearly ? { years: 1 } : { months: 1 };
         const startDate = DateTime.fromISO(`${periodicTask.lastGeneratedTask}T${periodicTask.startTime}:00`, { zone: periodicTask.timeZone }).plus({ days: 1 });
@@ -72,7 +73,6 @@ const buildFutureTasks = async (periodicTask, startDateJS, endDateJS) => {
         });
         if (cronObj.done) {
             const documentPath = `users/${periodicTask.userID}/periodicTasks/${periodicTask.id}`;
-            console.log(documentPath);
             const periodicTaskRef = db.doc(documentPath);
             await periodicTaskRef.update({ lastGeneratedTask: ISODate }).catch((error) => {
                 functions.logger.error('Error in generateTasksForPeriod:', error);
