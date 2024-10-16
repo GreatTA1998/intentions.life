@@ -36,8 +36,8 @@ const { handlePeriodicTask } = require('./handlePeriodicTask');
 
 const periodicTaskTest = {
   name: "test",
-  lastGeneratedTask: "2024-10-15",
-  crontab: "0 0 * * 1,4",
+  lastGeneratedTask: "2024-10-25",
+  crontab:  "0 0 * * 1,2,4",  //yearly on october 15th, monday and wednesday: "0 0 * * 1,4",
   iconUrl: "url",
   tags: [],
   id: "88888888",
@@ -47,6 +47,7 @@ const periodicTaskTest = {
   notify: "",
   duration: 30,
   startTime: "12:00",
+  isYearly: false,
 };
 
 exports.scheduledFunction = functions.https.onRequest(async (req, res) => {

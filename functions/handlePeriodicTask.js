@@ -9,7 +9,7 @@ const { getRandomID } = require('./utils.js');
 const periodicTaskTest = {
     name: "test",
     lastGeneratedTask: "2024-10-15",
-    crontab: "0 0 * * 1,4",
+    crontab: "0 0 15 10 *",  //yearly on october 15th, monday and wednesday: "0 0 * * 1,4",
     iconUrl: "url",
     tags: [],
     id: "88888888",
@@ -19,27 +19,28 @@ const periodicTaskTest = {
     notify: "",
     duration: 30,
     startTime: "12:00",
+    isYearly: true,
 };
 
 const handlePeriodicTask = async (periodicTask) => {
-    try{
-    const db = getFirestore('tokyo-db');
-    const startDate = DateTime.fromISO(`${periodicTask.lastGeneratedTask}T${periodicTask.startTime}:00`, { zone: periodicTask.timeZone }).plus({ days: 1 });
-    const endDate = DateTime.now().setZone(periodicTask.timeZone).plus({ months: 1 });
-    const tasksArray = await buildFutureTasks(periodicTask, new Date(startDate), new Date(endDate));
-    console.log(tasksArray);
-    const batch = db.batch();
+    try {
+        const db = getFirestore('tokyo-db');
+        const offset = periodicTask.isYearly ? { years: 1 } : { months: 1 };
+        const startDate = DateTime.fromISO(`${periodicTask.lastGeneratedTask}T${periodicTask.startTime}:00`, { zone: periodicTask.timeZone }).plus({ days: 1 });
+        const endDate = DateTime.now().setZone(periodicTask.timeZone).plus(offset);
+        if(startDate >= endDate) return;
+        const tasksArray = await buildFutureTasks(periodicTask, new Date(startDate), new Date(endDate));
+        const batch = db.batch();
 
-    tasksArray.forEach(task => {
-        const taskId = getRandomID()
-        const documentPath = `users/${periodicTask.userID}/tasks/${taskId}`;
-        console.log(documentPath);
-        const taskRef = db.doc(documentPath);
-        batch.set(taskRef, task);
-    });
+        tasksArray.forEach(task => {
+            const taskId = getRandomID()
+            const documentPath = `users/${periodicTask.userID}/tasks/${taskId}`;
+            const taskRef = db.doc(documentPath);
+            batch.set(taskRef, task);
+        });
 
-    await batch.commit();
-    functions.logger.log('Tasks generated for periodic task:', periodicTask.name, "through", endDate.toFormat('yyyy-MM-dd'));
+        await batch.commit();
+        functions.logger.log('Tasks generated for periodic task:', periodicTask.name, "through", endDate.toFormat('yyyy-MM-dd'));
         return;
     } catch (error) {
         console.log('Error in handlePeriodicTask:', error);
@@ -47,8 +48,7 @@ const handlePeriodicTask = async (periodicTask) => {
 }
 
 const buildFutureTasks = async (periodicTask, startDateJS, endDateJS) => {
-
-    const interval = parseExpression(periodicTask.crontab, ({currentDate:startDateJS, endDate:endDateJS, iterator:true }));
+    const interval = parseExpression(periodicTask.crontab, ({ currentDate: startDateJS, endDate: endDateJS, iterator: true }));
     const generatedTasks = [];
     while (true) { // I also smoke and do drugs
         const cronObj = interval.next();
@@ -80,7 +80,6 @@ const buildFutureTasks = async (periodicTask, startDateJS, endDateJS) => {
             break;
         }
     }
-
     return generatedTasks;
 };
 
