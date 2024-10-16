@@ -1,6 +1,5 @@
-<!-- background-color: var(--todo-list-bg-color);  -->
 <GrandTreeTodoReusableList
-  listTitle="TO-DO"
+  listTitle=""
   allTasksDue={$inclusiveWeekTodo}
   dueInHowManyDays={7}
   style="
@@ -26,8 +25,6 @@
     </span>
   </div>
 </GrandTreeTodoReusableList>
-
-<!-- TO-DO: display completed tasks here -->
 
 <script>
   import GrandTreeTodoReusableList from '$lib/GrandTreeTodoReusableList.svelte'

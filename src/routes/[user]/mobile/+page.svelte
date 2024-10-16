@@ -4,7 +4,7 @@
 {/if}
 
 <script>
-  import MobileMode from '$lib/MobileMode.svelte'
+  import MobileMode from '$lib/MobileMode/MobileMode.svelte'
 
   import { user } from '/src/store.js'
 </script>

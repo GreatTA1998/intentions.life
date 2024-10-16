@@ -5,18 +5,20 @@
   on:dragover={(e) => dragover_handler(e)}
 > 
   <div class="first-column" style="height: 100%; display: flex; flex-direction: column;">
-    <div style="display: flex; align-items: center;">
-      <div style="font-weight: 600; font-size: 18px; color: rgb(80, 80, 80)">
-        {listTitle} 
-      </div> 
-      
-      <span on:click={startTypingNewTask} 
-        class="new-task-icon material-icons" 
-        style="margin-left: 10px; margin-bottom: 10px"
-      >
-        +
-      </span>
-    </div>
+    {#if listTitle}
+      <div style="display: flex; align-items: center;">
+        <div style="font-weight: 600; font-size: 18px; color: rgb(80, 80, 80)">
+          {listTitle} 
+        </div> 
+        
+        <span on:click={startTypingNewTask} 
+          class="new-task-icon material-icons" 
+          style="margin-left: 10px; margin-bottom: 10px"
+        >
+          +
+        </span>
+      </div>
+    {/if}
 
     <div 
       style="flex-grow: 1; padding: 0px 6px;"
@@ -165,17 +167,18 @@
   function createRootTaskWithDeadline (taskName) {
     const newRootTaskObj = {
       startDateISO: '',
-      id: getRandomID(),
       name: taskName,
-      parentID: ""
+      parentID: ''
     }
 
     if (tasksToDisplay.length > 0) {
       newRootTaskObj.orderValue = (0 + tasksToDisplay[0].orderValue) / 2 
     } // otherwise the default `orderValue` will be `maxOrder`, handled by `applyTaskSchema`
 
-    dispatch('new-root-task', newRootTaskObj)
-    // use same API as legacy code
+    dispatch('new-root-task', { 
+      id: getRandomID(), 
+      newTaskObj: newRootTaskObj 
+    })
   }
 
   function handleDroppedTask (e) {

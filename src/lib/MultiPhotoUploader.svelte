@@ -15,7 +15,7 @@
 
 <script>
   import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage"
-  import { setFirestoreDoc } from '/src/helpers/crud.js'
+  import { setFirestoreDoc } from '/src/helpers/firestoreHelpers.js'
   import { getRandomID, getTimeInHHMM } from '/src/helpers/everythingElse.js'
   import { user } from '/src/store.js'
   import { onMount } from 'svelte'
@@ -85,7 +85,6 @@
     else dateClassObj = new Date(timeCreated) // otherwise we set the time to right now.
 
     const newTaskObj = {
-      id, 
       name: `Photo ${getTimeInHHMM({ dateClassObj })}`,
       imageDownloadURL,
       imageFullPath: fullPath, // for easy garbage collection
@@ -95,13 +94,16 @@
       isDone: true // so the image isn't blurred
     }
 
-    const formatedTask = await applyTaskSchema(newTaskObj, $user);
+    const formattedTask = await applyTaskSchema(newTaskObj, $user);
 
     await setFirestoreDoc(
       `users/${$user.uid}/tasks/${id}`, 
-      formatedTask
-    ).catch(err => 'error in setFirestore doc in Multi Photo uploader: ', err);
-    createOnLocalState({ createdNode: formatedTask })
+      formattedTask
+    )
+    // we can't catch errors here because `setFirestoreDoc` already catches its errors and doesn't throw anything
+
+    // ID has to be specifically regenerated
+    createOnLocalState({ id, createdNode: formattedTask })
   }
 </script>
 

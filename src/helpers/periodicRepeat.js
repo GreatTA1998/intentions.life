@@ -1,4 +1,4 @@
-import { setFirestoreDoc, updateFirestoreDoc } from "/src/helpers/crud.js";
+import { setFirestoreDoc, updateFirestoreDoc } from "/src/helpers/firestoreHelpers.js";
 import {
   getRandomID,
   mod,

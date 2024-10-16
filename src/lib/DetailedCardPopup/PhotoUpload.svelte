@@ -1,24 +1,30 @@
-<span class="material-symbols-outlined"  
-  on:click={() => FolderInput.click()} 
-  style="cursor: pointer; margin-left: 6px; border: 1px solid grey; border-radius: 24px; padding: 4px;"
->
-  add_photo_alternate
-</span>
+{#if !taskObject.imageDownloadURL}
+  <span class="circle-outline-button material-symbols-outlined"  
+    on:click={() => FolderInput.click()} 
+  >
+    add_photo_alternate
+  </span>
 
-<input style="display: none;" 
-  bind:this={FolderInput}
-  on:change={(e) =>  handleFileChange(e)} 
-  type="file" 
-  accept="image/*" 
->
+  <input style="display: none;" 
+    bind:this={FolderInput}
+    on:change={(e) => handleFileChange(e)} 
+    type="file" 
+    accept="image/*" 
+  >
+{:else}
+  <span class="circle-outline-button material-symbols-outlined" 
+    on:click={() => confirmDeletePhoto(taskObject.imageFullPath)}
+  >
+    no_photography
+  </span>
+{/if}
 
 <script>
   import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage"
-  import { updateFirestoreDoc } from '/src/helpers/crud.js'
   import { getRandomID, getTimeInHHMM } from '/src/helpers/everythingElse.js'
   import { DateTime } from 'luxon'
-  import { user } from '/src/store.js'
-  import { updateLocalState } from '/src/helpers/maintainState.js'
+  import { deleteImage } from '/src/helpers/storage.js'
+  import { updateTaskNode } from '/src/helpers/crud.js'
 
   export let taskObject
 
@@ -79,8 +85,10 @@
       updateObj.duration = durationForFullDisplay
     }
     try {
-      updateFirestoreDoc(`/users/${$user.uid}/tasks/${taskObject.id}`, updateObj)
-      updateLocalState({ id: taskObject.id, keyValueChanges: updateObj })
+      updateTaskNode({ 
+        id: taskObject.id, 
+        keyValueChanges: updateObj 
+      })
     } catch (error) {
       console.error(error)
       alert("Error uploading photo, please reload")
@@ -94,4 +102,24 @@
       resolve(snapshot)
     })
   }
+
+  function confirmDeletePhoto (imageFullPath) {
+    if (confirm('Are you sure you want to delete the photo?')) {
+      deleteImage({ imageFullPath })
+
+      updateTaskNode({ 
+        id: taskObject.id,
+        keyValueChanges: {
+          imageDownloadURL: '',
+          imageFullPath: ''
+        }
+      })
+    }
+  }
 </script>
+
+<style>
+  .circle-outline-button {
+    cursor: pointer; margin-left: 6px; border: 1px solid grey; border-radius: 24px; padding: 4px;
+  }
+</style>
