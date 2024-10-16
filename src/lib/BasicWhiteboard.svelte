@@ -4,6 +4,7 @@
   import { user } from "/src/store.js";
   import { doodleIcons } from "/src/store.js";
   import Icons from "/src/back-end/Icons.js";
+  import { getRandomID } from "/src/helpers/everythingElse.js";
   let colors = ["black", "orange", "red", "lightblue", "blue", "green"];
   let name = "";
   let tags = "";
@@ -24,6 +25,7 @@
     const dataURL = canvas.toDataURL();
     Icons.uploadIconDataURL({
       createdBy: $user.uid,
+      id: getRandomID(),
       name,
       dataURL,
       isShareable,

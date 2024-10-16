@@ -9,12 +9,6 @@
     convertMMDDToDateClassObject,
     computeDayDifference,
   } from "/src/helpers/everythingElse.js";
-  import {
-    deleteFirestoreDoc,
-    createFirestoreQuery,
-    getFirestoreQuery,
-    updateFirestoreDoc,
-  } from "/src/helpers/crud.js";
   import { user } from "/src/store.js";
   import { onMount, onDestroy } from "svelte";
   import _ from "lodash";
@@ -69,24 +63,11 @@
     }
   }
 
-  function hasPermission(weeklyTemplate) {
-    // find the `doodleIconDoc` first
-    let iconDoc = null;
-    for (let doodleIcon of $doodleIcons) {
-      if (doodleIcon.dataURL === weeklyTemplate.iconDataURL) {
-        iconDoc = doodleIcon;
-        break;
-      }
-    }
-
-    // now check creatorUID
-    if (!iconDoc.creatorUID) return true;
-    else return iconDoc.creatorUID === $user.uid;
-  }
-
-  function handleDelete(id) {
-    if (id && confirm("Are you sure you want to delete this icon?")) {
-      deleteFirestoreDoc(`/doodleIcons/${id}`);
+  function handleDelete({id, url}) {
+    console.log("deleting", id, url);
+    if (confirm("Are you sure you want to delete this icon?")) {
+     Icons.deleteRecursively({id, uid: $user.uid, url});
+     $doodleIcons = $doodleIcons.filter(icon => icon.id !== id);
     }
   }
 
@@ -252,14 +233,16 @@
                     updateWeeklyTemplate({ iconURL: doodleIcon.url })}
                   src={doodleIcon.url}
                   style="width: 48px; height: 48px; cursor: pointer;"
-                  class:orange-border={weeklyTemplate.iconDataURL ===
-                    doodleIcon.dataURL}
+                  class:orange-border={weeklyTemplate.iconUrl ===
+                    doodleIcon.url}
                 />
-
-                {#if weeklyTemplate.iconURL === doodleIcon.dataURL && hasPermission(weeklyTemplate)}
+                {#if doodleIcon.createdBy === $user.uid}
                   <!-- svelte-ignore a11y-click-events-have-key-events -->
                   <div
-                    on:click={() => handleDelete(doodleIcon.id)}
+                    on:click={() => {
+                      console.log('doodleIcon', doodleIcon);
+                      handleDelete({id: doodleIcon.id, url: doodleIcon.url})}
+                    }
                     style="cursor: pointer; font-size: 14px;"
                   >
                     Delete
