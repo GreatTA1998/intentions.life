@@ -1,5 +1,5 @@
 <script>
-  import AddButton from './AddButton.svelte'
+  import AddWeekly from './AddWeekly.svelte'
   import PeriodicTasks from '/src/back-end/PeriodicTasks.js'
   import WeeklyPopup from './weeklyPopup.svelte'
   import ReusableSimpleDropzone from '../../ReusableSimpleDropzone.svelte'
@@ -32,7 +32,7 @@
 <div>
   <div style="font-size: 24px; margin-bottom: 12px;">
     Weekly
-    <AddButton let:setIsPopupOpen defaultOrderValue={weeklyTasks.length}>
+    <AddWeekly let:setIsPopupOpen defaultOrderValue={weeklyTasks.length}>
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <span
         on:click={() => setIsPopupOpen({ newVal: true })}
@@ -40,7 +40,7 @@
       >
         +
       </span>
-    </AddButton>
+    </AddWeekly>
   </div>
 
   {#each weeklyTasks as weeklyTask, i (weeklyTask.id)}

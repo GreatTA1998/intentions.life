@@ -14,7 +14,7 @@ const Schema = {
   imageDownloadURL: "",
   imageFullPath: "",
   startDateISO: "",
-  iconURL: "",
+  iconUrl: "",
   timeZone: "",
   notify: "", //string so "0" means notification at 0 minutes instead of false
 };

@@ -2,25 +2,23 @@
   import UXFormField from '$lib/UXFormField.svelte'
   import UXToggleSwitch from '$lib/UXToggleSwitch.svelte'
   import ReusableRoundButton from '$lib/ReusableRoundButton.svelte'
-  import { user } from '/src/store.js'
-  import { createEventDispatcher } from 'svelte'
 
   export let weeklyTask
+  export let updateWeeklyTemplate
 
   let isEditingTaskStart = false
   let isEditingDuration = false
   let newDuration = weeklyTask.duration
   let newStartHHMM = weeklyTask.startTime
   let hasSpecificTime = weeklyTask.startTime
-  const dispatch = createEventDispatcher()
 
   function saveDuration() {
-    dispatch('weekly-template-update', { duration: newDuration })
+    updateWeeklyTemplate({ duration: newDuration })
     isEditingDuration = false
   }
 
   function saveStartTime() {
-    dispatch('weekly-template-update', { startTime: newStartHHMM })
+    updateWeeklyTemplate({ startTime: newStartHHMM })
     isEditingTaskStart = false
   }
 

@@ -13,7 +13,6 @@
 
   onMount(async () => {
     $periodicTasks = await PeriodicTasks.get($user.uid)
-    console.log('$periodicTasks in PeriodicTasks.svelte', $periodicTasks)
 
   })
 

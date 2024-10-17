@@ -41,7 +41,7 @@
           <!-- svelte-ignore a11y-missing-attribute -->
           <!-- svelte-ignore a11y-click-events-have-key-events -->
           <img
-            on:click={() => updateTemplate({ iconURL: doodleIcon.url })}
+            on:click={() => updateTemplate({ iconUrl: doodleIcon.url })}
             src={doodleIcon.url}
             style="width: 48px; height: 48px; cursor: pointer;"
             class:orange-border={template.iconUrl === doodleIcon.url}

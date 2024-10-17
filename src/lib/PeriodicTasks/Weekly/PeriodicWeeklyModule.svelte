@@ -2,6 +2,7 @@
   import ReusableRoundButton from '$lib/ReusableRoundButton.svelte'
 
   export let weeklyTask
+  export let updateWeeklyTemplate = () => {}
 
   let oldSelectedDays = weeklyTask.crontab.split(' ')[4].split(',')
   let dayOfWeekSymbol = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
@@ -9,15 +10,14 @@
   let isEditingPeriodicity = false
 
   const updateCrontab = () => {
+    console.log('updateCrontab', selectedDays)
     let updatedCrontab = weeklyTask.crontab.split(' ');
     updatedCrontab[4] = selectedDays.length ? selectedDays.sort().join(',') : '*';
     updatedCrontab = updatedCrontab.join(' ');
-
-    console.log('selectedDays', selectedDays);
-    console.log('updated crontab', updatedCrontab);
-    // isEditingPeriodicity = false;
+    console.log('updatedCrontab', updatedCrontab)
+    updateWeeklyTemplate({ crontab: updatedCrontab })
+    isEditingPeriodicity = false;
   }
-
 
   function handleSelectDay(i) {
     if (selectedDays.includes(i)) {
@@ -28,7 +28,7 @@
   }
 
   $: {
-    isEditingPeriodicity = oldSelectedDays !== selectedDays
+    isEditingPeriodicity = oldSelectedDays.join(',') !== selectedDays.join(',')
   }
 </script>
 

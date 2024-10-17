@@ -2,12 +2,17 @@ import { db } from "./firestoreConnection";
 import {
   doc,
   getDocs,
+  getDoc,
   collection,
   query,
   where,
   setDoc,
   updateDoc,
+  deleteDoc
 } from "firebase/firestore";
+import { parseExpression } from 'cron-parser';
+import { DateTime } from 'luxon';
+import { getRandomID } from '../helpers/everythingElse.js';
 
 // crontab:
 // *: Minutes (0-59)
@@ -35,14 +40,88 @@ const PeriodicTaskSchema = {
 const create = async ({ userID, task }) => {
   const docRef = doc(collection(db, "users", userID, 'periodicTasks'));
   await setDoc(docRef, task);
-  return docRef.id;};
+  return docRef.id;
+};
 
 const updateTemplate = async ({ userID, id, updates }) => {
-  console.log('updateTemplate', userID ,id, updates);
   await updateDoc(doc(db, "users", userID, 'periodicTasks', id), updates);
-} 
+}
+
+const deleteFutureTasks = async ({ userID, id, fromDate }) => {
+  const tasksQuery = query(
+    collection(db, "users", userID, "tasks"),
+    where('periodicTaskId', '==', id),
+    where('startDateISO', '>=', fromDate)
+  );
+  const tasksSnapshot = await getDocs(tasksQuery);
+  const deletePromises = tasksSnapshot.docs.map(doc =>
+    deleteDoc(doc.ref)
+  );
+  return Promise.all(deletePromises);
+}
+
+const getPeriodFromCrontab = (crontab) => {
+  const parts = crontab.split(' ');
+  if (parts.length !== 5) throw new Error('Invalid crontab format');
+  const [minute, hour, dayOfMonth, month, dayOfWeek] = parts;
+  if (dayOfMonth !== '*' && month !== '*' && dayOfWeek === '*') return 'yearly';
+  if (dayOfMonth !== '*' && month === '*' && dayOfWeek === '*') return 'monthly';
+  if (dayOfMonth === '*' && month === '*' && dayOfWeek !== '*') return 'weekly';
+  throw new Error('unknown frequency');
+}
+
+const postFutureTasks = async ({ userID, id, fromDate }) => {
+  const snapshot = await getDoc(doc(db, "users", userID, 'periodicTasks', id));
+  const periodicTask = snapshot.data();
+  periodicTask.id = id;
+  const offset = getPeriodFromCrontab(periodicTask.crontab) === 'yearly' ? { years: 1 } : { months: 1 };
+  const startDate = DateTime.fromISO(`${fromDate}T${periodicTask.startTime}:00`, { zone: periodicTask.timeZone }).plus({ days: 1 });
+  const endDate = DateTime.now().setZone(periodicTask.timeZone).plus(offset);
+  const tasksArray = await buildFutureTasks({periodicTask, startDateJS: new Date(startDate), endDateJS: new Date(endDate), userID, periodicTaskID: id});
+  tasksArray.forEach(task => {
+      const taskId = getRandomID()
+      setDoc(doc(db, "users", userID, 'tasks', taskId), task);
+  });
+}
+
+const buildFutureTasks = async ({periodicTask, startDateJS, endDateJS, userID, periodicTaskID}) => {
+  const interval = parseExpression(periodicTask.crontab, ({ currentDate: startDateJS, endDate: endDateJS, iterator: true }));
+  const generatedTasks = [];
+  while (true) {
+      const cronObj = interval.next();
+      const ISODate = DateTime.fromJSDate(new Date(cronObj.value.toString())).toFormat('yyyy-MM-dd')
+      generatedTasks.push({
+        name: periodicTask.name,
+        startDateISO: ISODate,
+        iconUrl: periodicTask.iconUrl,
+        tags: periodicTask.tags,
+        periodicTaskId: periodicTask.id,
+        timeZone: periodicTask.timeZone,
+        notes: periodicTask.notes,
+        notify: periodicTask.notify,
+        isDone: false,
+        imageDownloadURL: "",
+        imageFullPath: "",
+        duration: periodicTask.duration,
+        parentID: "",
+        orderValue: 0,
+        startTime: periodicTask.startTime,
+    });
+    if (cronObj.done) {
+      await updateDoc(doc(db, "users", userID, 'periodicTasks', periodicTaskID), {lastGeneratedTask: ISODate});
+      return generatedTasks;
+    }
+  }
+}
 
 const updateWithTasks = async ({ userID, id, updates }) => {
+  if (updates.crontab) {
+    await updateDoc(doc(db, "users", userID, 'periodicTasks', id), {crontab: updates.crontab});
+    return Promise.all([
+      deleteFutureTasks({ userID, id, fromDate: DateTime.now().toFormat('yyyy-MM-dd') }),
+      postFutureTasks({ userID, id, fromDate: DateTime.now().toFormat('yyyy-MM-dd') })
+    ]);
+  }
   await updateDoc(doc(db, "users", userID, 'periodicTasks', id), updates);
   const uniqueProperties = ['crontab', 'id', 'userID', 'lastGeneratedTask', 'orderValue'];
   for (const property of uniqueProperties) {
@@ -50,7 +129,7 @@ const updateWithTasks = async ({ userID, id, updates }) => {
   }
   const tasksQuery = query(
     collection(db, "users", userID, "tasks"),
-    where('periodicTaskID', '==', id),
+    where('periodicTaskId', '==', id),
     where('startDateISO', '>=', DateTime.now().toFormat('yyyy-MM-dd'))
   );
 
@@ -77,7 +156,7 @@ const get = (userID) => {
 const deleteTemplate = async ({ userID, id }) => {
   const tasksQuery = query(
     collection(db, "users", userID, "tasks"),
-    where('periodicTaskID', '==', id),
+    where('periodicTaskId', '==', id),
     where('startDateISO', '>=', DateTime.now().toFormat('yyyy-MM-dd'))
   );
   const tasksSnapshot = await getDocs(tasksQuery);
@@ -89,15 +168,14 @@ const deleteTemplate = async ({ userID, id }) => {
 };
 
 const getPeriod = ({ crontab }) => {
-  if(!crontab) return null;
-  console.log('crontab', crontab);
-    const parts = crontab.split(' ');
-    if (parts.length !== 5) throw new Error('Invalid crontab format');
-    const [minute, hour, dayOfMonth, month, dayOfWeek] = parts;
-    if (dayOfMonth !== '*' && month !== '*' && dayOfWeek === '*') return 'yearly';
-    if (dayOfMonth !== '*' && month === '*' && dayOfWeek === '*') return 'monthly';
-    if (dayOfMonth === '*' && month === '*' && dayOfWeek !== '*') return 'weekly';
-    throw new Error('unknown frequency');
+  if (!crontab) return null;
+  const parts = crontab.split(' ');
+  if (parts.length !== 5) throw new Error('Invalid crontab format');
+  const [minute, hour, dayOfMonth, month, dayOfWeek] = parts;
+  if (dayOfMonth !== '*' && month !== '*' && dayOfWeek === '*') return 'yearly';
+  if (dayOfMonth !== '*' && month === '*' && dayOfWeek === '*') return 'monthly';
+  if (dayOfMonth === '*' && month === '*' && dayOfWeek !== '*') return 'weekly';
+  throw new Error('unknown frequency');
 }
 
 export default { create, updateWithTasks, getTotalTime, get, deleteTemplate, getPeriod, updateTemplate, };

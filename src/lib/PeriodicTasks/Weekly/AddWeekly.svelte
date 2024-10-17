@@ -26,6 +26,7 @@
     }
     const id = await PeriodicTasks.create({ userID: $user.uid, task: newTask })
     newTask.id = id
+    console.log('newTask', newTask)
     $periodicTasks = ([...$periodicTasks, { ...newTask, id, userID: $user.uid }])
     newTaskName = ''
     isPopupOpen = false

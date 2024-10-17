@@ -4,6 +4,7 @@
   import PeriodicWeeklyModule from '$lib/PeriodicTasks/Weekly/PeriodicWeeklyModule.svelte'
   import ManageReusableTasksDurationStartTime from '$lib/PeriodicTasks/components/ManageReusableTasksDurationStartTime.svelte'
   import { user, periodicTasks } from '/src/store.js'
+  import PeriodicTasks from '/src/back-end/PeriodicTasks.js'
   import { onMount, onDestroy } from 'svelte'
   import _ from 'lodash'
   import Icons from '/src/back-end/Icons.js'
@@ -24,13 +25,14 @@
   onDestroy(() => unsub && unsub())
 
   async function updateWeeklyTemplate(keyValueChanges) {
+    console.log('updateWeeklyTemplate', keyValueChanges)
     PeriodicTasks.updateWithTasks({
       userID: $user.uid,
       id: weeklyTask.id,
       updates: keyValueChanges
     })
     $periodicTasks = $periodicTasks.map((task) =>
-      task.id === weeklyTemplate.id ? { ...task, ...keyValueChanges } : task
+      task.id === weeklyTask.id ? { ...task, ...keyValueChanges } : task
     )
   }
 
@@ -41,7 +43,8 @@
       )
     )
       return
-    PeriodicTasks.deleteTemplate({ id: weeklyTask.id, uid: $user.uid })
+    PeriodicTasks.deleteTemplate({ id: weeklyTask.id, userID: $user.uid })
+    $periodicTasks = $periodicTasks.filter((task) => task.id !== weeklyTask.id)
     isPopupOpen = false
   }
 
@@ -70,7 +73,7 @@
 
       <div style="display: flex; align-items: center; margin-top: 24px;">
         {#key weeklyTask}
-          <PeriodicWeeklyModule {weeklyTask} />
+          <PeriodicWeeklyModule {weeklyTask} updateWeeklyTemplate={updateWeeklyTemplate} />
         {/key}
 
         <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -84,8 +87,8 @@
       </div>
 
       <ManageReusableTasksDurationStartTime
-        {weeklyTask}
-        on:weekly-template-update={(e) => updateWeeklyTemplate(e.detail)}
+       weeklyTask={weeklyTask}
+        updateWeeklyTemplate={updateWeeklyTemplate}
       />
 
       <!-- ICON SECTION -->
