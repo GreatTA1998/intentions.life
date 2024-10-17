@@ -17,7 +17,7 @@ const IconSchema = {
     tags: "",
 }
 
-async function getAvailableIcons(uid) {
+async function getAvailable(uid) {
     const q = query(
         collection(db, "icons"),
         or(
@@ -81,4 +81,4 @@ async function deleteIconsFromTasks({ uid, url }) {
     }
 }
 
-export default { uploadIconDataURL, getAvailableIcons, deleteRecursively };
+export default { uploadIconDataURL, getAvailable, deleteRecursively };

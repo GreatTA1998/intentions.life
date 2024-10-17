@@ -39,7 +39,7 @@
 
 <script>
   import { createNewInstancesOfMonthlyRepeatingTasks } from '/src/helpers/periodicRepeat.js'
-  import ManageReusableTasksDurationStartTime from '$lib/ManageReusableTasksDurationStartTime.svelte'
+  import ManageReusableTasksDurationStartTime from '$lib/PeriodicTasks/components/ManageReusableTasksDurationStartTime.svelte'
   import PeriodicMonthlyModule from '$lib/PeriodicMonthlyModule.svelte'
   import {  convertMMDDToDateClassObject, computeDayDifference } from '/src/helpers/everythingElse.js'
   import {deleteFirestoreDoc, createFirestoreQuery, getFirestoreQuery, updateFirestoreDoc } from '/src/helpers/firestoreHelpers.js'

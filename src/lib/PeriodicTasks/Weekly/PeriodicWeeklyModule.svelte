@@ -1,77 +1,65 @@
+<script>
+  import ReusableRoundButton from '$lib/ReusableRoundButton.svelte'
+
+  export let weeklyTask
+
+  let oldSelectedDays = weeklyTask.crontab.split(' ')[4].split(',')
+  let dayOfWeekSymbol = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+  let selectedDays = weeklyTask.crontab.split(' ')[4].split(',')
+  let isEditingPeriodicity = false
+
+  const updateCrontab = () => {
+    let updatedCrontab = weeklyTask.crontab.split(' ');
+    updatedCrontab[4] = selectedDays.length ? selectedDays.sort().join(',') : '*';
+    updatedCrontab = updatedCrontab.join(' ');
+
+    console.log('selectedDays', selectedDays);
+    console.log('updated crontab', updatedCrontab);
+    // isEditingPeriodicity = false;
+  }
+
+
+  function handleSelectDay(i) {
+    if (selectedDays.includes(i)) {
+      selectedDays = selectedDays.filter((day) => day !== i)
+    } else {
+      selectedDays = [...selectedDays, i]
+    }
+  }
+
+  $: {
+    isEditingPeriodicity = oldSelectedDays !== selectedDays
+  }
+</script>
+
 <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
   <div style="display: flex;">
-    {#each {length: 7} as _, i}
-      <div 
-        on:click={() => repeatOnDayOfWeek[i] = !repeatOnDayOfWeek[i]} 
+    {#each { length: 7 } as _, i}
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
+      <div
+        on:click={() => handleSelectDay(String(i))}
         class="circle"
-        class:not-selected={!repeatOnDayOfWeek[i]}
-        class:highlighted={repeatOnDayOfWeek[i]}
+        class:not-selected={!selectedDays.includes(String(i))}
+        class:highlighted={selectedDays.includes(String(i))}
       >
         {dayOfWeekSymbol[i]}
       </div>
     {/each}
   </div>
-  
-  <div style="display: flex; align-items: center;">
-    <div>
-      Show repeats
-    </div>
-
-    <div>
-      <input class="underlined-input"
-        value={numOfWeeksInAdvance}
-        on:input={e => numOfWeeksInAdvance = e.target.value}
-      >
-    </div>
-    weeks ahead
-  </div>
 
   {#if isEditingPeriodicity}
-    <ReusableRoundButton on:click={() => {
-      dispatch('new-weekly-schedule', { repeatOnDayOfWeek, numOfWeeksInAdvance })
-      isEditingPeriodicity = false
-    }}
-      backgroundColor="rgb(0, 89, 125)" textColor="white"
+    <ReusableRoundButton
+      on:click={updateCrontab}
+      backgroundColor="rgb(0, 89, 125)"
+      textColor="white"
     >
       Save changes
     </ReusableRoundButton>
   {/if}
 </div>
 
-<script>
-  import ReusableRoundButton from '$lib/ReusableRoundButton.svelte'
-  import { createEventDispatcher } from 'svelte'
-
-  export let weeklyTemplate
-  
-  let numOfWeeksInAdvance = weeklyTemplate.numOfWeeksInAdvance || 2
-  let repeatOnDayOfWeek = weeklyTemplate.repeatOnDayOfWeek
-  const old = [...repeatOnDayOfWeek]
-  let dayOfWeekSymbol = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
-  let isEditingPeriodicity = false
-  const dispatch = createEventDispatcher()
-
-  $: {
-    if (areArraysEqual(repeatOnDayOfWeek, old)  
-      && weeklyTemplate.numOfWeeksInAdvance === numOfWeeksInAdvance
-    ) { 
-      isEditingPeriodicity = false
-    } else {
-      isEditingPeriodicity = true
-    }
-  }
-
-  function areArraysEqual(a1, a2) {
-    var i = a1.length;
-    while (i--) {
-        if (a1[i] !== a2[i]) return false;
-    }
-    return true
-  }
-</script>
-
 <style>
-  .underlined-input {
+  /* .underlined-input {
     border: none;
     border-bottom: 2px solid #313131;
     outline: none;
@@ -81,7 +69,7 @@
     width: 20px;
     margin: 4px;
     font-weight: 500;
-  }
+  } */
 
   .circle {
     width: 30px;

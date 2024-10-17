@@ -1,30 +1,38 @@
 <script>
-  import CreateWeekly from './CreateWeekly.svelte'
+  import AddButton from './AddButton.svelte'
   import PeriodicTasks from '/src/back-end/PeriodicTasks.js'
   import WeeklyPopup from './weeklyPopup.svelte'
   import ReusableSimpleDropzone from '../../ReusableSimpleDropzone.svelte'
-  import { weeklyTasks, user } from '/src/store.js'
+  import { user, periodicTasks } from '/src/store.js'
   const weeklyTaskWidthInPx = 180
   const dayOfWeekSymbol = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
 
   let draggedTemplate
+  $: weeklyTasks = $periodicTasks
+    .filter((task) => PeriodicTasks.getPeriod(task) === 'weekly')
+    .sort((a, b) => a.orderValue - b.orderValue)
 
   function handleDrop(newOrderValue) {
-    console.log('newOrderValue', newOrderValue, draggedTemplate.id)
-    PeriodicTasks.updateTemplate({userID: $user.uid, id: draggedTemplate.id, updates: {orderValue: newOrderValue}})
-    $weeklyTasks = $weeklyTasks.map(task => {
-      if (task.id === draggedTemplate.id) {
-        return {...task, orderValue: newOrderValue}
-      }
-      return task
-    }).sort((a, b) => a.orderValue - b.orderValue);
+    PeriodicTasks.updateTemplate({
+      userID: $user.uid,
+      id: draggedTemplate.id,
+      updates: { orderValue: newOrderValue }
+    })
+    $periodicTasks = $periodicTasks
+      .map((task) => {
+        if (task.id === draggedTemplate.id) {
+          return { ...task, orderValue: newOrderValue }
+        }
+        return task
+      })
+      .sort((a, b) => a.orderValue - b.orderValue)
   }
 </script>
 
 <div>
   <div style="font-size: 24px; margin-bottom: 12px;">
     Weekly
-    <CreateWeekly let:setIsPopupOpen defaultOrderValue={$weeklyTasks.length}>
+    <AddButton let:setIsPopupOpen defaultOrderValue={weeklyTasks.length}>
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <span
         on:click={() => setIsPopupOpen({ newVal: true })}
@@ -32,45 +40,42 @@
       >
         +
       </span>
-    </CreateWeekly>
+    </AddButton>
   </div>
 
-  {#each $weeklyTasks as weeklyTask, i (weeklyTask.id)}
+  {#each weeklyTasks as weeklyTask, i (weeklyTask.id)}
     {#if i === 0}
       <ReusableSimpleDropzone
-      on:new-order-value={(e) => handleDrop(e.detail)}
+        on:new-order-value={(e) => handleDrop(e.detail)}
         aboveOrder={0}
-        belowOrder={$weeklyTasks[0].orderValue}
+        belowOrder={weeklyTasks[0].orderValue}
       />
       <!-- general case drop-zone: must be between 2 tasks-->
-    {:else if i > 0 && i < $weeklyTasks.length}
+    {:else if i > 0 && i < weeklyTasks.length}
       <ReusableSimpleDropzone
-      on:new-order-value={(e) => handleDrop(e.detail)} aboveOrder={$weeklyTasks[i - 1].orderValue}
-        belowOrder={$weeklyTasks[i].orderValue}
+        on:new-order-value={(e) => handleDrop(e.detail)}
+        aboveOrder={weeklyTasks[i - 1].orderValue}
+        belowOrder={weeklyTasks[i].orderValue}
       />
     {/if}
 
-    <WeeklyPopup let:setIsPopupOpen weeklyTemplate={weeklyTask}>
+    <WeeklyPopup let:setIsPopupOpen weeklyTask={weeklyTask}>
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <div
         on:click={() => setIsPopupOpen({ newVal: true })}
         style="display: flex; align-items: center; cursor: pointer;"
         draggable="true"
-        on:dragstart|self={(e) => draggedTemplate=weeklyTask}
+        on:dragstart|self={(e) => (draggedTemplate = weeklyTask)}
       >
-        {#if weeklyTask.iconDataURL}
+        {#if weeklyTask.iconUrl}
           <!-- svelte-ignore a11y-missing-attribute -->
-          <img
-            src={weeklyTask.iconDataURL}
-            style="width: 60px; height: 60px;"
-          />
+          <img src={weeklyTask.iconUrl} style="width: 60px; height: 60px;" />
         {:else}
           <div style="width: 60px; height: 60px" />
         {/if}
 
         <div style="width: {weeklyTaskWidthInPx}px;">
           <div style="font-size: 16px; font-color: rgb(120, 120, 120)">
-            <!-- {weeklyTask.orderValue}  -->
             {weeklyTask.name}
           </div>
 
@@ -104,11 +109,11 @@
       </div>
     </WeeklyPopup>
 
-    {#if i === $weeklyTasks.length - 1}
+    {#if i === weeklyTasks.length - 1}
       <ReusableSimpleDropzone
         on:new-order-value={(e) => handleDrop(e.detail)}
-        aboveOrder={$weeklyTasks[i].orderValue}
-        belowOrder={$weeklyTasks[i].orderValue + 1}
+        aboveOrder={weeklyTasks[i].orderValue}
+        belowOrder={weeklyTasks[i].orderValue + 1}
       />
     {/if}
   {/each}

@@ -1,5 +1,5 @@
 <script>
-  import { user, weeklyTasks } from '/src/store.js'
+  import { user, periodicTasks } from '/src/store.js'
   import ReusableRoundButton from '$lib/ReusableRoundButton.svelte'
   import { DateTime } from 'luxon'
   import PeriodicTasks from '/src/back-end/PeriodicTasks.js'
@@ -21,12 +21,12 @@
       notify: '',
       startTime: '12:00',
       lastGeneratedTask: DateTime.now().toFormat('yyyy-MM-dd'),
-      iconUrl: 'url',
+      iconUrl: '',
       tags: ""
     }
     const id = await PeriodicTasks.create({ userID: $user.uid, task: newTask })
     newTask.id = id
-    $weeklyTasks = ([...$weeklyTasks, { ...newTask, id, userID: $user.uid }])
+    $periodicTasks = ([...$periodicTasks, { ...newTask, id, userID: $user.uid }])
     newTaskName = ''
     isPopupOpen = false
   }

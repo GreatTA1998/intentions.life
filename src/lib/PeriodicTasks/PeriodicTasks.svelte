@@ -1,11 +1,10 @@
 <script>
   import Weekly from './Weekly/Weekly.svelte'
   import { onMount, onDestroy } from 'svelte'
-  import { user, weeklyTasks, monthlyTasks, yearlyTasks } from '/src/store.js'
+  import { user, periodicTasks } from '/src/store.js'
   import PeriodicTasks from '/src/back-end/PeriodicTasks.js'
 
   let shouldUnsub = false
-  let periodicTasks = []
 
   let getStatsFromTaskID = {}
   let maxHourDuration = 0
@@ -13,16 +12,9 @@
 
 
   onMount(async () => {
-    periodicTasks = await PeriodicTasks.get($user.uid)
-    console.log('periodicTasks', periodicTasks)
-    const filterAndSort = (tasks, period) =>
-      tasks
-        .filter((task) => PeriodicTasks.getPeriod(task) === period)
-        .sort((a, b) => a.orderValue - b.orderValue)
-    $weeklyTasks = filterAndSort(periodicTasks, 'weekly')
-    console.log('$weeklyTasks', $weeklyTasks)
-    $monthlyTasks = filterAndSort(periodicTasks, 'monthly')
-    $yearlyTasks = filterAndSort(periodicTasks, 'yearly')
+    $periodicTasks = await PeriodicTasks.get($user.uid)
+    console.log('$periodicTasks in PeriodicTasks.svelte', $periodicTasks)
+
   })
 
   onDestroy(() => shouldUnsub && unsub())
