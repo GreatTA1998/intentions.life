@@ -16,7 +16,7 @@ const Schema = {
   reusableTemplateID: "",
   parentID: "",
   name: "",
-  orderValue: "",
+  orderValue: 0,
   duration: 30,
   isDone: false,
   imageDownloadURL: "",

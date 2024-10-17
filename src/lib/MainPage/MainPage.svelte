@@ -7,8 +7,6 @@
     user,
     showSnackbar,
     hasInitialScrolled,
-    todoTasks,
-    calendarTasks
   } from "/src/store.js";
   import AI from "../AI/AI.svelte";
   import TheSnackbar from "$lib/TheSnackbar.svelte";
@@ -16,7 +14,7 @@
   import PopupCustomerSupport from "$lib/PopupCustomerSupport.svelte";
   import NavbarAndContentWrapper from "$lib/NavbarAndContentWrapper.svelte";
   import DetailedCardPopup from "$lib/DetailedCardPopup/DetailedCardPopup.svelte";
-  import ManageReusableTasks from "$lib/ManageReusableTasks/ManageReusableTasks.svelte";
+  import PeriodicTasks from "$lib/PeriodicTasks/PeriodicTasks.svelte";
   import UncertainMilestones from "$lib/UncertainMilestones.svelte";
   import MultiPhotoUploader from "$lib/MultiPhotoUploader.svelte";
   import {
@@ -31,7 +29,6 @@
   import NewThisWeekTodo from "$lib/NewThisWeekTodo.svelte";
   import { handleInitialTasks } from "./handleTasks.js";
   import MobileMode from "$lib/MobileMode/MobileMode.svelte"
-  import { DateTime } from 'luxon'
   import { createTaskNode, updateTaskNode, deleteTaskNode } from '/src/helpers/crud.js'
   import { findTaskByID } from '/src/helpers/utils.js'
 
@@ -304,10 +301,8 @@
 
     <div slot="content" style="display: flex; flex-grow: 1; height: 100%;">
       {#if currentMode === "ManageRepeats"}
-        <ManageReusableTasks />
-        <!-- WEEK MODE -->
+        <PeriodicTasks />
       {:else if currentMode === "Week"}
-        <!-- 1st flex child -->
         <div class="todo-container">
           <NewThisWeekTodo
             on:new-root-task={(e) => createTaskNode(e.detail)}

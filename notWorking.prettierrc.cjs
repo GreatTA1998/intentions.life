@@ -1,13 +1,23 @@
 module.exports = {
+  plugins: ['prettier-plugin-svelte'],
+  overrides: [{ files: '*.svelte', options: { parser: 'svelte' } }],
   singleQuote: true,
+  svelteSortOrder: 'options-scripts-markup-styles',
+  svelteBracketNewLine: false,
+  svelteAllowShorthand: false,
+  svelteIndentScriptAndStyle: false,
+  semi: false, // Add this to remove semicolons
+  trailingComma: 'none', // Add this to remove trailing commas
+  bracketSpacing: true, // Add this for { db } instead of {db}
+  tabWidth: 2, // Add this for 2-space indentation
   space: {
     beforeParentheses: {
       anonymous: 'always',
       named: 'always',
-      asyncArrow: 'always',
-    },
-  },
-};
+      asyncArrow: 'always'
+    }
+  }
+}
 
 
 // Rules

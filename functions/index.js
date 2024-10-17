@@ -5,11 +5,6 @@ const { handlePeriodicTask } = require('./handlePeriodicTask');
 const { db } = require('./firebase');
 const { getFirestore } = require('firebase-admin/firestore');
 
-
-// 彼は英語のみならず、フランス語も話せます。
-// 音楽は楽しむと同時に、リラックスもできます。
-
-
 // This crontab expression breaks down as follows:
 // *: Minutes (0-59)
 // *: Hours (0-23)
@@ -59,7 +54,6 @@ exports.periodicTasks = onSchedule(
 //   notify: "",
 //   duration: 30,
 //   startTime: "12:00",
-//   isYearly: false,
 // };
 
 // exports.scheduledFunction = functions.https.onRequest(async (req, res) => {

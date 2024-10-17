@@ -1,9 +1,9 @@
 <script>
   import { createNewInstancesOfWeeklyRepeatingTasks } from "/src/helpers/periodicRepeat.js";
   import { doodleIcons } from "/src/store.js";
-  import BasicWhiteboard from "$lib/BasicWhiteboard.svelte";
-  import PremiumPopup from "$lib/PremiumPopup.svelte";
-  import PeriodicWeeklyModule from "$lib/PeriodicWeeklyModule.svelte";
+  import BasicWhiteboard from "$lib/PeriodicTasks/components/BasicWhiteboard.svelte";
+  import PremiumPopup from "$lib/PeriodicTasks/components/PremiumPopup.svelte";
+  import PeriodicWeeklyModule from "$lib/PeriodicTasks/Weekly/PeriodicWeeklyModule.svelte";
   import ManageReusableTasksDurationStartTime from "$lib/ManageReusableTasksDurationStartTime.svelte";
   import {
     convertMMDDToDateClassObject,
@@ -22,9 +22,7 @@
   };
 
   let isShowingPremiumPopup = false;
-  let allGeneratedTasksToUpload = [];
   let isPopupOpen = false;
-
   let repeatOnDayOfWeek = weeklyTemplate.repeatOnDayOfWeek;
   let repeatGroupID = weeklyTemplate.repeatGroupID;
   let newTaskName = weeklyTemplate.name;
@@ -52,113 +50,26 @@
     propagateChangeToFutureInstances(keyValueChanges);
   }
 
-  // a general function
-  async function propagateChangeToFutureInstances(keyValueChanges) {
-    const futureInstances = await getFutureInstances();
-    for (const taskInstance of futureInstances) {
-      updateFirestoreDoc(
-        `/users/${$user.uid}/tasks/${taskInstance.id}`,
-        keyValueChanges,
-      );
-    }
-  }
 
-  function handleDelete({id, url}) {
-    console.log("deleting", id, url);
+  function handleDeleteIcon({id, url}) {
     if (confirm("Are you sure you want to delete this icon?")) {
      Icons.deleteRecursively({id, uid: $user.uid, url});
      $doodleIcons = $doodleIcons.filter(icon => icon.id !== id);
     }
   }
 
-  async function properlyDeleteTemplate() {
-    if (
-      confirm(
-        'Are you sure? This will delete all "Time Spent" records too. If you just want to stop future repeats, you can set the weekly repeats to no days instead.',
-      )
-    ) {
-      await deleteExistingFutureInstances();
-      deleteFirestoreDoc(
-        `/users/${$user.uid}/periodicTasks/${weeklyTemplate.id}`,
-      );
-      isPopupOpen = false;
-    }
+  function deleteTemplate() {
+    console.log("deleting weekly template");
+    if (!confirm("Are you sure you want to delete this template and all its future instances?")) return 
+    PeriodicTasks.deleteTemplate({id: weeklyTemplate.id, uid: $user.uid});
+
+    isPopupOpen = false;
   }
 
   function setIsPopupOpen({ newVal }) {
     isPopupOpen = newVal;
   }
-
-  // effectively a delete + create
-  async function editExistingInstances({
-    repeatOnDayOfWeek,
-    numOfWeeksInAdvance,
-  }) {
-    // update the template itself
-    updateFirestoreDoc(
-      `/users/${$user.uid}/periodicTasks/${weeklyTemplate.id}`,
-      {
-        repeatOnDayOfWeek,
-        name: newTaskName,
-        iconDataURL: weeklyTemplate.iconDataURL || "",
-        numOfWeeksInAdvance,
-      },
-    );
-
-    await deleteExistingFutureInstances();
-
-    const updatedWeeklyTemplate = { ...weeklyTemplate };
-    updatedWeeklyTemplate.repeatOnDayOfWeek = repeatOnDayOfWeek;
-    updatedWeeklyTemplate.numOfWeeksInAdvance = numOfWeeksInAdvance;
-
-    // with a clean slate, generate new ones
-    createNewInstancesOfWeeklyRepeatingTasks({
-      weeklyTemplate: updatedWeeklyTemplate,
-      userDoc: $user,
-    });
-  }
-
-  function getFutureInstances() {
-    return new Promise(async (resolve) => {
-      const q = createFirestoreQuery({
-        collectionPath: `/users/${$user.uid}/tasks`,
-        criteriaTerms: ["repeatGroupID", "==", weeklyTemplate.repeatGroupID],
-      });
-
-      const allRepeatInstances = await getFirestoreQuery(q);
-      const currAndFutureInstances = allRepeatInstances.filter((instance) => {
-        const d1 = new Date();
-
-        const dockingAreaDefaultTime = "23:59"; // i.e. maximize the chance of unscheduled tasks to be updated
-        const d2 = convertMMDDToDateClassObject(
-          instance.startDate,
-          instance.startYYYY,
-          instance.startTime || dockingAreaDefaultTime,
-        );
-        const dayDiff = computeDayDifference(d1, d2); // dayDiff := d2 - d1
-        return dayDiff >= 0;
-      });
-      resolve(currAndFutureInstances);
-    });
-  }
-
-  // find all the repeat groups scheduled from today's date (don't care about the past)
-  async function deleteExistingFutureInstances() {
-    return new Promise(async (resolve) => {
-      const currAndFutureInstances = await getFutureInstances();
-
-      const deleteRequests = [];
-
-      // delete all of them, use a Firestore batch
-      for (const instance of currAndFutureInstances) {
-        deleteRequests.push(
-          deleteFirestoreDoc(`/users/${$user.uid}/tasks/${instance.id}`),
-        );
-      }
-      await Promise.all(deleteRequests);
-      resolve();
-    });
-  }
+ 
 </script>
 
 <slot {setIsPopupOpen}></slot>
@@ -190,7 +101,7 @@
         <!-- svelte-ignore a11y-click-events-have-key-events -->
         <span
           class="material-symbols-outlined"
-          on:click|stopPropagation={properlyDeleteTemplate}
+          on:click|stopPropagation={deleteWeeklyTemplate}
           style="cursor: pointer; margin-left: auto; right: 0px; border: 1px solid grey; border-radius: 24px; padding: 4px;"
         >
           delete
@@ -241,7 +152,7 @@
                   <div
                     on:click={() => {
                       console.log('doodleIcon', doodleIcon);
-                      handleDelete({id: doodleIcon.id, url: doodleIcon.url})}
+                      handleDeleteIcon({id: doodleIcon.id, url: doodleIcon.url})}
                     }
                     style="cursor: pointer; font-size: 14px;"
                   >
@@ -261,58 +172,4 @@
   </div>
 {/if}
 
-<style>
-  .premium-intro-button {
-    display: flex;
-    align-items: center;
-    color: #541d69;
-    font-size: 16px;
-    cursor: pointer;
-    margin-top: 24px;
-  }
-
-  .orange-border {
-    /* border: 4px solid orange; */
-    border: 1px solid var(--logo-twig-color);
-    background-image: linear-gradient(
-        90deg,
-        rgba(200, 200, 200, 0.8) 1px,
-        transparent 0
-      ),
-      linear-gradient(180deg, rgba(200, 200, 200, 0.8) 1px, transparent 0);
-    background-size: 12px 12px; /* Adjust the size of the pattern */
-  }
-
-  .title-underline-input {
-    /* Refer to: https://stackoverflow.com/a/3131082/7812829 */
-    background: transparent;
-    border: none;
-    border-bottom: 1px solid #dbdbdd;
-    outline: none;
-    font-size: 23px;
-    font-weight: 700;
-    padding-left: 0px;
-    padding-bottom: 6px;
-  }
-
-  .detailed-card-popup {
-    position: fixed;
-    font-size: 14px;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 58%;
-    overflow-y: auto;
-    z-index: 3;
-    min-width: 360px;
-
-    height: fit-content;
-
-    padding: 24px;
-    border-radius: 24px;
-    background-color: white;
-
-    /* border: 1px solid #000; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);*/
-    box-shadow: 0px 0px 0px 9999px rgba(0, 0, 0, 0.5);
-  }
-</style>
+<style src="./weeklyPopup.css"></style>

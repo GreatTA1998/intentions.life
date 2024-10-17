@@ -1,5 +1,10 @@
 import { writable, readable } from 'svelte/store'
 
+
+export const weeklyTasks = writable([])
+export const monthlyTasks = writable([])
+export const yearlyTasks = writable([])
+
 export const user = writable({}) // {} means not logged in, cannot be null
 export const doodleIcons = writable([]) 
 

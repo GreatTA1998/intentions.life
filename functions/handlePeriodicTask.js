@@ -4,29 +4,29 @@ const { getFirestore } = require('firebase-admin/firestore');
 const { DateTime } = require('luxon');
 const { parseExpression } = require('cron-parser');
 const db = getFirestore('tokyo-db');
-const { getRandomID } = require('./utils.js');
+const { getRandomID, getPeriodFromCrontab } = require('./utils.js');
 
-// const periodicTaskTest = {
-//     name: "test",
-//     lastGeneratedTask: "2024-10-15",
-//     crontab: "0 0 15 10 *",  //yearly on october 15th, monday and wednesday: "0 0 * * 1,4",
-//     iconUrl: "url",
-//     tags: [],
-//     id: "88888888",
-//     timeZone: "Asia/Tokyo",
-//     userID: "88888888",
-//     notes: "",
-//     notify: "",
-//     duration: 30,
-//     startTime: "12:00",
-//     isYearly: true,
-// };
+const periodicTaskExample = {
+    name: "test",
+    orderValue: 0,
+    lastGeneratedTask: "2024-10-15",
+    crontab: "0 0 15 10 *",  //yearly on october 15th, monday and wednesday: "0 0 * * 1,4",
+    iconUrl: "url",
+    tags: [],
+    id: "88888888",
+    timeZone: "Asia/Tokyo",
+    userID: "88888888",
+    notes: "",
+    notify: "",
+    duration: 30,
+    startTime: "12:00",
+};
 
 const handlePeriodicTask = async (periodicTask) => {
     try {
         if(!periodicTask.crontab) return;
         const db = getFirestore('tokyo-db');
-        const offset = periodicTask.isYearly ? { years: 1 } : { months: 1 };
+        const offset = getPeriodFromCrontab(periodicTask.crontab) === 'yearly' ? { years: 1 } : { months: 1 };
         const startDate = DateTime.fromISO(`${periodicTask.lastGeneratedTask}T${periodicTask.startTime}:00`, { zone: periodicTask.timeZone }).plus({ days: 1 });
         const endDate = DateTime.now().setZone(periodicTask.timeZone).plus(offset);
         if(startDate >= endDate) return;
@@ -68,7 +68,7 @@ const buildFutureTasks = async (periodicTask, startDateJS, endDateJS) => {
             imageFullPath: "",
             duration: periodicTask.duration,
             parentID: "",
-            orderValue: "",
+            orderValue: 0,
             startTime: periodicTask.startTime,
         });
         if (cronObj.done) {

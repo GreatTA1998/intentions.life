@@ -8,7 +8,7 @@ const Schema = {
   lastRanRepeatISO: "",
   parentID: "",
   name: "",
-  orderValue: "",
+  orderValue: 0,
   duration: 30,
   isDone: false,
   imageDownloadURL: "",

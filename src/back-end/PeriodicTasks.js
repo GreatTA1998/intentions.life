@@ -18,6 +18,7 @@ import {
 
 const PeriodicTaskSchema = {
   name: "test",
+  orderValue: 0,
   lastGeneratedTask: "2024-10-15",
   crontab: "0 0 15 10 *",  //yearly on october 15th
   iconUrl: "url",
@@ -29,17 +30,21 @@ const PeriodicTaskSchema = {
   notify: "",
   duration: 30,
   startTime: "12:00",
-  isYearly: true,
 };
 
-const post = ({ userID, task }) => {
-  return setDoc(doc(db, "users", userUID, 'periodicTasks'), task);
-};
+const create = async ({ userID, task }) => {
+  const docRef = doc(collection(db, "users", userID, 'periodicTasks'));
+  await setDoc(docRef, task);
+  return docRef.id;};
 
-// I would reload all tasks after update on the front end.
-const update = async ({ userID, id, updates }) => {
+const updateTemplate = async ({ userID, id, updates }) => {
+  console.log('updateTemplate', userID ,id, updates);
   await updateDoc(doc(db, "users", userID, 'periodicTasks', id), updates);
-  const uniqueProperties = ['crontab', 'id', 'userID', 'lastGeneratedTask', 'isYearly'];
+} 
+
+const updateWithTasks = async ({ userID, id, updates }) => {
+  await updateDoc(doc(db, "users", userID, 'periodicTasks', id), updates);
+  const uniqueProperties = ['crontab', 'id', 'userID', 'lastGeneratedTask', 'orderValue'];
   for (const property of uniqueProperties) {
     delete updates[property];
   }
@@ -69,4 +74,30 @@ const get = (userID) => {
   );
 };
 
-export { post, update, getTotalTime, get };
+const deleteTemplate = async ({ userID, id }) => {
+  const tasksQuery = query(
+    collection(db, "users", userID, "tasks"),
+    where('periodicTaskID', '==', id),
+    where('startDateISO', '>=', DateTime.now().toFormat('yyyy-MM-dd'))
+  );
+  const tasksSnapshot = await getDocs(tasksQuery);
+  const deletePromises = tasksSnapshot.docs.map(doc =>
+    deleteDoc(doc.ref)
+  );
+  await Promise.all(deletePromises);
+  return deleteDoc(doc(db, "users", userID, "periodicTasks", id));
+};
+
+const getPeriod = ({ crontab }) => {
+  if(!crontab) return null;
+  console.log('crontab', crontab);
+    const parts = crontab.split(' ');
+    if (parts.length !== 5) throw new Error('Invalid crontab format');
+    const [minute, hour, dayOfMonth, month, dayOfWeek] = parts;
+    if (dayOfMonth !== '*' && month !== '*' && dayOfWeek === '*') return 'yearly';
+    if (dayOfMonth !== '*' && month === '*' && dayOfWeek === '*') return 'monthly';
+    if (dayOfMonth === '*' && month === '*' && dayOfWeek !== '*') return 'weekly';
+    throw new Error('unknown frequency');
+}
+
+export default { create, updateWithTasks, getTotalTime, get, deleteTemplate, getPeriod, updateTemplate, };
