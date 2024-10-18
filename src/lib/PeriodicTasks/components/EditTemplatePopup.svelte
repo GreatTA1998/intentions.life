@@ -30,7 +30,7 @@
       )
     )
       return
-    PeriodicTasks.deleteTemplate({ id: template.id, uid: $user.uid })
+    PeriodicTasks.deleteTemplate({ id: template.id, userID: $user.uid })
     isPopupOpen = false
   }
 
