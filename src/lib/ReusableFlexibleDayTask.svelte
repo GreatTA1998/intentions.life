@@ -40,7 +40,7 @@
       />
     </div>
 
-   <div class="task-name truncate-to-one-line" style="font-size: 12px; margin-left: 4px;">
+   <div class="task-name truncate-to-one-line" style="font-size: {fontSizeInPx}px; margin-left: 4px;">
      {task.name}
    </div>
  </div>
@@ -56,6 +56,7 @@
 
  export let task = null
  export let pixelsPerHour = null
+ export let fontSizeInPx = 12
 
  $: height = (pixelsPerHour / 60) * task.duration
  $: isBulletPoint = height < 20
@@ -93,7 +94,6 @@
    margin-top: -1px; 
    margin-left: 4px; 
    width: 100%;
-   font-size: 14px;
    cursor: pointer; 
  }
 </style>

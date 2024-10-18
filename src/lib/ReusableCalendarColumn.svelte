@@ -15,7 +15,7 @@
     yPosWithinBlock,
     whatIsBeingDraggedFullObj,
     whatIsBeingDraggedID,
-    whatIsBeingDragged,
+    whatIsBeingDragged
   } from "/src/store.js";
   import ReusableCreateTaskDirectly from "$lib/ReusableCreateTaskDirectly.svelte";
   import ReusableCalendarColumnTimeIndicator from "$lib/ReusableCalendarColumnTimeIndicator.svelte"
@@ -36,7 +36,7 @@
   let reusableTaskTemplates = null;
   let pixelsPerMinute = pixelsPerHour / 60;
 
-  $: resultantDateClassObject = getResultantDateClassObject(yPosition);
+  $: resultantDateClassObject = getResultantDateClassObject(yPosition)
 
   onMount(async () => {
     // task template dropdown

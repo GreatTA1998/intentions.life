@@ -30,7 +30,7 @@
       {#if $tasksScheduledOn && doodleIcons}
         {#if $tasksScheduledOn[ISODate]}
           <div style="display: flex; flex-wrap: wrap;">
-            {#each $tasksScheduledOn[ISODate].noStartTime.hasIcon as iconTask}
+            {#each $tasksScheduledOn[ISODate].noStartTime.hasIcon as iconTask (iconTask.id)}
               <FunctionalDoodleIcon
                 {iconTask}
                 on:task-click
@@ -39,7 +39,7 @@
             {/each}
           </div>
         
-          {#each $tasksScheduledOn[ISODate].noStartTime.noIcon as flexibleDayTask}
+          {#each $tasksScheduledOn[ISODate].noStartTime.noIcon as flexibleDayTask (flexibleDayTask.id)}
             <div
               on:click={() => dispatch("task-click", { task: flexibleDayTask })}
               style="width: var(--calendar-day-section-width); font-size: 12px; display: flex; gap: 4px; margin-top: 8px; margin-left: 4px; margin-right: 4px;"
@@ -82,7 +82,6 @@
   import ReusableFlexibleDayTask from "$lib/ReusableFlexibleDayTask.svelte";
   import FunctionalDoodleIcon from "$lib/FunctionalDoodleIcon.svelte";
   import { onMount, createEventDispatcher, afterUpdate } from "svelte";
-  import { trace } from "../helpers/utils";
   import {
     tasksScheduledOn,
     whatIsBeingDraggedFullObj,
@@ -111,22 +110,26 @@
     e.dataTransfer.dropEffect = "move";
   }
 
-  function drop_handler(e, ISODate) {
-    const id = e.dataTransfer.getData("text/plain");
-    if (!id) return; // it means we're adjusting the duration but it triggers a drop event, and a dragend event must be followed by a drop event
+  function drop_handler (e, ISODate) {
+    const id = e.dataTransfer.getData("text/plain")
+    if (!id) return // it means we're adjusting the duration but it triggers a drop event, and a dragend event must be followed by a drop event
 
-    e.preventDefault();
-    e.stopPropagation();
+    e.preventDefault()
+    e.stopPropagation()
 
-    dispatch("task-scheduled", {
+    const dt = DateTime.fromISO(ISODate)
+
+    dispatch('task-update', { 
       id,
-      timeOfDay: "",
-      dateScheduled: DateTime.fromISO(ISODate).toFormat("LL/dd"),
-    });
+      keyValueChanges: {
+        startTime: '',
+        startDateISO: dt.toFormat('yyyy-MM-dd')
+      }
+    })
 
-    whatIsBeingDraggedFullObj.set(null);
-    whatIsBeingDraggedID.set("");
-    whatIsBeingDragged.set("");
+    whatIsBeingDraggedFullObj.set(null)
+    whatIsBeingDraggedID.set('')
+    whatIsBeingDragged.set('')
   }
 </script>
 
