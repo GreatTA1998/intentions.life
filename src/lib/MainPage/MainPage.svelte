@@ -229,9 +229,9 @@
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <div
         on:click={async () => {
-          currentMode = "";
-          await tick();
-          hasInitialScrolled.set(false);
+          if (currentMode === 'Week') {
+            hasInitialScrolled.set(false);
+          }
           currentMode = "Week";
         }}
         class="ux-tab-item"
@@ -288,55 +288,62 @@
   </div>
 
   <div slot="content" style="display: flex; flex-grow: 1; height: 100%;">
-    {#if currentMode === "ManageRepeats"}
-      <ManageReusableTasks {allTasks} />
-      <!-- WEEK MODE -->
-    {:else if currentMode === "Week"}
-      <!-- 1st flex child -->
-      <div class="todo-container">
-        <NewThisWeekTodo
-          on:new-root-task={(e) => createTaskNode(e.detail)}
-          on:task-unscheduled={(e) => putTaskToThisWeekTodo(e)}
-          on:task-click={(e) => openDetailedCard(e.detail)}
-          on:subtask-create={(e) => createSubtask(e.detail)}
-          on:task-checkbox-change={(e) =>
-            updateTaskNode({
-              id: e.detail.id,
-              keyValueChanges: { isDone: e.detail.isDone },
-            })}
-        />
-      </div>
+    <!-- TO-DO: merge with Maryus' pull request to fix periodic tasks -->
+    <!-- <div style="display: { currentMode === 'ManageRepeats' ? 'block' : 'none'}">
+      {#if allTasks}
+        <ManageReusableTasks {allTasks} />
+      {/if}
+    </div> -->
 
-      <!-- 2nd flex child -->
-      <div
-        id="the-only-scrollable-container"
-        class="calendar-section-flex-child"
-      >
-        <CalendarThisWeek
-          {calStartDateClassObj}
-          on:calendar-shifted={(e) =>
-            incrementDateClassObj({ days: e.detail.days })}
-          on:new-root-task={(e) => createTaskNode(e.detail)}
-          on:task-click={(e) => openDetailedCard(e.detail)}
-          on:task-update={(e) =>
-            updateTaskNode({
-              id: e.detail.id,
-              keyValueChanges: e.detail.keyValueChanges,
-            })}
-          on:task-dragged={(e) => changeTaskDeadline(e.detail)}
-          on:task-checkbox-change={(e) =>
-            updateTaskNode({
-              id: e.detail.id,
-              keyValueChanges: { isDone: e.detail.isDone },
-            })}
-        />
-      </div>
-      <!-- END OF WEEK MODE SECTION -->
-    {:else if currentMode === "Year"}
+    <!-- WEEK MODE -->
+    <!-- 1st flex child -->
+    <div style="display: { currentMode === 'Week' ? 'block' : 'none'}" class="todo-container">
+      <NewThisWeekTodo
+        on:new-root-task={(e) => createTaskNode(e.detail)}
+        on:task-unscheduled={(e) => putTaskToThisWeekTodo(e)}
+        on:task-click={(e) => openDetailedCard(e.detail)}
+        on:subtask-create={(e) => createSubtask(e.detail)}
+        on:task-checkbox-change={(e) =>
+          updateTaskNode({
+            id: e.detail.id,
+            keyValueChanges: { isDone: e.detail.isDone },
+          })}
+      />
+    </div>
+
+    <!-- 2nd flex child -->
+    <div style="display: { currentMode === 'Week' ? 'block' : 'none'}"
+      id="the-only-scrollable-container"
+      class="calendar-section-flex-child"
+    >
+      <CalendarThisWeek
+        {calStartDateClassObj}
+        on:calendar-shifted={(e) =>
+          incrementDateClassObj({ days: e.detail.days })}
+        on:new-root-task={(e) => createTaskNode(e.detail)}
+        on:task-click={(e) => openDetailedCard(e.detail)}
+        on:task-update={(e) =>
+          updateTaskNode({
+            id: e.detail.id,
+            keyValueChanges: e.detail.keyValueChanges,
+          })}
+        on:task-dragged={(e) => changeTaskDeadline(e.detail)}
+        on:task-checkbox-change={(e) =>
+          updateTaskNode({
+            id: e.detail.id,
+            keyValueChanges: { isDone: e.detail.isDone },
+          })}
+      />
+    </div>
+    <!-- END OF WEEK MODE SECTION -->
+     
+    <div style="display: { currentMode === 'Year' ? 'block' : 'none'}">
       <UncertainMilestones />
-    {:else if currentMode === "AI"}
-      <AI />
-    {/if}
+    </div>
+
+    <div style="display: { currentMode === 'AI' ? 'block' : 'none'}">
+       <AI />
+    </div>
   </div>
 </NavbarAndContentWrapper>
 
