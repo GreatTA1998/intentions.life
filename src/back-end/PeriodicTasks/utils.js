@@ -8,7 +8,7 @@ import { getRandomID } from '../../helpers/everythingElse.js';
 const getPeriodFromCrontab = (crontab) => {
     if (crontab === '') return 'quick';
     const parts = crontab.split(' ');
-    if (parts.length !== 5) throw new Error('Invalid crontab format');
+    if (parts.length !== 5) throw new Error('Invalid crontab format', crontab, parts);
     const [minute, hour, dayOfMonth, month, dayOfWeek] = parts;
     if (dayOfMonth !== '*' && month !== '*' && dayOfWeek === '*') return 'yearly';
     if (dayOfMonth !== '*' && month === '*' && dayOfWeek === '*') return 'monthly';

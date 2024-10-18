@@ -241,9 +241,9 @@
 
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <div
-        on:click={() => (currentMode = "ManageRepeats")}
+        on:click={() => (currentMode = "Templates")}
         class="ux-tab-item"
-        class:active-ux-tab={currentMode === "ManageRepeats"}
+        class:active-ux-tab={currentMode === "Templates"}
         class:transparent-inactive-tab={currentMode === "Day"}
       >
         <span
@@ -335,6 +335,10 @@
      
     <div style="display: { currentMode === 'Year' ? 'block' : 'none'}">
       <UncertainMilestones />
+    </div>
+
+    <div style="display: { currentMode === 'Templates' ? 'block' : 'none'}">
+      <PeriodicTasks />
     </div>
 
     <div style="display: { currentMode === 'AI' ? 'block' : 'none'}">

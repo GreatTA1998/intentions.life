@@ -65,7 +65,7 @@
                 class:highlighted={template.crontab
                   .split(' ')[4]
                   .split(',')
-                  .includes(i.toString())}
+                  .includes((i + 1).toString())}
               ></div>
             {/each}
           </div>
