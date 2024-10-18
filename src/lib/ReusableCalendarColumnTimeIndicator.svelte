@@ -22,16 +22,14 @@
   let timeIndicatorOffset
   let currentTimeString
 
+  // this reacts to the Home icon click which resets us back to today's position
+  $: if (CurrentTimeIndicator && !$hasInitialScrolled) {
+    scrollToTimeIndicator()
+  }
+
   onMount(() => {
-     // scrolling
-     if (CurrentTimeIndicator) {
-      setTimeout(() => {
-        // the calendar is re-rendered on every task drag-and-drop, so we don't want to reset scrolling each time
-        if (CurrentTimeIndicator && !$hasInitialScrolled) { 
-          CurrentTimeIndicator.scrollIntoView({ behavior: 'instant', block: 'center', inline: 'center' })
-          hasInitialScrolled.set(true)
-        }
-      }, 1000) 
+    if (CurrentTimeIndicator) {
+      scrollToTimeIndicator()
     }
 
     updateTimeIndicator() 
@@ -41,6 +39,17 @@
   onDestroy(() => {
     clearInterval(intervalID)
   })
+
+  function scrollToTimeIndicator () {
+    // I still don't understand why a `setTimeout` is needed even in situations where 
+    // both the calendar and indicator are fully rendered, but it just doesn't work without it
+    setTimeout(() => {
+      if (CurrentTimeIndicator && !$hasInitialScrolled) { 
+        CurrentTimeIndicator.scrollIntoView({ behavior: 'instant', block: 'center', inline: 'center' })
+        hasInitialScrolled.set(true)
+      }
+    }, 0) 
+  }
 
   function updateTimeIndicator () {
     timeIndicatorOffset = computeTimeIndicatorOffset()

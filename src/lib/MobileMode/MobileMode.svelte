@@ -54,7 +54,6 @@
   {:else if activeTabName === 'FUTURE_VIEW'}
     <div style="overflow-y: auto;">
       <ScheduleView
-        {futureScheduledTasks}
         on:task-duration-adjusted
         on:task-click={(e) => openDetailedCard(e.detail)}
       />
@@ -116,7 +115,6 @@
   import { fetchMobileTodoTasks, fetchMobileCalTasks, fetchMobileFutureOverviewTasks } from '$lib/MainPage/handleTasks.js'
 
   let isTesting = false
-  let futureScheduledTasks = null
   let activeTabName = 'TODO_VIEW'
   let unsub
   
@@ -128,9 +126,12 @@
 
   let tasksToDisplay = []
 
-  onMount(() => {
+  onMount(async () => {
     fetchMobileTodoTasks($user.uid)
-    fetchMobileCalTasks($user.uid)
+    
+    await fetchMobileCalTasks($user.uid)
+
+    // note this function is modified to merge with `mobileCalTasks`
     fetchMobileFutureOverviewTasks($user.uid)
   })
 

@@ -53,16 +53,13 @@
       else { // USER IS LOGGED INTO FIREBASE AUTH
         const urlParts = $page.url.pathname.split("/")
 
-        // for a full path, urlParts is ['', 'PfxP5N71jQVzDejF9tYwTgrVtGz2', 'camera']
-        if (urlParts.length === 3 && urlParts[2] === 'camera' || urlParts[2] === 'mobile') {
-          // don't redirect
-        }
-        // ['', 'sentry-example']
-        else if (urlParts.length === 2 && urlParts[1] === 'sentry-example') {
-          // don't redirect either
+        // for a full path, urlParts is ['', 'PfxP5N71jQVzDejF9tYwTgrVtGz2', 'mobile']
+        if (urlParts.length === 3 || urlParts[2] === 'mobile') {
+          if (!isMobile()) goto('/' + resultUser.uid)
         }
         else {
-          goto('/' + resultUser.uid)
+          if (isMobile()) goto('/' + resultUser.uid + '/mobile')
+          else goto('/' + resultUser.uid)
         }
 
         // partially hydrate the user so we can redirect away ASAP (NOTE: v1 this shouldn't make a lot of difference to load time)
@@ -99,6 +96,10 @@
   onDestroy(() => {
     if (unsubUserSnapListener) unsubUserSnapListener()
   })
+
+  function isMobile () {
+    return window.innerWidth <= 768 // You can adjust the width threshold as needed
+  }
 
   // NOTE: somewhat brittle code. If `.journal` is every empty temporariliy, for whatever reason, the entire journal will wipe.
   function guaranteeBackwardsCompatibility (userDoc) {

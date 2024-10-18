@@ -1,6 +1,4 @@
-
-
-export function lazyCallable(node, callback) {
+export function lazyCallable (node, callback) {
   let observer = new IntersectionObserver(
     (entries) => {
       // for some god damn reason the callbacks fire on initialization, even when there is no intersection,

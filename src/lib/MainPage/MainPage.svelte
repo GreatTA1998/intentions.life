@@ -41,7 +41,6 @@
   let calStartDateClassObj = new Date();
 
   let unsub;
-  let isMobile = false;
 
   $: if (clickedTaskID) {
     if (clickedTaskID) clickedTask = findTaskByID(clickedTaskID)
@@ -52,23 +51,11 @@
     clickedTaskID = task.id
   }
 
-  // Function to check if the user is on a mobile device
-  const checkMobile = () => {
-    isMobile = window.innerWidth <= 768; // You can adjust the width threshold as needed
-  };
-
   onMount(async () => {
-    checkMobile();
-    window.addEventListener("resize", checkMobile); // Update on resize
-
     handleNotificationPermission($user);
     handleSW();
 
     handleInitialTasks($user.uid);
-
-    return () => {
-      window.removeEventListener("resize", checkMobile);
-    };
   });
 
   function handleLogoClick() {
@@ -171,184 +158,189 @@
   }
 </script>
 
-{#if isMobile}
-  <MobileMode/>
-{:else}
-  {#if clickedTaskID}
-    <DetailedCardPopup
-      taskObject={clickedTask}
-      on:task-update={(e) => updateTaskNode(e.detail)}
-      on:task-reusable={() => createReusableTaskTemplate(clickedTask.id)}
-      on:task-click={(e) => openDetailedCard(e.detail)}
-      on:card-close={() => clickedTaskID = ''}
-      on:task-delete={(e) => deleteTaskNode(e.detail)}
-      on:task-checkbox-change={(e) =>
-        updateTaskNode({
-          id: e.detail.id,
-          keyValueChanges: { isDone: e.detail.isDone },
-        })}
-    />
-  {/if}
-
-  <!-- UNDO COMPLETED SNACKBAR -->
-  {#if $mostRecentlyCompletedTaskID}
-    <TheSnackbar
-      on:undo-task-completion={() => {
-        updateTaskNode({
-          id: $mostRecentlyCompletedTaskID,
-          keyValueChanges: {
-            isDone: false,
-          },
-        });
-        mostRecentlyCompletedTaskID.set("");
-      }}
-    ></TheSnackbar>
-  {/if}
-
-  <!-- Copy & paste snackbar -->
-  {#if $showSnackbar}
-    <TheSnackbar>Email copied to clipboard successfully.</TheSnackbar>
-  {/if}
-
-  <NavbarAndContentWrapper>
-    <div
-      slot="navbar"
-      class="top-navbar"
-      class:transparent-glow-navbar={currentMode === "Day"}
-    >
-      <!-- svelte-ignore a11y-click-events-have-key-events -->
-      <img
-        on:click={() => handleLogoClick()}
-        src="/trueoutput-square-nobg.png"
-        style="width: 38px; height: 38px; margin-right: 6px; margin-left: -4px; cursor: pointer;"
-        alt=""
-      />
-
-      <div class="day-week-toggle-segment">
-        <!-- svelte-ignore a11y-click-events-have-key-events -->
-        <div
-          on:click={() => (currentMode = "AI")}
-          class="ux-tab-item"
-          class:active-ux-tab={currentMode === "AI"}
-          class:transparent-inactive-tab={currentMode === "Day"}
-        >
-          <span class="material-symbols-outlined" style="font-size: 32px;">
-            psychology
-          </span>
-        </div>
-
-        <!-- quickfix so pressing home ALWAYS recalibrates you to today's region -->
-        <!-- svelte-ignore a11y-click-events-have-key-events -->
-        <div
-          on:click={async () => {
-            currentMode = "";
-            await tick();
-            hasInitialScrolled.set(false);
-            currentMode = "Week";
-          }}
-          class="ux-tab-item"
-          class:active-ux-tab={currentMode === "Week"}
-          class:transparent-inactive-tab={currentMode === "Day"}
-        >
-          <span class="material-symbols-outlined" style="font-size: 32px;">
-            house
-          </span>
-        </div>
-
-        <!-- svelte-ignore a11y-click-events-have-key-events -->
-        <div
-          on:click={() => (currentMode = "ManageRepeats")}
-          class="ux-tab-item"
-          class:active-ux-tab={currentMode === "ManageRepeats"}
-          class:transparent-inactive-tab={currentMode === "Day"}
-        >
-          <span
-            class="material-symbols-outlined"
-            class:blue-icon={currentMode === "Dashboard"}
-            style="font-size: 32px;"
-          >
-            restart_alt
-          </span>
-        </div>
-
-        <!-- svelte-ignore a11y-click-events-have-key-events -->
-        <div
-          on:click={() => (currentMode = "Year")}
-          class="ux-tab-item"
-          class:active-ux-tab={currentMode === "Year"}
-          class:transparent-inactive-tab={currentMode === "Day"}
-        >
-          <span class="material-symbols-outlined" style="font-size: 36px;">
-            sports_score
-          </span>
-        </div>
-      </div>
-
-      <div style="display: flex; gap: 24px; align-items: center;">
-        <MultiPhotoUploader />
-
-        <PopupCustomerSupport let:setIsPopupOpen>
-          <!-- svelte-ignore a11y-click-events-have-key-events -->
-          <span
-            on:click={() => setIsPopupOpen({ newVal: true })}
-            class="material-symbols-outlined mika-hover responsive-icon-size"
-          >
-            contact_support
-          </span>
-        </PopupCustomerSupport>
-      </div>
-    </div>
-
-    <div slot="content" style="display: flex; flex-grow: 1; height: 100%;">
-      {#if currentMode === "ManageRepeats"}
-        <PeriodicTasks />
-      {:else if currentMode === "Week"}
-        <div class="todo-container">
-          <NewThisWeekTodo
-            on:new-root-task={(e) => createTaskNode(e.detail)}
-            on:task-unscheduled={(e) => putTaskToThisWeekTodo(e)}
-            on:task-click={(e) => openDetailedCard(e.detail)}
-            on:subtask-create={(e) => createSubtask(e.detail)}
-            on:task-checkbox-change={(e) =>
-              updateTaskNode({
-                id: e.detail.id,
-                keyValueChanges: { isDone: e.detail.isDone },
-              })}
-          />
-        </div>
-
-        <!-- 2nd flex child -->
-        <div
-          id="the-only-scrollable-container"
-          class="calendar-section-flex-child"
-        >
-          <CalendarThisWeek
-            {calStartDateClassObj}
-            on:calendar-shifted={(e) =>
-              incrementDateClassObj({ days: e.detail.days })}
-            on:new-root-task={(e) => createTaskNode(e.detail)}
-            on:task-click={(e) => openDetailedCard(e.detail)}
-            on:task-update={(e) =>
-              updateTaskNode({
-                id: e.detail.id,
-                keyValueChanges: e.detail.keyValueChanges,
-              })}
-            on:task-dragged={(e) => changeTaskDeadline(e.detail)}
-            on:task-checkbox-change={(e) =>
-              updateTaskNode({
-                id: e.detail.id,
-                keyValueChanges: { isDone: e.detail.isDone },
-              })}
-          />
-        </div>
-        <!-- END OF WEEK MODE SECTION -->
-      {:else if currentMode === "Year"}
-        <UncertainMilestones />
-      {:else if currentMode === "AI"}
-        <AI />
-      {/if}
-    </div>
-  </NavbarAndContentWrapper>
+{#if clickedTaskID}
+  <DetailedCardPopup
+    taskObject={clickedTask}
+    on:task-update={(e) => updateTaskNode(e.detail)}
+    on:task-reusable={() => createReusableTaskTemplate(clickedTask.id)}
+    on:task-click={(e) => openDetailedCard(e.detail)}
+    on:card-close={() => clickedTaskID = ''}
+    on:task-delete={(e) => deleteTaskNode(e.detail)}
+    on:task-checkbox-change={(e) =>
+      updateTaskNode({
+        id: e.detail.id,
+        keyValueChanges: { isDone: e.detail.isDone },
+      })}
+  />
 {/if}
+
+<!-- UNDO COMPLETED SNACKBAR -->
+{#if $mostRecentlyCompletedTaskID}
+  <TheSnackbar
+    on:undo-task-completion={() => {
+      updateTaskNode({
+        id: $mostRecentlyCompletedTaskID,
+        keyValueChanges: {
+          isDone: false,
+        },
+      });
+      mostRecentlyCompletedTaskID.set("");
+    }}
+  ></TheSnackbar>
+{/if}
+
+<!-- Copy & paste snackbar -->
+{#if $showSnackbar}
+  <TheSnackbar>Email copied to clipboard successfully.</TheSnackbar>
+{/if}
+
+<NavbarAndContentWrapper>
+  <div
+    slot="navbar"
+    class="top-navbar"
+    class:transparent-glow-navbar={currentMode === "Day"}
+  >
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <img
+      on:click={() => handleLogoClick()}
+      src="/trueoutput-square-nobg.png"
+      style="width: 38px; height: 38px; margin-right: 6px; margin-left: -4px; cursor: pointer;"
+      alt=""
+    />
+
+    <div class="day-week-toggle-segment">
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
+      <div
+        on:click={() => (currentMode = "AI")}
+        class="ux-tab-item"
+        class:active-ux-tab={currentMode === "AI"}
+        class:transparent-inactive-tab={currentMode === "Day"}
+      >
+        <span class="material-symbols-outlined" style="font-size: 32px;">
+          psychology
+        </span>
+      </div>
+
+      <!-- quickfix so pressing home ALWAYS recalibrates you to today's region -->
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
+      <div
+        on:click={async () => {
+          if (currentMode === 'Week') {
+            hasInitialScrolled.set(false);
+          }
+          currentMode = "Week";
+        }}
+        class="ux-tab-item"
+        class:active-ux-tab={currentMode === "Week"}
+        class:transparent-inactive-tab={currentMode === "Day"}
+      >
+        <span class="material-symbols-outlined" style="font-size: 32px;">
+          house
+        </span>
+      </div>
+
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
+      <div
+        on:click={() => (currentMode = "ManageRepeats")}
+        class="ux-tab-item"
+        class:active-ux-tab={currentMode === "ManageRepeats"}
+        class:transparent-inactive-tab={currentMode === "Day"}
+      >
+        <span
+          class="material-symbols-outlined"
+          class:blue-icon={currentMode === "Dashboard"}
+          style="font-size: 32px;"
+        >
+          restart_alt
+        </span>
+      </div>
+
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
+      <div
+        on:click={() => (currentMode = "Year")}
+        class="ux-tab-item"
+        class:active-ux-tab={currentMode === "Year"}
+        class:transparent-inactive-tab={currentMode === "Day"}
+      >
+        <span class="material-symbols-outlined" style="font-size: 36px;">
+          sports_score
+        </span>
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 24px; align-items: center;">
+      <MultiPhotoUploader />
+
+      <PopupCustomerSupport let:setIsPopupOpen>
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <span
+          on:click={() => setIsPopupOpen({ newVal: true })}
+          class="material-symbols-outlined mika-hover responsive-icon-size"
+        >
+          contact_support
+        </span>
+      </PopupCustomerSupport>
+    </div>
+  </div>
+
+  <div slot="content" style="display: flex; flex-grow: 1; height: 100%;">
+    <!-- TO-DO: merge with Maryus' pull request to fix periodic tasks -->
+    <!-- <div style="display: { currentMode === 'ManageRepeats' ? 'block' : 'none'}">
+      {#if allTasks}
+        <ManageReusableTasks {allTasks} />
+      {/if}
+    </div> -->
+
+    <!-- WEEK MODE -->
+    <!-- 1st flex child -->
+    <div style="display: { currentMode === 'Week' ? 'block' : 'none'}" class="todo-container">
+      <NewThisWeekTodo
+        on:new-root-task={(e) => createTaskNode(e.detail)}
+        on:task-unscheduled={(e) => putTaskToThisWeekTodo(e)}
+        on:task-click={(e) => openDetailedCard(e.detail)}
+        on:subtask-create={(e) => createSubtask(e.detail)}
+        on:task-checkbox-change={(e) =>
+          updateTaskNode({
+            id: e.detail.id,
+            keyValueChanges: { isDone: e.detail.isDone },
+          })}
+      />
+    </div>
+
+    <!-- 2nd flex child -->
+    <div style="display: { currentMode === 'Week' ? 'block' : 'none'}"
+      id="the-only-scrollable-container"
+      class="calendar-section-flex-child"
+    >
+      <CalendarThisWeek
+        {calStartDateClassObj}
+        on:calendar-shifted={(e) =>
+          incrementDateClassObj({ days: e.detail.days })}
+        on:new-root-task={(e) => createTaskNode(e.detail)}
+        on:task-click={(e) => openDetailedCard(e.detail)}
+        on:task-update={(e) =>
+          updateTaskNode({
+            id: e.detail.id,
+            keyValueChanges: e.detail.keyValueChanges,
+          })}
+        on:task-dragged={(e) => changeTaskDeadline(e.detail)}
+        on:task-checkbox-change={(e) =>
+          updateTaskNode({
+            id: e.detail.id,
+            keyValueChanges: { isDone: e.detail.isDone },
+          })}
+      />
+    </div>
+    <!-- END OF WEEK MODE SECTION -->
+     
+    <div style="display: { currentMode === 'Year' ? 'block' : 'none'}">
+      <UncertainMilestones />
+    </div>
+
+    <div style="display: { currentMode === 'AI' ? 'block' : 'none'}">
+       <AI />
+    </div>
+  </div>
+</NavbarAndContentWrapper>
 
 <style src="./MainPage.css"></style>
