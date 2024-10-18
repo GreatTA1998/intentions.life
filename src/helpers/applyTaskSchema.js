@@ -8,13 +8,13 @@ const Schema = {
   lastRanRepeatISO: "",
   parentID: "",
   name: "",
-  orderValue: "",
+  orderValue: 0,
   duration: 30,
   isDone: false,
   imageDownloadURL: "",
   imageFullPath: "",
   startDateISO: "",
-  iconURL: "",
+  iconUrl: "",
   timeZone: "",
   notify: "", //string so "0" means notification at 0 minutes instead of false
 };

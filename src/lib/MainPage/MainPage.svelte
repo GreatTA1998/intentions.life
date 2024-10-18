@@ -7,8 +7,6 @@
     user,
     showSnackbar,
     hasInitialScrolled,
-    todoTasks,
-    calendarTasks
   } from "/src/store.js";
   import AI from "../AI/AI.svelte";
   import TheSnackbar from "$lib/TheSnackbar.svelte";
@@ -16,7 +14,7 @@
   import PopupCustomerSupport from "$lib/PopupCustomerSupport.svelte";
   import NavbarAndContentWrapper from "$lib/NavbarAndContentWrapper.svelte";
   import DetailedCardPopup from "$lib/DetailedCardPopup/DetailedCardPopup.svelte";
-  import ManageReusableTasks from "$lib/ManageReusableTasks.svelte";
+  import PeriodicTasks from "$lib/PeriodicTasks/PeriodicTasks.svelte";
   import UncertainMilestones from "$lib/UncertainMilestones.svelte";
   import MultiPhotoUploader from "$lib/MultiPhotoUploader.svelte";
   import {
@@ -31,7 +29,6 @@
   import NewThisWeekTodo from "$lib/NewThisWeekTodo.svelte";
   import { handleInitialTasks } from "./handleTasks.js";
   import MobileMode from "$lib/MobileMode/MobileMode.svelte"
-  import { DateTime } from 'luxon'
   import { createTaskNode, updateTaskNode, deleteTaskNode } from '/src/helpers/crud.js'
   import { findTaskByID } from '/src/helpers/utils.js'
 
@@ -42,7 +39,6 @@
   let clickedTask = {}
   
   let calStartDateClassObj = new Date();
-  let allTasks = null;
 
   let unsub;
 
@@ -245,9 +241,9 @@
 
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <div
-        on:click={() => (currentMode = "ManageRepeats")}
+        on:click={() => (currentMode = "Templates")}
         class="ux-tab-item"
-        class:active-ux-tab={currentMode === "ManageRepeats"}
+        class:active-ux-tab={currentMode === "Templates"}
         class:transparent-inactive-tab={currentMode === "Day"}
       >
         <span
@@ -339,6 +335,10 @@
      
     <div style="display: { currentMode === 'Year' ? 'block' : 'none'}">
       <UncertainMilestones />
+    </div>
+
+    <div style="display: { currentMode === 'Templates' ? 'block' : 'none'}">
+      <PeriodicTasks />
     </div>
 
     <div style="display: { currentMode === 'AI' ? 'block' : 'none'}">

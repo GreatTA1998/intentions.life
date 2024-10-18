@@ -62,7 +62,7 @@ async function convert(dataArray) {
               task.startDate.split("/")[1]
             }`
           : "",
-        iconURL: iconMap[task.iconDataURL] ? iconMap[task.iconDataURL] : "",
+        iconUrl: iconMap[task.iconDataURL] ? iconMap[task.iconDataURL] : "",
       };
 
       const convertedTask = {
@@ -83,11 +83,11 @@ async function convert(dataArray) {
   }
 }
 
-const updateDB = async (userId, dataArray, idArray) => {
+const updateDB = async (userID, dataArray, idArray) => {
   try {
     const batch = writeBatch(db);
     idArray.map((id, i) => {
-      const docRef = doc(db, "users", userId, "tasks", id);
+      const docRef = doc(db, "users", userID, "tasks", id);
       batch.set(docRef, dataArray[i]);
     });
     return await batch.commit();
