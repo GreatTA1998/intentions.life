@@ -1,6 +1,9 @@
 {
   "name": "project-y",
   "version": "0.0.1",
+  "engines": {
+    "node": "20.16.0"
+  },
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
