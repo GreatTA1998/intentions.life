@@ -1,8 +1,10 @@
 <div style="margin-bottom: 20px;">
-  <div>
-    <div style="font-size: 14px; margin-bottom: 2px; color: rgb(10, 10, 10); font-weight: 600;">  
-      {DateTime.fromISO(simpleDateISO).toFormat('LLLL d (ccc)')}
-    </div>
+  {#if DateTime.fromISO(simpleDateISO).toFormat('yyyy-MM-dd') === DateTime.now().toFormat('yyyy-MM-dd')}
+    <div bind:this={CurrentDayIndicator} class="current-time-indicator"></div>
+  {/if}
+
+  <div style="font-size: 20px; margin-bottom: 6px; color: rgb(10, 10, 10); font-weight: 600;">  
+    {DateTime.fromISO(simpleDateISO).toFormat('LLLL d (ccc)')}
   </div>
 
   <div style="display: flex; flex-wrap: wrap;">
@@ -26,6 +28,7 @@
       "
     >
       <ReusableFlexibleDayTask task={flexibleDayTask}
+        fontSizeInPx={16}
         on:task-click
         on:task-update
         on:task-checkbox-change
@@ -43,8 +46,15 @@
         class:grey-text={task.daysBeforeRepeating}
         class:purple-text={!task.daysBeforeRepeating}
       > 
-        <span style="white-space: nowrap; text-overflow: ellipsis; color: rgb(40, 40, 40); font-weight: 400; display: flex;">
-          - <div style="color: rgb(90, 90, 90); font-weight: 300; margin-right: 4px;">{task.startTime}</div> {' ' + task.name + ' '}
+        <span class="scheduled-event">
+          {' ' + task.name + ' '}
+          <!-- 
+            Cannot use an inner class because the outer class "scheduled-event" will override
+            I can't believe it's this hard...
+          -->
+          <div style="color: rgb(0, 0, 0); font-weight: 400; margin-right: 4px;">
+            {getAmPmTime(task.startTime)}
+          </div> 
         </span>
       </div>
     </div>
@@ -60,11 +70,35 @@
   export let tasksThisDay
   export let simpleDateISO
 
+  let CurrentDayIndicator
+  
+  $: if (CurrentDayIndicator) {
+    CurrentDayIndicator.scrollIntoView({ behavior: 'instant', block: 'start' })
+  }
+
   const dispatch = createEventDispatcher()
+
+  function getAmPmTime (hhmm) {
+    const [hh, mm] = hhmm.split(':')
+    const dt = DateTime.fromObject({ hour: Number(hh), minutes: Number(mm) })
+    return dt.toFormat('h:mm a')
+  }
 </script>
 
 <style>
-  .purple-text {
-    color: #6D6D6D;
+  .current-time-indicator {
+    border: 4px solid var(--location-indicator-color); 
+    border-radius: 0px;
+    width: 100%; 
+    margin-top: 8px; 
+    margin-bottom: 8px;
+  }
+
+  .scheduled-event {
+    opacity: 0.7;
+    font-size: 16px;
+    gap: 6px;
+    white-space: nowrap; text-overflow: ellipsis; 
+    font-weight: 400; display: flex;
   }
 </style>
