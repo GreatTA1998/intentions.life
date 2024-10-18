@@ -1,0 +1,84 @@
+<script>
+  import { doodleIcons } from '/src/store.js'
+  import PeriodicInput from '$lib/PeriodicTasks/components/PeriodicInput.svelte'
+  import YearlyInput from '$lib/PeriodicTasks/components/YearlyInput.svelte'
+  import EditTime from '$lib/PeriodicTasks/components/EditTime.svelte'
+  import { user, updateTemplate } from '/src/store.js'
+  import PeriodicTasks from '/src/back-end/PeriodicTasks'
+  import { onMount } from 'svelte'
+  import _ from 'lodash'
+  import IconsDisplay from './IconsDisplay.svelte'
+  import Icons from '/src/back-end/Icons.js'
+  export let template
+  let isPopupOpen = false
+  let newName = template.name
+
+
+  const debouncedRenameTask = _.debounce(
+    (newVal) => updateTemplate({ templateID: template.id, keyValueChanges: { name: newVal } }),
+    800
+  )
+
+  onMount(async () => {
+    $doodleIcons = await Icons.getAvailable($user.uid)
+  })
+
+  function deleteTemplate() {
+    if (
+      !confirm(
+        'Are you sure you want to delete this template and all its future instances?'
+      )
+    )
+      return
+    PeriodicTasks.deleteTemplate({ id: template.id, uid: $user.uid })
+    isPopupOpen = false
+  }
+
+  function setIsPopupOpen({ newVal }) {
+    isPopupOpen = newVal
+  }
+</script>
+
+<slot {setIsPopupOpen}></slot>
+
+{#if isPopupOpen}
+  <!-- svelte-ignore a11y-click-events-have-key-events -->
+  <div
+    class="fullscreen-invisible-modular-popup-layer"
+    on:click|self={() => (isPopupOpen = false)}
+  >
+    <div class="detailed-card-popup">
+      <input
+        type="text"
+        bind:value={newName}
+        on:input={(e) => debouncedRenameTask(e.target.value)}
+        placeholder="Untitled"
+        style="width: 100%; font-size: 24px;"
+        class="title-underline-input"
+      />
+
+      <div style="display: flex; align-items: center; margin-top: 24px;">
+        {#if PeriodicTasks.getPeriodFromCrontab(template.crontab) === 'weekly'}
+          <PeriodicInput {template}maxDays={7}  crontabIndex={4} />
+        {:else if PeriodicTasks.getPeriodFromCrontab(template.crontab) === 'monthly'}
+        <PeriodicInput {template} maxDays={31}  crontabIndex={2}/>
+        {:else if PeriodicTasks.getPeriodFromCrontab(template.crontab) === 'yearly'}
+        <YearlyInput {template}  />
+        {/if}
+
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <span
+          class="material-symbols-outlined"
+          on:click|stopPropagation={deleteTemplate}
+          style="cursor: pointer; margin-left: auto; right: 0px; border: 1px solid grey; border-radius: 24px; padding: 4px;"
+        >
+          delete
+        </span>
+      </div>
+      <EditTime {template} />
+      <IconsDisplay {setIsPopupOpen} {template} />
+    </div>
+  </div>
+{/if}
+
+<style src="./EditTemplatePopup.css"></style>

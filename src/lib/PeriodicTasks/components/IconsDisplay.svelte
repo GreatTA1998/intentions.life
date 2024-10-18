@@ -1,11 +1,16 @@
 <script>
-  import { user, doodleIcons } from '/src/store.js'
+  import { user, doodleIcons, updateTemplate } from '/src/store.js'
   import PremiumPopup from './PremiumPopup.svelte'
   import BasicWhiteboard from './BasicWhiteboard.svelte'
-  export let template = {};
-  export let updateTemplate = () => {};
+  export let template;
+  export let setIsPopupOpen
   let isShowingPremiumPopup = false
 
+
+function handleSelectIcon(iconUrl) {
+  updateTemplate({ templateID: template.id, keyValueChanges: { iconUrl } })
+  setIsPopupOpen({ newVal: false })
+}
 
   function handleDeleteIcon({ id, url }) {
     if (confirm('Are you sure you want to delete this icon?')) {
@@ -41,7 +46,7 @@
           <!-- svelte-ignore a11y-missing-attribute -->
           <!-- svelte-ignore a11y-click-events-have-key-events -->
           <img
-            on:click={() => updateTemplate({ iconUrl: doodleIcon.url })}
+            on:click={() => handleSelectIcon(doodleIcon.url)}
             src={doodleIcon.url}
             style="width: 48px; height: 48px; cursor: pointer;"
             class:orange-border={template.iconUrl === doodleIcon.url}

@@ -1,23 +1,19 @@
 <script>
   import ReusableRoundButton from '$lib/ReusableRoundButton.svelte'
+  import { updateCrontab } from '../utils.js'
+  export let template
+  export let crontabIndex = 3
+  export let maxDays = 7
 
-  export let weeklyTask
-  export let updateWeeklyTemplate = () => {}
-
-  let oldSelectedDays = weeklyTask.crontab.split(' ')[4].split(',')
-  let dayOfWeekSymbol = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-  let selectedDays = weeklyTask.crontab.split(' ')[4].split(',')
+  let oldSelectedDays = template.crontab.split(' ')[crontabIndex].split(',')
+  let dayOfWeekSymbol = [ "Sun", 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+  let selectedDays = template.crontab.split(' ')[crontabIndex].split(',')
   let isEditingPeriodicity = false
 
-  const updateCrontab = () => {
-    console.log('updateCrontab', selectedDays)
-    let updatedCrontab = weeklyTask.crontab.split(' ');
-    updatedCrontab[4] = selectedDays.length ? selectedDays.sort().join(',') : '*';
-    updatedCrontab = updatedCrontab.join(' ');
-    console.log('updatedCrontab', updatedCrontab)
-    updateWeeklyTemplate({ crontab: updatedCrontab })
-    isEditingPeriodicity = false;
-  }
+function handleSave() {
+  updateCrontab({selectedDays, template, crontabIndex})
+  isEditingPeriodicity = false
+}
 
   function handleSelectDay(i) {
     if (selectedDays.includes(i)) {
@@ -33,23 +29,23 @@
 </script>
 
 <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-  <div style="display: flex;">
-    {#each { length: 7 } as _, i}
+  <div style="display: flex; max-width: 100%; flex-wrap: wrap;">
+    {#each { length: maxDays } as _, i}
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <div
-        on:click={() => handleSelectDay(String(i))}
+        on:click={() => handleSelectDay(String(i + 1))}
         class="circle"
-        class:not-selected={!selectedDays.includes(String(i))}
-        class:highlighted={selectedDays.includes(String(i))}
+        class:not-selected={!selectedDays.includes(String(i + 1))}
+        class:highlighted={selectedDays.includes(String(i + 1))}
       >
-        {dayOfWeekSymbol[i]}
+        {maxDays == 7 ? dayOfWeekSymbol[i + 1]: i + 1}
       </div>
     {/each}
   </div>
 
   {#if isEditingPeriodicity}
     <ReusableRoundButton
-      on:click={updateCrontab}
+      on:click={handleSave}
       backgroundColor="rgb(0, 89, 125)"
       textColor="white"
     >

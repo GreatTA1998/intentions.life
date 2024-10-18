@@ -2,71 +2,80 @@
   import { user, periodicTasks } from '/src/store.js'
   import ReusableRoundButton from '$lib/ReusableRoundButton.svelte'
   import { DateTime } from 'luxon'
-  import PeriodicTasks from '/src/back-end/PeriodicTasks.js'
+  import PeriodicTasks from '/src/back-end/PeriodicTasks'
 
   export let defaultOrderValue = 1
+  export let crontab
   let isPopupOpen = false
   let newTaskName = ''
 
   const setIsPopupOpen = ({ newVal }) => (isPopupOpen = newVal)
 
-  async function createWeeklyTemplate() {
+  async function createTemplate() {
     const newTask = {
       name: newTaskName,
       duration: 5,
       orderValue: defaultOrderValue + Math.random() * 0.5,
-      crontab: '0 0 * * 0',
+      crontab: crontab,
       timeZone: DateTime.now().zoneName,
       notes: '',
       notify: '',
       startTime: '12:00',
       lastGeneratedTask: DateTime.now().toFormat('yyyy-MM-dd'),
       iconUrl: '',
-      tags: ""
+      tags: ''
     }
     const id = await PeriodicTasks.create({ userID: $user.uid, task: newTask })
     newTask.id = id
-    console.log('newTask', newTask)
-    $periodicTasks = ([...$periodicTasks, { ...newTask, id, userID: $user.uid }])
+    $periodicTasks = [...$periodicTasks, { ...newTask, id, userID: $user.uid }]
     newTaskName = ''
     isPopupOpen = false
   }
 </script>
 
-<slot {setIsPopupOpen} />
-
-{#if isPopupOpen}
+<div style="font-size: 24px; margin-bottom: 12px;">
+  {PeriodicTasks.getPeriodFromCrontab(crontab).toUpperCase()}
   <!-- svelte-ignore a11y-click-events-have-key-events -->
-  <div
-    class="fullscreen-invisible-modular-popup-layer"
-    on:click|self={() => (isPopupOpen = false)}
+  <span
+    on:click={() => setIsPopupOpen({ newVal: true })}
+    class="add-reusable-task-button"
   >
-    <div class="detailed-card-popup">
-      <!-- svelte-ignore a11y-autofocus -->
-      <input
-        type="text"
-        bind:value={newTaskName}
-        placeholder="Untitled"
-        style="margin-left: 12px; width: 100%; font-size: 24px;"
-        class="title-underline-input"
-        autofocus
-      />
+    +
+  </span>
 
-      <div
-        style="display: flex; justify-content: space-between; width: 100%;
+  {#if isPopupOpen}
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <div
+      class="fullscreen-invisible-modular-popup-layer"
+      on:click|self={() => (isPopupOpen = false)}
+    >
+      <div class="detailed-card-popup">
+        <!-- svelte-ignore a11y-autofocus -->
+        <input
+          type="text"
+          bind:value={newTaskName}
+          placeholder="Untitled"
+          style="margin-left: 12px; width: 100%; font-size: 24px;"
+          class="title-underline-input"
+          autofocus
+        />
+
+        <div
+          style="display: flex; justify-content: space-between; width: 100%;
         margin-top: 16px;"
-      >
-        <ReusableRoundButton
-          on:click={createWeeklyTemplate}
-          backgroundColor="rgb(0, 89, 125)"
-          textColor="white"
         >
-          Create template
-        </ReusableRoundButton>
+          <ReusableRoundButton
+            on:click={createTemplate}
+            backgroundColor="rgb(0, 89, 125)"
+            textColor="white"
+          >
+            Create template
+          </ReusableRoundButton>
+        </div>
       </div>
     </div>
-  </div>
-{/if}
+  {/if}
+</div>
 
 <style>
   .title-underline-input {

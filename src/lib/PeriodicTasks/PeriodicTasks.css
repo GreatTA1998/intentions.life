@@ -22,11 +22,6 @@
     color: 1px solid rgb(111, 111, 111);
   }
 
-  .highlighted {
-    background-color: orange;
-    border: none;
-  }
-
   .tick {
     position: absolute;
     width: 2px; /* 1px looks nicer, but is inconsistently rendered by the browser */

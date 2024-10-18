@@ -1,43 +1,40 @@
 <script>
-  import Weekly from './Weekly/Weekly.svelte'
-  import { onMount, onDestroy } from 'svelte'
+  import TemplateColumn from './TemplateColumn.svelte'
+  import { onMount } from 'svelte'
   import { user, periodicTasks } from '/src/store.js'
-  import PeriodicTasks from '/src/back-end/PeriodicTasks.js'
+  import PeriodicTasks from '/src/back-end/PeriodicTasks'
 
-  let shouldUnsub = false
+  $: weeklyTasks = $periodicTasks
+    .filter((task) => PeriodicTasks.getPeriodFromCrontab(task.crontab) === 'weekly')
+    .sort((a, b) => a.orderValue - b.orderValue)
 
-  let getStatsFromTaskID = {}
-  let maxHourDuration = 0
-  let weeklyTaskWidthInPx = 180
+  $: monthlyTasks = $periodicTasks
+    .filter((task) => PeriodicTasks.getPeriodFromCrontab(task.crontab) === 'monthly')
+    .sort((a, b) => a.orderValue - b.orderValue)
+
+  $: yearlyTasks = $periodicTasks
+    .filter((task) => PeriodicTasks.getPeriodFromCrontab(task.crontab) === 'yearly')
+    .sort((a, b) => a.orderValue - b.orderValue)
+
+  $: quickTasks = $periodicTasks
+    .filter((task) => PeriodicTasks.getPeriodFromCrontab(task.crontab) === 'quick')
+    .sort((a, b) => a.orderValue - b.orderValue)
 
 
   onMount(async () => {
-    $periodicTasks = await PeriodicTasks.get($user.uid)
-
+    $periodicTasks = await PeriodicTasks.getAll($user.uid)
   })
-
-  onDestroy(() => shouldUnsub && unsub())
-
-  function getDisplayLength(weeklyTask) {
-    // imperfect code, quick-fix was to divide by 3
-    const maxTimeBarWidth = window.innerWidth / 3 - weeklyTaskWidthInPx
-    const pixelsPerHour = maxTimeBarWidth / maxHourDuration
-
-    const accurateLength =
-      (getStatsFromTaskID[weeklyTask.id].hourDuration /
-        getStatsFromTaskID[weeklyTask.id].frequency) *
-      pixelsPerHour
-    return accurateLength
-  }
 
 </script>
 
 <div style="padding: 48px;">
-  <div style="font-size: 32px; margin-bottom: 48px;">Reusable Tasks</div>
-
+  <div style="font-size: 32px; margin-bottom: 48px;">Templates</div>
   {#if periodicTasks}
-    <div style="display: flex;">
-      <Weekly />
+    <div style="display: flex; width: 90vw; justify-content: space-between;">
+      <TemplateColumn templates={quickTasks} crontab=""  />
+      <TemplateColumn templates={weeklyTasks} crontab="0 0 * * 0" />
+      <TemplateColumn templates={monthlyTasks} crontab="0 0 0 * *" />
+      <TemplateColumn templates={yearlyTasks} crontab="0 0 0 0 *" />
     </div>
   {/if}
 </div>

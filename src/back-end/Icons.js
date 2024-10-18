@@ -39,7 +39,6 @@ async function uploadIconDataURL(iconObject) {
 }
 
 async function deleteRecursively({ id, uid, url }) {
-    console.log("deleting", id, uid, url);
     const storage = getStorage();
     const iconRef = ref(storage, `icons/${id}.png`);
     await deleteObject(iconRef);

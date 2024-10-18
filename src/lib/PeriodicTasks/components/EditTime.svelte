@@ -2,23 +2,22 @@
   import UXFormField from '$lib/UXFormField.svelte'
   import UXToggleSwitch from '$lib/UXToggleSwitch.svelte'
   import ReusableRoundButton from '$lib/ReusableRoundButton.svelte'
-
-  export let weeklyTask
-  export let updateWeeklyTemplate
+  import { updateTemplate } from '/src/store.js'
+  export let template
 
   let isEditingTaskStart = false
   let isEditingDuration = false
-  let newDuration = weeklyTask.duration
-  let newStartHHMM = weeklyTask.startTime
-  let hasSpecificTime = weeklyTask.startTime
+  let newDuration = template.duration
+  let newStartHHMM = template.startTime
+  let hasSpecificTime = template.startTime
 
   function saveDuration() {
-    updateWeeklyTemplate({ duration: newDuration })
+    updateTemplate({ templateID: template.id, keyValueChanges: { duration: newDuration } })
     isEditingDuration = false
   }
 
   function saveStartTime() {
-    updateWeeklyTemplate({ startTime: newStartHHMM })
+    updateTemplate({ templateID: template.id, keyValueChanges: { startTime: newStartHHMM } })
     isEditingTaskStart = false
   }
 
@@ -43,12 +42,12 @@
 >
   <div
     style="display: flex; align-items: center;"
-    class:half-invisible={!isScheduled(weeklyTask)}
+    class:half-invisible={!isScheduled(template)}
   >
     <div style="margin-left: 6px; margin-right: 6px; max-width: 80px;">
       <UXFormField
         fieldLabel="Duration"
-        value={Math.round(weeklyTask.duration)}
+        value={Math.round(template.duration)}
         willAutofocus={false}
         on:input={(e) => handleDurationInput(e)}
       >
@@ -67,7 +66,7 @@
       </div>
       <div>
         <UXToggleSwitch
-          isChecked={weeklyTask.startTime}
+          isChecked={template.startTime}
           on:new-checked-state={(e) => (hasSpecificTime = e.detail.isChecked)}
         />
       </div>
@@ -77,7 +76,7 @@
       <div style="max-width: 70px; margin-left: 8px;">
         <UXFormField
           fieldLabel="hh:mm"
-          value={weeklyTask.startTime}
+          value={template.startTime}
           willAutofocus={false}
           on:input={(e) => handleTaskStartInput(e)}
           placeholder="17:30"
