@@ -61,8 +61,8 @@
       </div>
     {/if}
 
-    {#if task.iconURL}
-      <img src={task.iconURL} style="pointer-events: none; width: 32px; height: 32px;">
+    {#if task.iconUrl}
+      <img src={task.iconUrl} style="pointer-events: none; width: 32px; height: 32px;">
     {:else}
       <div class="task-name truncate-to-one-line" style="color: {isBulletPoint ? '' : 'white'}">
         {task.name}

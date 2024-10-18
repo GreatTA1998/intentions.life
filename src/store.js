@@ -1,6 +1,23 @@
-import { writable, readable } from 'svelte/store'
+import { writable, readable, get } from 'svelte/store'
+import PeriodicTasks from './back-end/PeriodicTasks'
+
+export const periodicTasks = writable([])
+
+export function updateTemplate({templateID, keyValueChanges}) {
+    const currentUser = get(user);
+    PeriodicTasks.updateWithTasks({
+      userID: currentUser.uid,
+      id: templateID,
+      updates: keyValueChanges
+    })
+    periodicTasks.update((tasks)=>tasks.map((task) =>
+      task.id === templateID ? { ...task, ...keyValueChanges } : task
+    ))
+  }
 
 export const user = writable({}) // {} means not logged in, cannot be null
+export const doodleIcons = writable([]) 
+
 export const hasFetchedUser = writable(false)
 export const hasLogoExited = writable(false)
 

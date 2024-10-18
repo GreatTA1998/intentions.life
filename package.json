@@ -11,8 +11,9 @@
     "@sveltejs/adapter-auto": "next",
     "@sveltejs/adapter-vercel": "^1.0.0-next.40",
     "@sveltejs/kit": "^1.0.0",
-    "eslint": "^8.57.0",
-    "eslint-plugin-jsx-a11y": "^6.9.0",
+    "eslint": "^8.57.1",
+    "eslint-config-google": "^0.14.0",
+    "eslint-plugin-svelte3": "^4.0.0",
     "sass": "^1.63.5",
     "svelte": "^3.44.0",
     "svelte-preprocess": "^5.0.4"
@@ -20,6 +21,7 @@
   "type": "module",
   "dependencies": {
     "@sentry/sveltekit": "^8.19.0",
+    "cron-parser": "^4.9.0",
     "firebase": "^9.6.5",
     "firebase-functions": "^6.0.1",
     "js-datepicker": "^5.18.2",
@@ -27,6 +29,7 @@
     "luxon": "^3.4.4",
     "openai": "^4.56.0",
     "posthog-js": "^1.136.5",
+    "prettier-plugin-svelte": "^3.2.7",
     "svelte-portal": "^2.2.0"
   }
 }

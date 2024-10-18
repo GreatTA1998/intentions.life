@@ -30,7 +30,9 @@
       state.userID,
       state.DateRange.startDate,
       state.DateRange.endDate
-    );
+    ).catch((err) => {
+      console.error("error in onMount, ", err);
+    });
     setState({ ...state, tasksJSON });
   });
 

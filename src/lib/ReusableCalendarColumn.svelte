@@ -204,7 +204,7 @@
           width: 94%;
         "
       >
-        {#if task.iconURL}
+        {#if task.iconUrl}
           <!-- TO-DO: think about how attaching photos to icon tasks work -->
           <ReusableIconTaskElement
             {task}

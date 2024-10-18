@@ -1,4 +1,4 @@
-import {db} from "./firestoreConnection.js/index.js";
+import { db } from "./firestoreConnection.js/index.js";
 import {
   writeBatch,
   doc,
@@ -32,7 +32,7 @@ async function storeIconToBucket(name, icon) {
     const storage = getStorage();
     const iconRef = ref(storage, `icons/${name}.png`);
     return await uploadString(iconRef, icon, "data_url").then((snapshot) => {
-      getDownloadURL(snapshot.ref).then((downloadURL) => {});
+      getDownloadURL(snapshot.ref).then((downloadURL) => { });
     });
   } catch (err) {
     console.error("error in storeIconToBucket", err);
