@@ -23,37 +23,19 @@
   <div class="sticky-y-div flexbox">
     {#each $daysToRender as ISODate, i (ISODate)}
       {#if i === cushion}
-        <div use:lazyCallable={() => handleIntersect(ISODate)}>
-          <ReusableCalendarHeader
-            {ISODate}
-            {isShowingDockingArea}
-            on:task-checkbox-change
-            on:task-scheduled
-            on:new-root-task
-            on:task-click
-          />
-        </div>
+        <div use:lazyCallable={() => handleIntersect(ISODate)}></div>
       {:else if i === $daysToRender.length - 1 - cushion}
-        <div use:lazyCallable={() => fetchNewWeekOfFutureTasks(ISODate)}>
-          <ReusableCalendarHeader
-            {ISODate}
-            {isShowingDockingArea}
-            on:task-checkbox-change
-            on:task-scheduled
-            on:new-root-task
-            on:task-click
-          />
-        </div>
-      {:else}
-        <ReusableCalendarHeader
-          {ISODate}
-          {isShowingDockingArea}
-          on:task-checkbox-change
-          on:task-scheduled
-          on:new-root-task
-          on:task-click
-        />
+        <div use:lazyCallable={() => fetchNewWeekOfFutureTasks(ISODate)}></div>
       {/if}
+
+      <ReusableCalendarHeader
+        {ISODate}
+        {isShowingDockingArea}
+        on:task-update
+        on:task-click
+        on:task-checkbox-change
+        on:new-root-task
+      />
     {/each}
   </div>
 </div>
