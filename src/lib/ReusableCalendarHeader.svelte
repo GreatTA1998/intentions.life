@@ -30,7 +30,7 @@
       {#if $tasksScheduledOn && doodleIcons}
         {#if $tasksScheduledOn[ISODate]}
           <div style="display: flex; flex-wrap: wrap;">
-            {#each $tasksScheduledOn[ISODate].noStartTime.hasIcon as iconTask}
+            {#each $tasksScheduledOn[ISODate].noStartTime.hasIcon as iconTask (iconTask.id)}
               <FunctionalDoodleIcon
                 {iconTask}
                 on:task-click
@@ -39,7 +39,7 @@
             {/each}
           </div>
         
-          {#each $tasksScheduledOn[ISODate].noStartTime.noIcon as flexibleDayTask}
+          {#each $tasksScheduledOn[ISODate].noStartTime.noIcon as flexibleDayTask (flexibleDayTask.id)}
             <div
               on:click={() => dispatch("task-click", { task: flexibleDayTask })}
               style="width: var(--calendar-day-section-width); font-size: 12px; display: flex; gap: 4px; margin-top: 8px; margin-left: 4px; margin-right: 4px;"
@@ -82,7 +82,6 @@
   import ReusableFlexibleDayTask from "$lib/ReusableFlexibleDayTask.svelte";
   import FunctionalDoodleIcon from "$lib/FunctionalDoodleIcon.svelte";
   import { onMount, createEventDispatcher, afterUpdate } from "svelte";
-  import { trace } from "../helpers/utils";
   import {
     tasksScheduledOn,
     whatIsBeingDraggedFullObj,
