@@ -1,9 +1,10 @@
-import { parseExpression } from 'cron-parser';
+import cronParser from 'cron-parser'
 import { DateTime } from 'luxon';
 import { db } from "../firestoreConnection";
 import { updateDoc, doc, setDoc, getDoc, collection, query, where, getDocs, deleteDoc } from 'firebase/firestore';
 import { getRandomID } from '../../helpers/everythingElse.js';
 
+const { parseExpression } = cronParser
 
 const getPeriodFromCrontab = (crontab) => {
     if (crontab === '') return 'quick';
