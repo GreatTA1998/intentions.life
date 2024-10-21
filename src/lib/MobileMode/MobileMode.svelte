@@ -112,7 +112,7 @@
     getDateInMMDD, 
     getDateInDDMMYYYY,
   } from '/src/helpers/everythingElse.js'
-  import { user } from '/src/store.js'
+  import { user, todoMemoryTree } from '/src/store.js'
   import { onDestroy, onMount } from 'svelte'
   import ScheduleView from '$lib/MobileMode/ScheduleView.svelte'
   import ListView from '$lib/MobileMode/ListView.svelte'
@@ -133,8 +133,6 @@
   
   let isDetailedCardOpen = false
   let clickedTask = {}
-
-  let tasksToDisplay = []
 
   onMount(async () => {
     fetchMobileTodoTasks($user.uid)
@@ -166,18 +164,13 @@
 
     const newTaskObj = {
       name,
-      parentID: "",
-      deadlineDate: getDateInDDMMYYYY(d),
-      deadlineTime: '23:59'
+      parentID: ''
     }
 
-    if (tasksToDisplay.length > 0) {
-      newTaskObj.orderValue = (0 + tasksToDisplay[0].orderValue) / 2 
-
-      // quickfix so when multiple tasks are added, they don't have the same `orderValue` which breaks drag-and-drop
-      const epsilon = Math.random() * newTaskObj.orderValue 
-      newTaskObj.orderValue += epsilon
-    } // otherwise the default `orderValue` will be `maxOrder`, handled by `checkTaskObjSchema`
+    if ($todoMemoryTree.length > 0) {
+      newTaskObj.orderValue = (0 + $todoMemoryTree[0].orderValue) / 2 
+    } 
+    // if it's the first task, the orderValue is initialized to `maxOrder`
 
     createTaskNode({ id: getRandomID(), newTaskObj })
   }

@@ -78,4 +78,4 @@
   {iconName}
 </span>
 
-<div id="output"></div>
+<div id="output" style="display: none;"></div>
