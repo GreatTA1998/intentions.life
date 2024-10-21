@@ -30,7 +30,7 @@ exports.periodicTasks = onSchedule(
   },
   async (event) => {
     functions.logger.info('periodicTasks function excecuting');
-    const db = getFirestore('tokyo-db');
+    const db = getFirestore('asian-alliance');
     const snapshot = await db.collectionGroup('periodicTasks').get();
     const periodicTasks = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id, userID: doc.ref.parent.parent.id }));
     for (const periodicTask of periodicTasks) {
@@ -57,7 +57,7 @@ exports.periodicTasks = onSchedule(
 // };
 
 // exports.scheduledFunction = functions.https.onRequest(async (req, res) => {
-//   const db = getFirestore('tokyo-db');
+//   const db = getFirestore('asian-alliance');
 //   const snapshot = await db.collectionGroup('periodicTasks').get();
 //   const periodicTasks = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id, userID: doc.ref.parent.parent.id }));
 //   res.status(200).send('Function executed successfully');

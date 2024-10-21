@@ -4,7 +4,7 @@ const { getFirestore } = require('firebase-admin/firestore');
 const { DateTime } = require('luxon');
 
 async function checkNotify() {
-  const db = getFirestore('tokyo-db');
+  const db = getFirestore('asian-alliance');
   const usersSnapshot = await db
     .collection('users')
     .where('FCMTokens', '!=', [])
