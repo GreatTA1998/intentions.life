@@ -20,10 +20,10 @@
       timeZone: DateTime.now().zoneName,
       notes: '',
       notify: '',
-      startTime: '12:00',
+      startTime: '',
       lastGeneratedTask: DateTime.now().toFormat('yyyy-MM-dd'),
       iconUrl: '',
-      tags: ''
+      tags: '',
     }
     const id = await PeriodicTasks.create({ userID: $user.uid, task: newTask })
     newTask.id = id

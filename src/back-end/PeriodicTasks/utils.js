@@ -50,7 +50,7 @@ const buildFutureTasks = async ({periodicTask, startDateJS, endDateJS, userID, p
     const periodicTask = snapshot.data();
     periodicTask.id = id;
     const offset = getPeriodFromCrontab(periodicTask.crontab) === 'yearly' ? { years: 1 } : { months: 1 };
-    const startDate = DateTime.fromISO(`${fromDate}T${periodicTask.startTime}:00`, { zone: periodicTask.timeZone }).plus({ days: 1 });
+    const startDate = DateTime.fromISO(`${fromDate}T${periodicTask.startTime||'00:00'}:00`, { zone: periodicTask.timeZone }).plus({ days: 1 });
     const endDate = DateTime.now().setZone(periodicTask.timeZone).plus(offset);
     const tasksArray = await buildFutureTasks({periodicTask, startDateJS: new Date(startDate), endDateJS: new Date(endDate), userID, periodicTaskId: id});
     tasksArray.forEach(task => {
