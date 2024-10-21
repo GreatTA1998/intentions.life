@@ -27,6 +27,7 @@
 
 </script>
 
+<h4 class="bug-notice" >Known Bug: updates to templates need a refresh to display on the calendar</h4>
 <div style="padding: 48px;">
   <div style="font-size: 32px; margin-bottom: 48px;">Templates</div>
   {#if periodicTasks}
