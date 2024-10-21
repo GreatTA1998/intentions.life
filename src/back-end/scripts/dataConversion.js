@@ -1,12 +1,12 @@
 const user = "6uIcMMsBEkQ85OINCDADtrygzZx1";
-import{ db }from "./firestoreConnection.js/index.js";
+import{ sourceDB, destinationDB }from "../firestoreConnection.js";
 import {
   writeBatch,
   doc,
   getDocs,
   collection,
   query,
-} from "firebase/firestore/lite";
+} from "firebase/firestore";
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
 
 const nesseryProperties = [
@@ -14,23 +14,23 @@ const nesseryProperties = [
   "notes",
   "reusableTemplateID",
   "lastRanRepeatISO",
-  "parentID",
   "name",
   "orderValue",
+  "parentID",
   "duration",
   "isDone",
   "imageDownloadURL",
   "imageFullPath",
 ];
 
-// migrateUserDataToNewFormat("yGVJSutBrnS1156uopQQOBuwpMl2"); //Elton
+migrateUserDataToNewFormat("46OCRjQornhVCBmt0uz7ITASqOP2"); //Elton
 
 // migrateUserDataToNewFormat("6uIcMMsBEkQ85OINCDADtrygzZx1"); //Marius
 
-runConversionForAllUsers();
+// runConversionForAllUsers();
 async function runConversionForAllUsers() {
   try {
-    const querySnapshot = await getDocs(query(collection(db, "users")));
+    const querySnapshot = await getDocs(query(collection(sourceDB, "users")));
     const userIDArray = querySnapshot.docs.map((doc) => doc.id);
     for (const id of userIDArray) {
       await migrateUserDataToNewFormat(id);
@@ -41,7 +41,7 @@ async function runConversionForAllUsers() {
 }
 async function migrateUserDataToNewFormat(userID) {
   try {
-    const q = query(collection(db, "users", userID, "tasks"));
+    const q = query(collection(sourceDB, "users", userID, "tasks"));
     const querySnapshot = await getDocs(q);
     const tasksArray = querySnapshot.docs.map((doc) => doc.data());
     const IdArray = querySnapshot.docs.map((doc) => doc.id);
@@ -85,9 +85,9 @@ async function convert(dataArray) {
 
 const updateDB = async (userID, dataArray, idArray) => {
   try {
-    const batch = writeBatch(db);
+    const batch = writeBatch(destinationDB);
     idArray.map((id, i) => {
-      const docRef = doc(db, "users", userID, "tasks", id);
+      const docRef = doc(destinationDB, "users", userID, "tasks", id);
       batch.set(docRef, dataArray[i]);
     });
     return await batch.commit();
@@ -99,7 +99,7 @@ const updateDB = async (userID, dataArray, idArray) => {
 async function buildIconUrlMap() {
   try {
     const storage = getStorage();
-    const q = query(collection(db, "/doodleIcons"));
+    const q = query(collection(sourceDB, "doodleIcons"));
     const querySnapshot = await getDocs(q);
     const urlArray = await Promise.all(
       querySnapshot.docs.map((doc) =>

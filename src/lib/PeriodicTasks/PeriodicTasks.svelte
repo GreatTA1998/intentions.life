@@ -3,26 +3,19 @@
   import { onMount } from 'svelte'
   import { user, periodicTasks } from '/src/store.js'
   import PeriodicTasks from '/src/back-end/PeriodicTasks'
+  import { filterByType } from './utils.js'
 
-  $: weeklyTasks = $periodicTasks
-    .filter((task) => PeriodicTasks.getPeriodFromCrontab(task.crontab) === 'weekly')
-    .sort((a, b) => a.orderValue - b.orderValue)
-
-  $: monthlyTasks = $periodicTasks
-    .filter((task) => PeriodicTasks.getPeriodFromCrontab(task.crontab) === 'monthly')
-    .sort((a, b) => a.orderValue - b.orderValue)
-
-  $: yearlyTasks = $periodicTasks
-    .filter((task) => PeriodicTasks.getPeriodFromCrontab(task.crontab) === 'yearly')
-    .sort((a, b) => a.orderValue - b.orderValue)
-
-  $: quickTasks = $periodicTasks
-    .filter((task) => PeriodicTasks.getPeriodFromCrontab(task.crontab) === 'quick')
-    .sort((a, b) => a.orderValue - b.orderValue)
-
+  $: weeklyTasks = filterByType($periodicTasks, 'weekly')
+    
+  $: monthlyTasks = filterByType($periodicTasks, 'monthly')
+    
+  $: yearlyTasks = filterByType($periodicTasks, 'yearly')
+   
+  $: quickTasks = filterByType($periodicTasks, 'quick')
 
   onMount(async () => {
     $periodicTasks = await PeriodicTasks.getAll($user.uid)
+    console.log($periodicTasks)
   })
 
 </script>

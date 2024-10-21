@@ -12,5 +12,5 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app, "tokyo-db");
+const db = getFirestore(app, "asian-alliance");
 export { app, db };
