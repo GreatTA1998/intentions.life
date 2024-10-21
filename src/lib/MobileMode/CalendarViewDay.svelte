@@ -20,7 +20,10 @@
       <div on:click={() => dispatch('task-click', { task: flexibleDayTask })} 
         style="width: var(--calendar-day-section-width); font-size: 12px; display: flex; gap: 4px; margin-bottom: 4px; margin-left: 4px; margin-right: 4px;"
       >
-        <ReusableFlexibleDayTask task={flexibleDayTask}
+        <ReusableFlexibleDayTask 
+          task={flexibleDayTask}
+          fontSizeInPx={32}
+          cssWidth={'100%'}
           on:task-click
           on:task-update
           on:task-checkbox-change

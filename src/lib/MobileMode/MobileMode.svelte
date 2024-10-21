@@ -18,12 +18,8 @@
      class:voice-active-highlight={isUsingVoice}
      style="height: 100dvh; position: relative; display: flex; flex-direction: column;"
 >
-  {#if activeTabName === 'TODO_VIEW'}
-    <div style="font-size: 48px; margin-left: 6px; color: darkgreen;">
-      {speechResult}
-    </div>
-
-    <div style="overflow-y: auto;">
+  <div style="overflow-y: auto;">
+    {#if activeTabName === 'TODO_VIEW'}
       <ListView
         on:task-click={(e) => openDetailedCard(e.detail)}
         on:task-checkbox-change={(e) => updateTaskNode({ id: e.detail.id, keyValueChanges: { isDone: e.detail.isDone }})}
@@ -51,25 +47,28 @@
           />
         </FloatingButtonWrapper>
       </ListView>
-    </div>
-  {:else if activeTabName === 'TODAY_VIEW'}
-    <div style="overflow-y: auto;">
-      <CalendarView
+    {:else if activeTabName === 'TODAY_VIEW'}
+      <CalendarView 
+        let:startTypingNewTask={startTypingNewTask}
         on:task-click={(e) => openDetailedCard(e.detail)}
-      />
-    </div>
-
-    <FloatingButtonWrapper>
-      <MultiPhotoUploader/>
-    </FloatingButtonWrapper>
-  {:else if activeTabName === 'FUTURE_VIEW'}
-    <div style="overflow-y: auto;">
+      >
+        <FloatingButtonWrapper on:click={startTypingNewTask} distanceFromBottom={100}>
+          <span id="startButton" class="material-symbols-outlined" style="font-size: 48px; font-weight: 600;">
+            add
+          </span>
+        </FloatingButtonWrapper>
+        
+        <FloatingButtonWrapper>
+          <MultiPhotoUploader/>
+        </FloatingButtonWrapper>
+      </CalendarView>
+    {:else if activeTabName === 'FUTURE_VIEW'}
       <ScheduleView
         on:task-duration-adjusted
         on:task-click={(e) => openDetailedCard(e.detail)}
       />
-    </div>
-  {/if}
+    {/if}
+  </div>
 
   <div class="bottom-navbar">
     <div on:click={() => activeTabName = 'TODO_VIEW'} class="bottom-nav-tab" class:active-nav-tab={activeTabName === 'TODO_VIEW'}>

@@ -25,7 +25,7 @@
 
    `min-height` prevents the parent from being super small when it's bullet point mode
  -->
- <div style="display: flex; align-items: center; width: var(--calendar-day-section-width);">
+ <div style="display: flex; align-items: center; width: {cssWidth};">
     <div>
       <!-- `checked` hydrates the initial value 
         `task-checkbox-change` event will just toggle the checkbox, 
@@ -57,6 +57,7 @@
  export let task = null
  export let pixelsPerHour = null
  export let fontSizeInPx = 12
+ export let cssWidth = 'var(--calendar-day-section-width)'
 
  $: height = (pixelsPerHour / 60) * task.duration
  $: isBulletPoint = height < 20
