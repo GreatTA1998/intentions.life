@@ -26,10 +26,12 @@ const updateTemplate = async ({ userID, id, updates }) => {
 const updateWithTasks = async ({ userID, id, updates }) => {
   if (updates.crontab) {
     await updateDoc(doc(db, "users", userID, 'periodicTasks', id), { crontab: updates.crontab });
-    return Promise.all([
+    const [_, posted] = await Promise.all([
       deleteFutureTasks({ userID, id, fromDate: DateTime.now().toFormat('yyyy-MM-dd') }),
       postFutureTasks({ userID, id, fromDate: DateTime.now().toFormat('yyyy-MM-dd') })
     ]);
+    console.log("posted", posted);
+    return posted;
   }
   await updateDoc(doc(db, "users", userID, 'periodicTasks', id), updates);
   const uniqueProperties = ['crontab', 'id', 'userID', 'lastGeneratedTask', 'orderValue'];
@@ -41,12 +43,12 @@ const updateWithTasks = async ({ userID, id, updates }) => {
     where('periodicTaskId', '==', id),
     where('startDateISO', '>=', DateTime.now().toFormat('yyyy-MM-dd'))
   );
-
   const tasksSnapshot = await getDocs(tasksQuery);
   const updatePromises = tasksSnapshot.docs.map(doc =>
     updateDoc(doc.ref, updates)
   );
-  return Promise.all(updatePromises);
+  Promise.all(updatePromises);
+  return tasksSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data(), ...updates }))
 };
 
 

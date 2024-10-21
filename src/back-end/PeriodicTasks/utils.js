@@ -53,10 +53,13 @@ const buildFutureTasks = async ({periodicTask, startDateJS, endDateJS, userID, p
     const startDate = DateTime.fromISO(`${fromDate}T${periodicTask.startTime||'00:00'}:00`, { zone: periodicTask.timeZone }).plus({ days: 1 });
     const endDate = DateTime.now().setZone(periodicTask.timeZone).plus(offset);
     const tasksArray = await buildFutureTasks({periodicTask, startDateJS: new Date(startDate), endDateJS: new Date(endDate), userID, periodicTaskId: id});
-    tasksArray.forEach(task => {
+    tasksArray.forEach((task, index) => {
         const taskId = getRandomID()
+        tasksArray[index].id = taskId;
         setDoc(doc(db, "users", userID, 'tasks', taskId), task);
     });
+    console.log("tasksArray", tasksArray);
+    return tasksArray;
   }
 
   const getTotalStats = async ({ userID, id }) => {
