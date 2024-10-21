@@ -1,15 +1,6 @@
 
-<div on:click={handleClick} class="floating-button" class:highlighted-button={iconName === 'settings_voice'}>
-  <span id="startButton" class="material-symbols-outlined" class:bold-icon={iconName === 'settings_voice'} style="font-size: 48px; font-weight: 600;">
-    {iconName}
-  </span>
-</div>
-
-<div id="output"></div>
-
 <script>
   import { onMount, createEventDispatcher } from 'svelte'
-  import { twoDigits } from '/src/helpers/everythingElse.js'
 
   let outputDiv
   const dispatch = createEventDispatcher()
@@ -80,28 +71,11 @@
   }
 </script>
 
-<style>
-  .floating-button {
-    position: absolute;
-    right: 16px;
-    bottom: calc(var(--bottom-navbar-height) + 16px);
+<span on:click={handleClick} on:keydown
+  id="startButton" class="material-symbols-outlined" 
+  style="font-size: 48px; font-weight: 600;"
+>
+  {iconName}
+</span>
 
-    border: 4px solid black;
-    height: 72px;
-    width: 72px;
-    border-radius: 36px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .highlighted-button {
-    font-weight: 600;
-    background-color: orange;
-  }
-
-  .bold-icon {
-    font-weight: 600;
-  }
-</style>
+<div id="output"></div>

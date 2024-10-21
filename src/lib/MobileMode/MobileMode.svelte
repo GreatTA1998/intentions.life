@@ -30,22 +30,33 @@
 
         on:new-root-task={(e) => createTaskNode(e.detail)}
         on:subtask-create={(e) => createTaskNode(e.detail)}
-      />
-    </div>
+        let:startTypingNewTask={startTypingNewTask}
+      >
+        <FloatingButtonWrapper on:click={startTypingNewTask} distanceFromBottom={100}>
+          <span id="startButton" class="material-symbols-outlined" style="font-size: 48px; font-weight: 600;">
+            add
+          </span>
+        </FloatingButtonWrapper>
 
-    <VoiceKeywordDetect
-      on:voice-start={() => isUsingVoice = true}
-      on:voice-end={() => isUsingVoice = false}
-      on:new-mic-result={(e) => speechResult = e.detail}
-      
-      on:new-event-today={(e) => createNewEvent(e.detail)}
-      on:new-todo={(e) => createNewTodo(e.detail)}
-    />
+        <FloatingButtonWrapper let:setBackgroundColor={setBackgroundColor}>
+          <VoiceKeywordDetect
+            on:voice-start={() => {
+              isUsingVoice = true; 
+              setBackgroundColor('orange');
+            }}
+            on:voice-end={() => isUsingVoice = false}
+            on:new-mic-result={(e) => speechResult = e.detail}
+            on:new-event-today={(e) => createNewEvent(e.detail)}
+            on:new-todo={(e) => createNewTodo(e.detail)}
+          />
+        </FloatingButtonWrapper>
+      </ListView>
+    </div>
   {:else if activeTabName === 'TODAY_VIEW'}
     <div style="overflow-y: auto;">
       <CalendarView
         on:task-click={(e) => openDetailedCard(e.detail)}
-      />  
+      />
     </div>
 
     <FloatingButtonWrapper>
