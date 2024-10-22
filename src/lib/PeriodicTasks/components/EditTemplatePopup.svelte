@@ -7,7 +7,7 @@
   import PeriodicTasks from '/src/back-end/PeriodicTasks'
   import { onMount } from 'svelte'
   import _ from 'lodash'
-  import IconsDisplay from './IconsDisplay.svelte'
+  import IconsDisplay from './IconsDisplay/IconsDisplay.svelte'
   import Icons from '/src/back-end/Icons.js'
   export let template
   let isPopupOpen = false

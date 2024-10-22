@@ -2,6 +2,7 @@
   import { user, doodleIcons, updateTemplate } from '/src/store.js'
   import PremiumPopup from './PremiumPopup.svelte'
   import BasicWhiteboard from './BasicWhiteboard.svelte'
+  import Icons from '/src/back-end/Icons.js'
   export let template;
   export let setIsPopupOpen
   let isShowingPremiumPopup = false

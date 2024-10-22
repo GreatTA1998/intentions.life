@@ -2,7 +2,7 @@ import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_PUBLIC_FIREBASE_API,
+  apiKey: "AIzaSyCOVm0X6UUQQcftXf066z_0hFk497j4dNY",
   authDomain: "project-y-2a061.firebaseapp.com",
   projectId: "project-y-2a061",
   storageBucket: "project-y-2a061.appspot.com",
@@ -12,5 +12,8 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
+const appSource = initializeApp(firebaseConfig);
 const db = getFirestore(app, "asian-alliance");
-export { app, db };
+const sourceDB = getFirestore(appSource, "tokyo-db");
+
+export { app, db, sourceDB };
