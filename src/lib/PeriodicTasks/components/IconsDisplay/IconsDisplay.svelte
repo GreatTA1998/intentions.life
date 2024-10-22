@@ -3,15 +3,21 @@
   import PremiumPopup from './PremiumPopup.svelte'
   import BasicWhiteboard from './BasicWhiteboard.svelte'
   import Icons from '/src/back-end/Icons.js'
-  export let template;
-  export let setIsPopupOpen
+  export let template
+  export let setIsPopupOpen  // magic that closes the popup 
   let isShowingPremiumPopup = false
 
+  function handleSelectIcon(iconUrl) {
+    updateTemplate({ templateID: template.id, keyValueChanges: { iconUrl } })
+    // setIsPopupOpen({ newVal: false })
+  }
 
-function handleSelectIcon(iconUrl) {
-  updateTemplate({ templateID: template.id, keyValueChanges: { iconUrl } })
-  setIsPopupOpen({ newVal: false })
-}
+  function handleUnselectIcon() {
+    updateTemplate({
+      templateID: template.id,
+      keyValueChanges: { iconUrl: '' }
+    })
+  }
 
   function handleDeleteIcon({ id, url }) {
     if (confirm('Are you sure you want to delete this icon?')) {
@@ -19,8 +25,6 @@ function handleSelectIcon(iconUrl) {
       $doodleIcons = $doodleIcons.filter((icon) => icon.id !== id)
     }
   }
-
-
 </script>
 
 {#if !$user.isSubscriber}
@@ -68,6 +72,12 @@ function handleSelectIcon(iconUrl) {
           {/if}
         </div>
       {/each}
+      {#if template.iconUrl}
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <div on:click={handleUnselectIcon} class="remove-icon-button">
+          X
+        </div>
+      {/if}
     {/if}
   </div>
 
@@ -75,3 +85,34 @@ function handleSelectIcon(iconUrl) {
     <BasicWhiteboard />
   </div>
 {/if}
+
+<style>
+  .remove-icon-button {
+    width: 48px;
+    height: 48px;
+    background-color: #e6f3ff;
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 24px;
+    color: #0085ff;
+    transition: background-color 0.2s ease;
+  }
+
+  .remove-icon-button:hover {
+    background-color: #cce6ff;
+  }
+
+  .orange-border {
+    border: 1px solid var(--logo-twig-color);
+    background-image: linear-gradient(
+        90deg,
+        rgba(200, 200, 200, 0.8) 1px,
+        transparent 0
+      ),
+      linear-gradient(180deg, rgba(200, 200, 200, 0.8) 1px, transparent 0);
+    background-size: 12px 12px; 
+  }
+</style>

@@ -1,6 +1,6 @@
 <script>
   import ReusableRoundButton from '$lib/ReusableRoundButton.svelte'
-  import { updateCrontab } from '../utils.js'
+  import { updateCrontab } from '../../utils.js'
   export let template
   export let crontabIndex = 3
   export let maxDays = 7

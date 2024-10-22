@@ -1,13 +1,13 @@
 <script>
   import { doodleIcons } from '/src/store.js'
-  import PeriodicInput from '$lib/PeriodicTasks/components/PeriodicInput.svelte'
-  import YearlyInput from '$lib/PeriodicTasks/components/YearlyInput.svelte'
-  import EditTime from '$lib/PeriodicTasks/components/EditTime.svelte'
+  import PeriodicInput from '$lib/PeriodicTasks/components/EditTemplatePopup/PeriodicInput.svelte'
+  import YearlyInput from '$lib/PeriodicTasks/components/EditTemplatePopup/YearlyInput.svelte'
+  import EditTime from '$lib/PeriodicTasks/components/EditTemplatePopup/EditTime.svelte'
   import { user, updateTemplate, deleteTemplate } from '/src/store.js'
   import PeriodicTasks from '/src/back-end/PeriodicTasks'
   import { onMount } from 'svelte'
   import _ from 'lodash'
-  import IconsDisplay from './IconsDisplay/IconsDisplay.svelte'
+  import IconsDisplay from '../IconsDisplay/IconsDisplay.svelte'
   import Icons from '/src/back-end/Icons.js'
   export let template
   let isPopupOpen = false

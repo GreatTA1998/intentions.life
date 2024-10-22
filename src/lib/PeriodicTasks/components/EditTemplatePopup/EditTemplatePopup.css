@@ -7,18 +7,6 @@
     margin-top: 24px;
   }
 
-  .orange-border {
-    /* border: 4px solid orange; */
-    border: 1px solid var(--logo-twig-color);
-    background-image: linear-gradient(
-        90deg,
-        rgba(200, 200, 200, 0.8) 1px,
-        transparent 0
-      ),
-      linear-gradient(180deg, rgba(200, 200, 200, 0.8) 1px, transparent 0);
-    background-size: 12px 12px; /* Adjust the size of the pattern */
-  }
-
   .title-underline-input {
     /* Refer to: https://stackoverflow.com/a/3131082/7812829 */
     background: transparent;

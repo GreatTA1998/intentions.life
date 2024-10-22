@@ -5,21 +5,40 @@
   import { doodleIcons } from '/src/store.js'
   import Icons from '/src/back-end/Icons.js'
   import { getRandomID } from '/src/helpers/everythingElse.js'
+  import ColorPicker from './ColorPicker.svelte'
   let colors = ['black', 'orange', 'red', 'lightblue', 'blue', 'green']
   let name = ''
   let tags = ''
   let isShareable = false
+
   onMount(() => {
     canvas = document.getElementById('whiteboard')
     ctx = canvas.getContext('2d')
   })
 
+
+  $: {
+    console.log('colorPickerColor', colorPickerColor)
+    console.log('color', color)
+  }
   let drawing = false
   let color = 'black'
+  let colorPickerColor = ''
   let prevX = 0
   let prevY = 0
   let canvas
   let ctx
+
+  let showColorPicker = false;
+
+  function toggleColorPicker() {
+    showColorPicker = !showColorPicker;
+  }
+
+  function handleColorChange(colorUpdate) {
+    color = colorUpdate;
+    colorPickerColor = colorUpdate;
+  }
 
   function handleSave() {
     const dataURL = canvas.toDataURL()
@@ -100,10 +119,6 @@
     tags = ''
     isShareable = false
   }
-
-  function changeColor(newColor) {
-    color = newColor
-  }
 </script>
 
 <div style="display: flex; ">
@@ -114,20 +129,26 @@
       {#each colors as pencilColor}
         <!-- svelte-ignore a11y-click-events-have-key-events -->
         <div
+          class:selected={color === pencilColor}
           class="color-circle"
           on:click={() => (color = pencilColor)}
           style="background-color: {pencilColor}"
         ></div>
       {/each}
       <!-- svelte-ignore a11y-click-events-have-key-events -->
-      <span
-        class="material-icons"
-        on:click={() => (color = getRandomColor())}
-        style="cursor: pointer;"
+      <div
+        class="color-circle custom-color"
+        class:selected={!colors.includes(color)}
+        on:click={toggleColorPicker}
+        style="background-color: {colorPickerColor}"
+        title="Custom color"
       >
-        casino
-      </span>
+        <span class="material-icons">
+          colorize
+        </span>
+      </div>
     </div>
+
 
     <canvas
       id="whiteboard"
@@ -143,82 +164,28 @@
       Your browser does not support the HTML5 canvas tag.
     </canvas>
     <div>
-   
       <button on:click={clearBoard}>Clear</button>
-      {#if name}
-      <button class="save-button" on:click={handleSave}>Save</button>
-    {/if}
+      <button class="save-button" disabled={!name} on:click={handleSave}
+        >Save</button
+      >
     </div>
   </div>
   <div class="input-container">
     <label for="name">Name:</label>
     <input id="name" type="text" bind:value={name} placeholder="funny-moves" />
-    
+
     <label for="tags">Tags:</label>
-    <input id="tags" type="text" bind:value={tags} placeholder="e.g. funny, moves, doodle" />
-    
+    <input
+      id="tags"
+      type="text"
+      bind:value={tags}
+      placeholder="e.g. funny, moves, doodle"
+    />
+
     <label for="public">Public:</label>
     <input id="public" type="checkbox" bind:checked={isShareable} />
   </div>
- 
 </div>
+  <ColorPicker {showColorPicker} {handleColorChange} {toggleColorPicker} {colorPickerColor} />
 
-<style>
-  #whiteboard {
-    border: 1px solid #000;
-    cursor: crosshair;
-  }
-
-  .color-circle {
-    width: 24px;
-    height: 24px;
-    border-radius: 12px;
-  }
-  .input-container {
-    margin-left: 20px;
-    margin-top: 50px;
-    display: grid;
-    max-height: 100px;
-    grid-template-columns: auto 1fr;
-    gap: 10px;
-    align-items: center;
-  }
-
-  .input-container label {
-    text-align: left;
-  }
-
-  .input-container input[type="text"] {
-    width: 100%;
-  }
-
-  .input-container input[type="checkbox"] {
-    justify-self: start;
-  }
-  button {
-    padding: 8px 16px;
-    border: 1px solid #e2e8f0;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: 500;
-    transition: all 0.2s ease;
-    background-color: #f8fafc;
-    color: #64748b; 
-  }
-
-  button:hover {
-    background-color: #e2e8f0;
-    color: #1e293b;
-  }
-
-  .save-button {
-    background-color: #3b82f6;
-    color: white;
-    border-color: #3b82f6;
-  }
-
-  .save-button:hover {
-    background-color: #2563eb;
-    border-color: #2563eb;
-  }
-</style>
+<style src="./BasicWhiteboard.css"></style>
