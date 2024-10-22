@@ -1,6 +1,5 @@
 import { updateFirestoreDoc } from '/src/helpers/firestoreHelpers.js'
 
-
 const Schema = {
   startTime: "",
   notes: "",

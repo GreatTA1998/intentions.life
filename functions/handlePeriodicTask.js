@@ -3,7 +3,7 @@ const functions = require('firebase-functions');
 const { getFirestore } = require('firebase-admin/firestore');
 const { DateTime } = require('luxon');
 const { parseExpression } = require('cron-parser');
-const db = getFirestore('tokyo-db');
+const db = getFirestore('asian-alliance');
 const { getRandomID, getPeriodFromCrontab } = require('./utils.js');
 
 const periodicTaskExample = {
@@ -25,9 +25,9 @@ const periodicTaskExample = {
 const handlePeriodicTask = async (periodicTask) => {
     try {
         if(!periodicTask.crontab) return;
-        const db = getFirestore('tokyo-db');
+        const db = getFirestore('asian-alliance');
         const offset = getPeriodFromCrontab(periodicTask.crontab) === 'yearly' ? { years: 1 } : { months: 1 };
-        const startDate = DateTime.fromISO(`${periodicTask.lastGeneratedTask}T${periodicTask.startTime}:00`, { zone: periodicTask.timeZone }).plus({ days: 1 });
+        const startDate = DateTime.fromISO(`${periodicTask.lastGeneratedTask}T${periodicTask.startTime || '00:00'}:00`, { zone: periodicTask.timeZone }).plus({ days: 1 });
         const endDate = DateTime.now().setZone(periodicTask.timeZone).plus(offset);
         if(startDate >= endDate) return;
         const tasksArray = await buildFutureTasks(periodicTask, new Date(startDate), new Date(endDate));

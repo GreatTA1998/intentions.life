@@ -37,3 +37,13 @@
   .end {
     right: 0; /* Position the end tick at the end */
   }
+
+  .bug-notice {
+    color: #666; /* Grey color */
+    background-color: rgba(200, 200, 200, 0.2); /* Light grey background with 20% opacity */
+    padding: 10px;
+    border-radius: 5px;
+    font-style: italic;
+    margin: 10px 0;
+    border-left: 3px solid #999; /* Left border for emphasis */
+  }

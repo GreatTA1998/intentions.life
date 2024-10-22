@@ -3,6 +3,12 @@ import PeriodicTasks from './back-end/PeriodicTasks'
 
 export const periodicTasks = writable([])
 
+export function deleteTemplate({templateID}) {
+  const currentUser = get(user)
+  PeriodicTasks.deleteTemplate({ id: templateID, userID: currentUser.uid })
+  periodicTasks.update((tasks)=>tasks.filter((task)=>task.id !== templateID))
+}
+
 export function updateTemplate({templateID, keyValueChanges}) {
     const currentUser = get(user);
     PeriodicTasks.updateWithTasks({

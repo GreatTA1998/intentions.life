@@ -1,4 +1,10 @@
 import { updateTemplate } from '/src/store.js'
+import PeriodicTasks from '/src/back-end/PeriodicTasks'
+
+export const filterByType = (tasks, type) => 
+  tasks.filter((task) => PeriodicTasks.getPeriodFromCrontab(task.crontab) === type)
+  .sort((a, b) => a.orderValue - b.orderValue)
+
 
 export const getDisplayLength = ({ template, templateWidthInPx }) => {
   const hours = template.TotalMinutesSpent / 60

@@ -7,9 +7,7 @@ export const handleNotificationPermission = (user) => {
     if (permission === "granted") {
       handleFCMToken(user);
     } else {
-      alert(
-        "turn on notifications! (check chrome and Mac notification settings)"
-      );
+      console.log("Notification permission not granted");
     }
   });
 };

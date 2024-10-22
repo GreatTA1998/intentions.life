@@ -3,7 +3,7 @@
   import PeriodicInput from '$lib/PeriodicTasks/components/PeriodicInput.svelte'
   import YearlyInput from '$lib/PeriodicTasks/components/YearlyInput.svelte'
   import EditTime from '$lib/PeriodicTasks/components/EditTime.svelte'
-  import { user, updateTemplate } from '/src/store.js'
+  import { user, updateTemplate, deleteTemplate } from '/src/store.js'
   import PeriodicTasks from '/src/back-end/PeriodicTasks'
   import { onMount } from 'svelte'
   import _ from 'lodash'
@@ -12,7 +12,6 @@
   export let template
   let isPopupOpen = false
   let newName = template.name
-
 
   const debouncedRenameTask = _.debounce(
     (newVal) => updateTemplate({ templateID: template.id, keyValueChanges: { name: newVal } }),
@@ -23,14 +22,14 @@
     $doodleIcons = await Icons.getAvailable($user.uid)
   })
 
-  function deleteTemplate() {
+  function handleDelete() {
     if (
       !confirm(
         'Are you sure you want to delete this template and all its future instances?'
       )
     )
       return
-    PeriodicTasks.deleteTemplate({ id: template.id, userID: $user.uid })
+    deleteTemplate({ templateID: template.id })
     isPopupOpen = false
   }
 
@@ -69,7 +68,7 @@
         <!-- svelte-ignore a11y-click-events-have-key-events -->
         <span
           class="material-symbols-outlined"
-          on:click|stopPropagation={deleteTemplate}
+          on:click|stopPropagation={handleDelete}
           style="cursor: pointer; margin-left: auto; right: 0px; border: 1px solid grey; border-radius: 24px; padding: 4px;"
         >
           delete

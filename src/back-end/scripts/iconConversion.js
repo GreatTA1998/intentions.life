@@ -5,7 +5,7 @@ import {
   getDocs,
   collection,
   query,
-} from "firebase/firestore/lite";
+} from "firebase/firestore";
 import {
   getStorage,
   ref,
