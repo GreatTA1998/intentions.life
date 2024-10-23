@@ -9,7 +9,7 @@
   let isEditingDuration = false
   let newDuration = template.duration
   let newStartHHMM = template.startTime
-  let hasSpecificTime = template.startTime
+  let hasSpecificTime = !!template.startTime
 
   function saveDuration() {
     updateTemplate({
@@ -40,6 +40,16 @@
 
   function isScheduled(taskObj) {
     return taskObj.startDate && taskObj.startTime && taskObj.startYYYY
+  }
+
+  function handleSwitchToggle(e) {
+    if (hasSpecificTime) {
+      updateTemplate({
+        templateID: template.id,
+        keyValueChanges: { startTime: "" }
+      })
+    }
+    hasSpecificTime = e.detail.isChecked
   }
 </script>
 
@@ -74,7 +84,7 @@
       <div>
         <UXToggleSwitch
           isChecked={template.startTime}
-          on:new-checked-state={(e) => (hasSpecificTime = e.detail.isChecked)}
+          on:new-checked-state={handleSwitchToggle}
         />
       </div>
     </div>
