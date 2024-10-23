@@ -1,5 +1,4 @@
-import { sentrySvelteKit } from "@sentry/sveltekit";
-import { sveltekit } from '@sveltejs/kit/vite';
+import { sveltekit } from '@sveltejs/kit/vite'
 // import { viteCommonjs } from '@originjs/vite-plugin-commonjs'
 // Fixes `require is undefined` 
 // https://kit.svelte.dev/docs
