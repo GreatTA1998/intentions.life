@@ -24,9 +24,9 @@
     <div class="sticky-y-div flexbox">
       {#each $daysToRender as ISODate, i (ISODate)}
         {#if i === cushion}
-          <div use:lazyCallable={() => handleIntersect(ISODate)} style="outline: 20px solid blue;"></div>
+          <div use:lazyCallable={() => handleIntersect(ISODate)}></div>
         {:else if i === $daysToRender.length - 1 - cushion}
-          <div use:lazyCallable={() => fetchNewWeekOfFutureTasks(ISODate)} style="outline: 20px solid red;"></div>
+          <div use:lazyCallable={() => fetchNewWeekOfFutureTasks(ISODate)}></div>
         {/if}
 
         <ReusableCalendarHeader
