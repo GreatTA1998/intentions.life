@@ -3,7 +3,6 @@
   "version": "0.0.1",
   "engines": {
     "node": "20.x"
-    
   },
   "scripts": {
     "dev": "vite dev",
@@ -24,7 +23,6 @@
   },
   "type": "module",
   "dependencies": {
-    "@sentry/sveltekit": "^8.19.0",
     "cron-parser": "^4.9.0",
     "firebase": "^9.6.5",
     "firebase-functions": "^6.0.1",
