@@ -1,7 +1,7 @@
 <script>
   import AddTemplate from './components/AddTemplate.svelte'
   import ReusableSimpleDropzone from '$lib/ReusableSimpleDropzone.svelte'
-  import EditTemplatePopup from './components/EditTemplatePopup.svelte'
+  import EditTemplatePopup from './components/EditTemplatePopup/EditTemplatePopup.svelte'
   import { updateTemplate } from '/src/store.js'
   import { getDisplayLength } from './utils.js'
   import PeriodicTasks from '/src/back-end/PeriodicTasks'

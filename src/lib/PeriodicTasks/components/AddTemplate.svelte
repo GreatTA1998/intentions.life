@@ -23,7 +23,7 @@
       startTime: '',
       lastGeneratedTask: DateTime.now().toFormat('yyyy-MM-dd'),
       iconUrl: '',
-      tags: '',
+      tags: ''
     }
     const id = await PeriodicTasks.create({ userID: $user.uid, task: newTask })
     newTask.id = id
@@ -33,14 +33,19 @@
   }
 </script>
 
-<div style="font-size: 24px; margin-bottom: 12px;">
-  {PeriodicTasks.getPeriodFromCrontab(crontab).toUpperCase()}
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<div style="font-size: 24px; margin-bottom: 12px; cursor: pointer;">
+  <span style ="cursor:pointer" on:click={() => setIsPopupOpen({ newVal: true })} >
+    {PeriodicTasks.getPeriodFromCrontab(
+      crontab
+    ).toUpperCase()}</span
+  >
   <!-- svelte-ignore a11y-click-events-have-key-events -->
   <span
     on:click={() => setIsPopupOpen({ newVal: true })}
     class="add-reusable-task-button"
   >
-    +
+    <span class="material-icons">add_circle_outline</span>
   </span>
 
   {#if isPopupOpen}
@@ -50,6 +55,9 @@
       on:click|self={() => (isPopupOpen = false)}
     >
       <div class="detailed-card-popup">
+        <button class="close-button" on:click={() => (isPopupOpen = false)}>
+          <span class="close-icon">×</span>
+        </button>
         <!-- svelte-ignore a11y-autofocus -->
         <input
           type="text"
@@ -110,4 +118,59 @@
     /*    border: 1px solid #000; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);*/
     box-shadow: 0px 0px 0px 9999px rgba(0, 0, 0, 0.5);
   }
+
+  .add-reusable-task-button {
+    position: relative;
+    top: 4px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    transition: opacity 0.2s ease;
+  }
+
+  .add-reusable-task-button:hover {
+    opacity: 0.7;
+  }
+
+  .material-icons {
+    font-size: 24px;
+    color: #8e8e93;
+  }
+
+
+  .close-button {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.1);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+
+  .close-button:hover {
+    background-color: rgba(0, 0, 0, 0.2);
+  }
+
+  .close-icon {
+    font-size: 18px;
+    color: #333;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    margin-top: -2px; 
+  }
+
 </style>

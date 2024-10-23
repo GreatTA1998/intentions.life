@@ -106,6 +106,13 @@
     width: 100%;
   }
 
+
+  .ux-input-text::placeholder {
+    font-style: italic;
+    color: #aaa;
+    font-weight: 300;
+  }
+
   /* remove default input styling */
   input {
     all: unset;

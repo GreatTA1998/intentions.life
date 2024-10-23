@@ -21,7 +21,8 @@ export const updateCrontab = ({ selectedDays, template, crontabIndex }) => {
     updatedCrontab = selectedDays;
   } else {
     const selectedDaysFiltered = selectedDays.filter(day => day !== '0');
-    updatedCrontab[crontabIndex] = selectedDaysFiltered.length ? selectedDaysFiltered.sort().join(',') : '*';
+    updatedCrontab[crontabIndex] = selectedDaysFiltered.length ? selectedDaysFiltered.sort().join(',') : 
+    crontabIndex == 2 ? '0' : '*';
     updatedCrontab = updatedCrontab.join(' ');
   }
   updateTemplate({ templateID: template.id, keyValueChanges: { crontab: updatedCrontab } })

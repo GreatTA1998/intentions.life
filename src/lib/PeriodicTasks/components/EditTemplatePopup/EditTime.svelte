@@ -9,15 +9,21 @@
   let isEditingDuration = false
   let newDuration = template.duration
   let newStartHHMM = template.startTime
-  let hasSpecificTime = template.startTime
+  let hasSpecificTime = !!template.startTime
 
   function saveDuration() {
-    updateTemplate({ templateID: template.id, keyValueChanges: { duration: newDuration } })
+    updateTemplate({
+      templateID: template.id,
+      keyValueChanges: { duration: newDuration }
+    })
     isEditingDuration = false
   }
 
   function saveStartTime() {
-    updateTemplate({ templateID: template.id, keyValueChanges: { startTime: newStartHHMM } })
+    updateTemplate({
+      templateID: template.id,
+      keyValueChanges: { startTime: newStartHHMM }
+    })
     isEditingTaskStart = false
   }
 
@@ -35,6 +41,16 @@
   function isScheduled(taskObj) {
     return taskObj.startDate && taskObj.startTime && taskObj.startYYYY
   }
+
+  function handleSwitchToggle(e) {
+    if (hasSpecificTime) {
+      updateTemplate({
+        templateID: template.id,
+        keyValueChanges: { startTime: "" }
+      })
+    }
+    hasSpecificTime = e.detail.isChecked
+  }
 </script>
 
 <div
@@ -46,6 +62,7 @@
   >
     <div style="margin-left: 6px; margin-right: 6px; max-width: 80px;">
       <UXFormField
+        pattern={'^[0-9:]*$'}
         fieldLabel="Duration"
         value={Math.round(template.duration)}
         willAutofocus={false}
@@ -67,7 +84,7 @@
       <div>
         <UXToggleSwitch
           isChecked={template.startTime}
-          on:new-checked-state={(e) => (hasSpecificTime = e.detail.isChecked)}
+          on:new-checked-state={handleSwitchToggle}
         />
       </div>
     </div>
@@ -75,6 +92,7 @@
     {#if hasSpecificTime}
       <div style="max-width: 70px; margin-left: 8px;">
         <UXFormField
+          pattern={'^[0-9:]*$'}
           fieldLabel="hh:mm"
           value={template.startTime}
           willAutofocus={false}

@@ -24,7 +24,7 @@ const periodicTaskExample = {
 
 const handlePeriodicTask = async (periodicTask) => {
     try {
-        if(!periodicTask.crontab) return;
+        if(!periodicTask.crontab || periodicTask.crontab === '0 0 0 * *') return;
         const db = getFirestore('asian-alliance');
         const offset = getPeriodFromCrontab(periodicTask.crontab) === 'yearly' ? { years: 1 } : { months: 1 };
         const startDate = DateTime.fromISO(`${periodicTask.lastGeneratedTask}T${periodicTask.startTime || '00:00'}:00`, { zone: periodicTask.timeZone }).plus({ days: 1 });
