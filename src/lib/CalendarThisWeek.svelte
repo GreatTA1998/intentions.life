@@ -1,74 +1,76 @@
-<!-- This component was first planned on Svelte REPL: https://svelte.dev/repl/d42716f1cc2746ce949de01f0117419e?version=4.2.15 -->
-<div class="top-flexbox" class:bottom-border={$tasksScheduledOn}>
-  <div class="pinned-div">
-    <div style="font-size: 16px; margin-top: var(--main-content-top-margin);">
-      <div style="color: rgb(0, 0, 0); font-weight: 400;">
-        {calStartDateClassObj.toLocaleString("en-US", { month: "short" })}
+ <!-- This component was first planned on Svelte REPL: https://svelte.dev/repl/d42716f1cc2746ce949de01f0117419e?version=4.2.15 -->
+<div id="the-only-scrollable-container">
+  <div class="top-flexbox" class:bottom-border={$tasksScheduledOn}>
+    <div class="pinned-div">
+      <div style="font-size: 16px; margin-top: var(--main-content-top-margin);">
+        <div style="color: rgb(0, 0, 0); font-weight: 400;">
+          {calStartDateClassObj.toLocaleString("en-US", { month: "short" })}
+        </div>
+        <div style="font-weight: 200; margin-top: 2px;">
+          {calStartDateClassObj.toLocaleString("en-US", { year: "numeric" })}
+        </div>
       </div>
-      <div style="font-weight: 200; margin-top: 2px;">
-        {calStartDateClassObj.toLocaleString("en-US", { year: "numeric" })}
-      </div>
+
+      {#if $tasksScheduledOn}
+        <span
+          on:click={toggleDockingArea}
+          class="collapse-arrow material-symbols-outlined"
+        >
+          {isShowingDockingArea ? "expand_less" : "expand_more"}
+        </span>
+      {/if}
     </div>
 
-    {#if $tasksScheduledOn}
-      <span
-        on:click={toggleDockingArea}
-        class="collapse-arrow material-symbols-outlined"
-      >
-        {isShowingDockingArea ? "expand_less" : "expand_more"}
-      </span>
-    {/if}
-  </div>
+    <div class="sticky-y-div flexbox">
+      {#each $daysToRender as ISODate, i (ISODate)}
+        {#if i === cushion}
+          <div use:lazyCallable={() => handleIntersect(ISODate)} style="outline: 20px solid blue;"></div>
+        {:else if i === $daysToRender.length - 1 - cushion}
+          <div use:lazyCallable={() => fetchNewWeekOfFutureTasks(ISODate)} style="outline: 20px solid red;"></div>
+        {/if}
 
-  <div class="sticky-y-div flexbox">
-    {#each $daysToRender as ISODate, i (ISODate)}
-      {#if i === cushion}
-        <div use:lazyCallable={() => handleIntersect(ISODate)}></div>
-      {:else if i === $daysToRender.length - 1 - cushion}
-        <div use:lazyCallable={() => fetchNewWeekOfFutureTasks(ISODate)}></div>
-      {/if}
-
-      <ReusableCalendarHeader
-        {ISODate}
-        {isShowingDockingArea}
-        on:task-update
-        on:task-click
-        on:task-checkbox-change
-        on:new-root-task
-      />
-    {/each}
-  </div>
-</div>
-
-<div style="display: flex; width: fit-content;">
-  <div class="x-sticky" style="margin-top: {timestampDivTopMargin}px;">
-    {#each timesOfDay as timestamp, i (i)}
-      <div
-        class="x-sticky timestamp-number"
-        style="height: {MIKA_PIXELS_PER_HOUR}px; width: var(--timestamps-column-width);"
-      >
-        {timestamp.substring(0, 5)}
-      </div>
-    {/each}
-  </div>
-
-  {#each $daysToRender as ISODate (ISODate)}
-    <div style="margin-top: {topMarginEqualizer}px;" class="unselectable">
-      {#if $tasksScheduledOn && timesOfDay.length !== 0}
-        <ReusableCalendarColumn
-          calendarBeginningDateClassObject={DateTime.fromISO(ISODate).toJSDate()}
-          scheduledTasks={$tasksScheduledOn[ISODate] ? $tasksScheduledOn[ISODate].hasStartTime : []}
-          timestamps={timesOfDay}
-          pixelsPerHour={MIKA_PIXELS_PER_HOUR}
-          timeBlockDurationInMinutes={60}
-          on:new-root-task
+        <ReusableCalendarHeader
+          {ISODate}
+          {isShowingDockingArea}
           on:task-update
           on:task-click
           on:task-checkbox-change
+          on:new-root-task
         />
-      {/if}
+      {/each}
     </div>
-  {/each}
+  </div>
+
+  <div style="display: flex; width: fit-content;">
+    <div class="x-sticky" style="margin-top: {timestampDivTopMargin}px;">
+      {#each timesOfDay as timestamp, i (i)}
+        <div
+          class="x-sticky timestamp-number"
+          style="height: {MIKA_PIXELS_PER_HOUR}px; width: var(--timestamps-column-width);"
+        >
+          {timestamp.substring(0, 5)}
+        </div>
+      {/each}
+    </div>
+
+    {#each $daysToRender as ISODate (ISODate)}
+      <div style="margin-top: {topMarginEqualizer}px;" class="unselectable">
+        {#if $tasksScheduledOn && timesOfDay.length !== 0}
+          <ReusableCalendarColumn
+            calendarBeginningDateClassObject={DateTime.fromISO(ISODate).toJSDate()}
+            scheduledTasks={$tasksScheduledOn[ISODate] ? $tasksScheduledOn[ISODate].hasStartTime : []}
+            timestamps={timesOfDay}
+            pixelsPerHour={MIKA_PIXELS_PER_HOUR}
+            timeBlockDurationInMinutes={60}
+            on:new-root-task
+            on:task-update
+            on:task-click
+            on:task-checkbox-change
+          />
+        {/if}
+      </div>
+    {/each}
+  </div>
 </div>
 
 <script>
@@ -226,6 +228,14 @@
     --calendar-left-padding: 16px;
   }
 
+  #the-only-scrollable-container {
+    position: relative;
+    overflow: auto;
+
+    /* added to fix a patch of white between the header and the calendar column */
+    background-color: var(--calendar-bg-color);
+  }
+  
   .x-sticky {
     position: sticky;
     left: 0px;

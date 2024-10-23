@@ -4,15 +4,7 @@
     color: rgb(120, 120, 120);
   }
 
-  .todo-container {
-    min-width: 360px;
-    background-color: var(--todo-list-bg-color);
-    font-size: 2em;
-    overflow-y: auto;
-  }
-
   .rounded-card {
-    /* border-radius: 36px; */
     padding: 24px;
     border-radius: 6px;
   }
@@ -29,16 +21,6 @@
     max-width: 1200px;
     z-index: 1;
     display: flex;
-  }
-
-  #the-only-scrollable-container {
-    position: relative;
-    overflow: auto;
-  }
-
-  .calendar-section-flex-child {
-    /* this is funnily enough to fix a patch of white between the header and the calendar column */
-    background-color: var(--calendar-bg-color);
   }
 
   .day-week-toggle-segment {
@@ -110,27 +92,4 @@
 
   .blue-icon {
     color: #0085ff;
-  }
-
-  /* #radio-player-with-art {
-    background-image: url('../maplestory-watercolor.jpg')
-  } */
-
-  @media (max-width: 1279.99px) {
-    .todo-container {
-      /* reduce todo-list width by 60px for tablets */
-      min-width: 300px;
-    }
-  }
-
-  /* anything below this minimum tablet width is considered a phone */
-  @media (max-width: 767.99px) {
-    /* i.e. flatten all the scrolling onto one massive plane, instead of lots of separate scrolling contexts */
-    #the-only-scrollable-container {
-      overflow: visible;
-    }
-
-    .todo-container {
-      overflow: visible;
-    }
   }

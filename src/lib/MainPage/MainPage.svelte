@@ -26,7 +26,6 @@
   import { doc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore'
   import NewThisWeekTodo from '$lib/NewThisWeekTodo.svelte'
   import { handleInitialTasks } from './handleTasks.js'
-  import MobileMode from '$lib/MobileMode/MobileMode.svelte'
   import {
     createTaskNode,
     updateTaskNode,
@@ -290,20 +289,10 @@
     </div>
   </div>
 
+  <!-- WEEK MODE -->
   <div slot="content" style="display: flex; flex-grow: 1; height: 100%;">
-    <!-- TO-DO: merge with Maryus' pull request to fix periodic tasks -->
-    <!-- <div style="display: { currentMode === 'ManageRepeats' ? 'block' : 'none'}">
-      {#if allTasks}
-        <ManageReusableTasks {allTasks} />
-      {/if}
-    </div> -->
-
-    <!-- WEEK MODE -->
-    <!-- 1st flex child -->
-    <div
-      style="display: {currentMode === 'Week' ? 'block' : 'none'}"
-      class="todo-container"
-    >
+    <div style="display: {currentMode === 'Week' ? 'flex' : 'none'}; width: 100%;">
+      <!-- 1st flex child -->
       <NewThisWeekTodo
         on:new-root-task={(e) => createTaskNode(e.detail)}
         on:task-unscheduled={(e) => putTaskToThisWeekTodo(e)}
@@ -313,16 +302,11 @@
           updateTaskNode({
             id: e.detail.id,
             keyValueChanges: { isDone: e.detail.isDone }
-          })}
+          })
+        }
       />
-    </div>
 
-    <!-- 2nd flex child -->
-    <div
-      style="display: {currentMode === 'Week' ? 'block' : 'none'}"
-      id="the-only-scrollable-container"
-      class="calendar-section-flex-child"
-    >
+      <!-- 2nd flex child -->
       <CalendarThisWeek
         {calStartDateClassObj}
         on:calendar-shifted={(e) =>
@@ -333,15 +317,18 @@
           updateTaskNode({
             id: e.detail.id,
             keyValueChanges: e.detail.keyValueChanges
-          })}
+          })
+        }
         on:task-dragged={(e) => changeTaskDeadline(e.detail)}
         on:task-checkbox-change={(e) =>
           updateTaskNode({
             id: e.detail.id,
             keyValueChanges: { isDone: e.detail.isDone }
-          })}
+          })
+        }
       />
-    </div>
+   </div>
+
     <!-- END OF WEEK MODE SECTION -->
 
     <div style="display: {currentMode === 'Year' ? 'block' : 'none'}">
