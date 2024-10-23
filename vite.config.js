@@ -7,14 +7,9 @@ import { sveltekit } from '@sveltejs/kit/vite';
 // vite: {
 
 export default {
-  plugins: [sentrySvelteKit({
-    sourceMapsUploadOptions: {
-      org: "explain-inc",
-      project: "javascript-sveltekit"
-    }
-  }), // viteCommonjs(),
-  
-  sveltekit()],
+  plugins: [
+    sveltekit()
+  ]
 
   // Fixes known issue with v9 Firebase and SvelteKit
   // https://kit.svelte.dev/faq

@@ -9,3 +9,4 @@ node_modules
 /src/.secrets.js
 # Sentry Config File
 .sentryclirc
+./prettierrc.js
