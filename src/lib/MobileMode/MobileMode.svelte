@@ -18,47 +18,57 @@
      class:voice-active-highlight={isUsingVoice}
      style="height: 100dvh; position: relative; display: flex; flex-direction: column;"
 >
-  {#if activeTabName === 'TODO_VIEW'}
-    <div style="font-size: 48px; margin-left: 6px; color: darkgreen;">
-      {speechResult}
-    </div>
-
-    <div style="overflow-y: auto;">
+  <div style="overflow-y: auto;">
+    {#if activeTabName === 'TODO_VIEW'}
       <ListView
         on:task-click={(e) => openDetailedCard(e.detail)}
         on:task-checkbox-change={(e) => updateTaskNode({ id: e.detail.id, keyValueChanges: { isDone: e.detail.isDone }})}
 
         on:new-root-task={(e) => createTaskNode(e.detail)}
         on:subtask-create={(e) => createTaskNode(e.detail)}
-      />
-    </div>
+        let:startTypingNewTask={startTypingNewTask}
+      >
+        <FloatingButtonWrapper on:click={startTypingNewTask} distanceFromBottom={100}>
+          <span id="startButton" class="material-symbols-outlined" style="font-size: 48px; font-weight: 600;">
+            add
+          </span>
+        </FloatingButtonWrapper>
 
-    <VoiceKeywordDetect
-      on:voice-start={() => isUsingVoice = true}
-      on:voice-end={() => isUsingVoice = false}
-      on:new-mic-result={(e) => speechResult = e.detail}
-      
-      on:new-event-today={(e) => createNewEvent(e.detail)}
-      on:new-todo={(e) => createNewTodo(e.detail)}
-    />
-  {:else if activeTabName === 'TODAY_VIEW'}
-    <div style="overflow-y: auto;">
-      <CalendarView
+        <FloatingButtonWrapper let:setBackgroundColor={setBackgroundColor}>
+          <VoiceKeywordDetect
+            on:voice-start={() => {
+              isUsingVoice = true; 
+              setBackgroundColor('orange');
+            }}
+            on:voice-end={() => isUsingVoice = false}
+            on:new-mic-result={(e) => speechResult = e.detail}
+            on:new-event-today={(e) => createNewEvent(e.detail)}
+            on:new-todo={(e) => createNewTodo(e.detail)}
+          />
+        </FloatingButtonWrapper>
+      </ListView>
+    {:else if activeTabName === 'TODAY_VIEW'}
+      <CalendarView 
+        let:startTypingNewTask={startTypingNewTask}
         on:task-click={(e) => openDetailedCard(e.detail)}
-      />  
-    </div>
-
-    <FloatingButtonWrapper>
-      <MultiPhotoUploader/>
-    </FloatingButtonWrapper>
-  {:else if activeTabName === 'FUTURE_VIEW'}
-    <div style="overflow-y: auto;">
+      >
+        <FloatingButtonWrapper on:click={startTypingNewTask} distanceFromBottom={100}>
+          <span id="startButton" class="material-symbols-outlined" style="font-size: 48px; font-weight: 600;">
+            add
+          </span>
+        </FloatingButtonWrapper>
+        
+        <FloatingButtonWrapper>
+          <MultiPhotoUploader/>
+        </FloatingButtonWrapper>
+      </CalendarView>
+    {:else if activeTabName === 'FUTURE_VIEW'}
       <ScheduleView
         on:task-duration-adjusted
         on:task-click={(e) => openDetailedCard(e.detail)}
       />
-    </div>
-  {/if}
+    {/if}
+  </div>
 
   <div class="bottom-navbar">
     <div on:click={() => activeTabName = 'TODO_VIEW'} class="bottom-nav-tab" class:active-nav-tab={activeTabName === 'TODO_VIEW'}>
@@ -102,7 +112,7 @@
     getDateInMMDD, 
     getDateInDDMMYYYY,
   } from '/src/helpers/everythingElse.js'
-  import { user } from '/src/store.js'
+  import { user, todoMemoryTree } from '/src/store.js'
   import { onDestroy, onMount } from 'svelte'
   import ScheduleView from '$lib/MobileMode/ScheduleView.svelte'
   import ListView from '$lib/MobileMode/ListView.svelte'
@@ -123,8 +133,6 @@
   
   let isDetailedCardOpen = false
   let clickedTask = {}
-
-  let tasksToDisplay = []
 
   onMount(async () => {
     fetchMobileTodoTasks($user.uid)
@@ -156,18 +164,13 @@
 
     const newTaskObj = {
       name,
-      parentID: "",
-      deadlineDate: getDateInDDMMYYYY(d),
-      deadlineTime: '23:59'
+      parentID: ''
     }
 
-    if (tasksToDisplay.length > 0) {
-      newTaskObj.orderValue = (0 + tasksToDisplay[0].orderValue) / 2 
-
-      // quickfix so when multiple tasks are added, they don't have the same `orderValue` which breaks drag-and-drop
-      const epsilon = Math.random() * newTaskObj.orderValue 
-      newTaskObj.orderValue += epsilon
-    } // otherwise the default `orderValue` will be `maxOrder`, handled by `checkTaskObjSchema`
+    if ($todoMemoryTree.length > 0) {
+      newTaskObj.orderValue = (0 + $todoMemoryTree[0].orderValue) / 2 
+    } 
+    // if it's the first task, the orderValue is initialized to `maxOrder`
 
     createTaskNode({ id: getRandomID(), newTaskObj })
   }
