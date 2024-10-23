@@ -26,11 +26,4 @@
     font-size: 2em;
     overflow-y: auto;
   }
-  
-  @media (max-width: 1279.99px) {
-    .todo-container {
-      /* reduce todo-list width by 60px for tablets */
-      min-width: 300px;
-    }
-  }
 </style>

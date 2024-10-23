@@ -158,7 +158,7 @@
   export let isLargeFont = false
   export let isRecursive = true
 
-  const indentationAmount = 48
+  const indentationAmount = 32
   let newSubtaskStringValue = ''
   let isTypingNewSubtask = false
   let isTaskDueSoonOrOverdue = false
