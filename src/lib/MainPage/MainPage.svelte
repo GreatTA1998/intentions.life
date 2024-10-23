@@ -45,7 +45,6 @@
   let calStartDateClassObj = new Date()
 
   let unsub
-  let isIPad = false 
   $: if (clickedTaskID) {
     if (clickedTaskID) clickedTask = findTaskByID(clickedTaskID)
     else clickedTask = {}
@@ -56,15 +55,13 @@
   }
 
   onMount(async () => {
-    var userAgent = navigator.userAgent || navigator.vendor || window.opera;
-    console.log(navigator.maxTouchPoints > 1);
-    if (!dev) {
+    if (!dev || !navigator.maxTouchPoints > 1) {
       console.log('running handleNotificationPermission')
       try {
         handleNotificationPermission($user)
         handleSW()
       } catch (error) {
-        console.error('Error in onMount:', error)
+        console.error('Error with notifications:', error)
       }
     }
     handleInitialTasks($user.uid)
