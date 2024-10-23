@@ -3,26 +3,26 @@ import PeriodicTasks from './back-end/PeriodicTasks'
 
 export const periodicTasks = writable([])
 
-export function deleteTemplate({templateID}) {
+export function deleteTemplate({ templateID }) {
   const currentUser = get(user)
   PeriodicTasks.deleteTemplate({ id: templateID, userID: currentUser.uid })
-  periodicTasks.update((tasks)=>tasks.filter((task)=>task.id !== templateID))
+  periodicTasks.update((tasks) => tasks.filter((task) => task.id !== templateID))
 }
 
-export function updateTemplate({templateID, keyValueChanges}) {
-    const currentUser = get(user);
-    PeriodicTasks.updateWithTasks({
-      userID: currentUser.uid,
-      id: templateID,
-      updates: keyValueChanges
-    })
-    periodicTasks.update((tasks)=>tasks.map((task) =>
-      task.id === templateID ? { ...task, ...keyValueChanges } : task
-    ))
-  }
+export function updateTemplate({ templateID, keyValueChanges }) {
+  const currentUser = get(user);
+  PeriodicTasks.updateWithTasks({
+    userID: currentUser.uid,
+    id: templateID,
+    updates: keyValueChanges
+  })
+  periodicTasks.update((tasks) => tasks.map((task) =>
+    task.id === templateID ? { ...task, ...keyValueChanges } : task
+  ))
+}
 
 export const user = writable({}) // {} means not logged in, cannot be null
-export const doodleIcons = writable([]) 
+export const doodleIcons = writable([])
 
 export const hasFetchedUser = writable(false)
 export const hasLogoExited = writable(false)
@@ -32,7 +32,7 @@ export const isSnackbarHidden = writable(false)
 export const mostRecentlyCompletedTaskName = writable('')
 
 // 200/24 is the week view value
-export const appModePixelsPerHour = writable(200/24)
+export const appModePixelsPerHour = writable(200 / 24)
 
 export const hasInitialScrolled = writable(false)
 

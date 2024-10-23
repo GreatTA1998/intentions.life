@@ -3,24 +3,6 @@
     cursor: pointer;
   }
 
-  .add-reusable-task-button {
-    font-size: 26px;
-    margin-left: 8px;
-    cursor: pointer;
-  }
-
-  .day-of-week-circle {
-    border-radius: 2px;
-    background-color: rgb(223, 223, 223);
-    width: 4px;
-    height: 4px;
-    margin: 4px;
-    font-size: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: 1px solid rgb(111, 111, 111);
-  }
 
   .tick {
     position: absolute;

@@ -14,7 +14,11 @@
   let newName = template.name
 
   const debouncedRenameTask = _.debounce(
-    (newVal) => updateTemplate({ templateID: template.id, keyValueChanges: { name: newVal } }),
+    (newVal) =>
+      updateTemplate({
+        templateID: template.id,
+        keyValueChanges: { name: newVal }
+      }),
     800
   )
 
@@ -47,6 +51,9 @@
     on:click|self={() => (isPopupOpen = false)}
   >
     <div class="detailed-card-popup">
+      <button class="close-button" on:click={() => (isPopupOpen = false)}>
+        <span class="close-icon">×</span>
+      </button>
       <input
         type="text"
         bind:value={newName}
@@ -58,11 +65,11 @@
 
       <div style="display: flex; align-items: center; margin-top: 24px;">
         {#if PeriodicTasks.getPeriodFromCrontab(template.crontab) === 'weekly'}
-          <PeriodicInput {template}maxDays={7}  crontabIndex={4} />
+          <PeriodicInput {template} maxDays={7} crontabIndex={4} />
         {:else if PeriodicTasks.getPeriodFromCrontab(template.crontab) === 'monthly'}
-        <PeriodicInput {template} maxDays={31}  crontabIndex={2}/>
+          <PeriodicInput {template} maxDays={31} crontabIndex={2} />
         {:else if PeriodicTasks.getPeriodFromCrontab(template.crontab) === 'yearly'}
-        <YearlyInput {template}  />
+          <YearlyInput {template} />
         {/if}
 
         <!-- svelte-ignore a11y-click-events-have-key-events -->
