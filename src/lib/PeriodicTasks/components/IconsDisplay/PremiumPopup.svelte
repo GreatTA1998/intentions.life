@@ -2,8 +2,8 @@
   import ReusableRoundButton from '$lib/ReusableRoundButton.svelte'
   import { user } from '/src/store.js'
   import { onMount } from 'svelte'
-  import Icons from 'src/back-end/Icons'
-  import User from 'src/back-end/User'
+  import Icons from '/src/back-end/Icons'
+  import User from '/src/back-end/User'
 
   let doodleIcons = null
 
