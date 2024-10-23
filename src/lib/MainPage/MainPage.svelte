@@ -1,5 +1,6 @@
 <script>
   import { getDateInDDMMYYYY } from '/src/helpers/everythingElse.js'
+  import { browser } from '$app/environment';
   import {
     mostRecentlyCompletedTaskID,
     user,
@@ -44,7 +45,7 @@
   let calStartDateClassObj = new Date()
 
   let unsub
-
+  let isIPad = /iPad|iPad Simulator/i.test(navigator.userAgent);
   $: if (clickedTaskID) {
     if (clickedTaskID) clickedTask = findTaskByID(clickedTaskID)
     else clickedTask = {}
@@ -55,7 +56,7 @@
   }
 
   onMount(async () => {
-    if (!dev) {
+    if (!dev || !isIPad) {
       console.log('running handleNotificationPermission')
       handleNotificationPermission($user)
       handleSW()
