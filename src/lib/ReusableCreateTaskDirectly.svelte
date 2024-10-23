@@ -1,44 +1,11 @@
-<UXFormField
-  fieldLabel="Task Name"
-  value={newTaskName}
-  on:input={(e) => {
-    newTaskName = e.detail.value;
-    searchTaskTemplates();
-  }}
-  on:focus-out={() => {
-    if (newTaskName === '') {
-      dispatch('reset')
-    }
-  }}
-  on:task-entered={(e) => handleEnterKey(e)}
-/>
-
-<!-- Display reusable task templates here -->
-{#key taskTemplateSearchResults}
-  {#if $user && newTaskName.length >= 1}
-    <div class="core-shadow cast-shadow" style="background-color: white; padding: 6px; border-radius: 12px">   
-      {#each taskTemplateSearchResults as taskTemplate}
-        <div class="autocomplete-option" 
-          on:click={() => createNewInstanceOfReusableTask(taskTemplate)} 
-          class:option-highlight={taskTemplateSearchResults.length === 1}
-        >
-          {#if taskTemplate.iconDataURL}
-            <img src={taskTemplate.iconDataURL} style="width: 24px; height: 24px;">
-          {/if}
-
-          <div style="margin-left: {taskTemplate.iconDataURL ? '0px' : '12px'}">
-            {taskTemplate.name}
-          </div>
-        </div>
-      {/each}
-    </div>
-  {/if}
-{/key}
-
 <script>
   import UXFormField from '$lib/UXFormField.svelte'
   import { getFirestoreCollection } from '/src/helpers/firestoreHelpers.js'
-  import { getRandomID, getDateInMMDD, getHHMM } from '/src/helpers/everythingElse.js'
+  import {
+    getRandomID,
+    getDateInMMDD,
+    getHHMM
+  } from '/src/helpers/everythingElse.js'
   import { user } from '/src/store.js'
   import { onMount, createEventDispatcher } from 'svelte'
   import { DateTime } from 'luxon'
@@ -54,12 +21,14 @@
   const dispatch = createEventDispatcher()
 
   onMount(async () => {
-    const temp = await getFirestoreCollection(`/users/${$user.uid}/periodicTasks`)
+    const temp = await getFirestoreCollection(
+      `/users/${$user.uid}/periodicTasks`
+    )
     reusableTaskTemplates = temp
   })
 
-  function searchTaskTemplates () {
-    if (reusableTaskTemplates === null) return 
+  function searchTaskTemplates() {
+    if (reusableTaskTemplates === null) return
 
     const uniqueSet = new Set()
     const searchQuery = newTaskName
@@ -73,35 +42,39 @@
     return result
   }
 
-  function handleEnterKey (e) {
+  function handleEnterKey(e) {
     if (taskTemplateSearchResults.length === 1) {
       createNewInstanceOfReusableTask(taskTemplateSearchResults[0])
     } else {
       createTaskDirectly(e)
     }
   }
-  
-  async function createNewInstanceOfReusableTask (taskObj) {
-    const copy = {...taskObj}
+
+  async function createNewInstanceOfReusableTask(taskObj) {
+    const copy = { ...taskObj }
     copy.reusableTemplateID = taskObj.id
     copy.isDone = false
-    copy.startDateISO = DateTime.fromJSDate(resultantDateClassObject).toFormat('yyyy-MM-dd')
+    copy.startDateISO = DateTime.fromJSDate(resultantDateClassObject).toFormat(
+      'yyyy-MM-dd'
+    )
     copy.startTime = newTaskStartTime
-    dispatch('new-root-task', { 
-      id: getRandomID(), 
-      newTaskObj: copy 
+    dispatch('new-root-task', {
+      id: getRandomID(),
+      newTaskObj: copy
     })
     dispatch('reset')
   }
 
-  async function createTaskDirectly (e) {
+  async function createTaskDirectly(e) {
     const newTaskName = e.detail.taskName
     if (newTaskName !== '') {
       dispatch('new-root-task', {
         id: getRandomID(),
         newTaskObj: {
           name: newTaskName,
-          startDateISO: DateTime.fromJSDate(resultantDateClassObject).toFormat('yyyy-MM-dd'),
+          startDateISO: DateTime.fromJSDate(resultantDateClassObject).toFormat(
+            'yyyy-MM-dd'
+          ),
           startTime: newTaskStartTime
         }
       })
@@ -110,16 +83,62 @@
   }
 </script>
 
+<UXFormField
+  fieldLabel="Task Name"
+  value={newTaskName}
+  on:input={(e) => {
+    newTaskName = e.detail.value
+    searchTaskTemplates()
+  }}
+  on:focus-out={() => {
+    if (newTaskName === '') {
+      dispatch('reset')
+    }
+  }}
+  on:task-entered={(e) => handleEnterKey(e)}
+/>
+
+<!-- Display reusable task templates here -->
+{#key taskTemplateSearchResults}
+  {#if $user && newTaskName.length >= 1}
+    <div
+      class="core-shadow cast-shadow"
+      style="background-color: white; padding: 6px; border-radius: 12px"
+    >
+      {#each taskTemplateSearchResults as taskTemplate}
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <div
+          class="autocomplete-option"
+          on:click={() => createNewInstanceOfReusableTask(taskTemplate)}
+          class:option-highlight={taskTemplateSearchResults.length === 1}
+        >
+          {#if taskTemplate.iconUrl}
+            <!-- svelte-ignore a11y-missing-attribute -->
+            <img
+              src={taskTemplate.iconUrl}
+              style="width: 24px; height: 24px;"
+            />
+          {/if}
+
+          <div style="margin-left: {taskTemplate.iconUrl ? '0px' : '12px'}">
+            {taskTemplate.name}
+          </div>
+        </div>
+      {/each}
+    </div>
+  {/if}
+{/key}
+
 <style lang="scss">
   .autocomplete-option {
-    padding-top: 12px; 
-    padding-bottom: 12px; 
-    padding-left: 4px; 
-    padding-right: 12px; 
-    font-size: 12px; 
+    padding-top: 12px;
+    padding-bottom: 12px;
+    padding-left: 4px;
+    padding-right: 12px;
+    font-size: 12px;
     border-radius: 12px;
 
-    display: flex; 
+    display: flex;
     align-items: center;
   }
 
@@ -128,6 +147,6 @@
   }
 
   .autocomplete-option:hover {
-    @extend .option-highlight
+    @extend .option-highlight;
   }
 </style>
