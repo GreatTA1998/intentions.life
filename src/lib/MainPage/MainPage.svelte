@@ -6,6 +6,7 @@
     showSnackbar,
     hasInitialScrolled
   } from '/src/store.js'
+  import { browser } from '$app/environment'
   import AI from '../AI/AI.svelte'
   import TheSnackbar from '$lib/TheSnackbar.svelte'
   import CalendarThisWeek from '$lib/CalendarThisWeek.svelte'
@@ -56,8 +57,7 @@
 
   onMount(async () => {
     var userAgent = navigator.userAgent || navigator.vendor || window.opera;
-    console.log('userAgent', userAgent);
-    console.log(/iPad|iPhone|iPod/.test(userAgent));
+    console.log(navigator.maxTouchPoints > 1);
     if (!dev) {
       console.log('running handleNotificationPermission')
       try {
