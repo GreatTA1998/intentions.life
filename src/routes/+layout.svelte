@@ -64,7 +64,7 @@
         // desktop mode URL
         else {
           if (isMobile()) {
-            if (confirm('This is desktop mode. Use mode mode instead?')) {
+            if (confirm('This is desktop mode. Use mobile mode instead?')) {
               goto('/' + resultUser.uid + '/mobile')
             }
           }
