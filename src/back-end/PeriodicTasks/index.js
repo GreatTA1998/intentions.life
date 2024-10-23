@@ -28,7 +28,8 @@ const updateWithTasks = async ({ userID, id, updates }) => {
     await updateDoc(doc(db, "users", userID, 'periodicTasks', id), { crontab: updates.crontab });
     return Promise.all([
       deleteFutureTasks({ userID, id, fromDate: DateTime.now().toFormat('yyyy-MM-dd') }),
-      postFutureTasks({ userID, id, fromDate: DateTime.now().toFormat('yyyy-MM-dd') })
+      updates.crontab === '0 0 0 * *' ? Promise.resolve([]) :
+        postFutureTasks({ userID, id, fromDate: DateTime.now().toFormat('yyyy-MM-dd') })
     ]);
   }
   await updateDoc(doc(db, "users", userID, 'periodicTasks', id), updates);
