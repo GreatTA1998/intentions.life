@@ -55,14 +55,17 @@
   }
 
   onMount(async () => {
-    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-    if (/iPad|Macintosh/.test(userAgent) && 'ontouchend' in document) {
-      isIPad = true;
-    }
-    if (!dev || !isIPad) {
+    var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+    console.log('userAgent', userAgent);
+    console.log(/iPad|iPhone|iPod/.test(userAgent));
+    if (!dev) {
       console.log('running handleNotificationPermission')
-      handleNotificationPermission($user)
-      handleSW()
+      try {
+        handleNotificationPermission($user)
+        handleSW()
+      } catch (error) {
+        console.error('Error in onMount:', error)
+      }
     }
     handleInitialTasks($user.uid)
   })
