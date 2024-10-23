@@ -12,12 +12,18 @@
   let hasSpecificTime = template.startTime
 
   function saveDuration() {
-    updateTemplate({ templateID: template.id, keyValueChanges: { duration: newDuration } })
+    updateTemplate({
+      templateID: template.id,
+      keyValueChanges: { duration: newDuration }
+    })
     isEditingDuration = false
   }
 
   function saveStartTime() {
-    updateTemplate({ templateID: template.id, keyValueChanges: { startTime: newStartHHMM } })
+    updateTemplate({
+      templateID: template.id,
+      keyValueChanges: { startTime: newStartHHMM }
+    })
     isEditingTaskStart = false
   }
 
@@ -46,6 +52,7 @@
   >
     <div style="margin-left: 6px; margin-right: 6px; max-width: 80px;">
       <UXFormField
+        pattern={'^[0-9:]*$'}
         fieldLabel="Duration"
         value={Math.round(template.duration)}
         willAutofocus={false}
@@ -75,6 +82,7 @@
     {#if hasSpecificTime}
       <div style="max-width: 70px; margin-left: 8px;">
         <UXFormField
+          pattern={'^[0-9:]*$'}
           fieldLabel="hh:mm"
           value={template.startTime}
           willAutofocus={false}
