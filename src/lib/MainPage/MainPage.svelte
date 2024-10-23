@@ -46,6 +46,7 @@
 
   let unsub
   let isIPad = /iPad|iPad Simulator/i.test(navigator.userAgent);
+  console.log('isIPad', isIPad)
   $: if (clickedTaskID) {
     if (clickedTaskID) clickedTask = findTaskByID(clickedTaskID)
     else clickedTask = {}
@@ -56,11 +57,13 @@
   }
 
   onMount(async () => {
-    if (!dev || !isIPad) {
-      console.log('running handleNotificationPermission')
-      handleNotificationPermission($user)
-      handleSW()
-    }
+    console.log('isIPad in mount', isIPad)
+
+    // if (!dev || !isIPad) {
+    //   console.log('running handleNotificationPermission')
+    //   handleNotificationPermission($user)
+    //   handleSW()
+    // }
     handleInitialTasks($user.uid)
   })
 
