@@ -6,22 +6,6 @@ const { parseExpression } = require('cron-parser');
 const db = getFirestore('asian-alliance');
 const { getRandomID, getPeriodFromCrontab } = require('./utils.js');
 
-const periodicTaskExample = {
-    name: "test",
-    orderValue: 0,
-    lastGeneratedTask: "2024-10-15",
-    crontab: "0 0 15 10 *",  //yearly on october 15th, monday and wednesday: "0 0 * * 1,4",
-    iconUrl: "url",
-    tags: [],
-    id: "88888888",
-    timeZone: "Asia/Tokyo",
-    userID: "88888888",
-    notes: "",
-    notify: "",
-    duration: 30,
-    startTime: "12:00",
-};
-
 const handlePeriodicTask = async (periodicTask) => {
     try {
         if(!periodicTask.crontab || periodicTask.crontab === '0 0 0 * *') return;

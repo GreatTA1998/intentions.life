@@ -50,7 +50,6 @@ const updateWithTasks = async ({ userID, id, updates }) => {
   return Promise.all(updatePromises);
 };
 
-
 const getAll = async (userID) => {
   const q = query(collection(db, "users", userID, "periodicTasks"));
   const snapshot = await getDocs(q)
@@ -77,4 +76,24 @@ const deleteTemplate = async ({ userID, id }) => {
   return deleteDoc(doc(db, "users", userID, "periodicTasks", id));
 };
 
-export default { create, updateWithTasks, getAll, deleteTemplate, getPeriodFromCrontab, updateTemplate, };
+const generateTaskFromTemplate = async ({template, startDateISO, startTime}) => {
+  const task = {
+    startTime,
+    notes: template.notes,
+    periodicTaskId: template.id,
+    parentID: "",
+    name: template.name,
+    orderValue: 0,
+    duration: template.duration,
+    isDone: false,
+    imageDownloadURL: "",
+    imageFullPath: "",
+    startDateISO,
+    iconUrl: template.iconUrl,
+    timeZone: template.timeZone,
+    notify: template.notify,
+  }
+  return task
+}
+
+export default { create, updateWithTasks, getAll, deleteTemplate, getPeriodFromCrontab, updateTemplate, generateTaskFromTemplate };

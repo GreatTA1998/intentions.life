@@ -10,23 +10,6 @@ import {
   updateDoc,
 } from "firebase/firestore";
 
-const Schema = {
-  startTime: "",
-  notes: "",
-  reusableTemplateID: "",
-  parentID: "",
-  name: "",
-  orderValue: 0,
-  duration: 30,
-  isDone: false,
-  imageDownloadURL: "",
-  imageFullPath: "",
-  startDateISO: "",
-  iconUrl: "",
-  timeZone: "",
-  notify: "", //string so "0" means notification at 0 minutes instead of false
-};
-
 const getByDateRange = (userUID, startDate, endDate) => {
   try {
     const q = query(
