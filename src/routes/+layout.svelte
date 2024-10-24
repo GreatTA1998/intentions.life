@@ -9,18 +9,15 @@
   import { onDestroy, onMount } from 'svelte'
   import { updateFirestoreDoc } from '/src/helpers/firestoreHelpers.js'
   import posthog from 'posthog-js'
-  const startTime = performance.now();
   let unsubUserSnapListener = null
   let doingAuth = true
-
+  const startTime = performance.now()
+  
   onMount(() => {
-    const onMountTime = performance.now();
-    console.log('onMount time', onMountTime - startTime);
-    doingAuth = true
     // fetching user takes around 300 - 500 ms
     onAuthStateChanged(getAuth(), async (resultUser) => {
       const onAuthStateChangedTime = performance.now();
-      console.log('onAuthStateChanged time', onAuthStateChangedTime - startTime);
+      console.log(' to run a callback on auth took', onAuthStateChangedTime - startTime);
       if (!resultUser) {
         user.set({})
         goto('/')
@@ -70,16 +67,10 @@
           }
         })
       }
-      console.log('we are done with auth !!!!!!!!!!!!!!!!')
       const onAuthDoneTime = performance.now();
-      console.log('onAuth Done time', onAuthDoneTime - startTime);
+      console.log('auth callback took to run', onAuthDoneTime - onAuthStateChangedTime);
       doingAuth = false
     })
-
-    // const Elem = document.getElementById('loading-screen-logo-start')
-    // Elem.addEventListener('animationend', (e) => {
-    //   hasLogoExited.set(true)
-    // })
   })
 
   const trace = (y, x) => {
@@ -119,18 +110,11 @@
   }
 </script>
 
-<!-- // force a reload -->
 <div
   id="loading-screen-logo-start"
   style="z-index: 99999; background: white; width: 100vw; height: 100vh"
   class="center"
-  class:invisible={!trace(
-    'showing loading screen',
-    trace('have a user', $user?.uid) &&
-      // trace('not doing auth', !doingAuth) &&
-      trace('no calendar tasks', !$calendarTasks?.length) &&
-      trace('no todo tasks', !$todoTasks?.length)
-  )}
+  class:invisible={!(doingAuth || ($user?.uid && (!$calendarTasks?.length || !$todoTasks?.length )))}
 >
   <img
     src="/trueoutput-square-nobg.png"
@@ -140,7 +124,7 @@
   />
 </div>
 
-<div class:invisible={false}>
+<div>
   <slot></slot>
 </div>
 
