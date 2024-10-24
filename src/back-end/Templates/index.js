@@ -1,4 +1,4 @@
-import { db } from "../firestoreConnection";
+import { db } from "../firestoreConnection.js";
 import {
   doc,
   getDocs,
@@ -11,23 +11,20 @@ import {
 } from "firebase/firestore";
 import { DateTime } from 'luxon';
 import { getPeriodFromCrontab, deleteFutureTasks, postFutureTasks, getTotalStats } from './utils.js';
+import Joi from 'joi';
+import TemplateSchema from '../Schemas/TemplateSchema.js';
 
-
-const create = async ({ userID, task }) => {
-  const docRef = doc(collection(db, "users", userID, 'periodicTasks'));
-  await setDoc(docRef, task);
-  return docRef.id;
+const create = async ({ userID, template, templateID }) => {
+  Joi.assert(template, TemplateSchema);
+  const docRef = doc(db, "users", userID, 'templates', templateID);
+  return setDoc(docRef, template);
 };
-
-const updateTemplate = async ({ userID, id, updates }) => {
-  await updateDoc(doc(db, "users", userID, 'periodicTasks', id), updates);
-}
 
 const updateWithTasks = async ({ userID, id, updates }) => {
   if (updates.crontab) {
-    await updateDoc(doc(db, "users", userID, 'periodicTasks', id), { crontab: updates.crontab });
+    updateDoc(doc(db, "users", userID, 'templates', id), { crontab: updates.crontab });
     return Promise.all([
-      deleteFutureTasks({ userID, id, fromDate: DateTime.now().toFormat('yyyy-MM-dd') }),
+      deleteFutureTasks({ userID, id, fromDate: DateTime.now().toISO()}),
       updates.crontab === '0 0 0 * *' ? Promise.resolve([]) :
         postFutureTasks({ userID, id, fromDate: DateTime.now().toFormat('yyyy-MM-dd') })
     ]);
@@ -96,4 +93,4 @@ const generateTaskFromTemplate = async ({template, startDateISO, startTime}) => 
   return task
 }
 
-export default { create, updateWithTasks, getAll, deleteTemplate, getPeriodFromCrontab, updateTemplate, generateTaskFromTemplate };
+export default { create, updateWithTasks, getAll, deleteTemplate, getPeriodFromCrontab, generateTaskFromTemplate };

@@ -1,9 +1,9 @@
 <script>
-  import { user, periodicTasks } from '/src/store.js'
+  import { user, templates } from '/src/store.js'
   import ReusableRoundButton from '$lib/ReusableRoundButton.svelte'
   import { DateTime } from 'luxon'
-  import PeriodicTasks from '/src/back-end/PeriodicTasks'
-
+  import Templates from '/src/back-end/Templates'
+  import { getRandomID } from '/src/utils.js'
   export let defaultOrderValue = 1
   export let crontab
   let isPopupOpen = false
@@ -12,7 +12,7 @@
   const setIsPopupOpen = ({ newVal }) => (isPopupOpen = newVal)
 
   async function createTemplate() {
-    const newTask = {
+    const newTemplate = {
       name: newTaskName,
       duration: 5,
       orderValue: defaultOrderValue + Math.random() * 0.5,
@@ -25,9 +25,9 @@
       iconUrl: '',
       tags: ''
     }
-    const id = await PeriodicTasks.create({ userID: $user.uid, task: newTask })
-    newTask.id = id
-    $periodicTasks = [...$periodicTasks, { ...newTask, id, userID: $user.uid }]
+    const templateID = getRandomID();
+    Templates.create({ userID: $user.uid, template: newTemplate, templateID })
+    $templates = [...$templates, { ...newTemplate, id: templateID, userID: $user.uid }]
     newTaskName = ''
     isPopupOpen = false
   }
@@ -36,7 +36,7 @@
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <div style="font-size: 24px; margin-bottom: 12px; cursor: pointer;">
   <span style ="cursor:pointer" on:click={() => setIsPopupOpen({ newVal: true })} >
-    {PeriodicTasks.getPeriodFromCrontab(
+    {Templates.getPeriodFromCrontab(
       crontab
     ).toUpperCase()}</span
   >

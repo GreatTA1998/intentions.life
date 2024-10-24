@@ -1,24 +1,39 @@
 import { writable, readable, get } from 'svelte/store'
-import PeriodicTasks from './back-end/PeriodicTasks'
+import Templates from './back-end/Templates'
 
-export const periodicTasks = writable([])
+export const todoTasks = writable(null)
+export const calendarTasks = writable(null)
+
+// templates
+export const templates = writable([])
 
 export function deleteTemplate({ templateID }) {
   const currentUser = get(user)
-  PeriodicTasks.deleteTemplate({ id: templateID, userID: currentUser.uid })
-  periodicTasks.update((tasks) => tasks.filter((task) => task.id !== templateID))
+  Templates.deleteTemplate({ id: templateID, userID: currentUser.uid })
+  templates.update((templates) => templates.filter((template) => template.id !== templateID))
+  const fullISODate = ({ startDateISO, startTime }) => DateTime.fromISO(`${startDateISO}T${startTime || '00:00'}:00`)
+  const afterNow = (taskISO) => taskISO > DateTime.now().toISO();
+  const tasksToDelete = calendarTasks.get(tasks => tasks.filter(task => task.templateID === templateID && afterNow(fullISODate(task))))
+  tasksToDelete.forEach(deleteFromLocalState);
 }
 
 export function updateTemplate({ templateID, keyValueChanges }) {
   const currentUser = get(user);
-  PeriodicTasks.updateWithTasks({
+  Templates.updateWithTasks({
     userID: currentUser.uid,
     id: templateID,
     updates: keyValueChanges
   })
-  periodicTasks.update((tasks) => tasks.map((task) =>
-    task.id === templateID ? { ...task, ...keyValueChanges } : task
+  templates.update((templates) => templates.map((template) =>
+    template.id === templateID ? { ...template, ...keyValueChanges } : template
   ))
+  const fullISODate = ({ startDateISO, startTime }) => DateTime.fromISO(`${startDateISO}T${startTime || '00:00'}:00`)
+  const afterNow = (taskISO) => taskISO > DateTime.now().toISO();
+  const tasksToDelete = calendarTasks.get(tasks => tasks.filter(task => task.templateID === templateID && afterNow(fullISODate(task))))
+  tasksToDelete.forEach(deleteFromLocalState);
+
+  // update future tasks
+  // create local future tasks
 }
 
 export const user = writable({}) // {} means not logged in, cannot be null
@@ -60,8 +75,5 @@ export const yPosWithinBlock = writable(0)
 
 export const todoMemoryTree = writable(null)
 export const calendarMemoryTree = writable(null)
-
-export const todoTasks = writable(null)
-export const calendarTasks = writable(null)
 
 export const daysToRender = writable([])
