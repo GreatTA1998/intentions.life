@@ -1,4 +1,4 @@
-{#if !$hasLogoExited}
+{#if !$user.uid}
   <div 
     id="loading-screen-logo-start"
     style="opacity: 0; width: 30vw; height: 30vh"
@@ -13,7 +13,7 @@
   </div>
 {/if}
 
-<div class:invisible={!$hasLogoExited}>
+<div class:invisible={!$user.uid}>
   <slot>
 
   </slot>
@@ -135,7 +135,7 @@
 
 <style>
   .invisible {
-    display: none; 
+    visibility: hidden;
   }
   /* From Prabhakar's centering solution that works for iOS unlike StackOverflow
   https://github.com/project-feynman/v3/blob/d864f54d9a69e6cdf0beb7818e8b07a85cebb7eb/src/components/SeeExplanation.vue */
@@ -145,9 +145,11 @@
     left: 50%;
     transform: translate(-50%, -50%)
   }
+  
   .elementToFadeInAndOut {
-    animation: fadeInOut 1s ease-out 1 forwards;
+    animation: fadeInOut 2s ease-out 99 forwards;
   }
+
   @keyframes fadeInOut {
     0% {
       opacity: 0;
