@@ -75,7 +75,7 @@
           }
         })
       }
-      doingAuth = true
+      doingAuth = false
     })
 
     // const Elem = document.getElementById('loading-screen-logo-start')
