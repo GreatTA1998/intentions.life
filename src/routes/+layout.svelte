@@ -121,6 +121,9 @@
   }
 </script>
 
+
+
+<!-- // force a reload -->
   <div
     id="loading-screen-logo-start"
     style="opacity: 0; width: 30vw; height: 30vh"
