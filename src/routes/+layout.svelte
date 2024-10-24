@@ -147,7 +147,7 @@
   }
   
   .elementToFadeInAndOut {
-    animation: fadeInOut 2s ease-out 99 forwards;
+    animation: fadeInOut 1.4s ease-out 99 forwards;
   }
 
   @keyframes fadeInOut {
