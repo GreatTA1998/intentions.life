@@ -2,7 +2,7 @@
   import '/src/app.css'
   import { db } from '../back-end/firestoreConnection'
   import { page } from '$app/stores'
-  import { user, hasLogoExited } from '../store.js'
+  import { user, hasLogoExited, calendarTasks, todoTasks} from '../store.js'
   import { goto } from '$app/navigation'
   import { getAuth, onAuthStateChanged } from 'firebase/auth'
   import { doc, setDoc, onSnapshot } from 'firebase/firestore'
@@ -11,11 +11,12 @@
   import posthog from 'posthog-js'
 
   let unsubUserSnapListener = null
-  let fetchedAuth = true;
+  let doingAuth = false;
+
   onMount(() => {
     // fetching user takes around 300 - 500 ms
     onAuthStateChanged(getAuth(), async (resultUser) => {
-      
+      doingAuth = true
       if (!resultUser) {
         user.set({})
         goto('/')
@@ -61,14 +62,11 @@
             initializeNewFirestoreUser(ref, resultUser)
           } else {
             user.set({ ...snap.data() }) // augment with id, path, etc. when needed in the future
-
-            if (!fetchedAuth) {
               guaranteeBackwardsCompatibility($user)
-              // fetchedAuth = true
-            }
           }
         })
       }
+      doingAuth = false
     })
 
     // const Elem = document.getElementById('loading-screen-logo-start')
@@ -114,7 +112,7 @@
   }
 </script>
 
-{#if !fetchedAuth}
+{#if !doingAuth && !$calendarTasks && !$todoTasks}
   <div
     id="loading-screen-logo-start"
     style="opacity: 0; width: 30vw; height: 30vh"
@@ -129,7 +127,7 @@
   </div>
 {/if}
 
-<div class:invisible={!fetchedAuth}>
+<div class:invisible={doingAuth || !$calendarTasks && !$todoTasks}>
   <slot></slot>
 </div>
 
