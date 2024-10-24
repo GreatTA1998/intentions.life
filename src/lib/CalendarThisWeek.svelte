@@ -1,5 +1,5 @@
  <!-- This component was first planned on Svelte REPL: https://svelte.dev/repl/d42716f1cc2746ce949de01f0117419e?version=4.2.15 -->
-<div id="the-only-scrollable-container">
+<div bind:this={ScrollableContainer} id="the-only-scrollable-container">
   <div class="top-flexbox" class:bottom-border={$tasksScheduledOn}>
     <div class="pinned-div">
       <div style="font-size: 16px; margin-top: var(--main-content-top-margin);">
@@ -77,7 +77,7 @@
   import ReusableCalendarHeader from "$lib/ReusableCalendarHeader.svelte";
   import ReusableCalendarColumn from "$lib/ReusableCalendarColumn.svelte";
   import { MIKA_PIXELS_PER_HOUR } from "/src/helpers/everythingElse.js";
-  import { onMount, afterUpdate } from "svelte";
+  import { onMount, afterUpdate, tick } from "svelte";
   import { user, tasksScheduledOn, hasInitialScrolled } from "/src/store.js";
   import { getFirestoreCollection } from "/src/helpers/firestoreHelpers.js";
   import { lazyCallable } from "/src/helpers/actions.js";
@@ -90,6 +90,7 @@
 
   export let calStartDateClassObj;
 
+  let ScrollableContainer
   let doodleIcons = null;
   // NOTE: timesOfDay should start from 00:00, so dateClassObjects also need to start from 00:00 military time
   let timesOfDay = [];
@@ -98,17 +99,6 @@
   const timestampDivTopMargin = 24;
   let isShowingDockingArea = true;
   
-  let newScrollLeft = 0
-  let ScrollingParent
-  let hasFetchedNewPastTasks = false
-
-  afterUpdate(() => {
-    if (ScrollingParent && hasFetchedNewPastTasks) {
-      // ScrollingParent.scrollLeft = newScrollLeft
-      // hasFetchedNewPastTasks = false
-    }
-  })
-
   onMount(async () => {
     const today = DateTime.now()
     daysToRender.set(
@@ -123,30 +113,15 @@
   })
 
   function handleIntersect (ISODate) {
-    console.log("handleIntersect")
     // the initial intersection doesn't count
     // the real intersection is when the app loads and autoscrolls to today's position
     // then the user scrolls backwards to the past
     if ($hasInitialScrolled) {
-      console.log('$hasInitialScrolled =', $hasInitialScrolled)
-      console.log('fetchPastTasks()')
-      // fetchPastTasks(ISODate)
+      fetchPastTasks(ISODate)
       return true // this boolean causes the observer to destroy itself after the callback
     } 
     else {
       return false // this won't destroy the observer
-    }
-  }
-
-  function saveScrollPosition () {
-    ScrollingParent = document.getElementById('the-only-scrollable-container')
-    if (ScrollingParent) {
-      const dayColumnWidth = 200
-      const correctionAmount = dayColumnWidth * (size + cushion)  
- 
-      const oldScrollLeft = ScrollingParent.scrollLeft
-      newScrollLeft = correctionAmount + oldScrollLeft
-      hasFetchedNewPastTasks = true
     }
   }
 
@@ -161,18 +136,25 @@
       left.toISODate(), // '2024-07-31',
       right.toISODate()
     )
-
-    hasFetchedNewPastTasks = true
-
-    saveScrollPosition()
+    
+    // check scroll position AFTER data fetch, but before the update,
+    // as that's the most recent location of the scroll location (the user could have scrolled a lot during the data fetch)
+    const oldScrollLeft = ScrollableContainer.scrollLeft
 
     daysToRender.set(
       [...buildDates({ start: left, totalDays: size + cushion }), ...$daysToRender]
     )
-
     buildCalendarDataStructures({
       flatArray: [...newWeekTasksArray, ...$calendarTasks]
     })
+
+    await tick()
+
+    ScrollableContainer.scrollLeft = getShiftDueToNewColumns({ dayColumnWidth: 200 }) + oldScrollLeft
+  }
+
+  function getShiftDueToNewColumns ({ dayColumnWidth }) {
+    return (size + cushion) * dayColumnWidth
   }
 
   async function fetchNewWeekOfFutureTasks(intersectedDate) {

@@ -23,14 +23,13 @@
   let currentTimeString
 
   // this reacts to the Home icon click which resets us back to today's position
-  $: if (CurrentTimeIndicator && !$hasInitialScrolled) {
+  $: if (!$hasInitialScrolled) {
     requestAnimationFrame(() => {
       scrollToTimeIndicator()
     })
   }
 
   onMount(() => {
-
     updateTimeIndicator() 
     intervalID = setInterval(updateTimeIndicator, 1000)
   })
@@ -41,7 +40,9 @@
 
   function scrollToTimeIndicator () {
     CurrentTimeIndicator.scrollIntoView({ behavior: 'instant', block: 'center', inline: 'center' })
-    hasInitialScrolled.set(true)
+    requestAnimationFrame(() => {
+      hasInitialScrolled.set(true)
+    })
   }
 
   function updateTimeIndicator () {
