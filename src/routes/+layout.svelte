@@ -2,24 +2,27 @@
   import '/src/app.css'
   import { db } from '../back-end/firestoreConnection'
   import { page } from '$app/stores'
-  import { user, hasLogoExited, calendarTasks, todoTasks} from '../store.js'
+  import { user, hasLogoExited, calendarTasks, todoTasks } from '../store.js'
   import { goto } from '$app/navigation'
   import { getAuth, onAuthStateChanged } from 'firebase/auth'
   import { doc, setDoc, onSnapshot } from 'firebase/firestore'
   import { onDestroy, onMount } from 'svelte'
   import { updateFirestoreDoc } from '/src/helpers/firestoreHelpers.js'
   import posthog from 'posthog-js'
-
+  const startTime = performance.now();
   let unsubUserSnapListener = null
-  let doingAuth = false;
+  let doingAuth = true
 
   onMount(() => {
+    const onMountTime = performance.now();
+    console.log('onMount time', onMountTime - startTime);
+    doingAuth = true
     // fetching user takes around 300 - 500 ms
     onAuthStateChanged(getAuth(), async (resultUser) => {
-      doingAuth = true
+      const onAuthStateChangedTime = performance.now();
+      console.log('onAuthStateChanged time', onAuthStateChangedTime - startTime);
       if (!resultUser) {
         user.set({})
-        doingAuth = true
         goto('/')
 
         // see how new visitors interacts with home page demos
@@ -35,8 +38,6 @@
         if (urlParts.length === 3 || urlParts[2] === 'mobile') {
           if (!isMobile()) {
             if (confirm('This is mobile mode. Use desktop mode instead?')) {
-              doingAuth = true
-
               goto('/' + resultUser.uid)
             }
           }
@@ -45,13 +46,9 @@
         else {
           if (isMobile()) {
             if (confirm('This is desktop mode. Use mobile mode instead?')) {
-              doingAuth = true
-
               goto('/' + resultUser.uid + '/mobile')
             }
           } else {
-            doingAuth = true
-
             goto('/' + resultUser.uid)
           }
         }
@@ -69,12 +66,13 @@
             initializeNewFirestoreUser(ref, resultUser)
           } else {
             user.set({ ...snap.data() }) // augment with id, path, etc. when needed in the future
-              guaranteeBackwardsCompatibility($user)
-              doingAuth = false
-
+            guaranteeBackwardsCompatibility($user)
           }
         })
       }
+      console.log('we are done with auth !!!!!!!!!!!!!!!!')
+      const onAuthDoneTime = performance.now();
+      console.log('onAuth Done time', onAuthDoneTime - startTime);
       doingAuth = false
     })
 
@@ -85,7 +83,7 @@
   })
 
   const trace = (y, x) => {
-    console.log(y, x);
+    console.log(y, x)
     return x
   }
   // should be unnecessary because +layout getting destroyed means the App is closed
@@ -121,22 +119,26 @@
   }
 </script>
 
-
-
 <!-- // force a reload -->
-  <div
-    id="loading-screen-logo-start"
-    style="z-index: 99999; background: white; width: 100vw; height: 100vh"
-    class="center"
-    class:invisible={!trace('loading screen', trace('not doing auth', !doingAuth) && trace('no calendar tasks', !$calendarTasks?.length) && trace('no todo tasks', !$todoTasks?.length))}
-  >
-    <img
-      src="/trueoutput-square-nobg.png"
-      class="app-loading-logo elementToFadeInAndOut center"
-      alt="logo"
-      style="width: 48px; height: 48px;"
-    />
-  </div>
+<div
+  id="loading-screen-logo-start"
+  style="z-index: 99999; background: white; width: 100vw; height: 100vh"
+  class="center"
+  class:invisible={!trace(
+    'showing loading screen',
+    trace('have a user', $user?.uid) &&
+      // trace('not doing auth', !doingAuth) &&
+      trace('no calendar tasks', !$calendarTasks?.length) &&
+      trace('no todo tasks', !$todoTasks?.length)
+  )}
+>
+  <img
+    src="/trueoutput-square-nobg.png"
+    class="app-loading-logo elementToFadeInAndOut center"
+    alt="logo"
+    style="width: 48px; height: 48px;"
+  />
+</div>
 
 <div class:invisible={false}>
   <slot></slot>

@@ -33,7 +33,6 @@
   } from '/src/helpers/crud.js'
   import { findTaskByID } from '/src/helpers/utils.js'
   import { dev } from '$app/environment'
-
   let currentMode = 'Week'
   const userDocPath = `users/${$user.uid}`
 
@@ -53,6 +52,7 @@
   }
 
   onMount(async () => {
+    console.log('onMount MainPage!!!!!!!!!!!!!!')
     if (!dev) {
       console.log('running handleNotificationPermission')
       try {
