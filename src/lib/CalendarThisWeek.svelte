@@ -24,7 +24,7 @@
     <div class="sticky-y-div flexbox">
       {#each $daysToRender as ISODate, i (ISODate)}
         {#if i === cushion}
-          <div use:lazyCallable={() => handleIntersect(ISODate)}></div>
+          <div use:lazyCallable={() => handleIntersect(ISODate)} style="border: 40px solid blue;"></div>
         {:else if i === $daysToRender.length - 1 - cushion}
           <div use:lazyCallable={() => fetchNewWeekOfFutureTasks(ISODate)}></div>
         {/if}
@@ -104,8 +104,8 @@
 
   afterUpdate(() => {
     if (ScrollingParent && hasFetchedNewPastTasks) {
-      ScrollingParent.scrollLeft = newScrollLeft
-      hasFetchedNewPastTasks = false
+      // ScrollingParent.scrollLeft = newScrollLeft
+      // hasFetchedNewPastTasks = false
     }
   })
 
@@ -123,11 +123,14 @@
   })
 
   function handleIntersect (ISODate) {
+    console.log("handleIntersect")
     // the initial intersection doesn't count
     // the real intersection is when the app loads and autoscrolls to today's position
     // then the user scrolls backwards to the past
     if ($hasInitialScrolled) {
-      fetchPastTasks(ISODate)
+      console.log('$hasInitialScrolled =', $hasInitialScrolled)
+      console.log('fetchPastTasks()')
+      // fetchPastTasks(ISODate)
       return true // this boolean causes the observer to destroy itself after the callback
     } 
     else {
@@ -201,22 +204,19 @@
     isShowingDockingArea = !isShowingDockingArea;
   }
 
-  function getTimesOfDay() {
+  function getTimesOfDay () {
+    const temp = []
     let currentHour = 0; // today.getHours() // get the integer i.e. 0 to 23
     // now generate 16 hours of time (so it covers, for example, 8 am - midnight)
     for (let i = 0; i < numOfHourBlocksDisplayed; i++) {
       if (currentHour === 24) {
-        currentHour = 0;
+        currentHour = 0
       }
-      if (currentHour < 10) {
-        timesOfDay.push("0" + currentHour + ":00");
-      } else {
-        timesOfDay.push(currentHour + ":00");
-      }
-
-      currentHour += 1;
+      if (currentHour < 10) temp.push("0" + currentHour + ":00")
+      else temp.push(currentHour + ":00")
+      currentHour += 1
     }
-    timesOfDay = timesOfDay;
+    timesOfDay = temp
   }
 </script>
 

@@ -24,12 +24,14 @@
 
   // this reacts to the Home icon click which resets us back to today's position
   $: if (CurrentTimeIndicator && !$hasInitialScrolled) {
+    console.log('$ sign scroll')
     scrollToTimeIndicator()
   }
 
   onMount(() => {
     if (CurrentTimeIndicator) {
-      scrollToTimeIndicator()
+      // console.log('onMount scroll')
+      // scrollToTimeIndicator()
     }
 
     updateTimeIndicator() 
@@ -43,12 +45,20 @@
   function scrollToTimeIndicator () {
     // I still don't understand why a `setTimeout` is needed even in situations where 
     // both the calendar and indicator are fully rendered, but it just doesn't work without it
-    setTimeout(() => {
+
+    requestAnimationFrame(() => {
       if (CurrentTimeIndicator && !$hasInitialScrolled) { 
         CurrentTimeIndicator.scrollIntoView({ behavior: 'instant', block: 'center', inline: 'center' })
         hasInitialScrolled.set(true)
       }
-    }, 0) 
+    })
+
+    // setTimeout(() => {
+    //   if (CurrentTimeIndicator && !$hasInitialScrolled) { 
+    //     CurrentTimeIndicator.scrollIntoView({ behavior: 'instant', block: 'center', inline: 'center' })
+    //     hasInitialScrolled.set(true)
+    //   }
+    // }, 0) 
   }
 
   function updateTimeIndicator () {
