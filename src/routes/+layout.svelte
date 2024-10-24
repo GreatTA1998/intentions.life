@@ -19,6 +19,7 @@
       doingAuth = true
       if (!resultUser) {
         user.set({})
+        doingAuth = true
         goto('/')
 
         // see how new visitors interacts with home page demos
@@ -34,6 +35,8 @@
         if (urlParts.length === 3 || urlParts[2] === 'mobile') {
           if (!isMobile()) {
             if (confirm('This is mobile mode. Use desktop mode instead?')) {
+              doingAuth = true
+
               goto('/' + resultUser.uid)
             }
           }
@@ -42,9 +45,13 @@
         else {
           if (isMobile()) {
             if (confirm('This is desktop mode. Use mobile mode instead?')) {
+              doingAuth = true
+
               goto('/' + resultUser.uid + '/mobile')
             }
           } else {
+            doingAuth = true
+
             goto('/' + resultUser.uid)
           }
         }
@@ -63,10 +70,12 @@
           } else {
             user.set({ ...snap.data() }) // augment with id, path, etc. when needed in the future
               guaranteeBackwardsCompatibility($user)
+              doingAuth = false
+
           }
         })
       }
-      doingAuth = false
+      doingAuth = true
     })
 
     // const Elem = document.getElementById('loading-screen-logo-start')
@@ -75,8 +84,8 @@
     // })
   })
 
-  const trace = (x) => {
-    console.log(x);
+  const trace = (y, x) => {
+    console.log(y, x);
     return x
   }
   // should be unnecessary because +layout getting destroyed means the App is closed
@@ -112,7 +121,7 @@
   }
 </script>
 
-{#if !doingAuth && !$calendarTasks && !$todoTasks}
+{#if trace('loading screen', trace('not doing auth', !doingAuth) && trace('no calendar tasks', !$calendarTasks) && trace('no todo tasks', !$todoTasks))}
   <div
     id="loading-screen-logo-start"
     style="opacity: 0; width: 30vw; height: 30vh"
@@ -127,7 +136,7 @@
   </div>
 {/if}
 
-<div class:invisible={doingAuth || !$calendarTasks && !$todoTasks}>
+<div class:invisible={!trace('should be visible', trace('doing auth', doingAuth) || (trace('calendar tasks', $calendarTasks) && trace('todo tasks', $todoTasks)))}>
   <slot></slot>
 </div>
 
