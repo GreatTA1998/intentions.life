@@ -121,11 +121,11 @@
   }
 </script>
 
-{#if trace('loading screen', trace('not doing auth', !doingAuth) && trace('no calendar tasks', !$calendarTasks) && trace('no todo tasks', !$todoTasks))}
   <div
     id="loading-screen-logo-start"
     style="opacity: 0; width: 30vw; height: 30vh"
     class="elementToFadeInAndOut center"
+    class:invisible={trace('loading screen', trace('not doing auth', !doingAuth) && trace('no calendar tasks', !$calendarTasks?.length) && trace('no todo tasks', !$todoTasks?.length))}
   >
     <img
       src="/trueoutput-square-nobg.png"
@@ -134,9 +134,8 @@
       style="width: 48px; height: 48px;"
     />
   </div>
-{/if}
 
-<div class:invisible={!trace('should be visible', trace('doing auth', doingAuth) || (trace('calendar tasks', $calendarTasks) && trace('todo tasks', $todoTasks)))}>
+<div class:invisible={!trace('should be visible', trace('doing auth', doingAuth) || (trace('calendar tasks', $calendarTasks?.length) && trace('todo tasks', $todoTasks?.length)))}>
   <slot></slot>
 </div>
 
